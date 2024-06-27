@@ -4,7 +4,7 @@ float linearizeDepth(float depth) {
 }
 
 bool floatCompare(float a, float b){
-    return abs(a - b) < 0.0001;
+    return abs(a - b) < 0.001;
 }
 
 vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
