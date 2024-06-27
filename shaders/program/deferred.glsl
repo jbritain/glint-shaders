@@ -36,7 +36,7 @@
     #include "/lib/screenPassUtil.glsl"
 
     if(floatCompare(depth, 1.0)){ // is sky
-      color.rgb = gammaCorrect(getSky(normalize(eyePlayerPos))); // replace with own sky
+      color.rgb = getSky(normalize(eyePlayerPos)); // replace with own sky
     }
   }
 #endif

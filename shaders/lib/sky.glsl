@@ -1,7 +1,7 @@
 // https://www.shadertoy.com/view/sssXWH
 
 float SKY_HEIGHT = 0.2;
-vec3  SUN_COLOR = vec3(1,1.0,1.0);
+vec3  SUN_COLOR = vec3(1.0,1.0,1.0) * 4;
 vec3  SKY_SCATTERING = vec3(0.1, 0.3, 0.7);
 float SUN_ANGULAR_DIAMETER = 0.08;
 #define SUN_VECTOR normalize(mat3(gbufferModelViewInverse) * sunPosition)
@@ -29,7 +29,7 @@ vec3 transmittance(vec3 dir)
 }
 
 vec3 getSky(vec3 dir){
-  return mix(
+    return mix(
         getSun(SUN_VECTOR) * transmittance(SUN_VECTOR), 
         getSun(dir),
         transmittance(dir)
