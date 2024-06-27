@@ -15,9 +15,27 @@ vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
 vec3 encodeNormal(vec3 normal){
   return normal * 0.5 + 0.5;
 }
+
 vec3 decodeNormal(vec3 encodedNormal){
   return (encodedNormal - 0.5) * 2.0;
 }
 #define PI 3.1415926535
+
+// Creates a TBN matrix from a normal and a tangent
+mat3 tbnNormalTangent(vec3 normal, vec3 tangent) {
+    // For DirectX normal mapping you want to switch the order of these 
+    vec3 bitangent = cross(tangent, normal);
+    return mat3(tangent, bitangent, normal);
+}
+
+// Creates a TBN matrix from just a normal
+// The tangent version is needed for normal mapping because
+//   of face rotation
+mat3 tbnNormal(vec3 normal) {
+    // This could be
+    // normalize(vec3(normal.y - normal.z, -normal.x, normal.x))
+    vec3 tangent = normalize(cross(normal, vec3(0, 1, 1)));
+    return tbnNormalTangent(normal, tangent);
+}
 
 #define clamp01(x) clamp(x, 0.0, 1.0)

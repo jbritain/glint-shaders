@@ -2,11 +2,13 @@
 
 #ifdef vsh
   attribute vec2 mc_Entity;
+  attribute vec3 at_tangent;
 
   out vec2 lmcoord;
   out vec2 texcoord;
   out vec4 glcolor;
   out vec3 normal;
+  out vec3 tangent;
   out float materialID;
 
   void main() {
@@ -16,12 +18,14 @@
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
     normal = gl_NormalMatrix * gl_Normal;
+    tangent = gl_NormalMatrix * at_tangent;
   }
 #endif
 //------------------------------------------------------------------
 #ifdef fsh
   uniform sampler2D lightmap;
   uniform sampler2D gtexture;
+  uniform sampler2D normals;
 
   uniform float far;
   uniform float near;
@@ -31,6 +35,7 @@
   in vec4 glcolor;
   in float materialID;
   in vec3 normal;
+  in vec3 tangent;
 
   #include "/lib/tonemap.glsl"
   #include "/lib/util.glsl"
@@ -44,9 +49,17 @@
     
 
     color = texture(gtexture, texcoord) * glcolor;
-    color *= texture(lightmap, lmcoord);
 
     bool isWater = floatCompare(materialID, 1.0);
+
+    vec3 normal = normal;
+
+    vec3 mappedNormal = texture(normals, texcoord).rgb;
+    mappedNormal = mappedNormal * 2.0 - 1.0;
+    mappedNormal.z = sqrt(1.0 - dot(mappedNormal.xy, mappedNormal.xy)); // reconstruct z due to labPBR encoding
+    
+    mat3 tbnMatrix = tbnNormalTangent(normal, tangent);
+    normal = tbnMatrix * mappedNormal;
 
     outNormal.rgb = encodeNormal(normal);
 
@@ -62,5 +75,6 @@
     }
     color.rgb = gammaCorrect(color.rgb);
     outLightmap = vec4(lmcoord, 0.0, 1.0);
+    
   }
 #endif
