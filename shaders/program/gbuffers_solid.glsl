@@ -43,7 +43,7 @@
     }
     color.rgb = gammaCorrect(color.rgb);
 
-    outNormal = vec4(encodeNormal(normal), 1.0);
+    outNormal.rgb = encodeNormal(normal);
 
     outLightmap = vec4(lmcoord, 0.0, 1.0);
   }

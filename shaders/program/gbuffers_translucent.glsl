@@ -27,6 +27,7 @@
   layout(location = 0) out vec4 color;
 
   void main() {
+    discard;
     color = texture(gtexture, texcoord) * glcolor;
     color *= texture(lightmap, lmcoord);
     if (color.a < 0.1) {

@@ -13,11 +13,11 @@ vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
 }
 
 vec3 encodeNormal(vec3 normal){
-    return normal * 0.5 + 0.5;
+  return normal * 0.5 + 0.5;
 }
-
 vec3 decodeNormal(vec3 encodedNormal){
-    return normalize((encodedNormal * 2.0) - 1.0);
+  return (encodedNormal - 0.5) * 2.0;
 }
-
 #define PI 3.1415926535
+
+#define clamp01(x) clamp(x, 0.0, 1.0)
