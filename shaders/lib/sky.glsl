@@ -1,7 +1,7 @@
 // https://www.shadertoy.com/view/sssXWH
 
 float SKY_HEIGHT = 0.2;
-vec3  SUN_COLOR = vec3(1.0,1.0,1.0) * 4;
+vec3  SUN_COLOR = vec3(1.0,0.9,0.7) * 8;
 vec3  SKY_SCATTERING = vec3(0.1, 0.3, 0.7);
 float SUN_ANGULAR_DIAMETER = 0.08;
 #define SUN_VECTOR normalize(mat3(gbufferModelViewInverse) * sunPosition)

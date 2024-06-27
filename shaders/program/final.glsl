@@ -12,7 +12,7 @@
 //------------------------------------------------------------------
 #ifdef fsh
   #define DEBUG_ENABLE
-  #define DEBUG_TEX colortex1
+  #define DEBUG_TEX shadowtex0
 
   #ifdef DEBUG_ENABLE
   uniform sampler2D DEBUG_TEX;

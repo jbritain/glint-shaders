@@ -5,9 +5,13 @@
   out vec2 texcoord;
   out vec4 glcolor;
   out vec3 normal;
+  out float materialID;
+
+  attribute vec2 mc_Entity;
 
   void main() {
     gl_Position = ftransform();
+    materialID = mc_Entity.x;
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
@@ -26,6 +30,7 @@
   in vec2 texcoord;
   in vec4 glcolor;
   in vec3 normal;
+  in float materialID;
 
   #include "/lib/util.glsl"
   #include "/lib/tonemap.glsl"
