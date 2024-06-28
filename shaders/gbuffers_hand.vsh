@@ -1,4 +1,4 @@
-#version 330 compatibility
+#version 450 compatibility
 
 out vec2 lmcoord;
 out vec2 texcoord;

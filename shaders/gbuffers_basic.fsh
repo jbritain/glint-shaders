@@ -1,4 +1,4 @@
-#version 330 compatibility
+#version 450 compatibility
 
 uniform sampler2D lightmap;
 

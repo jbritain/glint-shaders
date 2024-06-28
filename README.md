@@ -1,19 +1,15 @@
 # Passes
 
+Diffuse lighting is done in gbuffers
+
 ## Deferred
 ### `deferred`
 Sky
-### `deferred1`
-Opaques diffuse lighting
 
 ## Composites
-### `composite`
-Translucents diffuse lighting
 
 ## `final`
 Tonemap
-
-Buffers are reused between opaques and translucents (i.e texture for normals)
 
 # Buffers
 ## `colortex0`

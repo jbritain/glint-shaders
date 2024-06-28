@@ -44,26 +44,7 @@
 
     #include "/lib/screenPassUtil.glsl"
 
-    if(!floatCompare(depth, 1.0)){
-      vec3 normal = decodeNormal(texture(colortex1, texcoord).rgb);
-      vec3 playerNormal = normalize(mat3(gbufferModelViewInverse) * normal);
-
-      vec2 lightmap = texture(colortex2, texcoord).rg;
-
-      float lightmapSky = lightmap.g;
-      float lightmapBlock = lightmap.r;
-
-      vec3 skyLight = getSky(vec3(0, 1, 0)) * SKYLIGHT_STRENGTH * lightmapSky;
-      vec3 artificial = TORCH_COLOR * lightmapBlock;
-
-      vec3 sunlightColor = getSky(SUN_VECTOR);
-
-      float nDotL = clamp01(dot(normal, normalize(sunPosition)));
-      vec3 direct = nDotL * getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, sunlightColor, normal);
-
-      color.rgb *= (skyLight + direct + artificial + vec3(AMBIENT_STRENGTH));
-      //color.rgb = vec3(clamp01(nDotL));
-    }
+    
     
   }
 #endif
