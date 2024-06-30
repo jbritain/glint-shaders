@@ -32,6 +32,7 @@
   in vec2 texcoord;
 
   #include "/lib/util.glsl"
+  #include "/lib/tonemap.glsl"
   #include "/lib/sky.glsl"
   #include "/lib/getSunlight.glsl"
 

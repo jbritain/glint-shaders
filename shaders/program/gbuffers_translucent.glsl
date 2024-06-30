@@ -98,8 +98,8 @@
     color.rgb = gammaCorrect(color.rgb);
     outLightmap = vec4(lmcoord, 0.0, 1.0);
 
-    vec3 sunlightColor = getSky(SUN_VECTOR);
-    vec3 skyLightColor = getSky(vec3(0, 1, 0));
+    vec3 sunlightColor = getSky(SUN_VECTOR, true);
+    vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
 
     vec3 playerNormal = normalize(mat3(gbufferModelViewInverse) * normal);
 
@@ -113,9 +113,9 @@
 
     float nDotL = clamp01(dot(normal, normalize(sunPosition)));
     nDotL *= step(0.01, dot(geometryNormal, normalize(sunPosition)));
-    vec3 direct = nDotL * getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, sunlightColor, normal);
+    vec3 sunlight = nDotL * getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, sunlightColor, normal);
 
-    color.rgb *= (skyLight + direct + artificial + AMBIENT_STRENGTH * skyLightColor);
+    color.rgb *= (skyLight + sunlight * SUNLIGHT_STRENGTH + artificial + AMBIENT_STRENGTH * skyLightColor);
 
     
   }

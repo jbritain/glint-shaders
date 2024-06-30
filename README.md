@@ -8,8 +8,12 @@ Sky
 
 ## Composites
 
+### 92+
+Bloom Blur
+
 ## `final`
-Tonemap
+- Bloom
+- Tonemap
 
 # Buffers
 ## `colortex0`
@@ -35,3 +39,6 @@ Translucents PBR
 
 ## `colortex7`
 Translucents
+
+## `colortex8`
+Bloom data

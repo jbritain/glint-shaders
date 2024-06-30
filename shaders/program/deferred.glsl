@@ -22,8 +22,8 @@
   in vec2 texcoord;
 
   #include "/lib/util.glsl"
-  #include "/lib/sky.glsl"
   #include "/lib/tonemap.glsl"
+  #include "/lib/sky.glsl"
 
   /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
@@ -36,7 +36,9 @@
     #include "/lib/screenPassUtil.glsl"
 
     if(floatCompare(depth, 1.0)){ // is sky
-      color.rgb = getSky(normalize(eyePlayerPos)); // replace with own sky
+      color.rgb = getSky(normalize(eyePlayerPos), true); // replace with own sky
+    } else {
+      // color.rgb = getAtmosphere(color.rgb, eyePlayerPos);
     }
   }
 #endif

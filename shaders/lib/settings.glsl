@@ -10,6 +10,11 @@ const bool shadowHardwareFiltering = true;
 
 #define SKYLIGHT_STRENGTH 0.5
 #define AMBIENT_STRENGTH 0.3
+#define SUNLIGHT_STRENGTH 0.2
+
+#define BLOOM
+#define BLOOM_AMOUNT 0.2 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define BLOOM_BLUR 1.0 // [1.0 1.5 2.0 2.5 3.0 3.5 4.0]
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 

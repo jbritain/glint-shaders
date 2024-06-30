@@ -29,6 +29,7 @@
 
 
   #include "/lib/util.glsl"
+  #include "/lib/tonemap.glsl"
   #include "/lib/sky.glsl"
   #include "/lib/getSunlight.glsl"
   

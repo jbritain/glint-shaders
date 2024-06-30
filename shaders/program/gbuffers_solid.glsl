@@ -30,6 +30,7 @@
   uniform sampler2D lightmap;
   uniform sampler2D gtexture;
   uniform sampler2D normals;
+  uniform sampler2D specular;
   uniform float near;
   uniform float far;
   uniform mat4 gbufferModelViewInverse;
@@ -81,11 +82,14 @@
     normal = tbnMatrix * mappedNormal;
     #endif
 
+    float emission = texture(specular, texcoord).a;
+    if(emission == 1.0) emission = 0.0;
+
     float lightmapSky = lmcoord.g;
     float lightmapBlock = lmcoord.r;
 
-    vec3 sunlightColor = getSky(SUN_VECTOR);
-    vec3 skyLightColor = getSky(vec3(0, 1, 0));
+    vec3 sunlightColor = getSky(SUN_VECTOR, true);
+    vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
 
     vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * lightmapSky;
     vec3 artificial = TORCH_COLOR * lightmapBlock;
@@ -94,9 +98,9 @@
 
     float nDotL = clamp01(dot(normal, normalize(sunPosition)));
     nDotL *= step(0.01, dot(geometryNormal, normalize(sunPosition)));
-    vec3 direct = nDotL * getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, sunlightColor, normal);
+    vec3 sunlight = nDotL * getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, sunlightColor, normal);
 
-    color.rgb *= (skyLight + direct + artificial + skyLightColor * AMBIENT_STRENGTH);
+    color.rgb *= (skyLight + sunlight * SUNLIGHT_STRENGTH + artificial + skyLightColor * AMBIENT_STRENGTH + vec3(emission * 16));
 
     
     
