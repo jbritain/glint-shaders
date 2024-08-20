@@ -14,7 +14,7 @@
   varying vec4 glcolor;
 
   #include "/lib/util.glsl"
-  #include "/lib/shadowBias.glsl"
+  #include "/lib/lighting/shadowBias.glsl"
 
   void main(){
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;

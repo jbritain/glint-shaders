@@ -1,16 +1,17 @@
 /*
 
-const int colortex0Format = RGB32F;
-const int colortex1Format = RGB16; // normal (encoded)
+const int colortex0Format = RGB32F;   || scene colour
+const int colortex1Format = RGBA16F;  || albedo, face normal, lightmap
+const int colortex2Format = RGBA16F;  || mapped normal, specular map data
 
 */
 
 const bool shadowHardwareFiltering = true;
 
 
-#define SKYLIGHT_STRENGTH 0.5
-#define AMBIENT_STRENGTH 0.3
-#define SUNLIGHT_STRENGTH 0.2
+#define SKYLIGHT_STRENGTH 0.3
+#define AMBIENT_STRENGTH 0.0
+#define SUNLIGHT_STRENGTH 0.1
 
 #define BLOOM
 #define BLOOM_AMOUNT 0.2 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]

@@ -30,11 +30,9 @@ mat3 tbnNormalTangent(vec3 normal, vec3 tangent) {
 
 // Creates a TBN matrix from just a normal
 // The tangent version is needed for normal mapping because
-//   of face rotation
+// of face rotation
 mat3 tbnNormal(vec3 normal) {
-    // This could be
-    // normalize(vec3(normal.y - normal.z, -normal.x, normal.x))
-    vec3 tangent = normalize(cross(normal, vec3(0, 1, 1)));
+    vec3 tangent = normalize(cross(normal, normalize(vec3(0, 1, 1))));
     return tbnNormalTangent(normal, tangent);
 }
 

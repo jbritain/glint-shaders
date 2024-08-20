@@ -23,7 +23,7 @@
 
   in vec2 texcoord;
 
-  #include "/lib/tonemap.glsl"
+  #include "/lib/postProcessing/tonemap.glsl"
 
   /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;

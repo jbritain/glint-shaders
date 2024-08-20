@@ -50,9 +50,9 @@
   in vec3 viewPos;
 
   #include "/lib/util.glsl"
-  #include "/lib/tonemap.glsl"
-  #include "/lib/sky.glsl"
-  #include "/lib/getSunlight.glsl"
+  #include "/lib/postProcessing/tonemap.glsl"
+  #include "/lib/atmosphere/sky.glsl"
+  #include "/lib/lighting/getSunlight.glsl"
 
   
 
@@ -85,14 +85,7 @@
     float emission = texture(specular, texcoord).a;
     if(emission == 1.0) emission = 0.0;
 
-    float lightmapSky = lmcoord.g;
-    float lightmapBlock = lmcoord.r;
 
-    vec3 sunlightColor = getSky(SUN_VECTOR, true);
-    vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
-
-    vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * lightmapSky;
-    vec3 artificial = TORCH_COLOR * lightmapBlock;
 
     
 

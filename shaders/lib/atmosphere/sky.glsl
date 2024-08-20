@@ -32,7 +32,9 @@ mat3 rotateZ(float theta) {
 }
 
 float normdist (float x, float mean, float dev) {
-    return (1.0 / (dev * sqrt(2.0 * PI))) * exp(-0.5 * pow((x - mean) / dev, 2.0));
+    float nd = (1.0 / (dev * sqrt(2.0 * PI))) * exp(-0.5 * pow((x - mean) / dev, 2.0));
+    if(isnan(nd)) nd = 0.0;
+    return nd;
 }
 
 //From Jessie
@@ -201,6 +203,7 @@ vec3 march (vec3 ro, vec3 rd, vec3 lrd, float intens, vec3 col, vec3 pos) {
     float miephase = mphase2(mu);
     
     vec3 scattero = vec3(PreethamBetaO_Fit(680.0), PreethamBetaO_Fit(550.0), PreethamBetaO_Fit(440.0)) * 2.5035422e25 * exp(-25e3 / 8e3) * 134.628 / 48.0 * 3e-6 * ozone;
+    
     #ifndef CUSTOMRAYLEIGH
     vec3 scatterr = vec3(BetaR(680.0), BetaR(550.0), BetaR(440.0));
     #endif
@@ -222,7 +225,7 @@ vec3 march (vec3 ro, vec3 rd, vec3 lrd, float intens, vec3 col, vec3 pos) {
         vec3 scatter = trans * (steptrans - 1.0) / -stepod;
 
         scattering += (scatterr * mass.x * rayphase + scatterm * mass.y * miephase) * scatter * lighttrans(p, lrd);
-        trans *= steptrans;
+        
     }
     if (any(isnan(scattering))) return vec3(0.0);
 

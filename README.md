@@ -1,44 +1,15 @@
-# Passes
-
-Diffuse lighting is done in gbuffers
-
-## Deferred
-### `deferred`
-Sky
-
-## Composites
-
-### 92+
-Bloom Blur
-
-## `final`
-- Bloom
-- Tonemap
+Translucents are fully forward rendered in gbuffers.
+Opaques are diffuse shaded in `deferred`.
+Specular is only applied to the front layer (i.e not opaques behind translucents)
 
 # Buffers
-## `colortex0`
-Main frame buffer
 
-## `colortex1`
-Opaques normal
+`colortex0` scene colour
+`colortex1` gbuffer data - albedo, face normal, lightmap
+`colortex2` gbuffer data - mapped normal, specular map data
 
-## `colortex2`
-Opaques lightmap
+# Passes
+`deferred` diffuse shading, sky
 
-## `colortex3`
-Opaques PBR
+`composite` specular lighting
 
-## `colortex4`
-Translucents normal (alpha is 1.0 if block is water, otherwise 0.5)
-
-## `colortex5`
-Translucents lightmap
-
-## `colortex6`
-Translucents PBR
-
-## `colortex7`
-Translucents
-
-## `colortex8`
-Bloom data

@@ -55,10 +55,10 @@
   in vec3 tangent;
   in vec3 viewPos;
 
-  #include "/lib/tonemap.glsl"
+  #include "/lib/postProcessing/tonemap.glsl"
   #include "/lib/util.glsl"
-  #include "/lib/sky.glsl"
-  #include "/lib/getSunlight.glsl"
+  #include "/lib/atmosphere/sky.glsl"
+  #include "/lib/lighting/getSunlight.glsl"
 
   /* DRAWBUFFERS:045 */
   layout(location = 0) out vec4 color;
@@ -103,8 +103,8 @@
 
     vec3 playerNormal = normalize(mat3(gbufferModelViewInverse) * normal);
 
-    float lightmapSky = lmcoord.g;
-    float lightmapBlock = lmcoord.r;
+    float lightmapSky = (lmcoord.g - 1.0/32.0) * 16.0/15.0;
+    float lightmapBlock = (lmcoord.r - 1.0/32.0) * 16.0/15.0;
 
     vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * lightmapSky;
     vec3 artificial = TORCH_COLOR * lightmapBlock;
