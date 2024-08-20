@@ -11,7 +11,7 @@
 #endif
 //------------------------------------------------------------------
 #ifdef fsh
-  #define DEBUG_ENABLE
+  // #define DEBUG_ENABLE
   #define DEBUG_TEX colortex8
 
   #ifdef DEBUG_ENABLE
@@ -35,8 +35,8 @@
     color.rgb = tonemap(color.rgb);
     color.rgb = invGammaCorrect(color.rgb);
 
-    #ifdef DEBUG_ENABLE
-      color = texture(DEBUG_TEX, texcoord / BLOOM_BLUR);
-    #endif
+    // #ifdef DEBUG_ENABLE
+    //   color = texture(DEBUG_TEX, texcoord / BLOOM_BLUR);
+    // #endif
   }
 #endif

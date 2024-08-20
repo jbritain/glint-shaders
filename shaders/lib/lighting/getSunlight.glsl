@@ -1,3 +1,6 @@
+#ifndef GET_SUNLIGHT_INCLUDE
+#define GET_SUNLIGHT_INCLUDE
+
 #include "/lib/lighting/shadowBias.glsl"
 
 vec3 sampleShadow(vec3 shadowScreenPos){
@@ -19,22 +22,13 @@ vec3 sampleShadow(vec3 shadowScreenPos){
   return mix(shadowColor * opaqueShadow, vec3(1.0), transparentShadow);
 }
 
-vec3 getSunlight(vec3 feetPlayerPos, inout vec3 sunlightColor, vec3 normal, vec3 faceNormal){
-  #ifndef SHADOWS
-    return sunlightColor;
-  #endif
-  vec4 shadowPos = getShadowPosition(feetPlayerPos, normal);
+vec3 getSunlight(vec3 feetPlayerPos, inout vec3 sunlightColor, vec3 mappedNormal, vec3 faceNormal){
+  vec4 shadowPos = getShadowPosition(feetPlayerPos, faceNormal);
 
-  #ifndef TRANSPARENT_SHADOWS
-  return vec3(shadow2D(shadowtex0, shadowPos.xyz)) * sunlightColor;
-  #endif
+  vec3 shadow = sampleShadow(shadowPos);
+  float NoL = clamp01(dot(mappedNormal, shadowLightPosition));
+  NoL = min(NoL, dot(faceNormal, shadowLightPosition));
 
-  float opaqueShadow = shadow2D(shadowtex0, shadowPos.xyz).r;
-  float fullShadow = shadow2D(shadowtex1, shadowPos.xyz).r;
-  vec4 shadowColorData = texture(shadowcolor0, shadowPos.xy);
-  float shadowTransparency = 1.0 - shadowColorData.a;
-  vec3 shadowColor = shadowColorData.rgb * shadowTransparency;
-  
-
-  return mix(shadowColor * fullShadow, vec3(1.0), opaqueShadow) * sunlightColor;
+  return sunlightColor * shadow * NoL;
 }
+#endif

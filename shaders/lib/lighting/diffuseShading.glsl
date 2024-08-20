@@ -1,10 +1,24 @@
-vec3 shadeDiffuse(vec3 color, vec2 lmcoord, vec3 normal, vec3 faceNormal){
-      float lightmapSky = (lmcoord.g - 1.0/32.0) * 16.0/15.0;
-    float lightmapBlock = (lmcoord.r - 1.0/32.0) * 16.0/15.0;
+#ifndef DIFFUSE_SHADING_INCLUDE
+#define DIFFUSE_SHADING_INCLUDE
 
-    vec3 sunlightColor = getSky(SUN_VECTOR, true);
-    vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
+#include "/lib/atmosphere/sky.glsl"
+#include "/lib/lighting/getSunlight.glsl"
 
-    vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * lightmapSky;
-    vec3 artificial = TORCH_COLOR * lightmapBlock;
+vec3 shadeDiffuse(vec3 feetPlayerPos, vec3 color, vec2 lightmap, vec3 mappedNormal, vec3 faceNormal){
+  vec3 sunlightColor = getSky(SUN_VECTOR, true);
+  vec3 skyLightColor = getSky(mat3(gbufferModelViewInverse) * faceNormal, false);
+
+  vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * lightmap.y;
+  vec3 blockLight = TORCH_COLOR * lightmap.x;
+  vec3 sunlight = getSunlight(feetPlayerPos, sunlightColor, mappedNormal, faceNormal);
+  vec3 ambient = vec3(AMBIENT_STRENGTH);
+
+  return color * (
+    skyLight +
+    blockLight +
+    sunlight +
+    ambient
+  );
 }
+
+#endif

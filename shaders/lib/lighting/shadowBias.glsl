@@ -1,3 +1,6 @@
+#ifndef SHADOW_BIAS_INCLUDE
+#define SHADOW_BIAS_INCLUDE
+
 #ifdef SHADOW_DISTORT_ENABLED
 	vec3 distort(vec3 pos) {
 		float factor = length(pos.xy) + SHADOW_DISTORT_FACTOR;
@@ -45,3 +48,4 @@ vec4 getShadowPosition(vec3 playerPos, vec3 normal){
 
   return shadowPos;
 }
+#endif

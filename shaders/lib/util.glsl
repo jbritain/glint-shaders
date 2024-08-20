@@ -1,7 +1,12 @@
-// Same algorithm, but faster, thanks to Kneemund/Niemand
-float linearizeDepth(float depth) {
-    return ((near * far) / (depth * (near - far) + far)) / far;
-}
+#ifndef UTIL_INCLUDE
+#define UTIL_INCLUDE
+
+
+#define PI 3.1415926535
+
+#define clamp01(x) clamp(x, 0.0, 1.0)
+#define rcp(x) 1.0/x
+#define sum4(v) (((v).x + (v).y) + ((v).z + (v).w))
 
 bool floatCompare(float a, float b){
     return abs(a - b) < 0.001;
@@ -12,14 +17,6 @@ vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
     return homPos.xyz / homPos.w;
 }
 
-vec3 encodeNormal(vec3 normal){
-  return normal * 0.5 + 0.5;
-}
-
-vec3 decodeNormal(vec3 encodedNormal){
-  return (encodedNormal - 0.5) * 2.0;
-}
-#define PI 3.1415926535
 
 // Creates a TBN matrix from a normal and a tangent
 mat3 tbnNormalTangent(vec3 normal, vec3 tangent) {
@@ -36,4 +33,5 @@ mat3 tbnNormal(vec3 normal) {
     return tbnNormalTangent(normal, tangent);
 }
 
-#define clamp01(x) clamp(x, 0.0, 1.0)
+
+#endif
