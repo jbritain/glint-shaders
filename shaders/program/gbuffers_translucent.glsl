@@ -74,10 +74,10 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:120 */
-  layout(location = 0) out vec4 outData1; // albedo, material ID, face normal, lightmap
-  layout(location = 1) out vec4 outData2; // mapped normal, specular map data
-  layout(location = 2) out vec4 color; // actual colour for test purposes
+  /* DRAWBUFFERS:012 */
+  layout(location = 0) out vec4 color; // shaded colour
+  layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
+  layout(location = 2) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
@@ -101,11 +101,8 @@
       vec3 mappedNormal = faceNormal;
     #endif
 
-    color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
-
-
     outData1.x = pack2x8F(color.r, color.g);
-    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 1000) * rcp(255.0)));
+    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
     outData1.z = pack2x8F(encodeNormal(faceNormal));
     outData1.w = pack2x8F(lightmap);
 
@@ -114,5 +111,8 @@
     outData2.x = pack2x8F(encodeNormal(mappedNormal));
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
+
+    color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
+
   }
 #endif

@@ -4,7 +4,7 @@
 
 
 bool water(int id) {
-	return id == 1001;
+	return id == 10001;
 }
 
 

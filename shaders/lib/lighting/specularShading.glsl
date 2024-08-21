@@ -65,6 +65,10 @@ vec3 schlick(Material material, float NoV){
 
 vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material){
 
+  if(material.roughness == 1.0){
+    return color;
+  }
+
   vec3 V = normalize(-viewPos);
   vec3 N = normal;
   vec3 L = normalize(shadowLightPosition);
@@ -73,11 +77,11 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
 
   vec3 fresnel = schlick(material, NoV);
 
-  // vec3 sunlight = getSunlight(feetPlayerPos, mappedNormal, faceNormal);
+  vec3 sunlight = getSunlight(mat3(gbufferModelViewInverse) * viewPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal);
 
-  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * 0.005;
+  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH;
 
-  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(0.001, material.roughness)) * sunlightColor;
+  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlightColor * sunlight;
 
   color = mix(color, specularHighlight, clamp01(fresnel));
 

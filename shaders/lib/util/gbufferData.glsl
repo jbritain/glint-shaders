@@ -14,10 +14,11 @@ void decodeGbufferData(in vec4 data1, in vec4 data2){
   vec2 decode2z = unpack2x8F(data2.z);
   vec2 decode2w = unpack2x8F(data2.w);
 
-
-
   albedo.rgb = vec3(decode1x.x, decode1x.y, decode1y.x);
-  materialID = int(decode1y.y * 255 + 1000.5);
+  materialID = int(decode1y.y * 255 + 0.5) + 10000;
+  if(materialID == 1000){
+    materialID = 0;
+  }
   faceNormal = decodeNormal(decode1z);
   lightmap = decode1w;
 

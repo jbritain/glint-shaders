@@ -63,7 +63,7 @@
       decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
       color.rgb = albedo;
 
-      color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
+      // color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
     }
 
     // color.rgb = texture(colortex0, texcoord).rgb;

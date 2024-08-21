@@ -12,7 +12,7 @@ def main():
 	},
 	pragma="MATERIAL_IDS_INCLUDE",
 	function_name="material_{flag}",
-	start_index=1001
+	start_index=10001
   )
 
 	with shaderpack_root.joinpath('shaders/block.properties').open('w') as f:

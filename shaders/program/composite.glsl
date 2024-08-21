@@ -67,6 +67,8 @@
     
     Material material;
 
+    // color.rgb = vec3(water(materialID));
+
     if(water(materialID)) {
       material = waterMaterial;
     } else {
@@ -74,6 +76,7 @@
     }
 
     color.rgb = shadeSpecular(color.rgb, lightmap, mappedNormal, viewPos, material);
+    // color.rgb = vec3(water(materialID));
 
   }
 #endif
