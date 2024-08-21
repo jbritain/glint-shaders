@@ -87,6 +87,7 @@ vec2 RSI (vec3 ro, vec3 rd, vec4 sph) {
 
 const float sundeg = 1.0;
 const float sunintens = 100.0;
+const float moonintens = 5.0;
 
 const int points = 8;
 const int odpoints = 4;
@@ -235,14 +236,13 @@ vec3 march (vec3 ro, vec3 rd, vec3 lrd, float intens, vec3 col, vec3 pos) {
 
 vec3 sky (vec3 ro, vec3 rd, vec3 sunrd, vec3 col, bool includeSun, vec3 pos) {
     vec3 sun = dot(rd, sunrd) > cos(radians(sundeg)) && includeSun ? vec3(sunintens) : col;
-    ro.y += planetrad;
     return march(ro, rd, sunrd, sunintens, sun, pos) * 0.5;
 }
 
 #define SUN_VECTOR normalize(mat3(gbufferModelViewInverse) * sunPosition)
 
 vec3 getSky(vec3 dir, bool includeSun){
-    return sky(vec3(0.), dir, SUN_VECTOR, vec3(0.), includeSun, vec3(0.));
+    return sky(vec3(0.0, planetrad, 0.0), dir, SUN_VECTOR, vec3(0.), includeSun, vec3(0.));
 }
 
 vec3 getAtmosphere(vec3 col, vec3 playerPos){
