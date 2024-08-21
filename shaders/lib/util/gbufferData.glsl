@@ -19,10 +19,10 @@ void decodeGbufferData(in vec4 data1, in vec4 data2){
   if(materialID == 1000){
     materialID = 0;
   }
-  faceNormal = decodeNormal(decode1z);
+  faceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);
   lightmap = decode1w;
 
-  mappedNormal = decodeNormal(decode2x);
+  mappedNormal = mat3(gbufferModelView) * decodeNormal(decode2x);
   specularData = vec4(decode2y, decode2z);
 }
 

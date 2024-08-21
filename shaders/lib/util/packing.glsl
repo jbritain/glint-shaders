@@ -47,19 +47,27 @@ vec2 unpack2x8F(in float pack) {
 	return xy * vec2(256.0 / 255.0, 1.0 / 255.0);
 }
 
-vec2 encodeNormal(vec3 n) {
-    float f = sqrt(n.z * 8.0 + 8.0);
-    return n.xy / f + 0.5;
+// https://jcgt.org/published/0003/02/01/
+// ---------------------------------------------------------->
+vec2 signNonZero(vec2 v) {
+	return vec2(
+		v.x >= 0.0 ? 1.0 : -1.0,
+		v.y >= 0.0 ? 1.0 : -1.0
+	);
 }
 
-vec3 decodeNormal(vec2 enc) {
-    vec2 fenc = enc * 4.0 - 2.0;
-    float f = dot(fenc,fenc);
-    float g = sqrt(1.0 - f / 4.0);
-    vec3 n;
-    n.xy = fenc * g;
-    n.z = 1.0 - f / 2.0;
-    return n;
+vec2 encodeNormal(vec3 v) {
+	vec2 p = v.xy * (1.0 / (abs(v.x) + abs(v.y) + abs(v.z)));
+	p = v.z <= 0.0 ? ((1.0 - abs(p.yx)) * signNonZero(p)) : p;
+	return 0.5 * p + 0.5;
 }
+
+vec3 decodeNormal(vec2 e) {
+	e = 2.0 * e - 1.0;
+	vec3 v = vec3(e.xy, 1.0 - abs(e.x) - abs(e.y));
+	if (v.z < 0) v.xy = (1.0 - abs(v.yx)) * signNonZero(v.xy);
+	return normalize(v);
+}
+// <----------------------------------------------------------
 
 #endif

@@ -6,7 +6,7 @@
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
-    float radiusCos = 1.0 - (1.0 / 360.0);
+    float radiusCos = 1.0 - 0.0001;
 		float radiusTan = tan(acos(radiusCos));
     
     float RoL = 2.0 * NoL * NoV - VoL;
@@ -51,7 +51,7 @@ vec3 schlick(Material material, float NoV){
   const vec3 f0 = material.f0;
   const vec3 f82 = material.f82;
   if(material.metalID == NO_METAL){ // normal schlick approx.
-    return vec3(f0 + (1.0 - f0) * pow(1.0 - NoV, 5.0));
+    return vec3(f0 + (1.0 - f0) * pow5(1.0 - NoV));
   } else { // lazanyi schlick - https://www.shadertoy.com/view/DdlGWM
     vec3 a = (823543./46656.) * (f0 - f82) + (49./6.) * (1.0 - f0);
 
@@ -79,7 +79,7 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
 
   vec3 sunlight = getSunlight(mat3(gbufferModelViewInverse) * viewPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal);
 
-  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH;
+  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH * 0.05;
 
   vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlightColor * sunlight;
 

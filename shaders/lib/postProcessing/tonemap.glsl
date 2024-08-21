@@ -34,4 +34,4 @@ vec3 uncharted2_filmic(vec3 v)
     return curr * white_scale;
 }
 
-#define tonemap jodieReinhardTonemap
+#define tonemap uncharted2_filmic
