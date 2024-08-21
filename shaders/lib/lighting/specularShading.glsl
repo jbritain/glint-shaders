@@ -42,7 +42,7 @@ float getNoHSquared(float NoL, float NoV, float VoL) {
 // https://mudstack.com/blog/tutorials/physically-based-rendering-study-part-2/
 float calculateSpecularHighlight(vec3 N, vec3 V, vec3 L, float roughness){
   float alpha = roughness;
-	float dotNHSquared = getNoHSquared(dotSafe(N, L), dotSafe(N, V), dotSafe(V, L));
+	float dotNHSquared = getNoHSquared(dot(N, L), dot(N, V), dot(V, L));
 	float distr = dotNHSquared * (alpha - 1.0) + 1.0;
 	return alpha / (PI * pow2(distr));
 }

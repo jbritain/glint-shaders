@@ -28,5 +28,6 @@ const bool shadowHardwareFiltering = true;
 #define SHADOW_BIAS 1.00 //Increase this if you get shadow acne. Decrease this if you get peter panning. [0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.60 0.70 0.80 0.90 1.00 1.50 2.00 2.50 3.00 3.50 4.00 4.50 5.00 6.00 7.00 8.00 9.00 10.00]
 //#define NORMAL_BIAS //Offsets the shadow sample position by the surface normal instead of towards the sun
 const int shadowMapResolution = 2048; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
+const float sunPathRotation = -40;
 
 #define NORMAL_MAPS
