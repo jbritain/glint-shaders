@@ -5,7 +5,7 @@
 #define PI 3.1415926535
 
 #define clamp01(x) clamp(x, 0.0, 1.0)
-#define rcp(x) 1.0/x
+#define rcp(x) (1.0/x)
 
 #define pow2(x) x*x
 #define pow3(x) x*x*x

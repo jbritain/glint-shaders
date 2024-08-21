@@ -42,7 +42,6 @@ float getNoHSquared(float NoL, float NoV, float VoL) {
 // https://mudstack.com/blog/tutorials/physically-based-rendering-study-part-2/
 float calculateSpecularHighlight(vec3 N, vec3 V, vec3 L, float roughness){
   float alpha = roughness;
-  // vec3 H = normalize(L + V);
 	float dotNHSquared = getNoHSquared(dotSafe(N, L), dotSafe(N, V), dotSafe(V, L));
 	float distr = dotNHSquared * (alpha - 1.0) + 1.0;
 	return alpha / (PI * pow2(distr));
@@ -52,7 +51,7 @@ vec3 schlick(Material material, float NoV){
   const vec3 f0 = material.f0;
   const vec3 f82 = material.f82;
   if(material.metalID == NO_METAL){ // normal schlick approx.
-    return vec3(f0 + (1.0 - f0) * pow5(1.0 - NoV));
+    return vec3(f0 + (1.0 - f0) * pow(1.0 - NoV, 5.0));
   } else { // lazanyi schlick - https://www.shadertoy.com/view/DdlGWM
     vec3 a = (823543./46656.) * (f0 - f82) + (49./6.) * (1.0 - f0);
 
@@ -70,17 +69,19 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
   vec3 N = normal;
   vec3 L = normalize(shadowLightPosition);
   
-  float NoV = dotSafe(N, V);
+  float NoV = dot(N, V);
 
   vec3 fresnel = schlick(material, NoV);
 
-  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true);
+  // vec3 sunlight = getSunlight(feetPlayerPos, mappedNormal, faceNormal);
 
-  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, material.roughness) * sunlightColor;
+  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * 0.005;
 
-  color = mix(color, color + specularHighlight, fresnel);
+  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(0.001, material.roughness)) * sunlightColor;
 
-  return vec3(NoV);
+  color = mix(color, specularHighlight, clamp01(fresnel));
+
+  return color;
 }
 
 #endif

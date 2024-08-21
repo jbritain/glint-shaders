@@ -106,12 +106,12 @@
 
     outData1.x = pack2x8F(color.r, color.g);
     outData1.y = pack2x8F(color.b, clamp01(float(materialID - 1000) * rcp(255.0)));
-    outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
+    outData1.z = pack2x8F(encodeNormal(faceNormal));
     outData1.w = pack2x8F(lightmap);
 
     vec4 specularData = texture(specular, texcoord);
 
-    outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
+    outData2.x = pack2x8F(encodeNormal(mappedNormal));
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
   }

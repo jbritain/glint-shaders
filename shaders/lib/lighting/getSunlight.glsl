@@ -30,13 +30,13 @@ float NoLSafe(vec3 n){
   return clamp01(dot(n, normalize(shadowLightPosition)));
 }
 
-vec3 getSunlight(vec3 feetPlayerPos, inout vec3 sunlightColor, vec3 mappedNormal, vec3 faceNormal){
+vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal){
   vec4 shadowPos = getShadowPosition(feetPlayerPos, faceNormal);
 
   vec3 shadow = sampleShadow(shadowPos.xyz);
   float NoL = NoLSafe(faceNormal);
   NoL = min(NoL, NoLSafe(mappedNormal));
 
-  return sunlightColor * shadow * NoL;
+  return shadow * NoL;
 }
 #endif

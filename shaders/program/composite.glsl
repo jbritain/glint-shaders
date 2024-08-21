@@ -73,7 +73,7 @@
       material = materialFromSpecularMap(albedo, specularData);
     }
 
-    color.rgb = shadeSpecular(color.rgb, lightmap, faceNormal, viewPos, material);
+    color.rgb = shadeSpecular(color.rgb, lightmap, mappedNormal, viewPos, material);
 
   }
 #endif
