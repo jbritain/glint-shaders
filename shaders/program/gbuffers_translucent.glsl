@@ -1,12 +1,13 @@
 #include "/lib/settings.glsl"
 
 #ifdef vsh
+
   out vec2 lmcoord;
   out vec2 texcoord;
   out vec4 glcolor;
   out vec3 faceNormal;
   out vec3 faceTangent;
-  flat out uint materialID;
+  flat out int materialID;
   out vec3 viewPos;
 
   attribute vec3 at_tangent;
@@ -14,7 +15,7 @@
 
   void main() {
     gl_Position = ftransform();
-    materialID = uint(mc_Entity.x + 0.5);
+    materialID = int(mc_Entity.x + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
@@ -54,14 +55,14 @@
   in vec4 glcolor;
   in vec3 faceTangent;
   in vec3 faceNormal;
-  flat in uint materialID;
+  flat in int materialID;
   in vec3 viewPos;
 
   #include "/lib/util.glsl"
-  #include "/lib/util/materialIDs.glsl"
   #include "/lib/postProcessing/tonemap.glsl"
   #include "/lib/util/packing.glsl"
   #include "/lib/lighting/diffuseShading.glsl"
+  #include "/lib/util/materialIDs.glsl"
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
@@ -85,7 +86,7 @@
     color.rgb = gammaCorrect(color.rgb);
 
     if(water(materialID)){
-      color = vec4(1.0, 0.0, 0.0, 0.75);
+      color = WATER_COLOR;
     }
 
     if (color.a < alphaTestRef) {

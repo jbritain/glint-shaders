@@ -10,7 +10,9 @@ def main():
 	mapping = BlockMapping.solve({
 		'water': blocks('minecraft:water')
 	},
-	pragma="MATERIAL_IDS_INCLUDE"
+	pragma="MATERIAL_IDS_INCLUDE",
+	function_name="material_{flag}",
+	start_index=1001
   )
 
 	with shaderpack_root.joinpath('shaders/block.properties').open('w') as f:

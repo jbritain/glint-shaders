@@ -1,6 +1,8 @@
 #ifndef PACKING_INCLUDE
 #define PACKING_INCLUDE
 
+#include "/lib/util.glsl"
+
 // pack 4 8 bit floats into a 32 bit float
 float pack4x8F(in vec4 a) {
 	uvec4 v = uvec4(round(clamp01(a) * 255.0)) << uvec4(0, 8, 16, 24);

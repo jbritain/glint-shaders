@@ -34,11 +34,12 @@
 
   in vec2 texcoord;
 
-  uint materialID;
-  vec3 wFaceNormal;
+  vec3 albedo;
+  int materialID;
+  vec3 faceNormal;
   vec2 lightmap;
 
-  vec3 wMappedNormal;
+  vec3 mappedNormal;
   vec4 specularData;
 
   /* DRAWBUFFERS:0 */
@@ -60,17 +61,11 @@
       color.rgb = getSky(normalize(eyePlayerPos), true);
     } else {
       decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
-
-      vec3 mappedNormal = mat3(gbufferModelView) * wMappedNormal;
-      vec3 faceNormal = mat3(gbufferModelView) * wFaceNormal;
+      color.rgb = albedo;
 
       color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
     }
 
-    // color = texture(colortex0, texcoord);
-    
-
-    
-    // color.rgb = wFaceNormal;
+    // color.rgb = texture(colortex0, texcoord).rgb;
   }
 #endif

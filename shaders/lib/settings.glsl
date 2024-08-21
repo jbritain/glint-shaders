@@ -19,6 +19,8 @@ const bool shadowHardwareFiltering = true;
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 
+#define WATER_COLOR vec4(0.015, 0.04, 0.098, 0.75)
+
 #define SHADOWS
 #define TRANSPARENT_SHADOWS
 #define SHADOW_DISTORT_ENABLED //Toggles shadow map distortion

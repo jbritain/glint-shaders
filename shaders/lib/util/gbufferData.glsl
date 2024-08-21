@@ -16,12 +16,12 @@ void decodeGbufferData(in vec4 data1, in vec4 data2){
 
 
 
-  color.rgb = vec3(decode1x.x, decode1x.y, decode1y.x);
-  materialID = uint(decode1y.y * 255 + 1000.5);
-  wFaceNormal = decodeNormal(decode1z);
+  albedo.rgb = vec3(decode1x.x, decode1x.y, decode1y.x);
+  materialID = int(decode1y.y * 255 + 1000.5);
+  faceNormal = decodeNormal(decode1z);
   lightmap = decode1w;
 
-  wMappedNormal = decodeNormal(decode2x);
+  mappedNormal = decodeNormal(decode2x);
   specularData = vec4(decode2y, decode2z);
 }
 

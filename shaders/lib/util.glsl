@@ -8,6 +8,9 @@
 #define rcp(x) 1.0/x
 
 #define pow2(x) x*x
+#define pow3(x) x*x*x
+#define pow4(x) x*x*x*x
+#define pow5(x) x*x*x*x*x
 
 #define sum2(v) ((v).x + (v).y)
 #define sum4(v) (((v).x + (v).y) + ((v).z + (v).w))
@@ -16,6 +19,9 @@ bool floatCompare(float a, float b){
     return abs(a - b) < 0.001;
 }
 
+float dotSafe(vec3 a, vec3 b){
+    return clamp01(dot(normalize(a), normalize(b)));
+}
 
 // Creates a TBN matrix from a normal and a tangent
 mat3 tbnNormalTangent(vec3 normal, vec3 tangent) {
