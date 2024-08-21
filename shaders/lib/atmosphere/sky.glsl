@@ -242,7 +242,7 @@ vec3 sky (vec3 ro, vec3 rd, vec3 sunrd, vec3 col, bool includeSun, vec3 pos) {
 #define SUN_VECTOR normalize(mat3(gbufferModelViewInverse) * sunPosition)
 
 vec3 getSky(vec3 dir, bool includeSun){
-    return sky(vec3(0.0, planetrad, 0.0), dir, SUN_VECTOR, vec3(0.), includeSun, vec3(0.));
+    return sky(vec3(0.0, planetrad + cameraPosition.y * 50, 0.0), dir, SUN_VECTOR, vec3(0.), includeSun, vec3(0.));
 }
 
 vec3 getAtmosphere(vec3 col, vec3 playerPos){

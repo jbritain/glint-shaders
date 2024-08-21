@@ -30,6 +30,7 @@
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
+  uniform vec3 cameraPosition;
 
   in vec2 texcoord;
 

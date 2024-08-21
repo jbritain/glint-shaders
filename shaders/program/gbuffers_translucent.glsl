@@ -38,6 +38,8 @@
 
   uniform float alphaTestRef;
 
+  uniform vec3 cameraPosition;
+
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
 

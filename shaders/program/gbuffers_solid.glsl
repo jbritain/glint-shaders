@@ -34,6 +34,8 @@
 
   uniform float alphaTestRef;
 
+  uniform vec3 cameraPosition;
+
   uniform mat4 gbufferModelViewInverse;
 
   in vec2 lmcoord;
