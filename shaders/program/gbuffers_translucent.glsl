@@ -38,6 +38,7 @@
   uniform sampler2D shadowcolor0;
 
   uniform float alphaTestRef;
+  uniform float frameTimeCounter;
 
   uniform vec3 cameraPosition;
 
@@ -63,6 +64,7 @@
   #include "/lib/util/packing.glsl"
   #include "/lib/lighting/diffuseShading.glsl"
   #include "/lib/util/materialIDs.glsl"
+  #include "/lib/water/waveNormals.glsl"
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
@@ -80,14 +82,17 @@
   layout(location = 2) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
+    vec3 faceNormal = faceNormal;
+
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
     color = texture(gtexture, texcoord) * glcolor;
     color.rgb = gammaCorrect(color.rgb);
 
-    // if(water(materialID)){
-    //   color = WATER_COLOR;
-    // }
+    if(water(materialID)){
+      color = WATER_COLOR;
+      faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, 0.01, 0.2);
+    }
 
     if (color.a < alphaTestRef) {
       discard;
