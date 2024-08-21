@@ -17,7 +17,7 @@ void decodeGbufferData(in vec4 data1, in vec4 data2){
 
 
   color.rgb = vec3(decode1x.x, decode1x.y, decode1y.x);
-  materialID = uint(decode1y.y * 255 + 0.5);
+  materialID = uint(decode1y.y * 255 + 1000.5);
   wFaceNormal = decodeNormal(decode1z);
   lightmap = decode1w;
 

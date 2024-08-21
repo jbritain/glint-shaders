@@ -1,5 +1,5 @@
 #version 450 compatibility
 
 #define vsh
-#define entities
+#define gbuffers_entities
 #include "/program/gbuffers_solid.glsl"

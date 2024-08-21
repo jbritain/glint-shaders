@@ -14,7 +14,7 @@
 
   void main() {
     gl_Position = ftransform();
-    materialID = uint(mc_Entity.x - 1000 + 0.5);
+    materialID = uint(mc_Entity.x + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
@@ -58,9 +58,11 @@
   in vec3 viewPos;
 
   #include "/lib/util.glsl"
+  #include "/lib/util/materialIDs.glsl"
   #include "/lib/postProcessing/tonemap.glsl"
   #include "/lib/util/packing.glsl"
   #include "/lib/lighting/diffuseShading.glsl"
+
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -82,6 +84,10 @@
     color = texture(gtexture, texcoord) * glcolor;
     color.rgb = gammaCorrect(color.rgb);
 
+    if(water(materialID)){
+      color = vec4(1.0, 0.0, 0.0, 0.75);
+    }
+
     if (color.a < alphaTestRef) {
       discard;
     }
@@ -98,7 +104,7 @@
 
 
     outData1.x = pack2x8F(color.r, color.g);
-    outData1.y = pack2x8F(color.b, clamp01(float(materialID) * rcp(255.0)));
+    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 1000) * rcp(255.0)));
     outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
     outData1.w = pack2x8F(lightmap);
 
