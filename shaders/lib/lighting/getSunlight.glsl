@@ -22,12 +22,20 @@ vec3 sampleShadow(vec3 shadowScreenPos){
   return mix(shadowColor * opaqueShadow, vec3(1.0), transparentShadow);
 }
 
+float NoLSafe(vec3 n){
+  if (normalize(n) == normalize(shadowLightPosition)){
+    return 0.0;
+  }
+
+  return clamp01(dot(n, normalize(shadowLightPosition)));
+}
+
 vec3 getSunlight(vec3 feetPlayerPos, inout vec3 sunlightColor, vec3 mappedNormal, vec3 faceNormal){
   vec4 shadowPos = getShadowPosition(feetPlayerPos, faceNormal);
 
-  vec3 shadow = sampleShadow(shadowPos);
-  float NoL = clamp01(dot(mappedNormal, shadowLightPosition));
-  NoL = min(NoL, dot(faceNormal, shadowLightPosition));
+  vec3 shadow = sampleShadow(shadowPos.xyz);
+  float NoL = NoLSafe(faceNormal);
+  NoL = min(NoL, NoLSafe(mappedNormal));
 
   return sunlightColor * shadow * NoL;
 }

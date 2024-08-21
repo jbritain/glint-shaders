@@ -1,3 +1,5 @@
+#ifndef SKY_INCLUDE
+#define SKY_INCLUDE
 // https://www.shadertoy.com/view/lcXSR2
 // thanks quadro!!! (and by extension Jessie, the goat of minecraft applied physics)
 
@@ -32,8 +34,7 @@ mat3 rotateZ(float theta) {
 }
 
 float normdist (float x, float mean, float dev) {
-    float nd = (1.0 / (dev * sqrt(2.0 * PI))) * exp(-0.5 * pow((x - mean) / dev, 2.0));
-    if(isnan(nd)) nd = 0.0;
+    float nd = (1.0 / (dev * sqrt(2.0 * PI))) * exp(-0.5 * pow2((x - mean) / dev));
     return nd;
 }
 
@@ -235,7 +236,7 @@ vec3 march (vec3 ro, vec3 rd, vec3 lrd, float intens, vec3 col, vec3 pos) {
 vec3 sky (vec3 ro, vec3 rd, vec3 sunrd, vec3 col, bool includeSun, vec3 pos) {
     vec3 sun = dot(rd, sunrd) > cos(radians(sundeg)) && includeSun ? vec3(sunintens) : col;
     ro.y += planetrad;
-    return march(ro, rd, sunrd, sunintens, sun, pos);
+    return march(ro, rd, sunrd, sunintens, sun, pos) * 0.5;
 }
 
 #define SUN_VECTOR normalize(mat3(gbufferModelViewInverse) * sunPosition)
@@ -248,3 +249,4 @@ vec3 getAtmosphere(vec3 col, vec3 playerPos){
     vec3 dir = normalize(playerPos);
     return sky(vec3(0.), dir, SUN_VECTOR, col, false, playerPos);
 }
+#endif

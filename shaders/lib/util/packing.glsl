@@ -40,34 +40,24 @@ float pack2x8F(in float a, in float b){
   return pack2x8F(vec2(a, b));
 }
 
-vec2 unpack2x8F(in float encodedBuffer) {
-  vec2 xy = vec2(0.0);
-  xy.x = modf((65535.0 / 256.0) * encodedBuffer, xy.y);
+vec2 unpack2x8F(in float pack) {
+	vec2 xy; xy.x = modf((65535.0 / 256.0) * pack, xy.y);
 	return xy * vec2(256.0 / 255.0, 1.0 / 255.0);
 }
 
-//-------------------------------------------------------------->>
-// https://jcgt.org/published/0003/02/01/
-
-vec2 signNotZero(vec2 v) {
-  return vec2((v.x >= 0.0) ? +1.0 : -1.0, (v.y >= 0.0) ? +1.0 : -1.0);
+vec2 encodeNormal(vec3 n) {
+    float f = sqrt(n.z * 8.0 + 8.0);
+    return n.xy / f + 0.5;
 }
 
-vec2 encodeNormal(vec3 n){
-  // Project the sphere onto the octahedron, and then onto the xy plane
-	vec2 p = n.xy * (1.0 / (abs(n.x) + abs(n.y) + abs(n.z)));
-
-	// Reflect the folds of the lower hemisphere over the diagonals
-	p = n.z <= 0.0 ? ((1.0 - abs(p.yx)) * signNotZero(p)) : p;
-
-	// Scale to [0, 1]
-	return 0.5 * p + 0.5;
+vec3 decodeNormal(vec2 enc) {
+    vec2 fenc = enc * 4.0 - 2.0;
+    float f = dot(fenc,fenc);
+    float g = sqrt(1.0 - f / 4.0);
+    vec3 n;
+    n.xy = fenc * g;
+    n.z = 1.0 - f / 2.0;
+    return n;
 }
 
-vec3 decodeNormal(vec2 e){
-  vec3 n = vec3(e.xy, 1.0 - abs(e.x) - abs(e.y));
-  if (n.z < 0) n.xy = (1.0 - abs(n.yx)) * signNotZero(n.xy);
-  return normalize(n);
-}
-//--------------------------------------------------------------<<
 #endif

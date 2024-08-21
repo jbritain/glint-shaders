@@ -6,15 +6,14 @@
 
 #define clamp01(x) clamp(x, 0.0, 1.0)
 #define rcp(x) 1.0/x
+
+#define pow2(x) x*x
+
+#define sum2(v) ((v).x + (v).y)
 #define sum4(v) (((v).x + (v).y) + ((v).z + (v).w))
 
 bool floatCompare(float a, float b){
     return abs(a - b) < 0.001;
-}
-
-vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
-    vec4 homPos = projectionMatrix * vec4(position, 1.0);
-    return homPos.xyz / homPos.w;
 }
 
 

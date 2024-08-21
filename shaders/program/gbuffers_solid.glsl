@@ -34,6 +34,8 @@
 
   uniform float alphaTestRef;
 
+  uniform mat4 gbufferModelViewInverse;
+
   in vec2 lmcoord;
   in vec2 texcoord;
   in vec4 glcolor;
@@ -55,12 +57,13 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:12 */
-  layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
-  layout(location = 2) out vec4 outData2; // mapped normal, specular map data
+  /* DRAWBUFFERS:120 */
+  layout(location = 0) out vec4 outData1; // albedo, material ID, face normal, lightmap
+  layout(location = 1) out vec4 outData2; // mapped normal, specular map data
+  layout(location = 2) out vec4 color; // actual colour for test purposes
 
   void main() {
-    vec4 color = texture(gtexture, texcoord) * glcolor;
+    color = texture(gtexture, texcoord) * glcolor;
     color.rgb = gammaCorrect(color.rgb);
 
     if (color.a < alphaTestRef) {
@@ -76,14 +79,14 @@
     #endif
 
 
-    outData1.x = pack2x8F(color.rg);
+    outData1.x = pack2x8F(color.r, color.g);
     outData1.y = pack2x8F(color.b, clamp01(float(materialID) * rcp(255.0)));
-    outData1.z = pack2x8F(encodeNormal(faceNormal));
+    outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
     outData1.w = pack2x8F(lightmap);
 
     vec4 specularData = texture(specular, texcoord);
 
-    outData2.x = pack2x8F(encodeNormal(mappedNormal));
+    outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
   }
