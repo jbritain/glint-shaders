@@ -14,7 +14,7 @@
 
   void main() {
     gl_Position = ftransform();
-    materialID = uint(mc_Entity.x - 10000 + 0.5);
+    materialID = uint(mc_Entity.x - 1000 + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
