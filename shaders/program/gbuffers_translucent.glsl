@@ -85,9 +85,9 @@
     color = texture(gtexture, texcoord) * glcolor;
     color.rgb = gammaCorrect(color.rgb);
 
-    if(water(materialID)){
-      color = WATER_COLOR;
-    }
+    // if(water(materialID)){
+    //   color = WATER_COLOR;
+    // }
 
     if (color.a < alphaTestRef) {
       discard;
