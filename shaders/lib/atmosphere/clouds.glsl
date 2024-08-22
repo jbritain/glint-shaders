@@ -4,29 +4,30 @@
 #include "/lib/textures/cloudNoise.glsl"
 
 #define LOWER_PLANE_HEIGHT 128.0
-#define UPPER_PLANE_HEIGHT 160.0
+#define UPPER_PLANE_HEIGHT 256.0
 
-#define CLOUD_SHAPE_SCALE 1
-#define CLOUD_EROSION_SCALE 100
+#define CLOUD_SHAPE_SCALE 500
+#define CLOUD_EROSION_SCALE vec3(1000, 750, 1000)
 #define MIN_CLOUD_DENSITY 0.9
 
 // blocks per second
-#define CLOUD_SHAPE_SPEED 1
+#define CLOUD_SHAPE_SPEED 0.02
 #define CLOUD_EROSION_SPEED 0.01
 
-#define ABSORPTION 0.5
-#define SUBMARCH_ABSORPTION 0.5
+#define ABSORPTION 0.05
+#define SUBMARCH_ABSORPTION 1.0
+#define k 0.95
 
-#define SAMPLES 10
+#define SAMPLES 20
 #define SUBSAMPLES 5
 
-float schlickPhase(float k, float costh)
+float schlickPhase(float costh)
 {
     return (1.0 - k * k) / (4.0 * PI * pow(1.0 - k * costh, 2.0));
 }
 
 float getDensity(vec3 pos){
-  float density = clamp01(cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r);
+  float density = clamp01(cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r - 0.8);
   density *= clamp01(cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * frameTimeCounter, 0.0, 0.0)).r - 0.8);
   // density = clamp01(density - MIN_CLOUD_DENSITY);
   return density;
@@ -108,10 +109,13 @@ vec4 getClouds(vec3 worldDir, float jitter, vec3 sunlightColor){
 
   for(int i = 0; i < SAMPLES; i++, rayPos += increment){
     float density = getDensity(rayPos) * length(increment);
+
+    density = mix(density, 0.0, sqrt(clamp01(length(rayPos.xz - cameraPosition.xz) / 8000)));
+
     if(density > 0){
       float lightTransmittance = subMarch(rayPos);
 
-      float phase = schlickPhase(0.9, dot(worldDir, normalize(mat3(gbufferModelViewInverse) * shadowLightPosition)));
+      float phase = schlickPhase(dot(worldDir, normalize(mat3(gbufferModelViewInverse) * shadowLightPosition)));
 
       lightEnergy += density * length(increment) * transmittance * lightTransmittance * phase;
       transmittance *= exp(-density * length(increment) * ABSORPTION);

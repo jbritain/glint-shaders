@@ -9,8 +9,10 @@ uniform sampler2D clouderosionnoisetex;
 #define CLOUD_EROSION_TILE_SIZE 32
 
 vec4 cloudShapeNoiseSample(vec3 texcoord){
-  ivec3 texelcoord = ivec3(mod(texcoord, 1.0) * CLOUD_SHAPE_TILE_SIZE);
+  vec3 texelcoord = vec3(mod(texcoord, 1.0) * CLOUD_SHAPE_TILE_SIZE);
   texelcoord = texelcoord.xzy;
+
+  texelcoord.z = round(texelcoord.z);
   
   texelcoord.x += texelcoord.z * CLOUD_SHAPE_TILE_SIZE; // offset by z slices
 
