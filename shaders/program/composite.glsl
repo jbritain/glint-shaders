@@ -32,6 +32,8 @@
   uniform vec3 shadowLightPosition;
   uniform vec3 cameraPosition;
 
+  uniform int frameCounter;
+
   in vec2 texcoord;
 
   vec3 albedo;

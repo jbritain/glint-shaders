@@ -66,12 +66,52 @@ vec3 schlick(Material material, float NoV){
   }
 }
 
-vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap){
+// from bliss, which means it's probably by chocapic
+// https://backend.orbit.dtu.dk/ws/portalfiles/portal/126824972/onb_frisvad_jgt2012_v2.pdf
+void computeFrisvadTangent(in vec3 n, out vec3 f, out vec3 r){
+    if(n.z < -0.9) {
+        f = vec3(0.,-1,0);
+        r = vec3(-1, 0, 0);
+    } else {
+    	float a = 1./(1.+n.z);
+    	float b = -n.x*n.y*a;
+    	f = vec3(1. - n.x*n.x*a, b, -n.x) ;
+    	r = vec3(b, 1. - n.y*n.y*a , -n.y);
+    }
+}
+
+// by Zombye
+// https://discordapp.com/channels/237199950235041794/525510804494221312/1118170604160421918
+vec3 sampleVNDFGGX(
+    vec3 viewerDirection, // Direction pointing towards the viewer, oriented such that +Z corresponds to the surface normal
+    vec2 alpha, // Roughness parameter along X and Y of the distribution
+    vec2 xy // Pair of uniformly distributed numbers in [0, 1)
+) {
+    // Transform viewer direction to the hemisphere configuration
+    viewerDirection = normalize(vec3(alpha * viewerDirection.xy, viewerDirection.z));
+
+    // Sample a reflection direction off the hemisphere
+    const float tau = 6.2831853; // 2 * pi
+    float phi = tau * xy.x;
+    float cosTheta = fma(1.0 - xy.y, 1.0 + viewerDirection.z, -viewerDirection.z);
+    float sinTheta = sqrt(clamp(1.0 - cosTheta * cosTheta, 0.0, 1.0));
+    vec3 reflected = vec3(vec2(cos(phi), sin(phi)) * sinTheta, cosTheta);
+
+    // Evaluate halfway direction
+    // This gives the normal on the hemisphere
+    vec3 halfway = reflected + viewerDirection;
+
+    // Transform the halfway direction back to hemiellispoid configuation
+    // This gives the final sampled normal
+    return normalize(vec3(alpha * halfway.xy, halfway.z));
+}
+
+vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   vec3 reflectionPos;
 
   vec3 reflectedColor;
 
-  if(traceRay(viewOrigin, viewRay, 30, false,  reflectionPos)){ // we hit something
+  if(traceRay(viewOrigin, viewRay, 30, jitter, false, reflectionPos)){ // we hit something
     reflectedColor = texture(colortex0, reflectionPos.xy).rgb;
 
     #ifdef SSR_FADE
@@ -91,7 +131,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap){
 
 vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material){
 
-  if(material.roughness != 0.0){
+  if(material.roughness == 1.0){
     return color;
   }
 
@@ -107,10 +147,44 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
   vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH * 0.05;
   vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlightColor * sunlight;
 
-  vec3 reflectedRay = reflect(normalize(viewPos), normal);
-  vec3 reflectedColor = SSRSample(viewPos, reflectedRay, lightmap.y);
+  vec3 reflectedColor;
 
-  color = mix(color, reflectedColor + specularHighlight, clamp01(fresnel));
+  if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
+    vec3 reflectedRay = reflect(normalize(viewPos), normal);
+    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter);
+    reflectedColor = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
+  } else if(material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
+
+    // we need a TBN to get into tangent space for the VNDF
+    vec3 tangent;
+    vec3 bitangent;
+    computeFrisvadTangent(mappedNormal, tangent, bitangent);
+
+    mat3 tbn = mat3(tangent, bitangent, normal);
+
+    for(int i = 0; i < SSR_SAMPLES; i++){
+      float r1 = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter * SSR_SAMPLES + i);
+			float r2 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(23, 97), frameCounter * SSR_SAMPLES + i);
+      float r3 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter * SSR_SAMPLES + i);
+
+      vec2 noise = vec2(r1, r2);
+
+      vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise));
+      vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
+      reflectedColor += SSRSample(viewPos, reflectedRay, lightmap.y, r3);
+    }
+    reflectedColor /= SSR_SAMPLES;
+  } else { // no reflection so just stick with the albedo
+    reflectedColor = color;
+  }
+
+  reflectedColor += specularHighlight;
+
+  if(material.metalID != NO_METAL){
+    reflectedColor *= material.albedo;
+  }
+
+  color = mix(color, reflectedColor, clamp01(fresnel));
   // vec3 reflectedScreenPos = viewSpaceToSceneSpace(reflectionPos);
   // color = reflectionPos;
   return color;
