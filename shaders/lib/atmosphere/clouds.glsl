@@ -14,13 +14,20 @@
 #define CLOUD_SHAPE_SPEED 1
 #define CLOUD_EROSION_SPEED 0.01
 
-#define ABSORPTION 1.0
+#define ABSORPTION 0.5
+#define SUBMARCH_ABSORPTION 0.5
 
 #define SAMPLES 10
+#define SUBSAMPLES 5
+
+float schlickPhase(float k, float costh)
+{
+    return (1.0 - k * k) / (4.0 * PI * pow(1.0 - k * costh, 2.0));
+}
 
 float getDensity(vec3 pos){
   float density = clamp01(cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r);
-  density *= clamp01(cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * frameTimeCounter, 0.0, 0.0)).r - 0.8) * 0.2;
+  density *= clamp01(cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * frameTimeCounter, 0.0, 0.0)).r - 0.8);
   // density = clamp01(density - MIN_CLOUD_DENSITY);
   return density;
 }
@@ -44,7 +51,33 @@ bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
   return true;
 }
 
-vec4 getClouds(vec3 worldDir, float jitter){
+
+// march from a ray position towards the sun to calculate how much light makes it there
+float subMarch(vec3 rayPos){
+  vec3 a = rayPos;
+  vec3 b = rayPos;
+
+  vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
+
+  if(!getCloudIntersection(rayPos, sunDir, UPPER_PLANE_HEIGHT, b)){ 
+    getCloudIntersection(rayPos, sunDir, LOWER_PLANE_HEIGHT, b);
+  }
+
+  if(b == rayPos) return 0; // this should never happen
+
+  vec3 increment = (b - a) / SUBSAMPLES;
+
+  vec3 subRayPos = a;
+  float totalDensity = 0;
+
+  for(int i = 0; i < SUBSAMPLES; i++, subRayPos += increment){
+    totalDensity += getDensity(subRayPos) * length(increment);
+  }
+
+  return exp(-totalDensity * SUBMARCH_ABSORPTION);
+}
+
+vec4 getClouds(vec3 worldDir, float jitter, vec3 sunlightColor){
   // we trace from a to b
   vec3 a;
   vec3 b;
@@ -63,25 +96,35 @@ vec4 getClouds(vec3 worldDir, float jitter){
       return vec4(0.0);
     }
   }
-
-  vec3 cloudColor = vec3(5.0);
   
   // march from lower to upper intersection
   vec3 rayPos = a;
   vec3 increment = (b - a) / SAMPLES;
 
-  float totalDensity = 0.0;
+  float transmittance = 1.0;
+  vec3 lightEnergy = vec3(0.0);
 
   rayPos += increment * jitter;
 
   for(int i = 0; i < SAMPLES; i++, rayPos += increment){
-    totalDensity += getDensity(rayPos) * length(increment);
+    float density = getDensity(rayPos) * length(increment);
+    if(density > 0){
+      float lightTransmittance = subMarch(rayPos);
+
+      float phase = schlickPhase(0.9, dot(worldDir, normalize(mat3(gbufferModelViewInverse) * shadowLightPosition)));
+
+      lightEnergy += density * length(increment) * transmittance * lightTransmittance * phase;
+      transmittance *= exp(-density * length(increment) * ABSORPTION);
+
+      if(transmittance < 0.01){
+        break;
+      }
+    }
   }
 
-  totalDensity = clamp01(totalDensity);
-  float transmittance = 1 - exp(-totalDensity);
+  vec3 cloudColor = lightEnergy * sunlightColor * SUNLIGHT_STRENGTH * 0.5;
 
-  return vec4(cloudColor, transmittance);
+  return vec4(cloudColor, 1.0 - transmittance);
 }
 
 #endif

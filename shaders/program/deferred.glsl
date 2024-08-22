@@ -64,7 +64,8 @@
 
     if(depth == 1.0){
       color.rgb = getSky(normalize(eyePlayerPos), true);
-      vec4 cloud = getClouds(normalize(eyePlayerPos), interleavedGradientNoise(floor(gl_FragCoord.xy)));
+      vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
+      vec4 cloud = getClouds(normalize(eyePlayerPos), interleavedGradientNoise(floor(gl_FragCoord.xy)), sunlightColor);
       color.rgb = mix(color.rgb, cloud.rgb, cloud.a);
     } else {
       decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
