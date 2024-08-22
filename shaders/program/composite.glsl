@@ -28,6 +28,9 @@
   uniform mat4 shadowProjection;
   uniform mat4 shadowModelView;
 
+  uniform float near;
+  uniform float far;
+
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
   uniform vec3 cameraPosition;
@@ -70,8 +73,6 @@
     
     Material material;
 
-    // color.rgb = vec3(water(materialID));
-
     if(water(materialID)) {
       material = waterMaterial;
     } else {
@@ -79,7 +80,16 @@
     }
 
     color.rgb = shadeSpecular(color.rgb, lightmap, mappedNormal, viewPos, material);
-    // color.rgb = vec3(water(materialID));
+
+    // we use positive Y to hide the horizon line
+    vec3 fog = getSky(normalize(vec3(eyePlayerPos.x, abs(eyePlayerPos.y), eyePlayerPos.z)), false);
+
+    float fogFactor = length(eyePlayerPos) / far;
+    fogFactor = clamp01(fogFactor - 0.2) / (1.0 - 0.2);
+    fogFactor = pow(fogFactor, 3.0);
+    fogFactor = clamp01(fogFactor);
+
+    color.rgb = mix(color.rgb, fog, fogFactor);
 
   }
 #endif

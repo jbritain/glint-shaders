@@ -144,7 +144,7 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
   vec3 fresnel = schlick(material, NoV);
 
   vec3 sunlight = getSunlight(mat3(gbufferModelViewInverse) * viewPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal);
-  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH * 0.05;
+  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH * 0.1;
   vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlightColor * sunlight;
 
   vec3 reflectedColor;
