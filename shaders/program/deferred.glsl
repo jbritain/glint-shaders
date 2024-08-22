@@ -33,6 +33,8 @@
   uniform vec3 shadowLightPosition;
   uniform vec3 cameraPosition;
 
+  uniform float frameTimeCounter;
+
   in vec2 texcoord;
 
   vec3 albedo;
@@ -50,6 +52,8 @@
   #include "/lib/lighting/diffuseShading.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/atmosphere/sky.glsl"
+  #include "/lib/atmosphere/clouds.glsl"
+  #include "/lib/util/noise.glsl"
 
   void main() {
     float depth = texture(depthtex0, texcoord).r;
@@ -60,13 +64,13 @@
 
     if(depth == 1.0){
       color.rgb = getSky(normalize(eyePlayerPos), true);
+      vec4 cloud = getClouds(normalize(eyePlayerPos), interleavedGradientNoise(floor(gl_FragCoord.xy)));
+      color.rgb = mix(color.rgb, cloud.rgb, cloud.a);
     } else {
       decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
       color.rgb = albedo;
 
       color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
     }
-
-    // color.rgb = texture(colortex0, texcoord).rgb;
   }
 #endif

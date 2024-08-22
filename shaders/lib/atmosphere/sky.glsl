@@ -151,7 +151,7 @@ vec3 march (vec3 ro, vec3 rd, vec3 lrd, float intens, vec3 col, vec3 pos) {
     vec2 atmo = RSI(ro, rd, vec4(vec3(0.0), atmorad));
     vec2 plan = RSI(ro, rd, vec4(vec3(0.0), atmolowerlim));
 
-    bool atmoi = atmo.y >= 0.0;
+    bool atmoi = false;//atmo.y >= 0.0;
     bool plani = plan.x >= 0.0;
 
     col *= float(!plani);

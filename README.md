@@ -1,3 +1,6 @@
+#
+
+# Implementation Details
 `block.properties` IDs are handled by [block-wrangler](https://camplowell.github.io/block_wrangler) in `block_properties.py`
 
 Translucents are fully forward rendered in gbuffers.
