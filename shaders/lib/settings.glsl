@@ -9,9 +9,9 @@ const int colortex2Format = RGBA16;  || mapped normal, specular map data
 const bool shadowHardwareFiltering = true;
 
 
-#define SKYLIGHT_STRENGTH 0.1
+#define SKYLIGHT_STRENGTH 0.5
 #define AMBIENT_STRENGTH 0.02
-#define SUNLIGHT_STRENGTH 0.15
+#define SUNLIGHT_STRENGTH 0.1
 
 #define BLOOM
 #define BLOOM_AMOUNT 0.2 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]

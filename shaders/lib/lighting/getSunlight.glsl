@@ -34,8 +34,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal){
   vec4 shadowPos = getShadowPosition(feetPlayerPos, faceNormal);
 
   vec3 shadow = sampleShadow(shadowPos.xyz);
-  float NoL = NoLSafe(faceNormal);
-  NoL = min(NoL, NoLSafe(mappedNormal));
+  float NoL = NoLSafe(faceNormal) * NoLSafe(mappedNormal);
 
   return shadow * NoL;
 }
