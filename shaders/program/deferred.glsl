@@ -21,6 +21,7 @@
   uniform sampler2DShadow shadowtex1;
   uniform sampler2D shadowcolor0;
 
+  uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -52,7 +53,7 @@
 
   void main() {
     float depth = texture(depthtex0, texcoord).r;
-    vec3 viewPos = screenToViewSpace(texcoord, depth);
+    vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
 

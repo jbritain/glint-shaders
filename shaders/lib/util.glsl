@@ -1,6 +1,7 @@
 #ifndef UTIL_INCLUDE
 #define UTIL_INCLUDE
 
+// a lotta stuff from https://github.com/Jessie-LC/open-source-utility-code
 
 const float PI = radians(180.0);
 const float TAU = radians(360.0);

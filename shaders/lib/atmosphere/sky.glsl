@@ -53,7 +53,7 @@ vec2 RSI (vec3 ro, vec3 rd, vec4 sph) {
     return -b + vec2(-c, c);
 }
 
-#define CUSTOMRAYLEIGH
+// #define CUSTOMRAYLEIGH
 
 const float sundeg = 1.0;
 const float sunintens = 100.0;

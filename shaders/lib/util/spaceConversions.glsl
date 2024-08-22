@@ -1,16 +1,38 @@
-#define diagonal2(mat) vec2((mat)[0].x, (mat)[1].y)
-#define diagonal3(mat) vec3((mat)[0].x, (mat)[1].y, mat[2].z)
+#ifndef SPACE_CONVERSIONS_INCLUDE
+#define SPACE_CONVERSIONS_INCLUDE
 
-#define transMAD(mat, v) (     mat3(mat) * (v) + (mat)[3].xyz)
-#define  projMAD(mat, v) (diagonal3(mat) * (v) + (mat)[3].xyz)
-
-vec3 projectAndDivide(mat4 projectionMatrix, vec3 position){
-    vec4 homPos = projectionMatrix * vec4(position, 1.0);
-    return homPos.xyz / homPos.w;
+float linearizeDepth(float depth, float near, float far) {
+  return (near * far) / (depth * (near - far) + far);
 }
 
-vec3 screenToViewSpace(vec2 texcoord, float depth){
-  vec3 screenPos = vec3(texcoord, depth) * 2.0 - 1.0;
+vec3 screenSpaceToViewSpace(vec3 screenPosition) {
+	screenPosition = screenPosition * 2.0 - 1.0;
 
-  return projMAD(gbufferProjectionInverse, screenPos) / (screenPos.z * gbufferProjectionInverse[2].w + gbufferProjectionInverse[3].w);
+	vec3 viewPosition  = vec3(vec2(gbufferProjectionInverse[0].x, gbufferProjectionInverse[1].y) * screenPosition.xy + gbufferProjectionInverse[3].xy, gbufferProjectionInverse[3].z);
+
+  viewPosition /= gbufferProjectionInverse[2].w * screenPosition.z + gbufferProjectionInverse[3].w;
+
+	return viewPosition;
 }
+
+float screenSpaceToViewSpace(float depth) {
+	depth = depth * 2.0 - 1.0;
+	return gbufferProjectionInverse[3].z / (gbufferProjectionInverse[2].w * depth + gbufferProjectionInverse[3].w);
+}
+
+vec3 viewSpaceToScreenSpace(vec3 viewPosition) {
+	vec3 screenPosition  = vec3(gbufferProjection[0].x, gbufferProjection[1].y, gbufferProjection[2].z) * viewPosition + gbufferProjection[3].xyz;
+	     screenPosition /= -viewPosition.z;
+
+	return screenPosition * 0.5 + 0.5;
+}
+
+float viewSpaceToScreenSpace(float depth) {
+	return ((gbufferProjection[2].z * depth + gbufferProjection[3].z) / -depth) * 0.5 + 0.5;
+}
+
+vec3 viewSpaceToSceneSpace(in vec3 viewPosition) {
+    return mat3(gbufferModelViewInverse) * viewPosition + gbufferModelViewInverse[3].xyz;
+}
+
+#endif

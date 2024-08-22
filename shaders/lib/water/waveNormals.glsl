@@ -2,7 +2,7 @@
 // https://www.shadertoy.com/view/MdXyzX
 // https://opensource.org/license/mit
 
-#define ITERATIONS_NORMAL 37 // waves iterations when calculating normals
+#define ITERATIONS_NORMAL 16 // waves iterations when calculating normals
 #define DRAG_MULT 0.38 // changes how much waves pull on the water
 
 // Calculates wave value and its derivative, 

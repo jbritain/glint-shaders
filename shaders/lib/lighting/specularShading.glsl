@@ -3,6 +3,9 @@
 
 #include "/lib/util.glsl"
 #include "/lib/util/material.glsl"
+#include "/lib/water/screenSpaceRayTrace.glsl"
+#include "/lib/atmosphere/sky.glsl"
+#include "/lib/util/noise.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
@@ -63,9 +66,32 @@ vec3 schlick(Material material, float NoV){
   }
 }
 
+vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap){
+  vec3 reflectionPos;
+
+  vec3 reflectedColor;
+
+  if(traceRay(viewOrigin, viewRay, 30, false,  reflectionPos)){ // we hit something
+    reflectedColor = texture(colortex0, reflectionPos.xy).rgb;
+
+    #ifdef SSR_FADE
+    float fadeFactor = smoothstep(0.95, 1.0, length(abs(reflectionPos.xy - 0.5) * 2));
+
+    if(fadeFactor > 0.0){
+      reflectedColor = mix(reflectedColor, getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap, fadeFactor);
+    }
+    #endif
+    
+  } else {
+    reflectedColor = getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+  }
+
+  return reflectedColor;
+}
+
 vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material){
 
-  if(material.roughness == 1.0){
+  if(material.roughness != 0.0){
     return color;
   }
 
@@ -78,13 +104,15 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
   vec3 fresnel = schlick(material, NoV);
 
   vec3 sunlight = getSunlight(mat3(gbufferModelViewInverse) * viewPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal);
-
   vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH * 0.05;
-
   vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlightColor * sunlight;
 
-  color = mix(color, specularHighlight, clamp01(fresnel));
+  vec3 reflectedRay = reflect(normalize(viewPos), normal);
+  vec3 reflectedColor = SSRSample(viewPos, reflectedRay, lightmap.y);
 
+  color = mix(color, reflectedColor + specularHighlight, clamp01(fresnel));
+  // vec3 reflectedScreenPos = viewSpaceToSceneSpace(reflectionPos);
+  // color = reflectionPos;
   return color;
 }
 
