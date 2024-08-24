@@ -21,6 +21,8 @@
   uniform sampler2DShadow shadowtex1;
   uniform sampler2D shadowcolor0;
 
+  uniform sampler2D noisetex;
+
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
   uniform mat4 gbufferModelView;
@@ -61,13 +63,13 @@
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
-
+    vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(sunPosition), true);
+    vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
+    cloudColor = getClouds(eyePlayerPos, depth, interleavedGradientNoise(floor(gl_FragCoord.xy)), sunlightColor, skyLightColor);
+    
 
     if(depth == 1.0){
       color.rgb = getSky(normalize(eyePlayerPos), true);
-      vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
-      vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
-      cloudColor = getClouds(normalize(eyePlayerPos), interleavedGradientNoise(floor(gl_FragCoord.xy)), sunlightColor, skyLightColor);
     } else {
       decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
       color.rgb = albedo;

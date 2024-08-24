@@ -28,6 +28,13 @@
     color = texture(colortex0, texcoord);
 
     vec4 cloud = texture2DLod(colortex3, texcoord, 2);
+
+    // prevent lack of clouds behind terrain bleeding through with mip
+    const ivec2[4] offsets = ivec2[4](ivec2(2), ivec2(-2, 2), ivec2(2, -2), ivec2(-2));
+    if(any(lessThan(textureGatherOffsets(depthtex0, texcoord, offsets, 0), vec4(1.0)))){
+
+      cloud = texture(colortex3, texcoord);
+    }
     color.rgb = mix(color.rgb, cloud.rgb, cloud.a);
   }
 #endif
