@@ -24,6 +24,8 @@
 #define SAMPLES 30
 #define SUBSAMPLES 10
 
+const vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * sunPosition);
+
 float schlickPhase(float costh)
 {
     return (1.0 - k * k) / (4.0 * PI * pow(1.0 - k * costh, 2.0));
@@ -38,12 +40,17 @@ float getDensity(vec3 pos){
   density = mix(density, clamp01(shapeDensity - 0.97), 0.3);
   density *= 10;
   density -= clamp01(erosionDensity - 0.6);
+  
+  float cumulusCentreHeight = mix(LOWER_PLANE_HEIGHT, UPPER_PLANE_HEIGHT, 0.2); // widest part of our cumulus clouds
 
-  float cloudCentreHeight = (LOWER_PLANE_HEIGHT + UPPER_PLANE_HEIGHT) / 2;
-  float cloudPlaneHeight = (UPPER_PLANE_HEIGHT - LOWER_PLANE_HEIGHT);
+  float heightDenseFactor;
 
-  float densityFactor = abs(pos.y - cloudCentreHeight) / (cloudPlaneHeight / 2);
-  density = mix(density, 0.0, densityFactor);
+  if(pos.y <= cumulusCentreHeight){
+    heightDenseFactor = smoothstep(LOWER_PLANE_HEIGHT, cumulusCentreHeight, pos.y);
+  } else {
+    heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, UPPER_PLANE_HEIGHT, pos.y);
+  }
+  density = mix(density, 0.0, 1.0 - pow2(heightDenseFactor));
 
   return density;
 }
@@ -72,8 +79,6 @@ bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
 float subMarch(vec3 rayPos, float jitter){
   vec3 a = rayPos;
   vec3 b = rayPos;
-
-  vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * sunPosition); // what the fuck, why do I need to invert this
 
   if(!getCloudIntersection(rayPos, sunDir, UPPER_PLANE_HEIGHT, b)){ 
     getCloudIntersection(rayPos, sunDir, LOWER_PLANE_HEIGHT, b);
@@ -163,7 +168,7 @@ vec4 getClouds(vec3 playerPos, float depth, float jitter, vec3 sunlightColor, ve
     if(density > 0){
       float lightTransmittance = subMarch(rayPos, jitter);
 
-      float phase = schlickPhase(dot(worldDir, normalize(mat3(gbufferModelViewInverse) * sunPosition)));
+      float phase = schlickPhase(dot(worldDir, sunDir));
 
       lightEnergy += density * length(increment) * transmittance * lightTransmittance * phase;
       transmittance *= exp(-density * length(increment) * ABSORPTION);
