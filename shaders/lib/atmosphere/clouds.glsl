@@ -25,7 +25,7 @@
 #define SAMPLES 30
 #define SUBSAMPLES 4
 
-const vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * sunPosition);
+vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * sunPosition);
 
 float schlickPhase(float costh)
 {
