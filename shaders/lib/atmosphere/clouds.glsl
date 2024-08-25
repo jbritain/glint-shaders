@@ -2,6 +2,7 @@
 #define CLOUD_INCLUDE
 
 #include "/lib/textures/cloudNoise.glsl"
+#include "/lib/util/noise.glsl"
 
 #define LOWER_PLANE_HEIGHT 128.0
 #define UPPER_PLANE_HEIGHT 256.0
@@ -22,7 +23,7 @@
 #define SUBMARCH_ABSORPTION 0.1
 #define k 0.6
 #define SAMPLES 30
-#define SUBSAMPLES 10
+#define SUBSAMPLES 4
 
 const vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * sunPosition);
 
@@ -76,7 +77,7 @@ bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
 
 
 // march from a ray position towards the sun to calculate how much light makes it there
-float subMarch(vec3 rayPos, float jitter){
+float subMarch(vec3 rayPos){
   vec3 a = rayPos;
   vec3 b = rayPos;
 
@@ -99,6 +100,8 @@ float subMarch(vec3 rayPos, float jitter){
   vec3 subRayPos = a;
   float totalDensity = 0;
 
+  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), 1);
+
   subRayPos += increment * jitter;
 
   for(int i = 0; i < SUBSAMPLES; i++, subRayPos += increment){
@@ -108,7 +111,7 @@ float subMarch(vec3 rayPos, float jitter){
   return exp(-totalDensity * SUBMARCH_ABSORPTION);
 }
 
-vec4 getClouds(vec3 playerPos, float depth, float jitter, vec3 sunlightColor, vec3 skyLightColor){
+vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
   vec3 worldDir = normalize(playerPos);
 
   // we trace from a to b
@@ -158,6 +161,7 @@ vec4 getClouds(vec3 playerPos, float depth, float jitter, vec3 sunlightColor, ve
   float transmittance = 1.0;
   vec3 lightEnergy = vec3(0.0);
 
+  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), 0);
   rayPos += increment * jitter;
 
   for(int i = 0; i < SAMPLES; i++, rayPos += increment){
@@ -166,7 +170,7 @@ vec4 getClouds(vec3 playerPos, float depth, float jitter, vec3 sunlightColor, ve
     density = mix(density, 0.0, smoothstep(MARCH_LIMIT * 0.5, MARCH_LIMIT, length(rayPos - cameraPosition)));
 
     if(density > 0){
-      float lightTransmittance = subMarch(rayPos, jitter);
+      float lightTransmittance = subMarch(rayPos);
 
       float phase = schlickPhase(dot(worldDir, sunDir));
 

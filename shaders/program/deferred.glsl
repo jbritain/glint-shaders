@@ -65,7 +65,7 @@
     
     vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(sunPosition), true);
     vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
-    cloudColor = getClouds(eyePlayerPos, depth, interleavedGradientNoise(floor(gl_FragCoord.xy)), sunlightColor, skyLightColor);
+    cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
     
 
     if(depth == 1.0){
