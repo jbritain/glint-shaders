@@ -76,7 +76,7 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:012 */
+  /* DRAWBUFFERS:0123 */
   layout(location = 0) out vec4 color; // shaded colour
   layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
   layout(location = 2) out vec4 outData2; // mapped normal, specular map data

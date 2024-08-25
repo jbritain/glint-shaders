@@ -34,12 +34,14 @@ float schlickPhase(float costh)
 }
 
 float getDensity(vec3 pos){
+  float coverage = mix(0.08, 0.2, wetness);
+
   float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r;
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r;
   float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * frameTimeCounter, 0.0, 0.0)).r;
   
-  float density = clamp01(shapeDensity2 - 0.92);
-  density = mix(density, clamp01(shapeDensity - 0.97), 0.3);
+  float density = clamp01(shapeDensity2 - (1.0 - coverage));
+  density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
   density -= clamp01(erosionDensity - 0.6);
   

@@ -40,6 +40,8 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform float wetness;
+
   in vec2 texcoord;
 
   vec3 albedo;
