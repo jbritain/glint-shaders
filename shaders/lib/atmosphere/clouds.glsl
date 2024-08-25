@@ -3,6 +3,7 @@
 
 #include "/lib/textures/cloudNoise.glsl"
 #include "/lib/util/noise.glsl"
+#include "/lib/textures/blueNoise.glsl"
 
 #define LOWER_PLANE_HEIGHT 128.0
 #define UPPER_PLANE_HEIGHT 256.0
@@ -100,7 +101,7 @@ float subMarch(vec3 rayPos){
   vec3 subRayPos = a;
   float totalDensity = 0;
 
-  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), 1);
+  float jitter = blueNoise(texcoord, 1).r;
 
   subRayPos += increment * jitter;
 
@@ -161,7 +162,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   float transmittance = 1.0;
   vec3 lightEnergy = vec3(0.0);
 
-  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), 0);
+  float jitter = blueNoise(texcoord, 0).r;
   rayPos += increment * jitter;
 
   for(int i = 0; i < SAMPLES; i++, rayPos += increment){
@@ -185,7 +186,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   // made up lighting calculations that look decent ish
   vec3 ambientColor = mix(skyLightColor, sunlightColor, 0.2);
-  vec3 cloudColor = lightEnergy * sunlightColor * 0.005 * ambientColor + skyLightColor;
+  vec3 cloudColor = lightEnergy * sunlightColor * 0.001 * ambientColor + skyLightColor * 2;
 
   // transmittance = mix(1.0, transmittance, pow2(smoothstep(0.0, 0.3, worldDir.y)));
 

@@ -37,6 +37,9 @@
 
   uniform float frameTimeCounter;
 
+  uniform float viewWidth;
+  uniform float viewHeight;
+
   in vec2 texcoord;
 
   vec3 albedo;

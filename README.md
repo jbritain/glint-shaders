@@ -14,7 +14,8 @@ Specular is only applied to the front layer (i.e not opaques behind translucents
 `colortex2` gbuffer data - mapped normal, specular map data
 
 # Passes
-`deferred` diffuse shading, sky
+`deferred` diffuse shading, sky, cloud generation
 
-`composite` specular lighting
+`composite` specular lighting, cloud blur pass
+`composite1` cloud blending
 

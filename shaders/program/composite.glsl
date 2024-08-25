@@ -13,6 +13,7 @@
   uniform sampler2D colortex0;
   uniform sampler2D colortex1;
   uniform sampler2D colortex2;
+  uniform sampler2D colortex3;
 
   uniform sampler2D depthtex0;
 
@@ -36,6 +37,8 @@
   uniform vec3 cameraPosition;
 
   uniform int frameCounter;
+  uniform float viewWidth;
+  uniform float viewHeight;
 
   in vec2 texcoord;
 
@@ -47,8 +50,9 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:0 */
+  /* DRAWBUFFERS:03 */
   layout(location = 0) out vec4 color;
+  layout(location = 1) out vec4 cloudColor;
 
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/lighting/diffuseShading.glsl"
@@ -57,11 +61,19 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/util/material.glsl"
   #include "/lib/util/materialIDs.glsl"
+  #include "/lib/util/blur.glsl"
 
   void main() {
     color = texture(colortex0, texcoord);
 
     float depth = texture(depthtex0, texcoord).r;
+
+    if(depth == 1.0){
+      cloudColor = blur13(colortex3, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
+    } else {
+      cloudColor = texture(colortex3, texcoord);
+    }
+
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     

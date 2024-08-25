@@ -11,14 +11,17 @@
 #endif
 
 #ifdef fsh
-  const bool colortex3MipmapEnabled = true;
-
   uniform sampler2D colortex0;
   uniform sampler2D colortex3;
 
   uniform sampler2D depthtex0;
 
+  uniform float viewWidth;
+  uniform float viewHeight;
+
   in vec2 texcoord;
+
+  #include "/lib/util/blur.glsl"
 
   /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
@@ -27,14 +30,15 @@
     float depth = texture(depthtex0, texcoord).r;
     color = texture(colortex0, texcoord);
 
-    vec4 cloud = texture2DLod(colortex3, texcoord, 2);
+    vec4 cloud;
 
-    // prevent lack of clouds behind terrain bleeding through with mip
-    const ivec2[4] offsets = ivec2[4](ivec2(2), ivec2(-2, 2), ivec2(2, -2), ivec2(-2));
-    if(any(lessThan(textureGatherOffsets(depthtex0, texcoord, offsets, 0), vec4(1.0)))){
-
+    if(depth == 1.0){
+      cloud = blur13(colortex3, texcoord, vec2(viewWidth, viewHeight), vec2(0.0, 1.0));
+    } else {
       cloud = texture(colortex3, texcoord);
     }
+
+
     color.rgb = mix(color.rgb, cloud.rgb, cloud.a);
   }
 #endif
