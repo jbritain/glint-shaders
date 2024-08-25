@@ -20,7 +20,7 @@
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define ABSORPTION 0.3
+#define ABSORPTION 0.1
 #define SUBMARCH_ABSORPTION 0.1
 #define k 0.6
 #define SAMPLES 30
@@ -187,6 +187,10 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   // made up lighting calculations that look decent ish
   vec3 ambientColor = mix(skyLightColor, sunlightColor, 0.2);
   vec3 cloudColor = lightEnergy * sunlightColor * 0.001 * ambientColor + skyLightColor * 2;
+
+  if(length(cloudColor) > 10){
+    cloudColor = normalize(cloudColor) * 10;
+  }
 
   // transmittance = mix(1.0, transmittance, pow2(smoothstep(0.0, 0.3, worldDir.y)));
 
