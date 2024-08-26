@@ -34,8 +34,6 @@
     
     color = texture(colortex0, texcoord);
 
-    // color.rgb = texture(colortex4, texcoord).rgb;
-
     // color += texture(colortex8, texcoord / BLOOM_BLUR) * BLOOM_AMOUNT;
     color.rgb = tonemap(color.rgb);
     color.rgb = invGammaCorrect(color.rgb);

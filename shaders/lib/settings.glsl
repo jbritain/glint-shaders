@@ -4,7 +4,7 @@ const int colortex0Format = RGB32F;  || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
 const int colortex3Format = RGBA16F; || clouds
-const int colortex4Format = RGBA16F; || previous frame data
+const int colortex4Format = RGBA32F; || previous frame data
 
 */
 

@@ -65,6 +65,9 @@
   #include "/lib/lighting/diffuseShading.glsl"
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/water/waveNormals.glsl"
+  #include "/lib/util/material.glsl"
+  #include "/lib/atmosphere/sky.glsl"
+  #include "/lib/lighting/getSunlight.glsl"
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
@@ -117,6 +120,8 @@
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
 
-    color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
+    vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal) * SUNLIGHT_STRENGTH * sunlightColor;
+    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
   }
 #endif

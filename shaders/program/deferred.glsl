@@ -62,6 +62,9 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/noise.glsl"
+  #include "/lib/util/material.glsl"
+  #include "/lib/util/materialIDs.glsl"
+  #include "/lib/lighting/getSunlight.glsl"
 
   void main() {
     float depth = texture(depthtex0, texcoord).r;
@@ -70,16 +73,22 @@
     
     vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(sunPosition), true);
     vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
-    cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
+    // cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
     
 
     if(depth == 1.0){
       color.rgb = getSky(normalize(eyePlayerPos), true);
     } else {
       decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
+      Material material = materialFromSpecularMap(albedo, specularData);
+
+      vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
+      vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal) * SUNLIGHT_STRENGTH * sunlightColor;
+
       color.rgb = albedo;
 
-      color.rgb = shadeDiffuse(color.rgb, eyePlayerPos + gbufferModelViewInverse[3].xyz, lightmap, mappedNormal, faceNormal);
+      color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
+      
     }
   }
 #endif

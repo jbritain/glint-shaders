@@ -17,12 +17,14 @@
 
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:4 */
+  /* DRAWBUFFERS:40 */
   layout(location = 0) out vec4 previousFrameData;
+  layout(location = 1) out vec4 color;
 
   void main() {
+    // color = vec4(texture(colortex4, texcoord).rgb - texture(colortex0, texcoord).rgb, 1.0);
     previousFrameData.rgb = texture(colortex0, texcoord).rgb;
-    previousFrameData.a = texture(depthtex0, texcoord).a;
+    previousFrameData.a = texture(depthtex0, texcoord).r;
 
   }
 #endif

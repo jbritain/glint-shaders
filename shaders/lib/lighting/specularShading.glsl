@@ -6,6 +6,7 @@
 #include "/lib/water/screenSpaceRayTrace.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/noise.glsl"
+#include "/lib/lighting/getSunlight.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
@@ -111,8 +112,11 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
 
   vec3 reflectedColor;
 
-  if(traceRay(viewOrigin, viewRay, 30, jitter, false, reflectionPos)){ // we hit something
-    reflectedColor = texture(colortex0, reflectionPos.xy).rgb;
+  if(traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos)){ // we hit something
+    reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
+    if(reflectedColor == vec3(0.0)){
+      reflectedColor = texture(colortex0, reflectionPos.xy).rgb;
+    }
 
     #ifdef SSR_FADE
     float fadeFactor = smoothstep(0.95, 1.0, length(abs(reflectionPos.xy - 0.5) * 2));

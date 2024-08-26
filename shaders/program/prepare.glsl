@@ -40,18 +40,21 @@
   layout(location = 0) out vec4 previousFrameData;
 
   void main() {
+    mat4 gbufferPreviousModelViewInverse = inverse(gbufferPreviousModelView); // TODO: not this
+
     float depth = texture(depthtex0, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
-    eyePlayerPos += cameraPosition - previousCameraPosition;
+    eyePlayerPos += gbufferModelViewInverse[3].xyz + cameraPosition;
+    eyePlayerPos -= gbufferPreviousModelViewInverse[3].xyz + previousCameraPosition;
     vec3 previousViewPos = mat3(gbufferPreviousModelView) * eyePlayerPos;
     vec3 previousScreenPos = viewSpaceToPreviousScreenSpace(previousViewPos);
 
-    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy){ // check if within screen bounds
+    // if(clamp01(previousScreenPos.xy) == previousScreenPos.xy){ // check if within screen bounds
       previousFrameData = texture(colortex4, previousScreenPos.xy);
-    } else {
-      previousFrameData = vec4(0.0);
-    }
+    // } else {
+    //   previousFrameData = vec4(vec3(0.0), 1.0);
+    // }
 
     
 
