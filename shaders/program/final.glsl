@@ -19,18 +19,23 @@
   #endif
 
   uniform sampler2D colortex0;
+  uniform sampler2D colortex4;
   uniform sampler2D colortex8;
+
+  uniform sampler2D depthtex0;
 
   in vec2 texcoord;
 
   #include "/lib/postProcessing/tonemap.glsl"
 
-  /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
 
   void main() {
     
     color = texture(colortex0, texcoord);
+
+    // color.rgb = texture(colortex4, texcoord).rgb;
+
     // color += texture(colortex8, texcoord / BLOOM_BLUR) * BLOOM_AMOUNT;
     color.rgb = tonemap(color.rgb);
     color.rgb = invGammaCorrect(color.rgb);
