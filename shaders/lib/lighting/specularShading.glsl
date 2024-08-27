@@ -6,6 +6,7 @@
 #include "/lib/water/screenSpaceRayTrace.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/noise.glsl"
+#include "/lib/textures/blueNoise.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
@@ -137,6 +138,8 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
     return color;
   }
 
+  vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
+
   vec3 V = normalize(-viewPos);
   vec3 N = normal;
   vec3 L = normalize(shadowLightPosition);
@@ -151,7 +154,7 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
 
   if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter);
+    float jitter = blueNoise(screenPos, frameCounter).r;
     reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
   } else if(material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
 
@@ -163,15 +166,17 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
     mat3 tbn = mat3(tangent, bitangent, normal);
 
     for(int i = 0; i < SSR_SAMPLES; i++){
-      float r1 = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter * SSR_SAMPLES + i);
-			float r2 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(23, 97), frameCounter * SSR_SAMPLES + i);
-      float r3 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter * SSR_SAMPLES + i);
+      // float r1 = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter * SSR_SAMPLES + i);
+			// float r2 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(23, 97), frameCounter * SSR_SAMPLES + i);
+      // float r3 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter * SSR_SAMPLES + i);
 
-      vec2 noise = vec2(r1, r2);
+      // vec2 noise = vec2(r1, r2);
 
-      vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise));
+      vec3 noise = blueNoise(screenPos, frameCounter * SSR_SAMPLES + i).rgb;
+
+      vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
-      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, r3);
+      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, noise.z);
     }
     reflectedColor /= SSR_SAMPLES;
   } else { // no reflection so just stick with the albedo
