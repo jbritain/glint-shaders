@@ -37,19 +37,32 @@
   uniform sampler2DShadow shadowtex1;
   uniform sampler2D shadowcolor0;
 
+  uniform sampler2D colortex0;
+  uniform sampler2D colortex4;
+
   uniform float alphaTestRef;
   uniform float frameTimeCounter;
 
   uniform vec3 cameraPosition;
+  uniform vec3 previousCameraPosition;
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
+  uniform mat4 gbufferProjection;
+  uniform mat4 gbufferProjectionInverse;
   
   uniform mat4 shadowProjection;
   uniform mat4 shadowModelView;
+
+  uniform float viewWidth;
+  uniform float viewHeight;
+
+  uniform float far;
+
+  uniform int frameCounter;
 
   in vec2 lmcoord;
   in vec2 texcoord;
@@ -68,6 +81,7 @@
   #include "/lib/util/material.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/lighting/getSunlight.glsl"
+  #include "/lib/lighting/specularShading.glsl"
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
@@ -116,6 +130,13 @@
 
     vec4 specularData = texture(specular, texcoord);
 
+    Material material;
+    if(water(materialID)) {
+      material = waterMaterial;
+    } else {
+      material = materialFromSpecularMap(color.rgb, specularData);
+    }
+
     outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
@@ -123,5 +144,15 @@
     vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
+    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
+
+    vec3 fog = getSky(normalize(vec3(eyePlayerPos.x, abs(eyePlayerPos.y), eyePlayerPos.z)), false);
+
+    float fogFactor = length(eyePlayerPos) / far;
+    fogFactor = clamp01(fogFactor - 0.2) / (1.0 - 0.2);
+    fogFactor = pow(fogFactor, 3.0);
+    fogFactor = clamp01(fogFactor);
+
+    color = mix(color, vec4(fog, 1.0), fogFactor);
   }
 #endif

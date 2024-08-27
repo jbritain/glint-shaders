@@ -5,7 +5,6 @@
 
 Translucents are fully forward rendered in gbuffers.
 Opaques are diffuse shaded in `deferred`.
-Specular is only applied to the front layer (i.e not opaques behind translucents)
 
 # Buffers
 
@@ -19,9 +18,6 @@ Specular is only applied to the front layer (i.e not opaques behind translucents
 `prepare` reprojecting previous frame data
 
 `deferred` diffuse shading, sky, cloud generation
-
-`composite` specular lighting, cloud blur pass
-`composite1` cloud blending
 
 `composite99` writing frame data for next frame to access (previous frame data)
 

@@ -6,7 +6,6 @@
 #include "/lib/water/screenSpaceRayTrace.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/noise.glsl"
-#include "/lib/lighting/getSunlight.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
@@ -133,8 +132,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   return reflectedColor;
 }
 
-vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material){
-
+vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight){
   if(material.roughness == 1.0){
     return color;
   }
@@ -147,22 +145,20 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
 
   vec3 fresnel = schlick(material, NoV);
 
-  vec3 sunlight = getSunlight(mat3(gbufferModelViewInverse) * viewPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal);
-  vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * L, true) * SUNLIGHT_STRENGTH * 0.1;
-  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlightColor * sunlight;
+  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlight;
 
-  vec3 reflectedColor;
+  vec4 reflectedColor = vec4(0.0, 0.0, 0.0, 1.0);
 
   if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
     float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter);
-    reflectedColor = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
+    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
   } else if(material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
 
     // we need a TBN to get into tangent space for the VNDF
     vec3 tangent;
     vec3 bitangent;
-    computeFrisvadTangent(mappedNormal, tangent, bitangent);
+    computeFrisvadTangent(normal, tangent, bitangent);
 
     mat3 tbn = mat3(tangent, bitangent, normal);
 
@@ -175,20 +171,20 @@ vec3 shadeSpecular(vec3 color, vec2 lightmap, vec3 normal, vec3 viewPos, Materia
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
-      reflectedColor += SSRSample(viewPos, reflectedRay, lightmap.y, r3);
+      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, r3);
     }
     reflectedColor /= SSR_SAMPLES;
   } else { // no reflection so just stick with the albedo
     reflectedColor = color;
   }
 
-  reflectedColor += specularHighlight;
+  reflectedColor.rgb += specularHighlight;
 
   if(material.metalID != NO_METAL){
-    reflectedColor *= material.albedo;
+    reflectedColor.rgb *= material.albedo;
   }
 
-  color = mix(color, reflectedColor, clamp01(fresnel));
+  color = mix(color, reflectedColor, vec4(clamp01(fresnel), clamp01(length(fresnel))));
   // vec3 reflectedScreenPos = viewSpaceToSceneSpace(reflectionPos);
   // color = reflectionPos;
   return color;

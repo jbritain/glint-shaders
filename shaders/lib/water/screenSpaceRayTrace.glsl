@@ -2,6 +2,7 @@
 #define SCREEN_SPACE_RAY_TRACE_INCLUDE
 
 #include "/lib/util/spaceConversions.glsl"
+#include "/lib/util/reproject.glsl"
 
 #define BINARY_REFINEMENTS 6
 #define BINARY_REDUCTION 0.5
@@ -9,7 +10,7 @@
 const float handDepth = MC_HAND_DEPTH * 0.5 + 0.5;
 
 float getDepth(vec2 pos){
-  return texelFetch(depthtex0, ivec2(pos * vec2(viewWidth, viewHeight)), 0).r;
+  return texelFetch(colortex4, ivec2(pos * vec2(viewWidth, viewHeight)), 0).a;
 }
 
 void binarySearch(inout vec3 rayPos, vec3 rayDir){
@@ -23,8 +24,8 @@ void binarySearch(inout vec3 rayPos, vec3 rayDir){
 // thanks, belmu!!
 // https://gist.github.com/BelmuTM/af0fe99ee5aab386b149a53775fe94a3#file-raytracer-glsl-L31
 bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool refine, out vec3 rayPos){
-  rayPos = viewSpaceToScreenSpace(viewOrigin);
-  vec3 rayDir = viewSpaceToScreenSpace(viewOrigin + viewDir) - rayPos;
+  rayPos = reproject(viewSpaceToScreenSpace(viewOrigin));
+  vec3 rayDir = reproject(viewSpaceToScreenSpace(viewOrigin + viewDir)) - rayPos;
   rayDir *= min3((sign(rayDir) - rayPos) / rayDir); // set length of ray to trace to the nearest screen edge (I think)
   rayDir *= rcp(maxSteps); // split ray up into our steps
 

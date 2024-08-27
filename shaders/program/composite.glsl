@@ -58,7 +58,6 @@
 
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/lighting/diffuseShading.glsl"
-  #include "/lib/lighting/specularShading.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/util/material.glsl"
@@ -86,24 +85,6 @@
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
     
     Material material;
-
-    if(water(materialID)) {
-      material = waterMaterial;
-    } else {
-      material = materialFromSpecularMap(albedo, specularData);
-    }
-
-    color.rgb = shadeSpecular(color.rgb, lightmap, mappedNormal, viewPos, material);
-
-    // we use positive Y to hide the horizon line
-    vec3 fog = getSky(normalize(vec3(eyePlayerPos.x, abs(eyePlayerPos.y), eyePlayerPos.z)), false);
-
-    float fogFactor = length(eyePlayerPos) / far;
-    fogFactor = clamp01(fogFactor - 0.2) / (1.0 - 0.2);
-    fogFactor = pow(fogFactor, 3.0);
-    fogFactor = clamp01(fogFactor);
-
-    color.rgb = mix(color.rgb, fog, fogFactor);
 
   }
 #endif

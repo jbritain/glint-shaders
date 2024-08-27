@@ -14,6 +14,7 @@
   uniform sampler2D colortex0;
   uniform sampler2D colortex1;
   uniform sampler2D colortex2;
+  uniform sampler2D colortex4;
 
   uniform sampler2D depthtex0;
 
@@ -33,14 +34,20 @@
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
+
   uniform vec3 cameraPosition;
+  uniform vec3 previousCameraPosition;
 
   uniform float frameTimeCounter;
 
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform int frameCounter;
+
   uniform float wetness;
+
+  uniform float far;
 
   in vec2 texcoord;
 
@@ -65,6 +72,7 @@
   #include "/lib/util/material.glsl"
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/lighting/getSunlight.glsl"
+  #include "/lib/lighting/specularShading.glsl"
 
   void main() {
     float depth = texture(depthtex0, texcoord).r;
@@ -73,22 +81,32 @@
     
     vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(sunPosition), true);
     vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
-    // cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
+    cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
     
 
     if(depth == 1.0){
       color.rgb = getSky(normalize(eyePlayerPos), true);
-    } else {
-      decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
-      Material material = materialFromSpecularMap(albedo, specularData);
-
-      vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
-      vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal) * SUNLIGHT_STRENGTH * sunlightColor;
-
-      color.rgb = albedo;
-
-      color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
-      
+      return;
     }
+
+    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
+    Material material = materialFromSpecularMap(albedo, specularData);
+
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal) * SUNLIGHT_STRENGTH * sunlightColor;
+
+    color.rgb = albedo;
+
+    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
+    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
+
+    vec3 fog = getSky(normalize(vec3(eyePlayerPos.x, abs(eyePlayerPos.y), eyePlayerPos.z)), false);
+
+    float fogFactor = length(eyePlayerPos) / far;
+    fogFactor = clamp01(fogFactor - 0.2) / (1.0 - 0.2);
+    fogFactor = pow(fogFactor, 3.0);
+    fogFactor = clamp01(fogFactor);
+
+    color = mix(color, vec4(fog, 1.0), fogFactor);
+      
   }
 #endif

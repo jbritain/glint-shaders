@@ -20,7 +20,7 @@ const bool shadowHardwareFiltering = true;
 #define BLOOM_AMOUNT 0.2 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 #define BLOOM_BLUR 1.0 // [1.0 1.5 2.0 2.5 3.0 3.5 4.0]
 
-// #define SSR_FADE
+#define SSR_FADE
 #define SSR_SAMPLES 4
 #define ROUGH_REFLECTION_THRESHOLD 0.3
 
