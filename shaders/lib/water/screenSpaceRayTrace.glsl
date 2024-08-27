@@ -33,7 +33,7 @@ bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool re
 
   bool intersect = false;
 
-  rayPos += rayDir * jitter;
+  rayPos += rayDir * (jitter + 2);
 
   for(int i = 0; i < maxSteps && !intersect; i++, rayPos += rayDir){
     if(clamp01(rayPos.xy) != rayPos.xy) return false; // we went offscreen

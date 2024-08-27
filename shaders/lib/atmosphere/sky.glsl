@@ -1,217 +1,170 @@
 #ifndef SKY_INCLUDE
 #define SKY_INCLUDE
-// https://www.shadertoy.com/view/lcXSR2
-// thanks quadro!!! (and by extension Jessie, the goat of minecraft applied physics)
 
-float normdist (float x, float mean, float dev) {
-    float nd = (1.0 / (dev * sqrt(2.0 * PI))) * exp(-0.5 * pow2((x - mean) / dev));
-    return nd;
+// FROM https://www.shadertoy.com/view/wsfGWH
+// TODO: NOT USE THIS BECAUSE THERE IS NO LICENSE ATTACHED
+
+// Planet Constants
+const float EARTHRADIUS = 6360e3; // 6360e3
+const float ATMOSPHERERADIUS = 6420e3; //6420e3
+const float SUNINTENSITY = 20.0; //20.0
+
+// Rayleigh Scattering
+const float RAYLEIGHSCALEHEIGHT = 7994.0; // 7994.0
+const vec3 BETAR = vec3(3.8e-6, 13.5e-6, 33.1e-6);
+
+// Mie Scattering
+const float MIESCALEHEIGHT = 1200.0; // 1200.0
+const vec3 BETAM = vec3(210e-5, 210e-5, 210e-5);
+const float G = 0.76;
+
+// --------------------------------------
+// ---------- Helper Functions-----------
+// --------------------------------------
+
+// Returns the matrix that rotates a given point by 'a' radians
+
+mat2 mm2(in float a) {
+    
+    float c = cos(a);
+    float s = sin(a);
+    return mat2(c, s, -s, c);
+    
 }
 
-//From Jessie
-float PreethamBetaO_Fit(float wavelength) {
-    wavelength -= 390.0;
-    float p1 = normdist(wavelength, 202.0, 15.0) * 14.4;
-    float p2 = normdist(wavelength, 170.0, 10.0) * 6.5;
-    float p3 = normdist(wavelength, 50.0, 20.0) * 3.0;
-    float p4 = normdist(wavelength, 100.0, 25.0) * 7.0;
-    float p5 = normdist(wavelength, 140.0, 30.0) * 20.0;
-    float p6 = normdist(wavelength, 150.0, 10.0) * 3.0;
-    float p7 = normdist(wavelength, 290.0, 30.0) * 12.0;
-    float p8 = normdist(wavelength, 330.0, 80.0) * 10.0;
-    float p9 = normdist(wavelength, 240.0, 20.0) * 13.0;
-    float p10 = normdist(wavelength, 220.0, 10.0) * 2.0;
-    float p11 = normdist(wavelength, 186.0, 8.0) * 1.3;
-    return 0.0001 * ((p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + p11) / 1e20);
-}
 
-float Air(in float wavelength) {
-    return 1.0+8.06051E-5+2.480990E-2/(132.274-pow(wavelength,-2.0))+1.74557E-4/(39.32957-pow(wavelength,-2.0));
-}
+// Returns the first intersection of the ray with the sphere (or -1.0 if no intersection)
+// From https://gist.github.com/wwwtyro/beecc31d65d1004f5a9d
 
-float BetaR(in float wavelength) {
-    float nanometers = wavelength * 1e-9;
-
-    float F_N2 = 1.034 + 3.17e-4 * (1.0 / pow(wavelength, 2.0));
-    float F_O2 = 1.096 + 1.385e-3 * (1.0 / pow(wavelength, 2.0)) + 1.448e-4 * (1.0 / pow(wavelength, 4.0));
-    float CCO2 = 0.045;
-    float kingFactor = (78.084 * F_N2 + 20.946 * F_O2 + 0.934 + CCO2 * 1.15) / (78.084 + 20.946 + 0.934 + CCO2);
-    float n = pow(Air(wavelength * 1e-3), 2.0) - 1.0;
-
-    return ((8.0 * pow(PI, 3.0) * pow(n, 2.0)) / (3.0 * 2.5035422e25 * pow(nanometers, 4.0))) * kingFactor;
-}
-
-vec2 RSI (vec3 ro, vec3 rd, vec4 sph) {
-    ro = ro - sph.xyz;
-    float a = sph.a * sph.a;
-    float b = dot(ro, rd);
-    float c = b * b + a - dot(ro, ro);
-
-    if (c < 0.0) return vec2(-1.0);
-
-    c = sqrt(c);
-    return -b + vec2(-c, c);
-}
-
-// #define CUSTOMRAYLEIGH
-
-const float sundeg = 1.0;
-const float sunintens = 100.0;
-const float moonintens = 5.0;
-
-const int points = 8;
-const int odpoints = 4;
-
-const vec3 scatterm = vec3(2e-6);
-const vec3 scatterr = vec3(1.8e-6, 14.5e-6, 44.1e-6);
-
-const float ozone = 1.0;
-
-const float planetrad = 6371e3;
-const float atmoheight = 100e3;
-
-const vec2 scaleheights = vec2(8.0, 1.4) * 1000.0;
-
-const vec2 inversescaleheights = 1.0 / scaleheights;
-const vec2 scaledplanetrads = planetrad * inversescaleheights;
-const float atmorad = planetrad + atmoheight;
-const float atmolowerlim = planetrad - 1000;
-
-float rphase(float c) {
-    return  3.0 * (1.0 + c * c) / 16.0 / PI;
-}
-
-float mphase2 (float c) {
-    float g = 0.76;
-
-    float e = 1.0;
-    for (int i = 0; i < 8; i++) {
-        float gFromE = 1.0 / e - 2.0 / log(2.0 * e + 1.0) + 1.0;
-        float deriv = 4.0 / ((2.0 * e + 1.0) * log(2.0 * e + 1.0) * log(2.0 * e + 1.0)) - 1.0 / (e * e);
-        if (abs(deriv) < 0.00000001) break;
-        e = e - (gFromE - g) / deriv;
+float raySphereIntersect(vec3 rayOrigin, vec3 rayDirection, vec3 sphereCenter, float sphereRadius) {
+    
+    float a = dot(rayDirection, rayDirection);
+    vec3 d = rayOrigin - sphereCenter;
+    float b = 2.0 * dot(rayDirection, d);
+    float c = dot(d, d) - (sphereRadius * sphereRadius);
+    if (b*b - 4.0*a*c < 0.0) {
+        return -1.0;
     }
-
-    return e / (2.0 * PI * (e * (1.0 - c) + 1.0) * log(2.0 * e + 1.0));
+    return (-b + sqrt((b*b) - 4.0*a*c))/(2.0*a);
+    
 }
 
-float raydens (in float h) {
-    return exp(-h * inversescaleheights.x + scaledplanetrads.x);
+// -------------------------------
+// ------- Main Functions --------
+// -------------------------------
+
+// The rayleigh phase function
+float rayleighPhase(float mu) {
+    float phase = (3.0 / (16.0 * PI)) * (1.0 + mu * mu);
+    return phase;
 }
 
-float miedens (in float h) {
-    return exp(-h * inversescaleheights.y + scaledplanetrads.y);
+// The mie phase function
+float miePhase(float mu) {
+    float numerator = (1.0 - G * G) * (1.0 + mu * mu);
+    float denominator = (2.0 + G * G) * pow(1.0 + G * G - 2.0 * G * mu, 3.0/2.0);
+    return (3.0 / (8.0 * PI)) * numerator / denominator;
 }
 
-//From Jessie
-float ozonedens (in float h) {
-    float o1 = 25.0 *     exp(( 0.0 - h) /   8.0) * 0.5;
-    float o2 = 30.0 * pow(exp((18.0 - h) /  80.0), h - 18.0);
-    float o3 = 75.0 * pow(exp((25.3 - h) /  35.0), h - 25.3);
-    float o4 = 50.0 * pow(exp((30.0 - h) / 150.0), h - 30.0);
-    return (o1 + o2 + o3 + o4) / 134.628;
+// Returns the expected amount of atmospheric scattering at a given height above sea level
+// Different parameters are passed in for rayleigh and mie scattering
+vec3 scatteringAtHeight(vec3 scatteringAtSea, float height, float heightScale) {
+	return scatteringAtSea * exp(-height/heightScale);
 }
 
-vec3 dens2 (float height) {
-    height = max(height, planetrad);
-    float ray = raydens(height);
-    float mie = miedens(height);
-    float ozone = ozonedens((height - planetrad) / 1000.0);
-
-    return vec3(ray, mie, ozone);
+// Returns the height of a vector above the 'earth'
+float height(vec3 p) {
+    return (length(p) - EARTHRADIUS);
 }
 
-vec3 lighttrans (vec3 ro, vec3 rd) {
-    float dist = dot(ro, rd);
-    dist = sqrt(dist * dist + atmorad * atmorad - dot(ro, ro)) - dist;
-    float t = dist / float(odpoints);
-    vec3 step = rd * t;
-    ro += step * 0.5;
-
-    vec3 sum = vec3(0.0);
-    for (int i = 0; i < odpoints; i++, ro += step) {
-        float height = length(ro);
-        sum += dens2(height);
+// Calculates the transmittance from pb to pa, given the scale height and the scattering
+// coefficients. The samples parameter controls how accurate the result is.
+// See the scratchapixel link for details on what is happening
+vec3 transmittance(vec3 pa, vec3 pb, int samples, float scaleHeight, vec3 scatCoeffs) {
+    float opticalDepth = 0.0;
+    float segmentLength = length(pb - pa)/float(samples);
+    for (int i = 0; i < samples; i++) {
+        vec3 samplePoint = mix(pa, pb, (float(i)+0.5)/float(samples));
+        float sampleHeight = height(samplePoint);
+        opticalDepth += exp(-sampleHeight / scaleHeight) * segmentLength;
     }
-    
-    vec3 scattero = vec3(PreethamBetaO_Fit(680.0), PreethamBetaO_Fit(550.0), PreethamBetaO_Fit(440.0)) * 2.5035422e25 * exp(-25e3 / 8e3) * 134.628 / 48.0 * 3e-6 * ozone;
-    #ifndef CUSTOMRAYLEIGH
-    vec3 scatterr = vec3(BetaR(680.0), BetaR(550.0), BetaR(440.0));
-    #endif
-
-    vec3 od = (scatterr * t * sum.x) + (scatterm * t * sum.y) + (scattero * t * sum.z);
-    vec3 trans = exp(-od);
-    if (any(isnan(trans))) trans = vec3(0.0);
-    if (any(isinf(trans))) trans = vec3(1.0);
-
-    return trans;
+    vec3 transmittance = exp(-1.0 * scatCoeffs * opticalDepth);
+    return transmittance;
 }
 
-vec3 march (vec3 ro, vec3 rd, vec3 lrd, float intens, vec3 col, vec3 pos) {
-    vec2 atmo = RSI(ro, rd, vec4(vec3(0.0), atmorad));
-    vec2 plan = RSI(ro, rd, vec4(vec3(0.0), atmolowerlim));
+// This is the main function that uses the ideas of rayleigh and mie scattering
+// This function is written with understandability in mind rather than performance, and
+// redundant calls to transmittance can be removed as per the code in the scratchapixel link
 
-    bool atmoi = false;//atmo.y >= 0.0;
-    bool plani = plan.x >= 0.0;
-
-    col *= float(!plani);
-
-    vec2 idk = vec2((plani && plan.x < 0.0) ? plan.y : max(atmo.x, 0.0), (plani && plan.x > 0.0) ? plan.x : atmo.y);
-
-    float t;
-
-    if (pos != vec3(0)){
-        t = length(pos) / float(points);
-    } else {
-        t = length(idk.y - idk.x) / float(points);
-    }
+vec3 getSkyColor(vec3 pa, vec3 pb, vec3 sunDir) {
+	
+    // Get the angle between the ray direction and the sun
+    float mu = dot(normalize(pb - pa), sunDir);
     
-    vec3 step = rd * t;
-    vec3 p = rd * idk.x + step * 0.5 + ro;
-
-    float mu = dot(rd, lrd);
-
-    float rayphase = rphase(mu);
-    float miephase = mphase2(mu);
+    // Calculate the result from the phase functions
+    float phaseR = rayleighPhase(mu);
+    float phaseM = miePhase(mu);
     
-    vec3 scattero = vec3(PreethamBetaO_Fit(680.0), PreethamBetaO_Fit(550.0), PreethamBetaO_Fit(440.0)) * 2.5035422e25 * exp(-25e3 / 8e3) * 134.628 / 48.0 * 3e-6 * ozone;
+    // Will be used to store the cumulative colors for rayleigh and mie
+    vec3 rayleighColor = vec3(0.0, 0.0, 0.0);
+    vec3 mieColor = vec3(0.0, 0.0, 0.0);
+
+    // Performs an integral approximation by checking a number of sample points and:
+    //		- Calculating the incident light on that point from the sun
+    //		- Calculating the amount of that light that gets reflected towards the origin
     
-    #ifndef CUSTOMRAYLEIGH
-    vec3 scatterr = vec3(BetaR(680.0), BetaR(550.0), BetaR(440.0));
-    #endif
-
-    vec3 scattering = vec3(0.0);
-    vec3 trans = vec3(1.0);
-    for (int i = 0; i < points; i++, p += step) {
-        vec3 dens = dens2(length(p));
-        if (dens.x > 1e35) break;
-        if (dens.y > 1e35) break;
-        if (dens.z > 1e35) break;
-
-        vec3 mass = t * dens;
-        if (any(isnan(mass))) mass = vec3(0.0);
-
-        vec3 stepod = (scatterr * mass.x) + (scatterm * mass.y) + (scattero * mass.z);
-
-        vec3 steptrans = exp(-stepod);
-        vec3 scatter = trans * (steptrans - 1.0) / -stepod;
-
-        scattering += (scatterr * mass.x * rayphase + scatterm * mass.y * miephase) * scatter * lighttrans(p, lrd);
+    int samples = 10;
+    float segmentLength = length(pb - pa) / float(samples);
+    
+    for (int i = 0; i < samples; i++) {
+        
+    	vec3 samplePoint = mix(pa, pb, (float(i)+0.5)/float(samples));
+        float sampleHeight = height(samplePoint);
+        float distanceToAtmosphere = raySphereIntersect(samplePoint, sunDir, vec3(0.0, 0.0, 0.0), ATMOSPHERERADIUS);
+    	vec3 atmosphereIntersect = samplePoint + sunDir * distanceToAtmosphere;
+        
+        // Rayleigh Calculations
+        vec3 trans1R = transmittance(pa, samplePoint, 10, RAYLEIGHSCALEHEIGHT, BETAR);
+        vec3 trans2R = transmittance(samplePoint, atmosphereIntersect, 10, RAYLEIGHSCALEHEIGHT, BETAR);
+        rayleighColor += trans1R * trans2R * scatteringAtHeight(BETAR, sampleHeight, RAYLEIGHSCALEHEIGHT) * segmentLength;
+        
+        // Mie Calculations
+        vec3 trans1M = transmittance(pa, samplePoint, 10, MIESCALEHEIGHT, BETAM);
+        vec3 trans2M = transmittance(samplePoint, atmosphereIntersect, 10, MIESCALEHEIGHT, BETAM);
+        mieColor += trans1M * trans2M * scatteringAtHeight(BETAM, sampleHeight, MIESCALEHEIGHT) * segmentLength;
         
     }
-    if (any(isnan(scattering))) return vec3(0.0);
-
-    return scattering * intens + col * trans;
+    
+    rayleighColor = SUNINTENSITY * phaseR * rayleighColor;
+    mieColor = SUNINTENSITY * phaseM * mieColor;
+    
+    return rayleighColor + mieColor;
+    
 }
 
-vec3 sky (vec3 ro, vec3 rd, vec3 sunrd, vec3 col, bool includeSun, vec3 pos) {
-    vec3 sun = dot(rd, sunrd) > cos(radians(sundeg)) && includeSun ? vec3(sunintens) : col;
-    return march(ro, rd, sunrd, sunintens, sun, pos) * 0.5;
+// Get the sky color for the ray in direction 'p'
+vec3 skyColor(vec3 p, vec3 sunDir, bool includeSun) {
+    
+    // Get the origin and direction of the ray
+	vec3 origin = vec3(0.0, EARTHRADIUS + 1.0, 0.0);
+	vec3 dir = p * vec3(1.0, sign(p.y), 1.0);
+
+	// Get the position where the ray 'leaves' the atmopshere (see the scratchapixel link for details)
+    // Note that this implementation only works when the origin is inside the atmosphere to begin with
+    float distanceToAtmosphere = raySphereIntersect(origin, dir, vec3(0.0, 0.0, 0.0), ATMOSPHERERADIUS);
+    vec3 atmosphereIntersect = origin + dir * distanceToAtmosphere;
+    
+    // Get the color of the light from the origin to the atmosphere intersect
+    vec3 col = getSkyColor(origin, atmosphereIntersect, sunDir) * 2;
+
+    vec3 sun = vec3(step(cos(radians(1.0)), dot(p, sunDir)) * float(includeSun)) * step(0.0, p.y);
+    return col + sun;
+
 }
 
 #define SUN_VECTOR normalize(mat3(gbufferModelViewInverse) * sunPosition)
 
 vec3 getSky(vec3 dir, bool includeSun){
-    return sky(vec3(0.0, planetrad + cameraPosition.y * 50, 0.0), dir, SUN_VECTOR, vec3(0.), includeSun, vec3(0.));
+    return skyColor(dir, SUN_VECTOR, includeSun);
 }
 #endif

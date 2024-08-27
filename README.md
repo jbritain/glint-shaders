@@ -15,9 +15,7 @@ Opaques are diffuse shaded in `deferred`.
 `colortex4` previous frame data - color rgb, depth
 
 # Passes
-`prepare` reprojecting previous frame data
-
-`deferred` diffuse shading, sky, cloud generation
+`deferred` diffuse shading, sky, cloud generation (and blending)
 
 `composite99` writing frame data for next frame to access (previous frame data)
 

@@ -108,27 +108,29 @@ vec3 sampleVNDFGGX(
 }
 
 vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
-  vec3 reflectionPos;
+  vec3 reflectionPos = vec3(0.0);
 
-  vec3 reflectedColor;
+  if(!traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos)){
+    return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+  }
 
-  if(traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos)){ // we hit something
-    reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
-    if(reflectedColor == vec3(0.0)){
-      reflectedColor = texture(colortex0, reflectionPos.xy).rgb;
-    }
+  // if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){ // weird depth check thing I have to do
+  //   return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+  // }
 
-    #ifdef SSR_FADE
-    float fadeFactor = smoothstep(0.95, 1.0, length(abs(reflectionPos.xy - 0.5) * 2));
+  vec3 reflectedColor = vec3(0.0);
+
+  reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
+
+  #ifdef SSR_FADE
+    float fadeFactor = smoothstep(0.8, 1.0, max2(abs(reflectionPos.xy - 0.5)) * 2);
 
     if(fadeFactor > 0.0){
       reflectedColor = mix(reflectedColor, getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap, fadeFactor);
     }
-    #endif
+  #endif
     
-  } else {
-    reflectedColor = getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
-  }
+    
 
   return reflectedColor;
 }
@@ -173,6 +175,8 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
       // vec2 noise = vec2(r1, r2);
 
       vec3 noise = blueNoise(screenPos, frameCounter * SSR_SAMPLES + i).rgb;
+      // noise.x = interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i);
+      // noise.y = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(23, 97), SSR_SAMPLES + i);
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);

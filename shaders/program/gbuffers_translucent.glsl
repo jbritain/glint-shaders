@@ -82,6 +82,7 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/lighting/specularShading.glsl"
+  #include "/lib/atmosphere/fog.glsl"
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
@@ -142,17 +143,10 @@
     outData2.z = pack2x8F(specularData.ba);
 
     vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
-    vec3 fog = getSky(normalize(vec3(eyePlayerPos.x, abs(eyePlayerPos.y), eyePlayerPos.z)), false);
-
-    float fogFactor = length(eyePlayerPos) / far;
-    fogFactor = clamp01(fogFactor - 0.2) / (1.0 - 0.2);
-    fogFactor = pow(fogFactor, 3.0);
-    fogFactor = clamp01(fogFactor);
-
-    color = mix(color, vec4(fog, 1.0), fogFactor);
+    color = getFog(color, eyePlayerPos);
   }
 #endif

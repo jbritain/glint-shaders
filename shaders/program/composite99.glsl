@@ -22,7 +22,7 @@
   layout(location = 1) out vec4 color;
 
   void main() {
-    // color = vec4(texture(colortex4, texcoord).rgb - texture(colortex0, texcoord).rgb, 1.0);
+    color = vec4(texture(colortex4, texcoord).rgb, 1.0);
     previousFrameData.rgb = texture(colortex0, texcoord).rgb;
     previousFrameData.a = texture(depthtex0, texcoord).r;
 

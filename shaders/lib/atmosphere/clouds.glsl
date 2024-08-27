@@ -21,7 +21,6 @@
 #define CLOUD_EROSION_SPEED 0.005
 
 #define ABSORPTION 0.1
-#define SUBMARCH_ABSORPTION 0.1
 #define k 0.6
 #define SAMPLES 30
 #define SUBSAMPLES 4
@@ -111,7 +110,7 @@ float subMarch(vec3 rayPos){
     totalDensity += getDensity(subRayPos) * length(increment);
   }
 
-  return exp(-totalDensity * SUBMARCH_ABSORPTION);
+  return exp(-totalDensity * ABSORPTION);
 }
 
 vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
@@ -188,7 +187,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   // made up lighting calculations that look decent ish
   vec3 ambientColor = mix(skyLightColor, sunlightColor, 0.2);
-  vec3 cloudColor = lightEnergy * sunlightColor * 0.001 * ambientColor + skyLightColor * 2;
+  vec3 cloudColor = lightEnergy * sunlightColor * 0.05 * ambientColor + skyLightColor * 2;
 
   if(length(cloudColor) > 10){
     cloudColor = normalize(cloudColor) * 10;

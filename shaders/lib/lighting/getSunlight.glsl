@@ -30,11 +30,13 @@ float NoLSafe(vec3 n){
   return clamp01(dot(n, normalize(shadowLightPosition)));
 }
 
-vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal){
+vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float sss){
   vec4 shadowPos = getShadowPosition(feetPlayerPos, faceNormal);
 
   vec3 shadow = sampleShadow(shadowPos.xyz);
   float NoL = NoLSafe(faceNormal) * NoLSafe(mappedNormal);
+
+  NoL = mix(NoL, pow2(NoL * 0.5 + 0.5), sss); // 'half lambert' shading as an approximation of subsurface scattering
 
   return shadow * NoL;
 }
