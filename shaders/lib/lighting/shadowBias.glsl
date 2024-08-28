@@ -29,7 +29,7 @@
 #endif
 
 vec4 getShadowPosition(vec3 playerPos, vec3 normal){
-  float nDotL = clamp01(dot(normal, normalize(sunPosition)));
+  float nDotL = clamp01(dot(normal, normalize(shadowLightPosition)));
   // if (nDotL <= 0.0) {
   //   return vec4(0.0);
   // }
@@ -47,5 +47,30 @@ vec4 getShadowPosition(vec3 playerPos, vec3 normal){
   #endif
 
   return shadowPos;
+}
+
+vec4 getShadowClipPos(vec3 playerPos){
+	vec4 shadowClipPos = shadowModelView * vec4(playerPos, 1.0);
+	return shadowClipPos;
+}
+
+vec4 getShadowScreenPos(vec4 shadowClipPos, vec3 normal){
+	float NoL = clamp01(dot(normal, normalize(shadowLightPosition)));
+
+	vec4 shadowScreenPos = shadowProjection * shadowClipPos; //convert to shadow ndc space.
+	float bias = computeBias(shadowScreenPos.xyz);
+	shadowScreenPos.xyz = distort(shadowScreenPos.xyz); //apply shadow distortion
+  shadowScreenPos.xyz = shadowScreenPos.xyz * 0.5 + 0.5; //convert from -1 ~ +1 to 0 ~ 1
+
+	#ifdef NORMAL_BIAS
+    //we are allowed to project the normal because shadowProjection is purely a scalar matrix.
+    //a faster way to apply the same operation would be to multiply by shadowProjection[0][0].
+    shadowScreenPos.xyz += normal.xyz * bias;
+  #else
+    shadowScreenPos.z -= bias / abs(NoL);
+  #endif
+
+
+	return shadowScreenPos;
 }
 #endif

@@ -100,7 +100,7 @@
 
     color.rgb = albedo;
 
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight);
+    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
   

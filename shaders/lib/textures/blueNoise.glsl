@@ -7,6 +7,7 @@ uniform sampler2D bluenoisetex;
 
 #define BLUE_NOISE_RESOLUTION 1024
 
+
 vec4 blueNoise(vec2 texcoord){
   ivec2 sampleCoord = ivec2(texcoord * vec2(viewWidth, viewHeight));
   sampleCoord = sampleCoord % ivec2(BLUE_NOISE_RESOLUTION);

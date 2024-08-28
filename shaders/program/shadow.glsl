@@ -5,7 +5,7 @@
   attribute vec4 mc_Entity;
   uniform mat4 shadowProjection;
   uniform mat4 shadowModelView;
-  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
   uniform float near;
   uniform float far;
 
