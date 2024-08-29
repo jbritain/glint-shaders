@@ -167,7 +167,7 @@ struct AtmosphereParameters {
 #define ATMOSPHERE ATMOSPHERE
 
 const AtmosphereParameters ATMOSPHERE = AtmosphereParameters(
-vec3(1.474000,1.850400,1.911980) * 0.1,
+vec3(1.474000,1.850400,1.911980),
 0.014675,
 6360.000000,
 6420.000000,
@@ -518,6 +518,19 @@ vec3 GetSkyRadianceToPoint(vec3 camera, in vec3 point, float shadow_float,
 
   return scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
       MiePhaseFunction(ATMOSPHERE.mie_phase_function_g, nu);
+}
+
+vec3 GetSunAndSkyIrradiance(in vec3 point, in vec3 sun_direction,
+    out vec3 sky_irradiance) {
+  float r = length(point);
+  float mu_s = dot(point, sun_direction) / r;
+
+  // Indirect float (approximated if the surface is not horizontal).
+  sky_irradiance = GetIrradiance(r, mu_s);
+
+  // Direct float.
+  return ATMOSPHERE.solar_irradiance *
+      GetTransmittanceToSun(r, mu_s);
 }
 
 vec3 GetSunAndSkyIrradiance(in vec3 point, in vec3 normal, in vec3 sun_direction,

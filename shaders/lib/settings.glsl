@@ -13,9 +13,9 @@ const bool colortex4Clear = false;
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0;
 
-#define SKYLIGHT_STRENGTH 0.3
+#define SKYLIGHT_STRENGTH 0.5
 #define AMBIENT_STRENGTH 0.01
-#define SUNLIGHT_STRENGTH 0.1
+#define SUNLIGHT_STRENGTH 1.0
 
 #define BLOOM
 #define BLOOM_AMOUNT 0.2 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]

@@ -10,8 +10,8 @@
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
-    float radiusCos = 1.0 - 0.0001;
-		float radiusTan = tan(acos(radiusCos));
+    float radiusCos = cos(ATMOSPHERE.sun_angular_radius);
+		float radiusTan = tan(ATMOSPHERE.sun_angular_radius);
     
     float RoL = 2.0 * NoL * NoV - VoL;
     if (RoL >= radiusCos)
@@ -150,7 +150,7 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
 
   vec3 fresnel = schlick(material, NoV);
 
-  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlight * 0.5;
+  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlight;
 
   vec4 reflectedColor = vec4(0.0, 0.0, 0.0, 1.0);
 

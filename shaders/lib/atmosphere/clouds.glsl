@@ -187,7 +187,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   // made up lighting calculations that look decent ish
   vec3 ambientColor = mix(skyLightColor, sunlightColor, 0.2);
-  vec3 cloudColor = lightEnergy * sunlightColor * 0.05 * ambientColor + skyLightColor * 2;
+  vec3 cloudColor = lightEnergy * sunlightColor * 0.5 + ambientColor * 0.05;
 
   if(length(cloudColor) > 10){
     cloudColor = normalize(cloudColor) * 10;

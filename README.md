@@ -1,23 +1,13 @@
-# Credits
+# Glint
+A shaderpack for Minecraft.
+
+## Acknowledgements
+- [Jessie-LC](https://github.com/Jessie-LC) - [various utility functions](https://github.com/Jessie-LC/open-source-utility-code)
 - Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/) (combined texture from [Ebin](https://github.com/BruceKnowsHow/ebin-shader))
-
-# Implementation Details
-`block.properties` IDs are handled by [block-wrangler](https://camplowell.github.io/block_wrangler) in `block_properties.py`
-
-Translucents are fully forward rendered in gbuffers.
-Opaques are diffuse shaded in `deferred`.
-
-# Buffers
-
-`colortex0` scene colour
-`colortex1` gbuffer data - albedo, material ID, face normal, lightmap
-`colortex2` gbuffer data - mapped normal, specular map data
-`colortex3` clouds
-`colortex4` previous frame data - color rgb, depth
-
-# Passes
-`deferred` diffuse shading, sky, cloud generation (and blending)
-
-`composite99` writing frame data for next frame to access (previous frame data)
-
-`final` post processing
+- [Moments in Graphics](http://momentsingraphics.de) - [blue noise texture](http://momentsingraphics.de/BlueNoise.html)
+- [Experience.Monks](https://github.com/Experience-Monks) - [Fast Gaussian Blur Functions](https://github.com/Experience-Monks/glsl-fast-gaussian-blur)
+- [Sebastian Lague](https://www.youtube.com/@SebastianLague) & [SimonDev](https://www.youtube.com/@simondev758) - YouTube videos used for reference on clouds.
+- [Geurrilla Games](https://www.guerrilla-games.com/) - [Area light sources for specular highlights](https://www.guerrilla-games.com/read/decima-engine-advances-in-lighting-and-aa)
+- [Belmu](https://github.com/BelmuTM) - Reference code for SSR
+- [Zombye](https://github.com/Zombye) - GGX VNDF Sampler
+- The members of the ShaderLABS Discord server who have helped me get this far learning how to do all this

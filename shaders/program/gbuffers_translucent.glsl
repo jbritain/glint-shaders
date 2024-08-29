@@ -143,7 +143,8 @@
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
 
-    vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(shadowLightPosition), true);
+    vec3 sunlightColor; vec3 skyLightColor;
+    getLightColors(sunlightColor, skyLightColor);
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);

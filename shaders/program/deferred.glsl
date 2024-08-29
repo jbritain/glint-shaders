@@ -82,15 +82,13 @@
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
-    vec3 sunlightColor = getSky(mat3(gbufferModelViewInverse) * normalize(sunPosition), true);
-    vec3 skyLightColor = getSky(vec3(0, 1, 0), false);
+    vec3 sunlightColor; vec3 skyLightColor;
+    getLightColors(sunlightColor, skyLightColor);
     cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
     
 
     if(depth == 1.0){
       color.rgb = getSky(normalize(eyePlayerPos), true);
-      color.a = 1.0;
-      color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
       return;
     }
 
