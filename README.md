@@ -1,4 +1,5 @@
-#
+# Credits
+- Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/) (combined texture from [Ebin](https://github.com/BruceKnowsHow/ebin-shader))
 
 # Implementation Details
 `block.properties` IDs are handled by [block-wrangler](https://camplowell.github.io/block_wrangler) in `block_properties.py`

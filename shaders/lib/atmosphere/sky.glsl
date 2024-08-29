@@ -16,6 +16,6 @@ vec3 getSky(vec3 dir, bool includeSun){
         radiance += transmit * GetSolarRadiance();
     }
 
-    return radiance;
+    return radiance * 0.5;
 }
 #endif

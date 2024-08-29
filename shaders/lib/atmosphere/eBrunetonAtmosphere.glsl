@@ -167,7 +167,7 @@ struct AtmosphereParameters {
 #define ATMOSPHERE ATMOSPHERE
 
 const AtmosphereParameters ATMOSPHERE = AtmosphereParameters(
-vec3(1.474000,1.850400,1.911980),
+vec3(1.474000,1.850400,1.911980) * 0.1,
 0.014675,
 6360.000000,
 6420.000000,

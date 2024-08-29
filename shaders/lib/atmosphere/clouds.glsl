@@ -114,7 +114,6 @@ float subMarch(vec3 rayPos){
 }
 
 vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
-  return vec4(0.0);
   vec3 worldDir = normalize(playerPos);
 
   // we trace from a to b
