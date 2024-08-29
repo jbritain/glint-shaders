@@ -25,8 +25,15 @@
   layout(location = 0) out vec4 cloudColor;
 
   void main() {
+    const ivec2 offsets[4] = ivec2[](
+      ivec2(CLOUD_BLUR_RADIUS_THRESHOLD, 0.0),
+      ivec2(0.0, CLOUD_BLUR_RADIUS_THRESHOLD),
+      ivec2(-1.0 * CLOUD_BLUR_RADIUS_THRESHOLD, 0.0),
+      ivec2(0.0, -1.0 * CLOUD_BLUR_RADIUS_THRESHOLD)
+    );
+
     float depth = texture(depthtex0, texcoord).r;
-    if(depth == 1.0){
+    if(depth == 1.0 && all(equal(textureGatherOffsets(depthtex0, texcoord, offsets), vec4(1.0)))){
       cloudColor = blur13(colortex3, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
     } else {
       cloudColor = texture(colortex3, texcoord);

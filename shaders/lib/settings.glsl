@@ -48,3 +48,6 @@ const float sunPathRotation = -40;
 
 #define FOG_POWER 8.0
 #define FOG_START 0.2
+
+// the radius in which the depth should be 1.0 to blur the clouds
+#define CLOUD_BLUR_RADIUS_THRESHOLD 2.0
