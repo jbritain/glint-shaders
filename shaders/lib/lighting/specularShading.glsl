@@ -150,7 +150,7 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
 
   vec3 fresnel = schlick(material, NoV);
 
-  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlight;
+  vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlight * 0.5;
 
   vec4 reflectedColor = vec4(0.0, 0.0, 0.0, 1.0);
 
