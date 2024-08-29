@@ -45,13 +45,13 @@ float computeSSS(float blockerDistance, float SSS, vec3 normal){
 
 vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos, normal).xyz;
-  float transparentShadow = shadow2D(shadowtex0, shadowScreenPos).r;
+  float transparentShadow = shadow2D(shadowtex0HW, shadowScreenPos).r;
 
   if(transparentShadow == 1.0){ // no shadow at all
 		return vec3(1.0);
 	}
 
-  float opaqueShadow = shadow2D(shadowtex1, shadowScreenPos).r;
+  float opaqueShadow = shadow2D(shadowtex1HW, shadowScreenPos).r;
 
   if(opaqueShadow == 0.0){ // opaque shadow so don't sample transparent shadow colour
 		return vec3(0.0);
@@ -84,7 +84,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	for(int i = 0; i < BLOCKER_SEARCH_SAMPLES; i++){
 		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, noise.r);
 		vec3 newShadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset * range, 0.0, 0.0), normal).xyz;
-		float newBlockerDepth = texture(shadowtex0, newShadowScreenPos).r;
+		float newBlockerDepth = texture(shadowtex0, newShadowScreenPos.xy).r;
 		if (newBlockerDepth < receiverDepth){
 			blockerDistance += (receiverDepth - newBlockerDepth);
 			blockerCount += 1;
@@ -126,8 +126,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 	// TODO: separate hardware samplers for PCSS
   float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
-	// float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
-	float penumbraWidth = 0.0;
+	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
 
 	float scatter = computeSSS(blockerDistance, SSS, faceNormal);
 

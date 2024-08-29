@@ -33,8 +33,9 @@
   uniform sampler2D normals;
   uniform sampler2D specular;
 
-  uniform sampler2DShadow shadowtex0;
-  uniform sampler2DShadow shadowtex1;
+  uniform sampler2D shadowtex0;
+  uniform sampler2DShadow shadowtex0HW;
+  uniform sampler2DShadow shadowtex1HW;
   uniform sampler2D shadowcolor0;
 
   uniform sampler2D colortex0;
