@@ -13,21 +13,26 @@
   uniform sampler2D depthtex0;
 
   uniform sampler2D colortex0;
-  uniform sampler2D colortex3;
+  uniform sampler2D colortex5;
 
   uniform float viewWidth;
   uniform float viewHeight;
 
-  #include "/lib/util/blur.glsl"
+  uniform float near;
+  uniform float far;
 
+  #include "/lib/util/blur.glsl"
+  #include "/lib/util.glsl"
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:0 */
+  /* DRAWBUFFERS:05 */
   layout(location = 0) out vec4 color;
+  layout(location = 1) out vec4 cloudColor;
 
   void main() {
     color = texture(colortex0, texcoord);
 
+    // sample within this radius and check if the depth is the sky or not. It must all be sky to blur, we can't blur on top of terrain.
     const ivec2 offsets[4] = ivec2[](
       ivec2(CLOUD_BLUR_RADIUS_THRESHOLD, 0.0),
       ivec2(0.0, CLOUD_BLUR_RADIUS_THRESHOLD),
@@ -35,13 +40,11 @@
       ivec2(0.0, -1.0 * CLOUD_BLUR_RADIUS_THRESHOLD)
     );
 
-    vec4 cloudColor;
-
     float depth = texture(depthtex0, texcoord).r;
     if(depth == 1.0 && all(equal(textureGatherOffsets(depthtex0, texcoord, offsets), vec4(1.0)))){
-      cloudColor = blur13(colortex3, texcoord, vec2(viewWidth, viewHeight), vec2(0.0, 1.0));
+      cloudColor = blur13(colortex5, texcoord, vec2(viewWidth, viewHeight), vec2(0.0, 1.0));
     } else {
-      cloudColor = texture(colortex3, texcoord);
+      cloudColor = texture(colortex5, texcoord);
     }
 
     color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);

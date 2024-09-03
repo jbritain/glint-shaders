@@ -3,7 +3,7 @@
 
 #include "/lib/util.glsl"
 #include "/lib/util/material.glsl"
-#include "/lib/water/screenSpaceRayTrace.glsl"
+#include "/lib/util/screenSpaceRayTrace.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
@@ -111,7 +111,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   vec3 reflectionPos = vec3(0.0);
 
   if(!traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos)){
-  return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+    return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
   }
 
 
@@ -127,8 +127,6 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   }
   #endif
   
-  
-
   return reflectedColor;
 }
 

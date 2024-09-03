@@ -81,6 +81,7 @@
     #endif
 
 
+    // encode gbuffer data
     outData1.x = pack2x8F(color.r, color.g);
     outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
     outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));

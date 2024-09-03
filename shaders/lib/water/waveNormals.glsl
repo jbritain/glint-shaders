@@ -50,14 +50,19 @@ float getwaves(vec2 position, int iterations) {
 }
 
 // Calculate normal at point by calculating the height at the pos and 2 additional points very close to pos
-vec3 waveNormal(vec2 pos, float e, float depth) {
+// returned value is in world space
+vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float e, float depth) {
   vec2 ex = vec2(e, 0);
   float H = getwaves(pos.xy, ITERATIONS_NORMAL) * depth;
   vec3 a = vec3(pos.x, H, pos.y);
-  return normalize(
+  vec3 waveNormal = normalize(
     cross(
       a - vec3(pos.x - e, getwaves(pos.xy - ex.xy, ITERATIONS_NORMAL) * depth, pos.y), 
       a - vec3(pos.x, getwaves(pos.xy + ex.yx, ITERATIONS_NORMAL) * depth, pos.y + e)
     )
   );
+
+  // rotate to align with face normal since the normal calculation assumes a surface facing straight up
+  waveNormal = rotate(waveNormal, vec3(0.0, 1.0, 0.0), worldFaceNormal);
+  return waveNormal;
 }

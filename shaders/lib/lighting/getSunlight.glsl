@@ -125,13 +125,14 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
   vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 
 	// TODO: separate hardware samplers for PCSS
+	// TODO: PCSS and SSS don't work for some reason
   float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
 	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
 
 	float scatter = computeSSS(blockerDistance, SSS, faceNormal);
 
 	vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal);
-  float NoL = NoLSafe(faceNormal) * NoLSafe(mappedNormal);
+  float NoL = NoLSafe(faceNormal) * step(0.0, NoLSafe(mappedNormal));
 
   return max(shadow * NoL, vec3(scatter));
 }

@@ -48,6 +48,7 @@
 
   uniform float wetness;
 
+  uniform float near;
   uniform float far;
 
   in vec2 texcoord;
@@ -60,7 +61,7 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:03 */
+  /* DRAWBUFFERS:05 */
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 cloudColor;
 

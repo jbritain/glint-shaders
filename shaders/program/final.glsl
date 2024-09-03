@@ -11,22 +11,20 @@
 #endif
 //------------------------------------------------------------------
 #ifdef fsh
-  // #define DEBUG_ENABLE
-  #define DEBUG_TEX colortex8
-
-  #ifdef DEBUG_ENABLE
-  // uniform sampler2D DEBUG_TEX;
-  #endif
+  const bool colortex0MipmapEnabled = true;;
 
   uniform sampler2D colortex0;
   uniform sampler2D colortex4;
-  uniform sampler2D colortex8;
 
   uniform sampler2D depthtex0;
+
+  uniform float viewWidth;
+  uniform float viewHeight;
 
   in vec2 texcoord;
 
   #include "/lib/postProcessing/tonemap.glsl"
+  #include "/lib/postProcessing/FXAA.glsl"
 
   layout(location = 0) out vec4 color;
 
@@ -34,12 +32,10 @@
     
     color = texture(colortex0, texcoord);
 
-    // color += texture(colortex8, texcoord / BLOOM_BLUR) * BLOOM_AMOUNT;
+    color.rgb = FXAA311(color.rgb);
     color.rgb = tonemap(color.rgb);
     color.rgb = invGammaCorrect(color.rgb);
 
-    // #ifdef DEBUG_ENABLE
-    //   color = texture(DEBUG_TEX, texcoord / BLOOM_BLUR);
-    // #endif
+
   }
 #endif

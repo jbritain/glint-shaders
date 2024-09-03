@@ -39,6 +39,7 @@
   uniform sampler2D shadowcolor0;
 
   uniform sampler2D colortex0;
+  uniform sampler2D colortex5;
   uniform sampler2D colortex4;
 
   uniform float alphaTestRef;
@@ -61,7 +62,10 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform float near;
   uniform float far;
+
+  uniform float wetness;
 
   uniform int frameCounter;
 
@@ -81,6 +85,7 @@
   #include "/lib/water/waveNormals.glsl"
   #include "/lib/util/material.glsl"
   #include "/lib/atmosphere/sky.glsl"
+  #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/fog.glsl"
@@ -95,7 +100,7 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:0123 */
+  /* DRAWBUFFERS:0125 */
   layout(location = 0) out vec4 color; // shaded colour
   layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
   layout(location = 2) out vec4 outData2; // mapped normal, specular map data
@@ -110,7 +115,7 @@
 
     if(water(materialID)){
       color = WATER_COLOR;
-      faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, 0.01, 0.2);
+      faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.2);
     }
 
     if (color.a < alphaTestRef) {
@@ -125,6 +130,7 @@
       vec3 mappedNormal = faceNormal;
     #endif
 
+    // encode gbuffer data
     outData1.x = pack2x8F(color.r, color.g);
     outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
     outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
@@ -150,5 +156,29 @@
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
     color = getFog(color, eyePlayerPos);
+
+    vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
+
+    vec4 cloud = texture(colortex5, screenPos);
+
+    vec3 worldPos = eyePlayerPos + cameraPosition;
+    
+    // this is for deciding whether to blend the translucents or not
+    // 0 - below cloud plane
+    // 1 - in cloud plane
+    // 2 - above cloud plane
+    // we don't blend if both are in the same state (unless the state is 1)
+    uint cameraPlaneState = 0;
+    uint positionPlaneState = 0;
+
+    if(cameraPosition.y > LOWER_PLANE_HEIGHT) cameraPlaneState++;
+    if(cameraPosition.y > UPPER_PLANE_HEIGHT) cameraPlaneState++;
+    if(worldPos.y > LOWER_PLANE_HEIGHT) positionPlaneState++;
+    if(worldPos.y > UPPER_PLANE_HEIGHT) positionPlaneState++;
+
+    if(cameraPlaneState != positionPlaneState || positionPlaneState == 1){
+      color = mix(color, cloud, cloud.a);
+    }
+
   }
 #endif

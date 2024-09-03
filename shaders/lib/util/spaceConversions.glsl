@@ -1,10 +1,6 @@
 #ifndef SPACE_CONVERSIONS_INCLUDE
 #define SPACE_CONVERSIONS_INCLUDE
 
-float linearizeDepth(float depth, float near, float far) {
-  return (near * far) / (depth * (near - far) + far);
-}
-
 vec3 screenSpaceToViewSpace(vec3 screenPosition) {
 	screenPosition = screenPosition * 2.0 - 1.0;
 

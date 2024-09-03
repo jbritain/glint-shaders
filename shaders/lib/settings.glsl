@@ -3,7 +3,7 @@
 const int colortex0Format = RGB32F;  || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
-const int colortex3Format = RGBA16F; || clouds
+const int colortex5Format = RGBA16F; || clouds
 const int colortex4Format = RGBA32F; || previous frame data
 
 */
@@ -49,5 +49,8 @@ const float sunPathRotation = -40;
 #define FOG_POWER 8.0
 #define FOG_START 0.2
 
-// the radius in which the depth should be 1.0 to blur the clouds
 #define CLOUD_BLUR_RADIUS_THRESHOLD 2.0
+
+#define FXAA
+#define FXAA_SUBPIXEL 0.75 //[0.00 0.25 0.50 0.75 1.00]
+#define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]

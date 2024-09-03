@@ -258,5 +258,9 @@ mat3 tbnNormal(vec3 normal) {
     return tbnNormalTangent(normal, tangent);
 }
 
+float linearizeDepth(float depth, float near, float far) {
+  return (near * far) / (depth * (near - far) + far);
+}
+
 
 #endif
