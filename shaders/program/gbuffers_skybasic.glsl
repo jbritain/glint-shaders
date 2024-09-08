@@ -1,0 +1,32 @@
+#include "/lib/settings.glsl"
+
+#ifdef vsh
+  out vec4 starData;
+
+  void main() {
+    gl_Position = ftransform();
+	  starData = vec4(gl_Color.rgb, float(gl_Color.r == gl_Color.g && gl_Color.g == gl_Color.b && gl_Color.r > 0.0));
+  }
+#endif
+//------------------------------------------------------------------
+#ifdef fsh
+
+  in vec4 starData;
+
+  #include "/lib/util.glsl"
+  #include "/lib/postProcessing/tonemap.glsl"
+
+  /* DRAWBUFFERS:3 */
+  layout(location = 0) out vec4 color;
+
+  void main() {
+
+    if(starData.a < 0.5){
+      discard;
+      return;
+    }
+
+    color = starData;
+    color.rgb = invGammaCorrect(color.rgb);
+  }
+#endif

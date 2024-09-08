@@ -68,6 +68,7 @@
   uniform float wetness;
 
   uniform int frameCounter;
+  uniform int worldTime;
 
   in vec2 lmcoord;
   in vec2 texcoord;

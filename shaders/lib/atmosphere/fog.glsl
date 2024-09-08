@@ -20,7 +20,7 @@ vec4 getFog(vec4 color, vec3 playerPos){
     kCamera,
     kCamera + playerPos,
     0.0,
-    SUN_VECTOR,
+    sunVector,
     transmit
   );
 

@@ -14,6 +14,7 @@
   uniform sampler2D colortex0;
   uniform sampler2D colortex1;
   uniform sampler2D colortex2;
+  uniform sampler2D colortex3;
   uniform sampler2D colortex4;
 
   uniform sampler2D depthtex0;
@@ -40,6 +41,7 @@
   uniform vec3 previousCameraPosition;
 
   uniform float frameTimeCounter;
+  uniform int worldTime;
 
   uniform float viewWidth;
   uniform float viewHeight;
@@ -89,7 +91,8 @@
     
 
     if(depth == 1.0){
-      color.rgb = getSky(normalize(eyePlayerPos), true);
+      color = texture(colortex3, texcoord);
+      color.rgb = getSky(color, normalize(eyePlayerPos), true);
       return;
     }
 
