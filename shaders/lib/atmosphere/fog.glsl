@@ -8,9 +8,9 @@ vec4 getFog(vec4 color, vec3 playerPos){
   return color;
   #endif
 
-  vec3 kCamera = vec3(0.0, 5.0 + cameraPosition.y/1000.0 + ATMOSPHERE.bottom_radius, 0.0);
+  vec3 kCamera = vec3(0.0, 128.0 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0);
 
-  vec3 transmit;
+  vec3 transmit = vec3(1.0);
 
   // vec3 fog = GetSkyRadianceToPoint(
   //   kCamera,
@@ -20,11 +20,14 @@ vec4 getFog(vec4 color, vec3 playerPos){
   //   transmit
   // );
 
+  vec3 dir = normalize(playerPos);
+  dir.y = abs(dir.y);
+
   vec3 fog = GetSkyRadiance(
-    kCamera, normalize(playerPos), 0.0, sunVector, transmit
+    kCamera, dir, 0.0, sunVector, transmit
   );
 
-  float visibilityDistance = mix(100000, 4000, wetness);
+  float visibilityDistance = mix(150000, 4000, wetness);
   float extinctionCoefficient = 3.912 / visibilityDistance;
   transmit = vec3(exp(-extinctionCoefficient * length(playerPos)));
 

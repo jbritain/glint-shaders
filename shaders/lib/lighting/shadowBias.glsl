@@ -69,7 +69,7 @@ vec4 getShadowScreenPos(vec4 shadowClipPos, vec3 normal){
     //a faster way to apply the same operation would be to multiply by shadowProjection[0][0].
     shadowScreenPos.xyz += normal.xyz * bias;
   #else
-    shadowScreenPos.z -= bias / abs(NoL);
+    shadowScreenPos.z -= bias;
   #endif
 
 

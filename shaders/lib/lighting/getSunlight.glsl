@@ -25,7 +25,7 @@ float computeSSS(float blockerDistance, float SSS, vec3 normal){
 		return 0.0;
 	}
 
-	float NoL = clamp01(dot(normal, normalize(shadowLightPosition)));
+	float NoL = dot(normal, normalize(shadowLightPosition));
 
 	if(NoL > -0.00001){
 		return 0.0;
@@ -33,6 +33,7 @@ float computeSSS(float blockerDistance, float SSS, vec3 normal){
 
 	float s = 1.0 / (SSS * 0.06);
 	float z = blockerDistance * 255;
+
 
 	if(isnan(z)){
 		z = 0.0;
@@ -126,11 +127,10 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 	float NoL = NoLSafe(faceNormal) * step(0.0, NoLSafe(mappedNormal));
 
-	// TODO: separate hardware samplers for PCSS
-	// TODO: PCSS and SSS don't work for some reason
 	#ifdef SHADOWS
   float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
 	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
+	// penumbraWidth = MAX_PENUMBRA_WIDTH;
 
 	float scatter = computeSSS(blockerDistance, SSS, faceNormal);
 

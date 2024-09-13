@@ -173,9 +173,9 @@ const AtmosphereParameters ATMOSPHERE = AtmosphereParameters(
 	// that are valid only if this angle is smaller than 0.1 radians.
 	radians(1.0),
 	// The distance between the planet center and the bottom of the atmosphere.
-	6360.000000,
+	6360000.000000,
 	// The distance between the planet center and the top of the atmosphere.
-	6480.000000,
+	6480000.000000,
 //	6480.000000,
 	// The density profile of air molecules, i.e. a function from altitude to
 	// dimensionless values between 0 (null density) and 1 (maximum density).

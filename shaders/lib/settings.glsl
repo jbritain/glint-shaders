@@ -38,6 +38,7 @@ const float shadowDistance = 160.0;
 #define BLOCKER_SEARCH_SAMPLES 8
 #define BLOCKER_SEARCH_RADIUS 0.5
 #define SHADOW_SAMPLES 16 // [4 8 16 32 64]
+#define SUBSURFACE_SCATTERING
 
 //#define NORMAL_BIAS //Offsets the shadow sample position by the surface normal instead of towards the sun
 const int shadowMapResolution = 2048; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
