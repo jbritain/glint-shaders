@@ -42,6 +42,7 @@
 
   uniform float frameTimeCounter;
   uniform int worldTime;
+  uniform int worldDay;
 
   uniform float viewWidth;
   uniform float viewHeight;
@@ -99,7 +100,7 @@
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
     Material material = materialFromSpecularMap(albedo, specularData);
 
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
 
     color.rgb = albedo;
 

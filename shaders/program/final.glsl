@@ -23,6 +23,7 @@
 
   in vec2 texcoord;
 
+  #include "/lib/util.glsl"
   #include "/lib/postProcessing/tonemap.glsl"
   #include "/lib/postProcessing/FXAA.glsl"
 
@@ -34,6 +35,9 @@
 
     color.rgb = FXAA311(color.rgb);
     color.rgb = tonemap(color.rgb);
+
+    color.rgb = setSaturationLevel(color.rgb, 1.2);
+
     color.rgb = invGammaCorrect(color.rgb);
 
 

@@ -69,6 +69,7 @@
 
   uniform int frameCounter;
   uniform int worldTime;
+  uniform int worldDay;
 
   in vec2 lmcoord;
   in vec2 texcoord;
@@ -112,16 +113,23 @@
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
     color = texture(gtexture, texcoord) * glcolor;
+
     color.rgb = gammaCorrect(color.rgb);
 
     if(water(materialID)){
       color = WATER_COLOR;
+      #ifdef WATER_NORMALS
       faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.2);
+      #endif
     }
 
     if (color.a < alphaTestRef) {
       discard;
     }
+
+    #ifdef gbuffers_weather
+      color = vec4(0.2);
+    #endif
 
     vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
 
@@ -152,7 +160,7 @@
 
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 

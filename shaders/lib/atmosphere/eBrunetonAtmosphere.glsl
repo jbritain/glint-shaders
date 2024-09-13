@@ -537,8 +537,11 @@ vec3 GetSunAndSkyIrradiance(in vec3 point, in vec3 sun_direction,
   sky_irradiance = GetIrradiance(r, mu_s);
 
   // Direct float.
-  return ATMOSPHERE.solar_irradiance *
+  vec3 irradiance = ATMOSPHERE.solar_irradiance *
       GetTransmittanceToSun(r, mu_s);
+  irradiance = setSaturationLevel(irradiance, 1.5);
+
+  return irradiance;
 }
 
 vec3 GetSunAndSkyIrradiance(in vec3 point, in vec3 normal, in vec3 sun_direction,

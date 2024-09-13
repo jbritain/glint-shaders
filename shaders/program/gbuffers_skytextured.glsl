@@ -39,7 +39,9 @@
     if (color.a < 0.1) {
       discard;
     }
+
+
     
-    // color.rgb = invGammaCorrect(color.rgb);
+    color.rgb = gammaCorrect(color.rgb);
   }
 #endif

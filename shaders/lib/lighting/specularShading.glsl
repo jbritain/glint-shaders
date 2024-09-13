@@ -5,6 +5,7 @@
 #include "/lib/util/material.glsl"
 #include "/lib/util/screenSpaceRayTrace.glsl"
 #include "/lib/atmosphere/sky.glsl"
+#include "/lib/atmosphere/clouds.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
 
@@ -42,6 +43,22 @@ float getNoHSquared(float NoL, float NoV, float VoL) {
   return clamp(NoH * NoH / HoH, 0.0, 1.0);
 }
 
+float schlickGGX(float NoV, float K) {
+  float nom   = NoV;
+  float denom = NoV * (1.0 - K) + K;
+
+  return nom / denom;
+}
+  
+float geometrySmith(vec3 N, vec3 V, vec3 L, float K) {
+  float NoV = max(dot(N, V), 0.0);
+  float NoL = max(dot(N, L), 0.0);
+  float ggx1 = schlickGGX(NoV, K);
+  float ggx2 = schlickGGX(NoL, K);
+
+  return ggx1 * ggx2;
+}
+
 // trowbridge-reitz ggx
 // https://mudstack.com/blog/tutorials/physically-based-rendering-study-part-2/
 float calculateSpecularHighlight(vec3 N, vec3 V, vec3 L, float roughness){
@@ -50,6 +67,8 @@ float calculateSpecularHighlight(vec3 N, vec3 V, vec3 L, float roughness){
 	float distr = dotNHSquared * (alpha - 1.0) + 1.0;
 	return alpha / (PI * pow2(distr));
 }
+
+
 
 vec3 schlick(Material material, float NoV){
   const vec3 f0 = material.f0;
@@ -114,6 +133,10 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
     return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
   }
 
+  if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){
+    return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+  }
+
 
   vec3 reflectedColor = vec3(0.0);
 
@@ -130,12 +153,39 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   return reflectedColor;
 }
 
+vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight){
+  vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
+  if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
+    vec3 reflectedRay = reflect(normalize(viewPos), normal);
+    float jitter = blueNoise(screenPos, frameCounter).r;
+    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
+  } else if (material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
+
+  // we need a TBN to get into tangent space for the VNDF
+  vec3 tangent;
+  vec3 bitangent;
+  computeFrisvadTangent(normal, tangent, bitangent);
+
+  mat3 tbn = mat3(tangent, bitangent, normal);
+
+    for(int i = 0; i < SSR_SAMPLES; i++){
+      vec3 noise = blueNoise(screenPos, frameCounter * SSR_SAMPLES + i).rgb;
+
+      vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
+      vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
+      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, noise.z);
+    }
+
+    reflectedColor /= SSR_SAMPLES;
+  }
+
+  return reflectedColor;
+}
+
 vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight){
   if(material.roughness == 1.0){
   return color;
   }
-
-  vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 
   vec3 V = normalize(-viewPos);
   vec3 N = normal;
@@ -149,46 +199,23 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
 
   vec4 reflectedColor = vec4(0.0, 0.0, 0.0, 1.0);
 
-  if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
-  vec3 reflectedRay = reflect(normalize(viewPos), normal);
-  float jitter = blueNoise(screenPos, frameCounter).r;
-  reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
-  } else if(material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
-
-  // we need a TBN to get into tangent space for the VNDF
-  vec3 tangent;
-  vec3 bitangent;
-  computeFrisvadTangent(normal, tangent, bitangent);
-
-  mat3 tbn = mat3(tangent, bitangent, normal);
-
-  for(int i = 0; i < SSR_SAMPLES; i++){
-    // float r1 = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter * SSR_SAMPLES + i);
-			// float r2 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(23, 97), frameCounter * SSR_SAMPLES + i);
-    // float r3 = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(97, 23), frameCounter * SSR_SAMPLES + i);
-
-    // vec2 noise = vec2(r1, r2);
-
-    vec3 noise = blueNoise(screenPos, frameCounter * SSR_SAMPLES + i).rgb;
-    // noise.x = interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i);
-    // noise.y = interleavedGradientNoise(floor(gl_FragCoord.xy) + vec2(23, 97), SSR_SAMPLES + i);
-
-    vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
-    vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
-    reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, noise.z);
+  #ifdef SSR
+  reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material, sunlight);
+  #else
+  if(material.roughness == 0.0){
+    reflectedColor.rgb = getSky(mat3(gbufferModelViewInverse) * normalize(viewPos), false) * lightmap.y;
+  } else {
+    reflectedColor = color;
   }
-  reflectedColor /= SSR_SAMPLES;
-  } else { // no reflection so just stick with the albedo
-  reflectedColor = color;
-  }
+  #endif
 
   reflectedColor.rgb += specularHighlight;
 
   if(material.metalID != NO_METAL){
-  reflectedColor.rgb *= material.albedo;
+    reflectedColor.rgb *= material.albedo;
   }
 
-  color = mix(color, reflectedColor, vec4(clamp01(fresnel), clamp01(length(fresnel))));
+  color = mix(color, reflectedColor, vec4(clamp01(fresnel), clamp01(length(fresnel))) * clamp01(geometrySmith(N, V, L, material.roughness)));
   // vec3 reflectedScreenPos = viewSpaceToSceneSpace(reflectionPos);
   // color = reflectionPos;
   return color;

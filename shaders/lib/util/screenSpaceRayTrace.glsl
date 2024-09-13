@@ -27,11 +27,12 @@ void binarySearch(inout vec3 rayPos, vec3 rayDir){
 // https://gist.github.com/BelmuTM/af0fe99ee5aab386b149a53775fe94a3#file-raytracer-glsl-L31
 bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool refine, out vec3 rayPos){
   rayPos = reproject(viewSpaceToScreenSpace(viewOrigin));
+
+  float depthLenience = max(abs(viewDir.z) * 3.0, 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
+
   vec3 rayDir = reproject(viewSpaceToScreenSpace(viewOrigin + viewDir)) - rayPos;
   rayDir *= min3((sign(rayDir) - rayPos) / rayDir); // set length of ray to trace to the nearest screen edge (I think)
   rayDir *= rcp(maxSteps); // split ray up into our steps
-
-  float depthLenience = max(abs(viewDir.z) * 3.0, 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
 
   bool intersect = false;
 

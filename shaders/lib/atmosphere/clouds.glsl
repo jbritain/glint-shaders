@@ -5,7 +5,7 @@
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
 
-#define LOWER_PLANE_HEIGHT 128.0
+#define LOWER_PLANE_HEIGHT 192.0
 #define UPPER_PLANE_HEIGHT 256.0
 
 #define CLOUD_SHAPE_SCALE 1000
@@ -20,8 +20,8 @@
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define ABSORPTION 0.1
-#define k 0.6
+#define ABSORPTION 0.9
+#define k 0.95
 #define SAMPLES 30
 #define SUBSAMPLES 4
 
@@ -33,18 +33,19 @@ float schlickPhase(float costh)
 }
 
 float getDensity(vec3 pos){
+
   float coverage = mix(0.08, 0.2, wetness);
 
-  float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r;
-  float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * frameTimeCounter, 0.0, 0.0)).r;
-  float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * frameTimeCounter, 0.0, 0.0)).r;
+  float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
+  float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
+  float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   
   float density = clamp01(shapeDensity2 - (1.0 - coverage));
   density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
   density -= clamp01(erosionDensity - 0.6);
   
-  float cumulusCentreHeight = mix(LOWER_PLANE_HEIGHT, UPPER_PLANE_HEIGHT, 0.2); // widest part of our cumulus clouds
+  float cumulusCentreHeight = mix(LOWER_PLANE_HEIGHT, UPPER_PLANE_HEIGHT, 0.3); // widest part of our cumulus clouds
 
   float heightDenseFactor;
 
@@ -53,9 +54,9 @@ float getDensity(vec3 pos){
   } else {
     heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, UPPER_PLANE_HEIGHT, pos.y);
   }
-  density = mix(density, 0.0, 1.0 - pow2(heightDenseFactor));
+  density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return density;
+  return density * (0.5 + wetness * 0.5);
 }
 
 bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
@@ -102,18 +103,25 @@ float subMarch(vec3 rayPos){
   vec3 subRayPos = a;
   float totalDensity = 0;
 
-  float jitter = blueNoise(texcoord, 1).r;
+  float jitter = blueNoise(texcoord, 0).g;
 
   subRayPos += increment * jitter;
 
   for(int i = 0; i < SUBSAMPLES; i++, subRayPos += increment){
     totalDensity += getDensity(subRayPos) * length(increment);
+    if(totalDensity >= 1.0){
+      break;
+    }
   }
 
-  return exp(-totalDensity * ABSORPTION);
+  return clamp01(exp(-totalDensity * ABSORPTION));
 }
 
 vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
+  #ifndef CLOUDS
+  return vec4(0.0);
+  #endif
+
   vec3 worldDir = normalize(playerPos);
 
   // we trace from a to b
@@ -150,7 +158,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
     if(b.y + cameraPosition.y < LOWER_PLANE_HEIGHT){ // neither the camera nor the terrain is in the cloud plane
       return vec4(0.0);
     }
-  } else if(length(b) > MARCH_LIMIT){ // limit how far we can march
+  } if(length(b) > MARCH_LIMIT){ // limit how far we can march
     b = normalize(b) * MARCH_LIMIT;
   }
 
@@ -160,42 +168,39 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   vec3 rayPos = a;
   vec3 increment = (b - a) / SAMPLES;
 
-  float transmittance = 1.0;
+  float totalTransmittance = 1.0;
   vec3 lightEnergy = vec3(0.0);
 
   float jitter = blueNoise(texcoord, 0).r;
   rayPos += increment * jitter;
 
+  vec3 scatter = vec3(0.0);
+
+  float phase = schlickPhase(dot(worldDir, sunDir));
+
   for(int i = 0; i < SAMPLES; i++, rayPos += increment){
     float density = getDensity(rayPos) * length(increment);
 
-    density = mix(density, 0.0, smoothstep(MARCH_LIMIT * 0.5, MARCH_LIMIT, length(rayPos - cameraPosition)));
+    // density = mix(density, 0.0, smoothstep(MARCH_LIMIT * 0.5, MARCH_LIMIT, length(rayPos - cameraPosition)));
+    float transmittance = exp(-density * ABSORPTION);
 
-    if(density > 0){
-      float lightTransmittance = subMarch(rayPos);
+    if(density < 1e-6){
+      continue;
+    }
 
-      float phase = schlickPhase(dot(worldDir, sunDir));
+    float lightTransmittance = subMarch(rayPos);
+    vec3 luminance = sunlightColor * lightTransmittance * phase * 25.0 + skyLightColor; // I do not like these numbers but they are what they are
+    luminance /= 2.0;
+    vec3 integScatter = (luminance - luminance * transmittance);
 
-      lightEnergy += density * length(increment) * transmittance * lightTransmittance * phase;
-      transmittance *= exp(-density * length(increment) * ABSORPTION);
+    totalTransmittance *= transmittance;
+    scatter += integScatter * totalTransmittance;
 
-      if(transmittance < 0.01){
-        break;
-      }
+    if(totalTransmittance < 0.01){
+      break;
     }
   }
-
-  // made up lighting calculations that look decent ish
-  vec3 ambientColor = mix(skyLightColor, sunlightColor, 0.2);
-  vec3 cloudColor = lightEnergy * sunlightColor * 0.5 + ambientColor * 0.05;
-
-  if(length(cloudColor) > 10){
-    cloudColor = normalize(cloudColor) * 10;
-  }
-
-  // transmittance = mix(1.0, transmittance, pow2(smoothstep(0.0, 0.3, worldDir.y)));
-
-  return vec4(cloudColor, 1.0 - transmittance);
+  return vec4(scatter, 1.0 - totalTransmittance);
 }
 
 #endif

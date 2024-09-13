@@ -13,14 +13,13 @@ const bool colortex4Clear = false;
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0;
 
-#define SKYLIGHT_STRENGTH 0.5
+#define SKYLIGHT_STRENGTH 0.2
 #define AMBIENT_STRENGTH 0.01
-#define SUNLIGHT_STRENGTH 1.0
+#define SUNLIGHT_STRENGTH 4.0
 
-#define BLOOM
-#define BLOOM_AMOUNT 0.2 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-#define BLOOM_BLUR 1.0 // [1.0 1.5 2.0 2.5 3.0 3.5 4.0]
+#define WATER_NORMALS
 
+#define SSR
 #define SSR_FADE
 #define SSR_SAMPLES 4
 #define ROUGH_REFLECTION_THRESHOLD 0.3
@@ -46,10 +45,12 @@ const float sunPathRotation = -40;
 
 #define NORMAL_MAPS
 
+#define FOG
 #define FOG_POWER 8.0
 #define FOG_START 0.2
 
-#define CLOUD_BLUR_RADIUS_THRESHOLD 2.0
+#define CLOUDS
+#define CLOUD_BLUR_RADIUS_THRESHOLD 4.0
 
 #define FXAA
 #define FXAA_SUBPIXEL 0.75 //[0.00 0.25 0.50 0.75 1.00]
