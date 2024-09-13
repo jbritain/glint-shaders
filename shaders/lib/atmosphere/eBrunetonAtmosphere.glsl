@@ -167,20 +167,56 @@ struct AtmosphereParameters {
 #define ATMOSPHERE ATMOSPHERE
 
 const AtmosphereParameters ATMOSPHERE = AtmosphereParameters(
-vec3(1.474000,1.850400,1.911980),
-radians(1.0),
-6360000.000000,
-6420000.000000,
-DensityProfile(DensityProfileLayer[2](DensityProfileLayer(0.000000,0.000000,0.000000,0.000000,0.000000),DensityProfileLayer(0.000000,1.000000,-0.125000,0.000000,0.000000))),
-vec3(0.005802,0.013558,0.033100),
-DensityProfile(DensityProfileLayer[2](DensityProfileLayer(0.000000,0.000000,0.000000,0.000000,0.000000),DensityProfileLayer(0.000000,1.000000,-0.833333,0.000000,0.000000))),
-vec3(0.003996,0.003996,0.003996),
-vec3(0.004440,0.004440,0.004440),
-0.800000,
-DensityProfile(DensityProfileLayer[2](DensityProfileLayer(25.000000,0.000000,0.000000,0.066667,-0.666667),DensityProfileLayer(0.000000,0.000000,0.000000,-0.066667,2.666667))),
-vec3(0.000650,0.001881,0.000085),
-vec3(0.100000,0.100000,0.100000),
--0.207912);
+	// The solar irradiance at the top of the atmosphere.
+	vec3(1.474000,1.850400,1.911980),
+	// The sun's angular radius. Warning: the implementation uses approximations
+	// that are valid only if this angle is smaller than 0.1 radians.
+	radians(1.0),
+	// The distance between the planet center and the bottom of the atmosphere.
+	6360.000000,
+	// The distance between the planet center and the top of the atmosphere.
+	6480.000000,
+//	6480.000000,
+	// The density profile of air molecules, i.e. a function from altitude to
+	// dimensionless values between 0 (null density) and 1 (maximum density).
+	DensityProfile(DensityProfileLayer[2](DensityProfileLayer(0.000000,0.000000,0.000000,0.000000,0.000000),DensityProfileLayer(0.000000,1.000000,-0.125000,0.000000,0.000000))),
+	// The scattering coefficient of air molecules at the altitude where their
+	// density is maximum (usually the bottom of the atmosphere), as a function of
+	// wavelength. The scattering coefficient at altitude h is equal to
+	// 'rayleigh_scattering' times 'rayleigh_density' at this altitude.
+	vec3(0.005802,0.013558,0.033100),
+	// The density profile of aerosols, i.e. a function from altitude to
+	// dimensionless values between 0 (null density) and 1 (maximum density).
+	DensityProfile(DensityProfileLayer[2](DensityProfileLayer(0.000000,0.000000,0.000000,0.000000,0.000000),DensityProfileLayer(0.000000,1.000000,-0.833333,0.000000,0.000000))),
+	// The scattering coefficient of aerosols at the altitude where their density
+	// is maximum (usually the bottom of the atmosphere), as a function of
+	// wavelength. The scattering coefficient at altitude h is equal to
+	// 'mie_scattering' times 'mie_density' at this altitude.
+	vec3(0.003996,0.003996,0.003996),
+	// The extinction coefficient of aerosols at the altitude where their density
+	// is maximum (usually the bottom of the atmosphere), as a function of
+	// wavelength. The extinction coefficient at altitude h is equal to
+	// 'mie_extinction' times 'mie_density' at this altitude.
+	vec3(0.004440,0.004440,0.004440),
+	// The asymetry parameter for the Cornette-Shanks phase function for the
+	// aerosols.
+	0.800000,
+	// The density profile of air molecules that absorb light (e.g. ozone), i.e.
+	// a function from altitude to dimensionless values between 0 (null density)
+	// and 1 (maximum density).
+	DensityProfile(DensityProfileLayer[2](DensityProfileLayer(25.000000,0.000000,0.000000,0.066667,-0.666667),DensityProfileLayer(0.000000,0.000000,0.000000,-0.066667,2.666667))),
+	// The extinction coefficient of molecules that absorb light (e.g. ozone) at
+	// the altitude where their density is maximum, as a function of wavelength.
+	// The extinction coefficient at altitude h is equal to
+	// 'absorption_extinction' times 'absorption_density' at this altitude.
+	vec3(0.000650,0.001881,0.000085),
+	// The average albedo of the ground.
+	vec3(0.100000,0.100000,0.100000),
+	// The cosine of the maximum Sun zenith angle for which atmospheric scattering
+	// must be precomputed (for maximum precision, use the smallest Sun zenith
+	// angle yielding negligible sky light radiance values. For instance, for the
+	// Earth case, 102 degrees is a good choice - yielding mu_s_min = -0.2).
+	-0.207912);
 
 const vec3 SKY_SPECTRAL_RADIANCE_TO_LUMINANCE = vec3(114974.916437,71305.954816,65310.548555);
 const vec3 SUN_SPECTRAL_RADIANCE_TO_LUMINANCE = vec3(98242.786222,69954.398112,66475.012354);
