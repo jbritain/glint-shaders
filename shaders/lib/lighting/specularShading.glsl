@@ -129,7 +129,7 @@ vec3 sampleVNDFGGX(
 vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   vec3 reflectionPos = vec3(0.0);
 
-  if(!traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos)){
+  if(!traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos, true)){
     return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
   }
 

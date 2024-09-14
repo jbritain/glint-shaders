@@ -57,6 +57,7 @@
   uniform sampler2DShadow shadowtex1HW;
   uniform sampler2D shadowcolor0;
 
+  uniform sampler2D depthtex0; // do not use this in gbuffers it is a bad idea
   uniform sampler2D depthtex1;
   uniform sampler2D colortex0;
   uniform sampler2D colortex6;

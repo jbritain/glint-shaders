@@ -14,6 +14,8 @@
   uniform sampler2D colortex1;
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
+  uniform sampler2D colortex4;
+
 
   uniform sampler2D depthtex0;
   uniform sampler2D depthtex1;
@@ -34,6 +36,13 @@
   uniform float wetness;
   uniform int isEyeInWater;
 
+  uniform int frameCounter;
+
+  uniform int viewWidth;
+  uniform int viewHeight;
+
+  uniform vec3 previousCameraPosition;
+
   in vec2 texcoord;
 
   vec3 albedo;
@@ -49,6 +58,8 @@
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/water/waterFog.glsl"
+  #include "/lib/util/screenSpaceRaytrace.glsl"
+  #include "/lib/textures/blueNoise.glsl"
 
   /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
@@ -62,11 +73,29 @@
 
     vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
     vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+
+    vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
+    vec3 translucentEyePlayerPos = mat3(gbufferModelViewInverse) * translucentViewPos;
     
     vec4 translucent = texture(colortex3, texcoord);
 
     bool inWater = isEyeInWater == 1;
     bool waterMask = materialIsWater(materialID);
+
+    #ifdef REFRACTION
+    if(waterMask){
+      vec3 dir = normalize(translucentViewPos);
+      vec3 refracted = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33)));
+
+      vec3 refractedPos = vec3(0.0);
+      float jitter = blueNoise(texcoord, frameCounter).r;
+      traceRay(translucentViewPos, refracted, 32, jitter, true, refractedPos, false);
+      refractedPos = clamp01(refractedPos);
+      refractedPos.xy = mix(refractedPos.xy, texcoord, smoothstep(0.4, 0.5, distance(refractedPos.xy, vec2(0.5))));
+        
+      color.rgb = texture(colortex0, refractedPos.xy).rgb;
+    }
+    #endif
 
     if(waterMask == inWater && opaqueDepth != 1.0){
       color = getFog(color, opaqueEyePlayerPos);

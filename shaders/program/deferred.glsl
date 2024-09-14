@@ -19,6 +19,7 @@
   uniform sampler2D colortex5;
 
   uniform sampler2D depthtex0;
+  uniform sampler2D depthtex1;
 
   uniform sampler2D shadowtex0;
   uniform sampler2DShadow shadowtex0HW;
