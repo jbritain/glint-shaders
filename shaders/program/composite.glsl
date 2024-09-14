@@ -66,7 +66,7 @@
     vec4 translucent = texture(colortex3, texcoord);
 
     bool inWater = isEyeInWater == 1;
-    bool waterMask = water(materialID);
+    bool waterMask = materialIsWater(materialID);
 
     if(waterMask == inWater && opaqueDepth != 1.0){
       color = getFog(color, opaqueEyePlayerPos);

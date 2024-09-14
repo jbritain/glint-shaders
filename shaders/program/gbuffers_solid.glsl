@@ -9,11 +9,24 @@
   flat out int materialID;
   out vec3 viewPos;
 
-  attribute vec3 at_tangent;
-  attribute vec2 mc_Entity;
+  uniform int worldTime;
+  uniform int worldDay;
+
+  uniform mat4 gbufferModelView;
+  uniform mat4 gbufferModelViewInverse;
+
+  uniform mat4 gbufferProjection;
+
+  uniform vec3 cameraPosition;
+
+  in vec3 at_tangent;
+  in vec2 mc_Entity;
+  in vec3 at_midBlock;
+
+  #include "/lib/util.glsl"
+  #include "/lib/misc/sway.glsl"
 
   void main() {
-    gl_Position = ftransform();
     materialID = int(mc_Entity.x + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
@@ -22,6 +35,13 @@
     faceTangent = gl_NormalMatrix * at_tangent;
 
     viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+    vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
+    vec3 worldPos = feetPlayerPos + cameraPosition;
+    worldPos = getSway(materialID, worldPos, at_midBlock);
+    feetPlayerPos = worldPos - cameraPosition;
+    viewPos = (gbufferModelView * vec4(feetPlayerPos, 1.0)).xyz;
+
+    gl_Position = gbufferProjection * vec4(viewPos, 1.0);
   }
 #endif
 //------------------------------------------------------------------

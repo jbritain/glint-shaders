@@ -56,7 +56,7 @@ float getDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return density;// * (0.5 + wetness * 0.5);
+  return density * (0.5 + wetness * 0.5);
 }
 
 bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){

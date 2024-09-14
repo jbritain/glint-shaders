@@ -106,6 +106,10 @@
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
     Material material = materialFromSpecularMap(albedo, specularData);
 
+    if(materialIsPlant(materialID)){
+      material.sss = 1.0;
+    }
+
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
 
     color.rgb = albedo;
@@ -113,7 +117,7 @@
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
-    if((isEyeInWater == 1) != water(materialID)){
+    if((isEyeInWater == 1) != materialIsWater(materialID)){
       color = getFog(color, eyePlayerPos);
     }
 

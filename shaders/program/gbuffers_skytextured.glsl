@@ -41,7 +41,7 @@
     }
 
 
-    
+    color.rgb *= vec3(4.0, 4.0, 5.0);
     color.rgb = gammaCorrect(color.rgb);
   }
 #endif
