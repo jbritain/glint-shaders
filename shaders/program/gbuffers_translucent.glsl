@@ -38,7 +38,7 @@
   uniform sampler2DShadow shadowtex1HW;
   uniform sampler2D shadowcolor0;
 
-  uniform sampler2D depthtex0;
+  uniform sampler2D depthtex1;
   uniform sampler2D colortex0;
   uniform sampler2D colortex6;
   uniform sampler2D colortex4;
@@ -129,7 +129,7 @@
 
         // get position of the solid thing behind the water
         vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-        float opaqueDepth = texture(depthtex0, screenPos).r;
+        float opaqueDepth = texture(depthtex1, screenPos).r;
 
         if(opaqueDepth != 1.0){
           vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(screenPos, opaqueDepth));

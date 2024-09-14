@@ -191,7 +191,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
     float lightTransmittance = subMarch(rayPos);
     vec3 luminance = sunlightColor * lightTransmittance * phase * 25.0 + skyLightColor; // I do not like these numbers but they are what they are
     luminance /= 2.0;
-    vec3 integScatter = (luminance - luminance * transmittance);
+    vec3 integScatter = (luminance - luminance * lightTransmittance) / ABSORPTION;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;
