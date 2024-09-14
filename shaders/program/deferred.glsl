@@ -111,7 +111,7 @@
       material.sss = 1.0;
     }
 
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, materialID) * SUNLIGHT_STRENGTH * sunlightColor;
 
     color.rgb = albedo;
 

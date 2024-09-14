@@ -33,6 +33,7 @@
 
   uniform vec3 cameraPosition;
 
+  uniform float far;
   uniform float wetness;
   uniform int isEyeInWater;
 

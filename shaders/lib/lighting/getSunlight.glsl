@@ -120,30 +120,46 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
 	return shadowSum;
 }
 
-vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
+vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap, int materialID){
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 	noise = blueNoise(screenPos);
 
 	float faceNoL = NoLSafe(faceNormal);
 	float NoL = NoLSafe(mappedNormal) * step(0.00001, faceNoL);
 
-	vec3 bias = getShadowBias(feetPlayerPos, mappedNormal, faceNoL);
-
-	vec4 shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
-
 	#ifdef SHADOWS
-  float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
-	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, 1.0);
-	
+		
 
-	float scatter = computeSSS(blockerDistance, SSS, faceNormal);
+		vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 
-	vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal);
+		float taxicabDistance = max(abs(feetPlayerPos.x), abs(feetPlayerPos.z));
+		float distFade = smoothstep(0.8 * shadowDistance, shadowDistance, taxicabDistance);
+
+		float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
+		float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, 1.0);
+		
+		vec3 bias = getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * mappedNormal, faceNoL);
+		shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
+
+		float scatter = computeSSS(blockerDistance, SSS, faceNormal);
+
+		vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal);
+
+		if(distFade > 0.0){
+			float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
+
+			scatter = mix(scatter, mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow, distFade);
+			shadow = mix(shadow, vec3(lightmapShadow), distFade);
+		}
 	#else
-	vec3 shadow = vec3(lightmap.y);
-	float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS);
+		float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
+
+		vec3 shadow = vec3(lightmapShadow);
+		float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
 	#endif
 
-  return max(shadow * NoL, vec3(scatter));
+  vec3 sunlight = max(shadow * NoL, vec3(scatter));
+
+	return sunlight;
 }
 #endif

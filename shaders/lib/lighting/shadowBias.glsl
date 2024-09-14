@@ -24,8 +24,8 @@ vec4 getShadowScreenPos(vec4 shadowClipPos, vec3 normal){
 }
 
 // bias from complementary
-vec3 getShadowBias(vec3 playerPos, vec3 normal, float NoL){
-	vec3 bias = 0.25 * normal * clamp01(0.12 + 0.01 * length(playerPos) * (2.0 - clamp01(NoL)));
+vec3 getShadowBias(vec3 playerPos, vec3 worldNormal, float NoL){
+	vec3 bias = 0.25 * worldNormal * clamp01(0.12 + 0.01 * length(playerPos) * (2.0 - clamp01(NoL)));
 
 	return bias;
 }

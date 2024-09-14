@@ -31,7 +31,7 @@ vec3 lowerSway(vec3 pos, vec3 midblock){ // bottom halves of double high plants
 
 vec3 hangingSway(vec3 pos, vec3 midblock){ // stuff hanging from a block
   float waveMult = smoothstep(-64, 64, midblock.y);
-  return pos + getWave(pos) * waveMult;
+  return pos + getWave(pos + midblock / 64) * waveMult;
 }
 
 vec3 floatingSway(vec3 pos){ // stuff on the water

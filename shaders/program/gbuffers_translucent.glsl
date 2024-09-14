@@ -94,6 +94,8 @@
 
   uniform int isEyeInWater;
 
+  uniform int biome_precipitation;
+
   in vec2 lmcoord;
   in vec2 texcoord;
   in vec4 glcolor;
@@ -171,9 +173,13 @@
     }
 
     #ifdef gbuffers_weather
-      color = vec4(0.2);
-      color.a = mix(0.0, color.a, wetness);
+      if(biome_precipitation != 2){
+        color = vec4(0.2);
+      }
+      
     #endif
+
+    
 
     vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
 
@@ -204,7 +210,7 @@
 
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, materialID) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 

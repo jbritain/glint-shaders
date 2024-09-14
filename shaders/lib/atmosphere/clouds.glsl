@@ -5,7 +5,7 @@
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
 
-#define LOWER_PLANE_HEIGHT 128.0
+#define LOWER_PLANE_HEIGHT 192.0
 #define UPPER_PLANE_HEIGHT 256.0
 
 #define CLOUD_SHAPE_SCALE 1000
