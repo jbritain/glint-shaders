@@ -18,6 +18,8 @@ const float TAU = radians(360.0);
 #define _rcp(x) (1.0 / x)
 #define _log10(x, y) (log2(x) / log2(y))
 #define _pow2(x) (x*x)
+#define _pow3(x) (x*x*x)
+#define _pow4(x) (x*x*x*x)
 #define _pow5(x) (x*x*x*x*x)
 
 float square(in float x) {
@@ -66,6 +68,38 @@ vec3 pow2(in vec3 x) {
 }
 vec4 pow2(in vec4 x) {
     return _pow2(x);
+}
+
+float pow3(in float x) {
+    return _pow3(x);
+}
+int pow3(in int x) {
+    return _pow3(x);
+}
+vec2 pow3(in vec2 x) {
+    return _pow3(x);
+}
+vec3 pow3(in vec3 x) {
+    return _pow3(x);
+}
+vec4 pow3(in vec4 x) {
+    return _pow3(x);
+}
+
+float pow4(in float x) {
+    return _pow4(x);
+}
+int pow4(in int x) {
+    return _pow4(x);
+}
+vec2 pow4(in vec2 x) {
+    return _pow4(x);
+}
+vec3 pow4(in vec3 x) {
+    return _pow4(x);
+}
+vec4 pow4(in vec4 x) {
+    return _pow4(x);
 }
 
 float pow5(in float x) {

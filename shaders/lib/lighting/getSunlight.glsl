@@ -105,7 +105,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
 		return(sampleShadow(shadowClipPos, normal));
 	}
 
-	float penumbraWidth = penumbraWidthBlocks / shadowDistance;
+	float penumbraWidth = penumbraWidthBlocks / (shadowDistance * 2); // TODO: WHY ARE MY SHADOWS SO DAMN SOLID
 	float range = penumbraWidth / 2;
 
 	vec3 shadowSum = vec3(0.0);
@@ -123,14 +123,18 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 	noise = blueNoise(screenPos);
-  vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 
-	float NoL = NoLSafe(mappedNormal) * step(0.00001, NoLSafe(faceNormal));
+	float faceNoL = NoLSafe(faceNormal);
+	float NoL = NoLSafe(mappedNormal) * step(0.00001, faceNoL);
+
+	vec3 bias = getShadowBias(feetPlayerPos, mappedNormal, faceNoL);
+
+	vec4 shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
 
 	#ifdef SHADOWS
   float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
-	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
-	// penumbraWidth = MAX_PENUMBRA_WIDTH;
+	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, 1.0);
+	
 
 	float scatter = computeSSS(blockerDistance, SSS, faceNormal);
 
