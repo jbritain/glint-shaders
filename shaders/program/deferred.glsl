@@ -16,6 +16,7 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
+  uniform sampler2D colortex5;
 
   uniform sampler2D depthtex0;
 
@@ -54,6 +55,8 @@
   uniform float near;
   uniform float far;
 
+  uniform int isEyeInWater;
+
   in vec2 texcoord;
 
   vec3 albedo;
@@ -64,9 +67,10 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:05 */
+  /* DRAWBUFFERS:063 */
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 cloudColor;
+  layout(location = 2) out vec4 tex3;
 
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -79,6 +83,7 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/atmosphere/fog.glsl"
+  #include "/lib/water/waterFog.glsl"
 
 
   void main() {
@@ -90,6 +95,7 @@
     getLightColors(sunlightColor, skyLightColor);
     cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
     
+    tex3 = vec4(0.0); // clear buffer in preparation for translucents to write to it
 
     if(depth == 1.0){
       color = texture(colortex3, texcoord);
@@ -107,10 +113,11 @@
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
-  
-    color = getFog(color, eyePlayerPos);
+    if((isEyeInWater == 1) != water(materialID)){
+      color = getFog(color, eyePlayerPos);
+    }
+
     color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
 
-      
   }
 #endif

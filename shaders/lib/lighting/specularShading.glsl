@@ -161,12 +161,12 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
   } else if (material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
 
-  // we need a TBN to get into tangent space for the VNDF
-  vec3 tangent;
-  vec3 bitangent;
-  computeFrisvadTangent(normal, tangent, bitangent);
+    // we need a TBN to get into tangent space for the VNDF
+    vec3 tangent;
+    vec3 bitangent;
+    computeFrisvadTangent(normal, tangent, bitangent);
 
-  mat3 tbn = mat3(tangent, bitangent, normal);
+    mat3 tbn = mat3(tangent, bitangent, normal);
 
     for(int i = 0; i < SSR_SAMPLES; i++){
       vec3 noise = blueNoise(screenPos, frameCounter * SSR_SAMPLES + i).rgb;

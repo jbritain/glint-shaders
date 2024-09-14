@@ -3,8 +3,9 @@
 const int colortex0Format = RGB32F;  || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
-const int colortex5Format = RGBA16F; || clouds
-const int colortex4Format = RGBA32F; || previous frame data
+const int colortex3Format = RGBA32F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
+const int colortex4Format = RGBA32F; || previous frame data - color rgb, opaque depth
+const int colortex6Format = RGBA16F; || clouds
 
 */
 
@@ -26,7 +27,7 @@ const float shadowDistance = 160.0;
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 
-#define WATER_COLOR vec4(0.015, 0.04, 0.098, 0.5)
+#define WATER_COLOR vec4(0.0, 0.02, 0.098, 0.0)
 
 #define SHADOWS
 #define TRANSPARENT_SHADOWS

@@ -38,8 +38,9 @@
   uniform sampler2DShadow shadowtex1HW;
   uniform sampler2D shadowcolor0;
 
+  uniform sampler2D depthtex0;
   uniform sampler2D colortex0;
-  uniform sampler2D colortex5;
+  uniform sampler2D colortex6;
   uniform sampler2D colortex4;
 
   uniform float alphaTestRef;
@@ -71,6 +72,8 @@
   uniform int worldTime;
   uniform int worldDay;
 
+  uniform int isEyeInWater;
+
   in vec2 lmcoord;
   in vec2 texcoord;
   in vec4 glcolor;
@@ -91,6 +94,7 @@
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/fog.glsl"
+  #include "/lib/water/waterFog.glsl"
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
@@ -102,7 +106,7 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:0125 */
+  /* DRAWBUFFERS:312 */
   layout(location = 0) out vec4 color; // shaded colour
   layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
   layout(location = 2) out vec4 outData2; // mapped normal, specular map data
@@ -118,6 +122,25 @@
 
     if(water(materialID)){
       color = WATER_COLOR;
+
+      if(isEyeInWater == 1){ // in water
+        color = waterFog(color, vec3(0.0), viewPos);
+      } else { // not in water
+
+        // get position of the solid thing behind the water
+        vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
+        float opaqueDepth = texture(depthtex0, screenPos).r;
+
+        if(opaqueDepth != 1.0){
+          vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(screenPos, opaqueDepth));
+
+          // fog between water and solid thing
+          color = waterFog(color, viewPos, opaqueViewPos);
+        }
+      }
+      
+      
+
       #ifdef WATER_NORMALS
       faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.2);
       #endif
@@ -129,6 +152,7 @@
 
     #ifdef gbuffers_weather
       color = vec4(0.2);
+      color.a = mix(0.0, color.a, wetness);
     #endif
 
     vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
@@ -168,7 +192,7 @@
 
     vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 
-    vec4 cloud = texture(colortex5, screenPos);
+    vec4 cloud = texture(colortex6, screenPos);
 
     vec3 worldPos = eyePlayerPos + cameraPosition;
     

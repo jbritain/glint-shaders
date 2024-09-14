@@ -125,7 +125,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	noise = blueNoise(screenPos);
   vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 
-	float NoL = NoLSafe(faceNormal) * step(0.0, NoLSafe(mappedNormal));
+	float NoL = NoLSafe(mappedNormal) * step(0.00001, NoLSafe(faceNormal));
 
 	#ifdef SHADOWS
   float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);

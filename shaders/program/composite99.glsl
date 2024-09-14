@@ -11,20 +11,21 @@
 
 #ifdef fsh
   uniform sampler2D colortex0;
+  uniform sampler2D colortex1;
+  uniform sampler2D colortex2;
   uniform sampler2D colortex4;
 
   uniform sampler2D depthtex0;
+  uniform sampler2D depthtex1;
 
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:40 */
-  layout(location = 0) out vec4 previousFrameData;
-  layout(location = 1) out vec4 color;
+  /* DRAWBUFFERS:4 */
+  layout(location = 0) out vec4 previousFrameData1;
 
   void main() {
-    color = vec4(texture(colortex4, texcoord).rgb, 1.0);
-    previousFrameData.rgb = texture(colortex0, texcoord).rgb;
-    previousFrameData.a = texture(depthtex0, texcoord).r;
+    previousFrameData1.rgb = texture(colortex0, texcoord).rgb;
+    previousFrameData1.a = texture(depthtex0, texcoord).r;
 
   }
 #endif

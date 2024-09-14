@@ -12,7 +12,7 @@
 #ifdef fsh
   uniform sampler2D depthtex0;
 
-  uniform sampler2D colortex5;
+  uniform sampler2D colortex6;
 
   uniform float viewWidth;
   uniform float viewHeight;
@@ -25,7 +25,7 @@
 
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:5 */
+  /* DRAWBUFFERS:6 */
   layout(location = 0) out vec4 cloudColor;
 
   void main() {
@@ -39,9 +39,9 @@
 
     float depth = texture(depthtex0, texcoord).r;
     if(depth == 1.0 && all(equal(textureGatherOffsets(depthtex0, texcoord, offsets), vec4(1.0)))){
-      cloudColor = blur13(colortex5, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
+      cloudColor = blur13(colortex6, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
     } else {
-      cloudColor = texture(colortex5, texcoord);
+      cloudColor = texture(colortex6, texcoord);
     }
   }
 #endif
