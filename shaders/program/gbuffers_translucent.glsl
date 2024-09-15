@@ -56,6 +56,7 @@
   uniform sampler2DShadow shadowtex0HW;
   uniform sampler2DShadow shadowtex1HW;
   uniform sampler2D shadowcolor0;
+  uniform sampler2D shadowcolor1;
 
   uniform sampler2D depthtex0; // do not use this in gbuffers it is a bad idea
   uniform sampler2D depthtex1;
@@ -142,34 +143,15 @@
 
     color.rgb = gammaCorrect(color.rgb);
 
+    if (color.a < alphaTestRef) {
+      discard;
+    }
+
     if(materialIsWater(materialID)){
-      color = WATER_COLOR;
-
-      if(isEyeInWater == 1){ // in water
-        color = waterFog(color, vec3(0.0), viewPos);
-      } else { // not in water
-
-        // get position of the solid thing behind the water
-        vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-        float opaqueDepth = texture(depthtex1, screenPos).r;
-
-        if(opaqueDepth != 1.0){
-          vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(screenPos, opaqueDepth));
-
-          // fog between water and solid thing
-          color = waterFog(color, viewPos, opaqueViewPos);
-        }
-      }
-      
-      
-
+      color = vec4(0.0);
       #ifdef WATER_NORMALS
       faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.2);
       #endif
-    }
-
-    if (color.a < alphaTestRef) {
-      discard;
     }
 
     #ifdef gbuffers_weather
@@ -210,7 +192,7 @@
 
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, materialID) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 

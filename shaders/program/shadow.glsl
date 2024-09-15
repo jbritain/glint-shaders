@@ -67,14 +67,10 @@
 
   void main(){
     vec4 color = texture(gtexture, texcoord) * glcolor;
-
-    if(materialIsWater(materialID)){
-      color = WATER_COLOR;
-      color.a = sqrt(getwaves(feetPlayerPos.xz + cameraPosition.xz, ITERATIONS_NORMAL));
-    }
     
 
 	  gl_FragData[0] = color;
+    gl_FragData[1] = vec4(clamp01(float(materialID - 10000) * rcp(255.0)), 0.0, 0.0, 1.0);
   }
   
 #endif

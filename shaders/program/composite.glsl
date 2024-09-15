@@ -102,10 +102,16 @@
       color = getFog(color, opaqueEyePlayerPos);
     }
 
-    if(inWater && !waterMask){
-      color = waterFog(color, vec3(0.0), opaqueViewPos);
+    if(inWater && !waterMask){ // water fog when camera and object are underwater
+      color.rgb = waterFog(color.rgb, vec3(0.0), opaqueViewPos);
+    } else if(inWater && waterMask){ // water fog when only camera is underwater
+      color.rgb = waterFog(color.rgb, vec3(0.0), translucentViewPos);
+
+      translucent.rgb = waterFog(translucent.rgb, vec3(0.0), translucentViewPos);
+    } else if(!inWater && waterMask){ // water fog when only object is underwater
+      color.rgb = waterFog(color.rgb, translucentViewPos, opaqueViewPos);
     }
 
-    color.rgb = mix(color.rgb, translucent.rgb, translucent.a);
+    color.rgb = mix(color.rgb, translucent.rgb, clamp01(translucent.a));
   }
 #endif

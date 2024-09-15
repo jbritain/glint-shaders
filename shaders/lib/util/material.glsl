@@ -96,7 +96,7 @@ Material materialFromSpecularMap(vec3 albedo, vec4 specularData){
 }
 
 Material waterMaterial = Material(
-  WATER_COLOR.rgb,
+  vec3(0.0),
   0.0,
   vec3(0.02),
   vec3(0.0),

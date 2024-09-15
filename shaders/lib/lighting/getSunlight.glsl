@@ -3,6 +3,7 @@
 
 #include "/lib/lighting/shadowBias.glsl"
 #include "/lib/textures/blueNoise.glsl"
+#include "/lib/util/materialIDs.glsl"
 
 vec4 noise;
 
@@ -13,6 +14,12 @@ vec2 vogelDiscSample(int stepIndex, int stepCount, float rotation) {
   float theta = stepIndex * goldenAngle + rotation;
 
   return r * vec2(cos(theta), sin(theta));
+}
+
+int getBlockerID(vec3 shadowScreenPos){
+	vec4 blockerData = texture(shadowcolor1, shadowScreenPos.xy);
+	int materialID = int(blockerData.x * 255 + 0.5) + 10000;
+	return materialID;
 }
 
 // ask tech, idk
@@ -32,7 +39,7 @@ float computeSSS(float blockerDistance, float SSS, vec3 normal){
 	}
 
 	float s = 1.0 / (SSS * 0.06);
-	float z = blockerDistance * 255;
+	float z = blockerDistance * 255 * 2; // multiply by 2 to account for distortion halving z
 
 
 	if(isnan(z)){
@@ -59,6 +66,18 @@ vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 	}
 
   vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
+
+	int blockerID = getBlockerID(shadowScreenPos);
+
+	if(materialIsWater(blockerID)){
+		float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
+		float blockerDistance = blockerDistanceRaw * 255 * 2;
+
+		vec3 extinction = exp(-WATER_EXTINCTION * blockerDistance);
+
+		return extinction;
+	}
+
   vec3 shadowColor = shadowColorData.rgb * (1.0 - shadowColorData.a);
 
   return mix(shadowColor * opaqueShadow, vec3(1.0), transparentShadow);
@@ -120,7 +139,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
 	return shadowSum;
 }
 
-vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap, int materialID){
+vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 	noise = blueNoise(screenPos);
 

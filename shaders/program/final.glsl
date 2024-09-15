@@ -35,7 +35,9 @@
 
     vec3 bloom = texture(colortex3, texcoord).rgb;
 
+    #ifdef BLOOM
     color.rgb = mix(color.rgb, bloom, 0.01 * BLOOM_STRENGTH);
+    #endif
 
     color.rgb = tonemap(color.rgb);
 

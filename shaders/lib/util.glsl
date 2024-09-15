@@ -280,7 +280,6 @@ vec3 generateConeVector(vec3 vector, vec2 xy, float angle) {
 
 // Creates a TBN matrix from a normal and a tangent
 mat3 tbnNormalTangent(vec3 normal, vec3 tangent) {
-    // For DirectX normal mapping you want to switch the order of these 
     vec3 bitangent = cross(tangent, normal);
     return mat3(tangent, bitangent, normal);
 }

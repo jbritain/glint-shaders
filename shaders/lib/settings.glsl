@@ -27,7 +27,7 @@ const float shadowDistance = 160.0;
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 
-#define WATER_COLOR vec4(0.0, 0.02, 0.098, 0.0)
+#define WATER_EXTINCTION vec3(0.7, 0.15, 0.05)
 
 #define SHADOWS
 #define TRANSPARENT_SHADOWS
@@ -56,6 +56,7 @@ const float sunPathRotation = -40;
 #define FXAA_SUBPIXEL 0.75 //[0.00 0.25 0.50 0.75 1.00]
 #define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]
 
+#define BLOOM
 #define BLOOM_RADIUS 1.0
 #define BLOOM_STRENGTH 1.0
 
