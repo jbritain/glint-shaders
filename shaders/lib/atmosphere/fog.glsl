@@ -22,9 +22,9 @@ vec4 getFog(vec4 color, vec3 playerPos){
 
   vec3 dir = normalize(playerPos);
 
-  vec3 fog = GetSkyRadiance(
+  vec3 fog = hasSkylight ? GetSkyRadiance(
     kCamera, dir, 0.0, sunVector, transmit
-  );
+  ) : pow(fogColor, vec3(2.2));
 
   float visibilityDistance = 150000.0;
   float extinctionCoefficient = 3.912 / visibilityDistance;

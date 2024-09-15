@@ -96,6 +96,8 @@
   uniform int isEyeInWater;
 
   uniform int biome_precipitation;
+  uniform bool hasSkylight;
+  uniform vec3 fogColor;
 
   in vec2 lmcoord;
   in vec2 texcoord;
@@ -192,7 +194,7 @@
 
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 

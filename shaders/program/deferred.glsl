@@ -59,6 +59,9 @@
 
   uniform int isEyeInWater;
 
+  uniform bool hasSkylight;
+  uniform vec3 fogColor;
+
   in vec2 texcoord;
 
   vec3 albedo;
@@ -95,7 +98,7 @@
     
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
-    cloudColor = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor);
+    cloudColor = hasSkylight ? getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor) : vec4(0.0);
     
     tex3 = vec4(0.0); // clear buffer in preparation for translucents to write to it
 
@@ -112,7 +115,7 @@
       material.sss = 1.0;
     }
 
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
+    vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
 
     color.rgb = albedo;
 

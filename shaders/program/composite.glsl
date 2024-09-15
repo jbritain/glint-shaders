@@ -44,6 +44,9 @@
 
   uniform vec3 previousCameraPosition;
 
+  uniform bool hasSkylight;
+  uniform vec3 fogColor;
+
   in vec2 texcoord;
 
   vec3 albedo;

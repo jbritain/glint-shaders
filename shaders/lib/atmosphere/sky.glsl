@@ -7,6 +7,10 @@ const vec3 sunVector = normalize(mat3(gbufferModelViewInverse) * sunPosition);
 const vec3 lightVector = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
 
 vec3 getSky(vec4 color, vec3 dir, bool includeSun){
+  if(!hasSkylight){
+    return vec3(0.0);
+  }
+
   // return vec3(0.0);
   vec3 transmit = vec3(1.0);
   vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + ATMOSPHERE.bottom_radius + 10000, 0.0);

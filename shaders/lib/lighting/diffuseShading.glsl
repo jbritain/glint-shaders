@@ -16,7 +16,7 @@ vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material){
     skyLight +
     blockLight +
     sunlight +
-    ambient +
+    ambient * (hasSkylight ? 1.0 : 3.0) +
     material.emission * 16
   );
 }

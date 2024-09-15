@@ -15,6 +15,8 @@
   uniform int worldDay;
   uniform vec3 cameraPosition;
 
+  uniform bool hasSkylight;
+
   out vec2 lmcoord;
   out vec2 texcoord;
   out vec4 glcolor;
@@ -26,6 +28,12 @@
   #include "/lib/misc/sway.glsl"
 
   void main(){
+
+    if(!hasSkylight){
+      gl_Position = vec4(1e2);
+      return;
+    }
+
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord  = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
