@@ -56,4 +56,7 @@ const float sunPathRotation = -40;
 #define FXAA_SUBPIXEL 0.75 //[0.00 0.25 0.50 0.75 1.00]
 #define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]
 
+#define BLOOM_RADIUS 1.0
+#define BLOOM_STRENGTH 1.0
+
 // #define REFRACTION

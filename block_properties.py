@@ -23,7 +23,7 @@ def main():
 			'lower': tags['sway/lower'],
 			'hanging': tags['sway/hanging'],
 			'floating': tags['sway/floating'],
-			'full': Flag(tags['sway/full'] + tags['minecraft:leaves'])
+			'full': tags['sway/full']
 		}),
 	},
 	MappingConfig(

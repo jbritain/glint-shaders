@@ -14,7 +14,7 @@
   const bool colortex0MipmapEnabled = true;;
 
   uniform sampler2D colortex0;
-  uniform sampler2D colortex4;
+  uniform sampler2D colortex3;
 
   uniform sampler2D depthtex0;
 
@@ -34,12 +34,15 @@
     color = texture(colortex0, texcoord);
 
     color.rgb = FXAA311(color.rgb);
+
+    vec3 bloom = texture(colortex3, texcoord).rgb;
+
+    color.rgb = mix(color.rgb, bloom, 0.01 * BLOOM_STRENGTH);
+
     color.rgb = tonemap(color.rgb);
 
     color.rgb = setSaturationLevel(color.rgb, 1.2);
 
     color.rgb = invGammaCorrect(color.rgb);
-
-
   }
 #endif

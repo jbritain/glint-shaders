@@ -12,7 +12,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex0` scene colour
 `colortex1` gbuffer data - albedo, material ID, face normal, lightmap
 `colortex2` gbuffer data - mapped normal, specular map data
-`colortex3` stars [gbuffers > deferred] translucents [gbuffers translucent>]
+`colortex3` stars [gbuffers > deferred] translucents [gbuffers translucent>composite89] bloom [composite90>]
 `colortex4` previous frame data - color rgb, opaque depth
 `colortex5` unused
 `colortex6` clouds
@@ -23,6 +23,18 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `deferred2` cloud blur (vertical) and blending with opaques
 
 `composite` some fog, translucency blending
+
+`composite90` bloom downsample full>A
+`composite91` bloom downsample A>B
+`composite92` bloom downsample B>C
+`composite93` bloom downsample C>D
+`composite94` bloom downsample D>E
+
+`composite96` bloom upsample E>D
+`composite95` bloom upsample D>C
+`composite96` bloom upsample C>B
+`composite97` bloom upsample B>A
+`composite98` bloom upsample A>full
 `composite99` writing frame data for next frame to access (previous frame data)
 
 `final` post processing
