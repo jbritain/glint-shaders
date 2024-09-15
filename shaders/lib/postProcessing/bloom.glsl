@@ -1,6 +1,25 @@
 // implemented following https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom
 // which is in turn an implementation of Sledgehammer Games' bloom used for COD Advanced Warfare
 
+vec3 powVec3(vec3 v, float p)
+{
+    return vec3(pow(v.x, p), pow(v.y, p), pow(v.z, p));
+}
+
+vec3 toSRGB(vec3 v) { return powVec3(v, 1.0/2.2); }
+
+float RGBToLuminance(vec3 col)
+{
+    return dot(col, vec3(0.2126f, 0.7152f, 0.0722f));
+}
+
+float karisAverage(vec3 col)
+{
+    // Formula is 1 / (1 + luma)
+    float luma = RGBToLuminance(toSRGB(col)) * 0.25f;
+    return 1.0f / (1.0f + luma);
+}
+
 struct BloomTile {
   vec2 origin;
   int mipLevel;
@@ -15,7 +34,7 @@ const BloomTile tileE = BloomTile(vec2(0.9375 + 8/viewWidth, 0.0), 5, 0.03125); 
 
 BloomTile tiles[5] = BloomTile[5](tileA, tileB, tileC, tileD, tileE);
 
-vec3 downSample(sampler2D sourceTexture, vec2 coord){
+vec3 downSample(sampler2D sourceTexture, vec2 coord, bool doKarisAverage){
     // a - b - c
     // - j - k -
     // d - e - f
@@ -39,10 +58,27 @@ vec3 downSample(sampler2D sourceTexture, vec2 coord){
   vec3 l = texture(sourceTexture, vec2(coord.x - x, coord.y - y)).rgb;
   vec3 m = texture(sourceTexture, vec2(coord.x + x, coord.y - y)).rgb;
 
-  vec3 dsample = e * 0.125;
-  dsample += (a+c+g+i) * 0.03125;
-  dsample += (b+d+f+h) * 0.0625;
-  dsample += (j+k+l+m) * 0.125;
+  vec3 dsample;
+  if(doKarisAverage){
+    vec3 group0 = (a+b+d+e) * (0.124/4.0);
+    vec3 group1 = (b+c+e+f) * (0.124/4.0);
+    vec3 group2 = (d+e+g+h) * (0.125/4.0);
+    vec3 group3 = (e+f+h+i) * (0.125/4.0);
+    vec3 group4 = (j+k+l+m) * (0.5/4.0);
+
+    group0 *= karisAverage(group0);
+    group1 *= karisAverage(group1);
+    group2 *= karisAverage(group2);
+    group3 *= karisAverage(group3);
+    group4 *= karisAverage(group4);
+    dsample = group0 + group1 + group2 + group3 + group4;
+  } else {
+    dsample = e * 0.125;
+    dsample += (a+c+g+i) * 0.03125;
+    dsample += (b+d+f+h) * 0.0625;
+    dsample += (j+k+l+m) * 0.125;
+  }
+
 
   return dsample;
 }
@@ -85,13 +121,3 @@ vec2 scaleFromBloomTile(vec2 coord, BloomTile tile){
   return coord * tile.scale + tile.origin;
 }
 
-// // when downsampling, which bloom tile are we reading?
-// bool getCurrentTile(vec2 coord, out BloomTile tile){
-//   for(int i = 0; i < tiles.length(); i++){
-//     tile = tiles[i];
-//     if(coord.x < tile.origin.x + tile.scale && coord.x > tile.origin.x && coord.y < tile.scale){
-//       return true;
-//     }
-//   }
-//   return false;
-// }

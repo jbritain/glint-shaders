@@ -11,8 +11,6 @@
 #endif
 //------------------------------------------------------------------
 #ifdef fsh
-  const bool colortex0MipmapEnabled = true;;
-
   uniform sampler2D colortex0;
   uniform sampler2D colortex3;
 

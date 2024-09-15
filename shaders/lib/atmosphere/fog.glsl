@@ -30,7 +30,7 @@ vec4 getFog(vec4 color, vec3 playerPos){
   float extinctionCoefficient = 3.912 / visibilityDistance;
   float extinction = exp(-extinctionCoefficient * length(playerPos));
 
-  extinction = mix(extinction, 0.0, smoothstep(far * 0.8, far, length(playerPos)));
+  extinction = mix(extinction, 0.0, smoothstep(far * 0.8, far, length(playerPos))); // this is not the extinction and I should really rename these variables
 
   transmit = vec3(extinction);
 
