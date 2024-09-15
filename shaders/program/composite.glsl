@@ -87,17 +87,29 @@
     bool waterMask = materialIsWater(materialID);
 
     #ifdef REFRACTION
+
+    // this is cheating at refraction
+    // instead of actually tracing the refracted ray we just step a little bit
     if(waterMask){
       vec3 dir = normalize(translucentViewPos);
-      vec3 refracted = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33)));
+      vec3 refracted = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
 
-      vec3 refractedPos = vec3(0.0);
-      float jitter = blueNoise(texcoord, frameCounter).r;
-      traceRay(translucentViewPos, refracted, 32, jitter, true, refractedPos, false);
-      refractedPos = clamp01(refractedPos);
-      refractedPos.xy = mix(refractedPos.xy, texcoord, smoothstep(0.4, 0.5, distance(refractedPos.xy, vec2(0.5))));
-        
-      color.rgb = texture(colortex0, refractedPos.xy).rgb;
+
+      vec3 refractedPos = translucentViewPos;
+      refractedPos += refracted * REFRACTION_AMOUNT; // that's right we're gonna cheat
+      vec2 refractedCoord = viewSpaceToScreenSpace(refractedPos).xy;
+
+      refractedCoord = mix(refractedCoord, texcoord, smoothstep(0.95, 1.0, max2(abs(0.5 - refractedCoord)) * 2.0));
+
+      if(clamp01(refractedCoord) != refractedCoord || texture(depthtex1, refractedCoord).r < translucentDepth){
+        refractedCoord = texcoord;
+      }
+
+      color.rgb = texture(colortex0, refractedCoord).rgb;
+      opaqueDepth = texture(depthtex1, refractedCoord).r;
+
+      opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
+      opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
     }
     #endif
 

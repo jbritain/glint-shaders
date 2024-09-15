@@ -61,3 +61,4 @@ const float sunPathRotation = -40;
 #define BLOOM_STRENGTH 1.0
 
 // #define REFRACTION
+#define REFRACTION_AMOUNT 1.0

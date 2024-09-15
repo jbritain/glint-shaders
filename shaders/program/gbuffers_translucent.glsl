@@ -149,13 +149,6 @@
       discard;
     }
 
-    if(materialIsWater(materialID)){
-      color = vec4(0.0);
-      #ifdef WATER_NORMALS
-      faceNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.2);
-      #endif
-    }
-
     #ifdef gbuffers_weather
       if(biome_precipitation != 2){
         color = vec4(0.2);
@@ -172,6 +165,13 @@
     #else
       vec3 mappedNormal = faceNormal;
     #endif
+
+    if(materialIsWater(materialID)){
+      color = vec4(0.0);
+      #ifdef WATER_NORMALS
+      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.2);
+      #endif
+    }
 
     // encode gbuffer data
     outData1.x = pack2x8F(color.r, color.g);
