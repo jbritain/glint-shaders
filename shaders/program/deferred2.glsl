@@ -47,7 +47,7 @@
       cloudColor = texture(colortex6, texcoord);
     }
 
-    color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
+    color.rgb = color.rgb * (1.0 - cloudColor.a) + cloudColor.rgb;
     
   }
 #endif

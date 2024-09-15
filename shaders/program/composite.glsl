@@ -17,6 +17,12 @@
   uniform sampler2D colortex4;
 
 
+  uniform sampler2D shadowtex0;
+  uniform sampler2DShadow shadowtex0HW;
+  uniform sampler2DShadow shadowtex1HW;
+  uniform sampler2D shadowcolor0;
+  uniform sampler2D shadowcolor1;
+
   uniform sampler2D depthtex0;
   uniform sampler2D depthtex1;
 
@@ -25,6 +31,9 @@
 
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
+
+  uniform mat4 shadowModelView;
+  uniform mat4 shadowProjection;
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
@@ -39,8 +48,10 @@
 
   uniform int frameCounter;
 
-  uniform int viewWidth;
-  uniform int viewHeight;
+  uniform float viewWidth;
+  uniform float viewHeight;
+
+  uniform ivec2 eyeBrightnessSmooth;
 
   uniform vec3 previousCameraPosition;
 
@@ -69,6 +80,9 @@
   layout(location = 0) out vec4 color;
 
   void main() {
+    vec3 sunlightColor; vec3 skyLightColor;
+    getLightColors(sunlightColor, skyLightColor);
+
     color = texture(colortex0, texcoord);
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
 
@@ -118,13 +132,13 @@
     }
 
     if(inWater && !waterMask){ // water fog when camera and object are underwater
-      color.rgb = waterFog(color.rgb, vec3(0.0), opaqueViewPos);
+      color.rgb = waterFog(color.rgb, vec3(0.0), opaqueEyePlayerPos, sunlightColor, skyLightColor);
     } else if(inWater && waterMask){ // water fog when only camera is underwater
-      color.rgb = waterFog(color.rgb, vec3(0.0), translucentViewPos);
+      color.rgb = waterFog(color.rgb, vec3(0.0), translucentEyePlayerPos, sunlightColor, skyLightColor);
 
-      translucent.rgb = waterFog(translucent.rgb, vec3(0.0), translucentViewPos);
+      translucent.rgb = waterFog(translucent.rgb, vec3(0.0), translucentEyePlayerPos, sunlightColor, skyLightColor);
     } else if(!inWater && waterMask){ // water fog when only object is underwater
-      color.rgb = waterFog(color.rgb, translucentViewPos, opaqueViewPos);
+      color.rgb = waterFog(color.rgb, translucentEyePlayerPos, opaqueEyePlayerPos, sunlightColor, skyLightColor);
     }
 
     color.rgb = mix(color.rgb, translucent.rgb, clamp01(translucent.a));

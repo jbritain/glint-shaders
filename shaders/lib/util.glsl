@@ -322,6 +322,7 @@ vec3 rgb(vec3 c) {
 }
 
 #define worldTimeCounter ((worldTime / 20.0) + (worldDay * 1200.0))
+#define EBS (vec2(eyeBrightnessSmooth) / 240.0)
 
 
 #endif

@@ -27,8 +27,6 @@ const float shadowDistance = 160.0;
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 
-#define WATER_EXTINCTION vec3(0.7, 0.15, 0.05)
-
 #define SHADOWS
 #define TRANSPARENT_SHADOWS
 #define SHADOW_DISTORTION 0.85
@@ -62,3 +60,8 @@ const float sunPathRotation = -40;
 
 // #define REFRACTION
 #define REFRACTION_AMOUNT 1.0
+
+#define VOLUMETRIC_WATER_SAMPLES 10
+#define VOLUMETRIC_WATER_SUBSAMPLES 4
+#define WATER_EXTINCTION vec3(0.7, 0.2, 0.05)
+#define WATER_K 0.0

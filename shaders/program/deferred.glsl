@@ -88,7 +88,7 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/atmosphere/fog.glsl"
-  #include "/lib/water/waterFog.glsl"
+
 
 
   void main() {

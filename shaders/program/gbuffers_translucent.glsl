@@ -119,7 +119,7 @@
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/fog.glsl"
-  #include "/lib/water/waterFog.glsl"
+
 
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){

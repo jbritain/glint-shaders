@@ -2,7 +2,7 @@
 #define GET_SUNLIGHT_INCLUDE
 
 #include "/lib/lighting/shadowBias.glsl"
-#include "/lib/textures/blueNoise.glsl"
+#include "/lib/util/noise.glsl"
 #include "/lib/util/materialIDs.glsl"
 
 vec4 noise;
@@ -73,7 +73,7 @@ vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 		float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 		float blockerDistance = blockerDistanceRaw * 255 * 2;
 
-		vec3 extinction = exp(-WATER_EXTINCTION * blockerDistance);
+		vec3 extinction = exp(-WATER_EXTINCTION * blockerDistance) * shadowColorData.a;
 
 		return extinction;
 	}
@@ -119,7 +119,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	return clamp01(blockerDistance);
 }
 
-vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
+vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal, int samples){
 	if(penumbraWidthBlocks == 0.0){
 		return(sampleShadow(shadowClipPos, normal));
 	}
@@ -128,7 +128,6 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
 	float range = penumbraWidth / 2;
 
 	vec3 shadowSum = vec3(0.0);
-	int samples = SHADOW_SAMPLES;
 
 	for(int i = 0; i < samples; i++){
 		vec2 offset = vogelDiscSample(i, samples, noise.g);
@@ -141,7 +140,12 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal){
 
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-	noise = blueNoise(screenPos);
+	noise = vec4(
+		interleavedGradientNoise(screenPos, 0),
+		interleavedGradientNoise(screenPos, 1),
+		0.0,
+		0.0
+	);
 
 	float faceNoL = NoLSafe(faceNormal);
 	float NoL = NoLSafe(mappedNormal) * step(0.00001, faceNoL);
@@ -162,7 +166,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 		float scatter = computeSSS(blockerDistance, SSS, faceNormal);
 
-		vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal);
+		vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES);
 
 		if(distFade > 0.0){
 			float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
