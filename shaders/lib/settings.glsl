@@ -60,10 +60,11 @@ const float sunPathRotation = -40;
 #define BLOOM_RADIUS 1.0
 #define BLOOM_STRENGTH 1.0
 
-#define REFRACTION
-#define REFRACTION_AMOUNT 1.0
+// #define REFRACTION
+#define REFRACTION_AMOUNT 0.5
 
+#define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10
 #define VOLUMETRIC_WATER_SUBSAMPLES 4
-#define WATER_EXTINCTION (vec3(0.7, 0.2, 0.05) * 2.0)
-#define WATER_K 0.9
+#define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 2.0)
+#define WATER_K 0.5

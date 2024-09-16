@@ -108,12 +108,16 @@
       vec3 dir = normalize(translucentViewPos);
       vec3 refractedDir = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
 
-      vec3 refractedPos = translucentViewPos + refractedDir * distance(opaqueViewPos, translucentViewPos);
-      vec3 refractedCoord = viewSpaceToScreenSpace(refractedPos);
+      //vec3 refractedPos = translucentViewPos + refractedDir * distance(opaqueViewPos, translucentViewPos) * REFRACTION_AMOUNT;
+      //vec3 refractedCoord = viewSpaceToScreenSpace(refractedPos);
 
-      bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy;
+      vec3 refractedCoord;
+      float jitter = blueNoise(texcoord).r;
+      traceRay(translucentViewPos, refractedDir, 32, jitter, true, refractedCoord, false);
 
-      if(refract){
+      bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy; // don't refract offscreen
+
+      if(refract){ // don't refract stuff that's not underwater
         vec2 refractedDecode1y = unpack2x8F(texture(colortex1, refractedCoord.xy).y);
         int refractedMaterialID = int(refractedDecode1y.y * 255 + 0.5) + 10000;
         refract = materialIsWater(refractedMaterialID);
@@ -126,11 +130,6 @@
         opaqueViewPos = screenSpaceToViewSpace(refractedCoord);
         opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
       }
-
-
-
-
-      
     }
     #endif
 

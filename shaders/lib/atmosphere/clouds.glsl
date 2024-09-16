@@ -20,8 +20,8 @@
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define ABSORPTION 0.7
-#define k 0.95
+#define ABSORPTION 0.6
+#define k 0.3
 #define SAMPLES 50
 #define SUBSAMPLES 4
 
@@ -34,7 +34,7 @@ float schlickPhase(float costh)
 
 float getDensity(vec3 pos){
 
-  float coverage = mix(0.08, 0.2, wetness);
+  float coverage = mix(0.1, 0.2, wetness);
 
   float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
@@ -56,7 +56,7 @@ float getDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return density * (0.5 + wetness * 0.5);
+  return density * 0.7;// * (0.5 + wetness * 0.5);
 }
 
 bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){

@@ -5,7 +5,8 @@
 #include "/lib/util/noise.glsl"
 #include "/lib/lighting/getSunlight.glsl"
 
-vec3 waterFog(vec3 color, vec3 frontPos, vec3 backPos){
+#ifndef VOLUMETRIC_WATER
+vec3 waterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 skyLightColor){
   float dist = distance(frontPos, backPos);
 
   vec3 extinction = exp(-WATER_EXTINCTION * dist);
@@ -14,14 +15,14 @@ vec3 waterFog(vec3 color, vec3 frontPos, vec3 backPos){
 
   return color;
 }
-
+#else
 //takes player space positions
 vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor){
   vec3 rayPos = a;
 
   vec3 increment = (b - a) / VOLUMETRIC_WATER_SAMPLES;
-  // float jitter = blueNoise(texcoord, 0).r;
-  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
+  float jitter = blueNoise(texcoord, frameCounter).r;
+  // float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
 
   float phase = (1.0 - WATER_K * WATER_K) / (4.0 * PI * pow(1.0 - WATER_K * dot(normalize(increment), lightVector), 2.0));
 
@@ -58,5 +59,6 @@ vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor
 
   return color;
 }
+#endif
 
 #endif

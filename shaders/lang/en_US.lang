@@ -25,6 +25,9 @@ option.REFRACTION.comment=Bends light as it passes through water.
 option.BLOOM=Bloom
 option.BLOOM.comment=Makes bright stuff glow.
 
+option.VOLUMETRIC_WATER=Volumetric Water
+option.VOLUMETRIC_WATER.comment=Scatters sunlight through water.
+
 option.NORMAL_MAPS=Normal Maps
 option.NORMAL_MAPS.comment=Use normal data from the resource pack.
 

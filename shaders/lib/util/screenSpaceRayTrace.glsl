@@ -21,10 +21,16 @@ float getDepth(vec2 pos, bool previousFrame){
 }
 
 void binarySearch(inout vec3 rayPos, vec3 rayDir, bool previousFrame){
+  vec3 lastGoodPos = rayPos; // stores the last position we know was inside, in case we accidentally step back out
   for (int i = 0; i < BINARY_REFINEMENTS; i++){
-    rayPos += sign(getDepth(rayPos.xy, previousFrame) - rayPos.z) * rayDir; // goes back if we're in geometry and forward if we're not
+    float depth = getDepth(rayPos.xy, previousFrame);
+    float intersect = sign(depth - rayPos.z);
+    lastGoodPos = intersect == 1.0 ? rayPos : lastGoodPos; // update last good pos if still inside
+    
+    rayPos += intersect * rayDir; // goes back if we're in geometry and forward if we're not
     rayDir *= BINARY_REDUCTION; // scale down the ray
   }
+  rayPos = lastGoodPos;
 }
 
 // traces through view space to find intersection point
