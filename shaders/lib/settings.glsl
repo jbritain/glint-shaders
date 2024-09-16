@@ -3,8 +3,9 @@
 const int colortex0Format = RGB32F;  || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
-const int colortex3Format = RGBA32F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
+const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
 const int colortex4Format = RGBA32F; || previous frame data - color rgb, opaque depth
+const int colortex5Format = RGBA16F; || hand
 const int colortex6Format = RGBA16F; || clouds
 
 */
@@ -58,10 +59,10 @@ const float sunPathRotation = -40;
 #define BLOOM_RADIUS 1.0
 #define BLOOM_STRENGTH 1.0
 
-// #define REFRACTION
+#define REFRACTION
 #define REFRACTION_AMOUNT 1.0
 
 #define VOLUMETRIC_WATER_SAMPLES 10
 #define VOLUMETRIC_WATER_SUBSAMPLES 4
-#define WATER_EXTINCTION vec3(0.7, 0.2, 0.05)
-#define WATER_K 0.0
+#define WATER_EXTINCTION (vec3(0.7, 0.2, 0.05) * 2.0)
+#define WATER_K 0.9

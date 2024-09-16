@@ -14,7 +14,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex2` gbuffer data - mapped normal, specular map data
 `colortex3` stars [gbuffers > deferred] translucents [gbuffers translucent>composite89] bloom [composite90>]
 `colortex4` previous frame data - color rgb, opaque depth
-`colortex5` unused
+`colortex5` hand
 `colortex6` clouds
 
 # Passes
@@ -24,17 +24,18 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 
 `composite` some fog, translucency blending
 
+`composite89` writing frame data for next frame to access (previous frame data), blending hand
+
 `composite90` bloom downsample full>A
 `composite91` bloom downsample A>B
 `composite92` bloom downsample B>C
 `composite93` bloom downsample C>D
 `composite94` bloom downsample D>E
 
-`composite96` bloom upsample E>D
-`composite95` bloom upsample D>C
-`composite96` bloom upsample C>B
-`composite97` bloom upsample B>A
-`composite98` bloom upsample A>full
-`composite99` writing frame data for next frame to access (previous frame data)
+`composite95` bloom upsample E>D
+`composite96` bloom upsample D>C
+`composite97` bloom upsample C>B
+`composite98` bloom upsample B>A
+`composite99` bloom upsample A>full
 
 `final` post processing

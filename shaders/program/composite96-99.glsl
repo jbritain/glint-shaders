@@ -27,11 +27,11 @@
 
   void main() {
     BloomTile tile = tiles[TILE_INDEX];
-    BloomTile nextTile = tiles[TILE_INDEX - 1];
+    #if TILE_INDEX > 0
+    BloomTile nextTile = tiles[max(0, TILE_INDEX - 1)];
+    vec2 tileCoord = scaleToBloomTile(texcoord, nextTile);
 
     bloomColor = texture(colortex3, texcoord);
-
-    vec2 tileCoord = scaleToBloomTile(texcoord, nextTile);
 
     if(clamp01(tileCoord) != tileCoord){
       return;
@@ -39,6 +39,9 @@
 
     tileCoord = scaleFromBloomTile(tileCoord, tile);
     // bloomColor.rgb = vec3(tileCoord.xy, 0.0);
-    bloomColor.rgb += upSample(colortex3, tileCoord);    
+    #else
+    vec2 tileCoord = texcoord / 2;
+    #endif
+    bloomColor.rgb += upSample(colortex3, tileCoord);  
   }
 #endif

@@ -2,6 +2,7 @@
 #define WATER_FOG_INCLUDE
 
 #include "/lib/textures/blueNoise.glsl"
+#include "/lib/util/noise.glsl"
 #include "/lib/lighting/getSunlight.glsl"
 
 vec3 waterFog(vec3 color, vec3 frontPos, vec3 backPos){
@@ -19,8 +20,8 @@ vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor
   vec3 rayPos = a;
 
   vec3 increment = (b - a) / VOLUMETRIC_WATER_SAMPLES;
-  vec4 noise = blueNoise(texcoord, 0);
-  float jitter = noise.r;
+  // float jitter = blueNoise(texcoord, 0).r;
+  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
 
   float phase = (1.0 - WATER_K * WATER_K) / (4.0 * PI * pow(1.0 - WATER_K * dot(normalize(increment), lightVector), 2.0));
 
@@ -34,6 +35,7 @@ vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor
 
     vec3 transmittance = exp(-density * WATER_EXTINCTION);
 
+    vec3 bias = getShadowBias(rayPos, lightVector, 1.0);
     vec4 shadowClipPos = getShadowClipPos(rayPos);
 
     float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));

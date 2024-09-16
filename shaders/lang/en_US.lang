@@ -1,0 +1,21 @@
+option.WATER_NORMALS=Water Normals
+option.WATER_NORMALS.comment=Makes water 'wave'.
+
+option.SSR=Screen Space Reflections
+option.SSR.comment=Allows reflective surfaces to...reflect what's onscreen.
+
+option.SHADOWS=Shadows
+option.SHADOWS.comment=Makes objects block sunlight.
+
+option.FXAA=FXAA
+
+
+option.FOG=Fog
+
+option.CLOUDS=Clouds
+
+option.SUBSURFACE_SCATTERING=Subsurface Scattering
+
+option.REFRACTION=Refraction
+
+option.BLOOM=Bloom

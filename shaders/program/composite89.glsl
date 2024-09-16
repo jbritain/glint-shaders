@@ -15,21 +15,26 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
+  uniform sampler2D colortex5;
+
+  uniform int frameCounter;
 
   uniform sampler2D depthtex0;
-  uniform sampler2D depthtex1;
+  uniform sampler2D depthtex2;
 
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:43 */
-  layout(location = 0) out vec4 previousFrameData1;
-  layout(location = 1) out vec4 bloomColor;
+  /* DRAWBUFFERS:04 */
+  layout(location = 0) out vec4 color;
+  layout(location = 1) out vec4 previousFrameData1;
 
   void main() {
     previousFrameData1.rgb = texture(colortex0, texcoord).rgb;
     previousFrameData1.a = texture(depthtex0, texcoord).r;
 
-    bloomColor = texture(colortex3, texcoord / 2);
+    color = texture(colortex0, texcoord);
+    vec4 hand = texture(colortex5, texcoord);
+    color.rgb = mix(color.rgb, hand.rgb, hand.a);
 
   }
 #endif

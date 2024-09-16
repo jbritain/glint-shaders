@@ -19,18 +19,18 @@ vec3 getWave(vec3 pos){
 }
 
 vec3 upperSway(vec3 pos, vec3 midblock){ // top halves of double high plants
-float waveMult = (1.0 - smoothstep(-64, 64, midblock.y)) * 0.5 + 0.5;
+float waveMult = (1.0 - step(0, midblock.y)) * 0.5 + 0.5;
   return pos + getWave(pos) * waveMult;
 }
 
 vec3 lowerSway(vec3 pos, vec3 midblock){ // bottom halves of double high plants
-  float waveMult = (1.0 - smoothstep(-64, 64, midblock.y)) * 0.5;
+  float waveMult = (1.0 - step(0, midblock.y)) * 0.5;
 
   return pos + getWave(pos) * waveMult;
 }
 
 vec3 hangingSway(vec3 pos, vec3 midblock){ // stuff hanging from a block
-  float waveMult = smoothstep(-64, 64, midblock.y);
+  float waveMult = step(0, midblock.y);
   return pos + getWave(pos + midblock / 64) * waveMult;
 }
 

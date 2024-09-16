@@ -131,10 +131,8 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:312 */
+  /* DRAWBUFFERS:5 */
   layout(location = 0) out vec4 color; // shaded colour
-  layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
-  layout(location = 2) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
     vec3 faceNormal = faceNormal;
@@ -149,15 +147,6 @@
       discard;
     }
 
-    #ifdef gbuffers_weather
-      if(biome_precipitation != 2){
-        color = vec4(0.2);
-      }
-      
-    #endif
-
-    
-
     vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
 
     #ifdef NORMAL_MAPS
@@ -166,62 +155,14 @@
       vec3 mappedNormal = faceNormal;
     #endif
 
-    if(materialIsWater(materialID)){
-      color = vec4(0.0);
-      #ifdef WATER_NORMALS
-      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.1);
-      #endif
-    }
-
-    // encode gbuffer data
-    outData1.x = pack2x8F(color.r, color.g);
-    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
-    outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
-    outData1.w = pack2x8F(lightmap);
-
     vec4 specularData = texture(specular, texcoord);
 
     Material material;
-    if(materialIsWater(materialID)) {
-      material = waterMaterial;
-    } else {
-      material = materialFromSpecularMap(color.rgb, specularData);
-    }
-
-    outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
-    outData2.y = pack2x8F(specularData.rg);
-    outData2.z = pack2x8F(specularData.ba);
 
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
     vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
-
-    color = getFog(color, eyePlayerPos);
-
-    vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-
-    vec4 cloud = texture(colortex6, screenPos);
-
-    vec3 worldPos = eyePlayerPos + cameraPosition;
-    
-    // this is for deciding whether to blend the translucents or not
-    // 0 - below cloud plane
-    // 1 - in cloud plane
-    // 2 - above cloud plane
-    // we don't blend if both are in the same state (unless the state is 1)
-    uint cameraPlaneState = 0;
-    uint positionPlaneState = 0;
-
-    if(cameraPosition.y > LOWER_PLANE_HEIGHT) cameraPlaneState++;
-    if(cameraPosition.y > UPPER_PLANE_HEIGHT) cameraPlaneState++;
-    if(worldPos.y > LOWER_PLANE_HEIGHT) positionPlaneState++;
-    if(worldPos.y > UPPER_PLANE_HEIGHT) positionPlaneState++;
-
-    if(cameraPlaneState != positionPlaneState || positionPlaneState == 1){
-      color = mix(color, cloud, cloud.a);
-    }
-
   }
 #endif

@@ -1,4 +1,6 @@
 #version 450 compatibility
 #define fsh
 
-#include "/program/composite99.glsl"
+#define TILE_INDEX 0
+
+#include "/program/composite96-99.glsl"

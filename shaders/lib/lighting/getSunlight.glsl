@@ -141,8 +141,8 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidthBlocks, vec3 normal, i
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 	noise = vec4(
-		interleavedGradientNoise(screenPos, 0),
-		interleavedGradientNoise(screenPos, 1),
+		interleavedGradientNoise(floor(gl_FragCoord.xy), 0),
+		interleavedGradientNoise(floor(gl_FragCoord.xy), 1),
 		0.0,
 		0.0
 	);

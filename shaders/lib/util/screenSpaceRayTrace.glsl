@@ -15,7 +15,7 @@ float getDepth(vec2 pos, bool previousFrame){
   if(previousFrame){
     return texelFetch(colortex4, ivec2(pos * vec2(viewWidth, viewHeight)), 0).a;
   } else {
-    return texelFetch(depthtex1, ivec2(pos * vec2(viewWidth, viewHeight)), 0).r;
+    return texelFetch(depthtex2, ivec2(pos * vec2(viewWidth, viewHeight)), 0).r;
   }
   
 }
@@ -35,9 +35,6 @@ bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool re
   if(previousFrame){
     rayPos = reproject(rayPos);
   }
-  
-
-  float depthLenience = max(abs(viewDir.z) * 3.0, 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
 
   vec3 rayDir;
   rayDir = viewSpaceToScreenSpace(viewOrigin + viewDir);
@@ -48,6 +45,8 @@ bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool re
   rayDir -= rayPos;
   rayDir *= min3((sign(rayDir) - rayPos) / rayDir); // set length of ray to trace to the nearest screen edge (I think)
   rayDir *= rcp(maxSteps); // split ray up into our steps
+
+  float depthLenience = max(abs(rayDir.z), 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
 
   bool intersect = false;
 

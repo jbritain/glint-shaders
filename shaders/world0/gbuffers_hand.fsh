@@ -2,4 +2,4 @@
 
 #define fsh
 #define gbuffers_hand
-#include "/program/gbuffers_solid.glsl"
+#include "/program/gbuffers_hand.glsl"

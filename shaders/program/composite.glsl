@@ -24,7 +24,7 @@
   uniform sampler2D shadowcolor1;
 
   uniform sampler2D depthtex0;
-  uniform sampler2D depthtex1;
+  uniform sampler2D depthtex2;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -87,7 +87,7 @@
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
 
     float translucentDepth = texture(depthtex0, texcoord).r;
-    float opaqueDepth = texture(depthtex1, texcoord).r;
+    float opaqueDepth = texture(depthtex2, texcoord).r;
 
     vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
     vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
@@ -103,27 +103,34 @@
     #ifdef REFRACTION
 
     // this is cheating at refraction
-    // instead of actually tracing the refracted ray we just step a little bit
+    // instead of actually tracing the refracted ray we just step the distance of the original ray in the refracted direction
     if(waterMask){
       vec3 dir = normalize(translucentViewPos);
-      vec3 refracted = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
+      vec3 refractedDir = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
 
+      vec3 refractedPos = translucentViewPos + refractedDir * distance(opaqueViewPos, translucentViewPos);
+      vec3 refractedCoord = viewSpaceToScreenSpace(refractedPos);
 
-      vec3 refractedPos = translucentViewPos;
-      refractedPos += refracted * REFRACTION_AMOUNT; // that's right we're gonna cheat
-      vec2 refractedCoord = viewSpaceToScreenSpace(refractedPos).xy;
+      bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy;
 
-      refractedCoord = mix(refractedCoord, texcoord, smoothstep(0.95, 1.0, max2(abs(0.5 - refractedCoord)) * 2.0));
-
-      if(clamp01(refractedCoord) != refractedCoord || texture(depthtex1, refractedCoord).r < translucentDepth){
-        refractedCoord = texcoord;
+      if(refract){
+        vec2 refractedDecode1y = unpack2x8F(texture(colortex1, refractedCoord.xy).y);
+        int refractedMaterialID = int(refractedDecode1y.y * 255 + 0.5) + 10000;
+        refract = materialIsWater(refractedMaterialID);
       }
 
-      color.rgb = texture(colortex0, refractedCoord).rgb;
-      opaqueDepth = texture(depthtex1, refractedCoord).r;
 
-      opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
-      opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+      if(refract){
+        color = texture(colortex0, refractedCoord.xy);
+        refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
+        opaqueViewPos = screenSpaceToViewSpace(refractedCoord);
+        opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+      }
+
+
+
+
+      
     }
     #endif
 

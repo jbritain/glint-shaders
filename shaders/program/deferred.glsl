@@ -18,8 +18,7 @@
   uniform sampler2D colortex4;
   uniform sampler2D colortex5;
 
-  uniform sampler2D depthtex0;
-  uniform sampler2D depthtex1;
+  uniform sampler2D depthtex2;
 
   uniform sampler2D shadowtex0;
   uniform sampler2DShadow shadowtex0HW;
@@ -92,7 +91,7 @@
 
 
   void main() {
-    float depth = texture(depthtex0, texcoord).r;
+    float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
