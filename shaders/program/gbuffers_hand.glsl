@@ -155,9 +155,14 @@
       vec3 mappedNormal = faceNormal;
     #endif
 
+    #ifdef SPECULAR_MAPS
     vec4 specularData = texture(specular, texcoord);
+    #else
+    vec4 specularData= vec4(0.0);
+    #endif
 
     Material material;
+    material = materialFromSpecularMap(color.rgb, specularData);
 
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);

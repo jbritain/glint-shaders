@@ -2,4 +2,4 @@
 
 #define vsh
 #define gbuffers_hand
-#include "/program/gbuffers_translucent.glsl"
+#include "/program/gbuffers_hand.glsl"

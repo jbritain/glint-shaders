@@ -107,7 +107,11 @@
     outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
     outData1.w = pack2x8F(lightmap);
 
+    #ifdef SPECULAR_MAPS
     vec4 specularData = texture(specular, texcoord);
+    #else
+    vec4 specularData= vec4(0.0);
+    #endif
 
     outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
     outData2.y = pack2x8F(specularData.rg);

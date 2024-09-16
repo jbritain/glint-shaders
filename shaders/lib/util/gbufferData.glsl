@@ -16,7 +16,7 @@ void decodeGbufferData(in vec4 data1, in vec4 data2){
 
   albedo.rgb = vec3(decode1x.x, decode1x.y, decode1y.x);
   materialID = int(decode1y.y * 255 + 0.5) + 10000;
-  if(materialID == 1000){
+  if(materialID == 10000){
     materialID = 0;
   }
   faceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);

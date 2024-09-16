@@ -43,6 +43,7 @@ const int shadowMapResolution = 2048; //Resolution of the shadow map. Higher num
 const float sunPathRotation = -40;
 
 #define NORMAL_MAPS
+#define SPECULAR_MAPS
 
 #define FOG
 #define FOG_POWER 8.0

@@ -8,14 +8,25 @@ option.SHADOWS=Shadows
 option.SHADOWS.comment=Makes objects block sunlight.
 
 option.FXAA=FXAA
-
+option.FXAA.comment=Attempts to remove jagged edges caused by aliasing artefacts.
 
 option.FOG=Fog
+option.FOG.comment=Makes things fade into the distance.
 
 option.CLOUDS=Clouds
+option.CLOUDS.comment=Clouds.
 
 option.SUBSURFACE_SCATTERING=Subsurface Scattering
+option.SUBSURFACE_SCATTERING.comment=Lets sunlight pass through some materials.
 
 option.REFRACTION=Refraction
+option.REFRACTION.comment=Bends light as it passes through water.
 
 option.BLOOM=Bloom
+option.BLOOM.comment=Makes bright stuff glow.
+
+option.NORMAL_MAPS=Normal Maps
+option.NORMAL_MAPS.comment=Use normal data from the resource pack.
+
+option.SPECULAR_MAPS=Specular Maps
+option.SPECULAR_MAPS.comment=Use specular data from the resource pack.
