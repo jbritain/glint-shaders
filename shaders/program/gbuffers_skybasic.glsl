@@ -27,6 +27,7 @@
     }
 
     color = starData;
+    color.rgb *= vec3(4.0, 4.0, 5.0) * 20;
     color.rgb = invGammaCorrect(color.rgb);
   }
 #endif

@@ -33,6 +33,7 @@
   uniform mat4 gbufferProjectionInverse;
 
   uniform mat4 shadowModelView;
+  uniform mat4 shadowProjectionInverse;
   uniform mat4 shadowProjection;
 
   uniform vec3 sunPosition;

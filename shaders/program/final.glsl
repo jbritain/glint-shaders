@@ -48,6 +48,6 @@
 
     color.rgb = invGammaCorrect(color.rgb);
 
-
+    
   }
 #endif

@@ -79,6 +79,7 @@
   uniform mat4 gbufferProjectionInverse;
   
   uniform mat4 shadowProjection;
+  uniform mat4 shadowProjectionInverse;
   uniform mat4 shadowModelView;
 
   uniform float viewWidth;

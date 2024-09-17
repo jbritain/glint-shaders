@@ -66,5 +66,5 @@ const float sunPathRotation = -40;
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10
 #define VOLUMETRIC_WATER_SUBSAMPLES 4
-#define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 2.0)
+#define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 3.0)
 #define WATER_K 0.5

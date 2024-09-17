@@ -1,6 +1,13 @@
 #ifndef SHADOW_BIAS_INCLUDE
 #define SHADOW_BIAS_INCLUDE
 
+float getShadowDistance(float depth) {
+	depth = depth * 2.0 - 1.0;
+	depth /= 0.5; // for distortion
+	vec4 shadowHomPos = shadowProjectionInverse * vec4(0.0, 0.0, depth, 1.0);
+	return shadowHomPos.z / shadowHomPos.w;
+}
+
 // distortion from photon
 // https://github.com/sixthsurge/photon/blob/090b3b5d760087b090d8783e6810585fb6e3e44e/shaders/include/light/distortion.glsl
 vec3 distort(vec3 pos) {

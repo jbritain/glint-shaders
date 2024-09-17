@@ -79,6 +79,7 @@
   uniform mat4 gbufferProjectionInverse;
   
   uniform mat4 shadowProjection;
+  uniform mat4 shadowProjectionInverse;
   uniform mat4 shadowModelView;
 
   uniform float viewWidth;
@@ -218,10 +219,10 @@
     uint cameraPlaneState = 0;
     uint positionPlaneState = 0;
 
-    if(cameraPosition.y > LOWER_PLANE_HEIGHT) cameraPlaneState++;
-    if(cameraPosition.y > UPPER_PLANE_HEIGHT) cameraPlaneState++;
-    if(worldPos.y > LOWER_PLANE_HEIGHT) positionPlaneState++;
-    if(worldPos.y > UPPER_PLANE_HEIGHT) positionPlaneState++;
+    if(cameraPosition.y > CLOUD_LOWER_PLANE_HEIGHT) cameraPlaneState++;
+    if(cameraPosition.y > CLOUD_UPPER_PLANE_HEIGHT) cameraPlaneState++;
+    if(worldPos.y > CLOUD_LOWER_PLANE_HEIGHT) positionPlaneState++;
+    if(worldPos.y > CLOUD_UPPER_PLANE_HEIGHT) positionPlaneState++;
 
     if(cameraPlaneState != positionPlaneState || positionPlaneState == 1){
       color = mix(color, cloud, cloud.a);
