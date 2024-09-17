@@ -77,6 +77,12 @@
   #include "/lib/util/screenSpaceRaytrace.glsl"
   #include "/lib/textures/blueNoise.glsl"
 
+  // Kneemund's Border Attenuation
+  float kneemundAttenuation(vec2 pos, float edgeFactor) {
+    pos *= 1.0 - pos;
+    return 1.0 - quinticStep(edgeFactor, 0.0, min2(pos));
+  }
+
   /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
 
@@ -105,18 +111,21 @@
 
     // this is cheating at refraction
     // instead of actually tracing the refracted ray we just step the distance of the original ray in the refracted direction
+    // also we refract in player space
     if(waterMask){
-      vec3 dir = normalize(translucentViewPos);
-      vec3 refractedDir = normalize(refract(dir, mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
+      vec3 dir = normalize(opaqueEyePlayerPos);
+      vec3 refractedDir = normalize(refract(dir, mat3(gbufferModelViewInverse) * mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
 
-      //vec3 refractedPos = translucentViewPos + refractedDir * distance(opaqueViewPos, translucentViewPos) * REFRACTION_AMOUNT;
-      //vec3 refractedCoord = viewSpaceToScreenSpace(refractedPos);
+      float waterDepth = distance(opaqueEyePlayerPos, translucentEyePlayerPos);
 
-      vec3 refractedCoord;
-      float jitter = blueNoise(texcoord).r;
-      traceRay(translucentViewPos, refractedDir, 32, jitter, true, refractedCoord, false);
+      vec3 refractedPlayerPos = (translucentEyePlayerPos + refractedDir * REFRACTION_AMOUNT * (waterDepth / refractedDir.y * dir.y));
+      vec3 refractedCoord = viewSpaceToScreenSpace(mat3(gbufferModelView) * refractedPlayerPos);
 
       bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy; // don't refract offscreen
+
+      refract = refract && (
+        refractedCoord.z > translucentDepth
+      );
 
       if(refract){ // don't refract stuff that's not underwater
         vec2 refractedDecode1y = unpack2x8F(texture(colortex1, refractedCoord.xy).y);
@@ -124,8 +133,11 @@
         refract = materialIsWater(refractedMaterialID);
       }
 
+      refract = refract && (refractedCoord.z >= translucentDepth);
+
 
       if(refract){
+        refractedCoord.xy = mix(texcoord, refractedCoord.xy, kneemundAttenuation(refractedCoord.xy, 0.03));
         color = texture(colortex0, refractedCoord.xy);
         refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
         opaqueViewPos = screenSpaceToViewSpace(refractedCoord);

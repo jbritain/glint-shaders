@@ -89,7 +89,7 @@
     vec4 color = texture(gtexture, texcoord) * glcolor;
     
     if(materialIsWater(materialID)){
-      vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), 0.01, 0.1);
+      vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
       vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
 
       float opaqueDepth = getShadowDistance(texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r); // how far away from the sun is the opaque fragment shadowed by the water?

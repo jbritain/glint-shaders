@@ -171,6 +171,10 @@ float max2(vec2 x) {
     return max(x.x, x.y);
 }
 
+float min2(vec2 x){
+    return min(x.x, x.y);
+}
+
 float max3(float x, float y, float z) {
     return max(x, max(y, z));
 }
@@ -296,7 +300,11 @@ float linearizeDepth(float depth, float near, float far) {
   return (near * far) / (depth * (near - far) + far);
 }
 
-vec3  setSaturationLevel(vec3 color, float level) {
+float delinearizeDepth(float depth, float near, float far){
+    return ((near - depth) * far) / depth * (near - far);
+}
+
+vec3 setSaturationLevel(vec3 color, float level) {
 	float luminance = dot(color, vec3(0.2125, 0.7154, 0.0721));
 	vec3 newColor = max0(mix(vec3(luminance), color, level));
 	
@@ -319,6 +327,11 @@ vec3 rgb(vec3 c) {
 	vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
 	
 	return c.z * mix(K.xxx, clamp01(p - K.xxx), c.y);
+}
+
+float quinticStep(float edge0, float edge1, float x) {
+    x = saturate((x - edge0) / (edge1 - edge0));
+    return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
 }
 
 #define worldTimeCounter ((worldTime / 20.0) + (worldDay * 1200.0))

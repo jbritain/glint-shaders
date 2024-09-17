@@ -170,7 +170,7 @@
     if(materialIsWater(materialID)){
       color = vec4(0.0);
       #ifdef WATER_NORMALS
-      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, 0.01, 0.1);
+      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, WAVE_E, WAVE_DEPTH);
       #endif
     }
 
