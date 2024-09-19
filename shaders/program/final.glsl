@@ -44,7 +44,7 @@
 
     color.rgb = tonemap(color.rgb);
 
-    color.rgb = setSaturationLevel(color.rgb, 1.2);
+    color.rgb = setSaturationLevel(color.rgb, SATURATION);
 
     color.rgb = invGammaCorrect(color.rgb);
 

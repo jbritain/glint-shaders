@@ -3,7 +3,7 @@ A shaderpack for Minecraft.
 
 ## Acknowledgements
 - [Jessie-LC](https://github.com/Jessie-LC) - [various utility functions](https://github.com/Jessie-LC/open-source-utility-code)
-- Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/) (combined texture from [Ebin](https://github.com/BruceKnowsHow/ebin-shader))
+- Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/) (combined texture from [Revelation](https://github.com/HaringProGit/Revelation))
 - [Moments in Graphics](http://momentsingraphics.de) - [blue noise texture](http://momentsingraphics.de/BlueNoise.html)
 - [Experience.Monks](https://github.com/Experience-Monks) - [Fast Gaussian Blur Functions](https://github.com/Experience-Monks/glsl-fast-gaussian-blur)
 - [Sebastian Lague](https://www.youtube.com/@SebastianLague) & [SimonDev](https://www.youtube.com/@simondev758) - YouTube videos used for reference on clouds.

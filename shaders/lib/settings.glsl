@@ -15,9 +15,10 @@ const bool colortex4Clear = false;
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0;
 
-#define SKYLIGHT_STRENGTH 0.2
+#define SKYLIGHT_STRENGTH 1.0
 #define AMBIENT_STRENGTH 0.01
-#define SUNLIGHT_STRENGTH 4.0
+#define SUNLIGHT_STRENGTH 1.0
+#define BLOCKLIGHT_STRENGTH 0.1
 
 #define WATER_NORMALS
 
@@ -67,7 +68,10 @@ const float sunPathRotation = -40;
 #define VOLUMETRIC_WATER_SAMPLES 10
 #define VOLUMETRIC_WATER_SUBSAMPLES 4
 #define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 5.0)
-#define WATER_K 0.95
+#define WATER_K 0.99
 
 #define WAVE_DEPTH 0.2
 #define WAVE_E 0.01
+
+#define SATURATION 1.0
+#define EXPOSURE 4.0

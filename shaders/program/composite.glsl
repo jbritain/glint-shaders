@@ -70,6 +70,7 @@
   vec4 specularData;
 
   #include "/lib/util/gbufferData.glsl"
+  #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/fog.glsl"
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/util/spaceConversions.glsl"

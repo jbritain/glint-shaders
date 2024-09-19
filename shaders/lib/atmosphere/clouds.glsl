@@ -11,7 +11,6 @@
 #define CLOUD_SHAPE_SCALE 1000
 #define CLOUD_SHAPE_SCALE_2 2000
 #define CLOUD_EROSION_SCALE 100
-#define MIN_CLOUD_DENSITY 0.9
 
 #define CLOUD_MARCH_LIMIT 1000.0
 #define CLOUD_SUBMARCH_LIMIT 500.0
@@ -20,7 +19,7 @@
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define CLOUD_ABSORPTION 0.6
+#define CLOUD_ABSORPTION 0.9
 #define CLOUD_K 0.65
 #define CLOUD_SAMPLES 50
 #define CLOUD_SUBSAMPLES 4
@@ -191,9 +190,9 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
     }
 
     float lightTransmittance = subMarch(rayPos);
-    vec3 luminance = sunlightColor * phase * 20 * lightTransmittance + mix(skyLightColor, sunlightColor, 0.5); // I do not like these numbers but they are what they are
+    vec3 luminance = sunlightColor * 10 * phase * lightTransmittance + skyLightColor * 5; // I do not like these numbers but they are what they are
     luminance /= 2.0;
-    vec3 integScatter = luminance *  (1.0 - clamp01(transmittance)) / CLOUD_ABSORPTION;
+    vec3 integScatter = luminance * (1.0 - clamp01(transmittance)) / CLOUD_ABSORPTION;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;

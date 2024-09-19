@@ -1,35 +1,37 @@
 #ifndef FOG_INCLUDE
 #define FOG_INCLUDE
 
-#include "/lib/atmosphere/sky.glsl"
+#include "/lib/atmosphere/eBrunetonAtmosphere.glsl"
 
 vec4 getFog(vec4 color, vec3 playerPos){
   #ifndef FOG
   return color;
   #endif
 
-  vec3 kCamera = vec3(0.0, 128.0 + cameraPosition.y + ATMOSPHERE.bottom_radius + 10000, 0.0);
+  vec3 kCamera = vec3(0.0, 128.0 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0);
 
   vec3 transmit = vec3(1.0);
 
   vec3 dir = normalize(playerPos);
 
-  vec3 fog = hasSkylight ? GetSkyRadiance(
-    kCamera, dir, 0.0, sunVector, transmit
-  ) : pow(fogColor, vec3(2.2));
+  vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit);
 
-  float visibilityDistance = 150000.0;
-  float extinctionCoefficient = 3.912 / visibilityDistance;
-  float extinction = exp(-extinctionCoefficient * length(playerPos));
+  // vec3 fog = hasSkylight ? GetSkyRadiance(
+  //   kCamera, dir, 0.0, sunVector, transmit
+  // ) : pow(fogColor, vec3(2.2));
 
-  extinction = mix(extinction, 0.0, smoothstep(far * 0.8, far, length(playerPos))); // this is not the extinction and I should really rename these variables
+  // float visibilityDistance = 150000.0;
+  // float extinctionCoefficient = 3.912 / visibilityDistance;
+  // float extinction = exp(-extinctionCoefficient * length(playerPos));
 
-  transmit = vec3(extinction);
+  // extinction = mix(extinction, 0.0, smoothstep(far * 0.8, far, length(playerPos))); // this is not the extinction and I should really rename these variables
 
-  color.rgb = mix(color.rgb, fog, 1.0 - transmit);
-  color.a = (1.0 - (1.0 - color.a) * (extinction));
+  // transmit = vec3(extinction);
 
-  return color;
+  // color.rgb = mix(color.rgb, fog, 1.0 - transmit);
+  // color.a = (1.0 - (1.0 - color.a) * (extinction));
+
+  return vec4(color.rgb * transmit + fog, color.a);
 }
 
 #endif

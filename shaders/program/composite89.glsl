@@ -36,5 +36,7 @@
     vec4 hand = texture(colortex5, texcoord);
     color.rgb = mix(color.rgb, hand.rgb, hand.a);
 
+    color.rgb *= pow(2, EXPOSURE);
+
   }
 #endif
