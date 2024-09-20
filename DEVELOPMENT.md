@@ -39,3 +39,6 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `composite99` bloom upsample A>full
 
 `final` post processing
+
+# Things to know
+- Sampling shadows in any program with `/lib/water/waterFog.glsl` included will make caustics very faint. This is so the fog doesn't look weird.

@@ -204,29 +204,5 @@
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
     color = getFog(color, eyePlayerPos);
-
-    vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-
-    vec4 cloud = texture(colortex6, screenPos);
-
-    vec3 worldPos = eyePlayerPos + cameraPosition;
-    
-    // this is for deciding whether to blend the translucents or not
-    // 0 - below cloud plane
-    // 1 - in cloud plane
-    // 2 - above cloud plane
-    // we don't blend if both are in the same state (unless the state is 1)
-    uint cameraPlaneState = 0;
-    uint positionPlaneState = 0;
-
-    if(cameraPosition.y > CLOUD_LOWER_PLANE_HEIGHT) cameraPlaneState++;
-    if(cameraPosition.y > CLOUD_UPPER_PLANE_HEIGHT) cameraPlaneState++;
-    if(worldPos.y > CLOUD_LOWER_PLANE_HEIGHT) positionPlaneState++;
-    if(worldPos.y > CLOUD_UPPER_PLANE_HEIGHT) positionPlaneState++;
-
-    if(cameraPlaneState != positionPlaneState || positionPlaneState == 1){
-      color = mix(color, cloud, cloud.a);
-    }
-
   }
 #endif

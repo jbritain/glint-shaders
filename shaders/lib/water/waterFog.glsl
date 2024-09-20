@@ -24,7 +24,8 @@ vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor
   float jitter = blueNoise(texcoord, frameCounter).r;
   // float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
 
-  float phase = (1.0 - WATER_K * WATER_K) / (4.0 * PI * pow(1.0 - WATER_K * dot(normalize(increment), lightVector), 2.0));
+  float cosTheta = dot(normalize(increment), lightVector);
+  float phase = (1.0 - pow2(WATER_G)) / pow(1.0 + pow2(WATER_G) - 2 * WATER_G * cosTheta, 3.0/2.0);
 
   rayPos += increment * jitter;
 
@@ -42,7 +43,7 @@ vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor
     float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));
     vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * WATER_EXTINCTION);
 
-    vec3 sunlight = computeShadow(shadowClipPos, 16.0, lightVector, 2) + skyLightColor * skylightTransmittance * EBS.y;
+    vec3 sunlight = computeShadow(shadowClipPos, 0.0, lightVector, 2) + skyLightColor * skylightTransmittance * EBS.y;
     sunlight *= clamp01(phase) * sunlightColor;
 
     vec3 integScatter = sunlight * (1.0 - clamp01(transmittance)) / WATER_EXTINCTION;

@@ -14,6 +14,8 @@ const bool colortex4Clear = false;
 
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0;
+const int shadowMapResolution = 4096; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
+const float sunPathRotation = -40;
 
 #define SKYLIGHT_STRENGTH 1.0
 #define AMBIENT_STRENGTH 0.01
@@ -32,16 +34,12 @@ const float shadowDistance = 160.0;
 #define SHADOWS
 #define TRANSPARENT_SHADOWS
 #define SHADOW_DISTORTION 0.85
-#define MAX_PENUMBRA_WIDTH 80.0
-#define MIN_PENUMBRA_WIDTH 0.0
+#define MAX_PENUMBRA_WIDTH 4.0
+#define MIN_PENUMBRA_WIDTH 0.1
 #define BLOCKER_SEARCH_SAMPLES 8
-#define BLOCKER_SEARCH_RADIUS 5
+#define BLOCKER_SEARCH_RADIUS 2.0
 #define SHADOW_SAMPLES 16 // [4 8 16 32 64]
 #define SUBSURFACE_SCATTERING
-
-//#define NORMAL_BIAS //Offsets the shadow sample position by the surface normal instead of towards the sun
-const int shadowMapResolution = 2048; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
-const float sunPathRotation = -40;
 
 #define NORMAL_MAPS
 #define SPECULAR_MAPS
@@ -61,14 +59,14 @@ const float sunPathRotation = -40;
 #define BLOOM_RADIUS 1.0
 #define BLOOM_STRENGTH 1.0
 
-#define REFRACTION
+// #define REFRACTION
 #define REFRACTION_AMOUNT 0.5
 
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10
 #define VOLUMETRIC_WATER_SUBSAMPLES 4
 #define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 5.0)
-#define WATER_K 0.99
+#define WATER_G 0.99
 
 #define WAVE_DEPTH 0.2
 #define WAVE_E 0.01

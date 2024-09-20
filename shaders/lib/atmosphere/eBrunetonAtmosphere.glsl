@@ -597,8 +597,8 @@ vec3 GetSkyRadianceToPoint(vec3 camera, in vec3 point, float shadow_length,
   single_mie_scattering = GetExtrapolatedSingleMieScattering(vec4(scattering, single_mie_scattering.r));
 
   // Hack to avoid rendering artifacts when the sun is below the horizon.
-  single_mie_scattering = single_mie_scattering *
-      smoothstep(0.0, 0.01, mu_s);
+  single_mie_scattering = single_mie_scattering * 0.01;
+      // smoothstep(0.0, 0.01, mu_s);
 
   vec3 in_scatter = scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
       MiePhaseFunction(ATMOSPHERE.mie_phase_function_g, nu);

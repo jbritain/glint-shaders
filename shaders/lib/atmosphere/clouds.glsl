@@ -4,6 +4,7 @@
 #include "/lib/textures/cloudNoise.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
+#include "/lib/atmosphere/sky.glsl"
 
 #define CLOUD_LOWER_PLANE_HEIGHT 192.0
 #define CLOUD_UPPER_PLANE_HEIGHT 256.0
@@ -19,16 +20,18 @@
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define CLOUD_ABSORPTION 0.9
-#define CLOUD_K 0.65
+#define CLOUD_EXTINCTION 0.9
+#define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
+#define CLOUD_G 0.85
 #define CLOUD_SAMPLES 50
 #define CLOUD_SUBSAMPLES 4
 
 vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
 
-float schlickPhase(float costh)
+float henyeyGreenstein(float costh)
 {
-    return (1.0 - CLOUD_K * CLOUD_K) / (4.0 * PI * pow(1.0 - CLOUD_K * costh, 2.0));
+  float g2 = pow2(CLOUD_G);
+  return (1.0 - g2) / (4.0 * PI * pow(1.0 + g2 - 2.0 * CLOUD_G * costh, 3.0/2.0));
 }
 
 float getDensity(vec3 pos){
@@ -55,7 +58,7 @@ float getDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return density * 0.7 + wetness * 0.3;
+  return density * 0.5;
 }
 
 bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
@@ -79,7 +82,7 @@ bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
 
 
 // march from a ray position towards the sun to calculate how much light makes it there
-float subMarch(vec3 rayPos){
+vec3 subMarch(vec3 rayPos, float jitter){
   vec3 a = rayPos;
   vec3 b = rayPos;
 
@@ -87,7 +90,7 @@ float subMarch(vec3 rayPos){
     getCloudIntersection(rayPos, sunDir, CLOUD_LOWER_PLANE_HEIGHT, b);
   }
 
-  if(b == rayPos) return 0; // this should never happen
+  if(b == rayPos) return vec3(0.0); // this should never happen
 
   b -= cameraPosition;
 
@@ -102,8 +105,6 @@ float subMarch(vec3 rayPos){
   vec3 subRayPos = a;
   float totalDensity = 0;
 
-  float jitter = blueNoise(texcoord, 0).g;
-
   subRayPos += increment * jitter;
 
   for(int i = 0; i < CLOUD_SUBSAMPLES; i++, subRayPos += increment){
@@ -113,7 +114,7 @@ float subMarch(vec3 rayPos){
     }
   }
 
-  return clamp01(exp(-totalDensity * CLOUD_ABSORPTION)) * clamp01((1.0 - exp(-totalDensity * 2)));
+  return clamp01(exp(-totalDensity * CLOUD_EXTINCTION_COLOR)) * clamp01((1.0 - exp(-totalDensity * 2)));
 }
 
 vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
@@ -172,27 +173,29 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   float totalTransmittance = 1.0;
   vec3 lightEnergy = vec3(0.0);
 
-  float jitter = blueNoise(texcoord, 0).r;
+  float jitter = blueNoise(texcoord, frameCounter).r;
   rayPos += increment * jitter;
 
   vec3 scatter = vec3(0.0);
 
-  float phase = schlickPhase(dot(worldDir, sunDir));
+  float phase = henyeyGreenstein(dot(worldDir, sunDir));
 
   for(int i = 0; i < samples; i++, rayPos += increment){
     float density = getDensity(rayPos) * length(increment);
 
     // density = mix(density, 0.0, smoothstep(CLOUD_MARCH_LIMIT * 0.5, CLOUD_MARCH_LIMIT, length(rayPos - cameraPosition)));
-    float transmittance = exp(-density * CLOUD_ABSORPTION);
+    float transmittance = exp(-density * CLOUD_EXTINCTION);
 
     if(density < 1e-6){
       continue;
     }
 
-    float lightTransmittance = subMarch(rayPos);
-    vec3 luminance = sunlightColor * 10 * phase * lightTransmittance + skyLightColor * 5; // I do not like these numbers but they are what they are
+    float lightJitter = blueNoise(texcoord, frameCounter + i).r;
+
+    vec3 lightTransmittance = subMarch(rayPos, lightJitter);
+    vec3 luminance = sunlightColor * phase * lightTransmittance + skyLightColor; // I do not like these numbers but they are what they are
     luminance /= 2.0;
-    vec3 integScatter = luminance * (1.0 - clamp01(transmittance)) / CLOUD_ABSORPTION;
+    vec3 integScatter = luminance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;
