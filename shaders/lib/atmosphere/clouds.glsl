@@ -4,13 +4,13 @@
 #include "/lib/textures/cloudNoise.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
-#include "/lib/atmosphere/fog.glsl"
+#include "/lib/atmosphere/common.glsl"
 
-#define CLOUD_LOWER_PLANE_HEIGHT 196.0
-#define CLOUD_UPPER_PLANE_HEIGHT 256.0
+#define CLOUD_LOWER_PLANE_HEIGHT 500.0
+#define CLOUD_UPPER_PLANE_HEIGHT 650.0
 
-#define CLOUD_SHAPE_SCALE 1000
-#define CLOUD_SHAPE_SCALE_2 2000
+#define CLOUD_SHAPE_SCALE 2000
+#define CLOUD_SHAPE_SCALE_2 4000
 #define CLOUD_EROSION_SCALE 100
 
 #define CLOUD_MARCH_LIMIT 1000.0
@@ -20,50 +20,14 @@
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define CLOUD_EXTINCTION 0.9
 #define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
+#define CLOUD_EXTINCTION length(CLOUD_EXTINCTION_COLOR)
 #define CLOUD_SAMPLES 50
 #define CLOUD_SUBSAMPLES 4
-#define DUAL_LOBE_WEIGHT 0.7
+#define CLOUD_DUAL_LOBE_WEIGHT 0.7
+#define CLOUD_G 0.6
 
-#define SCATTERING_OCTAVES 4
-
-vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
-
-float henyeyGreenstein(float g, float mu) {
-  float gg = g * g;
-	return (1.0 / (4.0 * PI))  * ((1.0 - gg) / pow(1.0 + gg - 2.0 * g * mu, 1.5));
-}
-
-float dualHenyeyGreenstein(float g, float costh) {
-  return mix(henyeyGreenstein(-g, costh), henyeyGreenstein(g, costh), DUAL_LOBE_WEIGHT);
-}
-
-vec3 multipleScattering(float density, float costh){
-  vec3 radiance = vec3(0.0);
-
-  float attenuation = 0.2;
-  float contribution = 0.2;
-  float phaseAttenuation = 0.5;
-
-  float g = 0.85;
-  float a = 1.0;
-  float b = 1.0;
-  float c = 1.0;
-
-  for(int n = 0; n < SCATTERING_OCTAVES; n++){
-    float phase = dualHenyeyGreenstein(g * c, costh);
-    radiance += b * phase * exp(-density * CLOUD_EXTINCTION_COLOR * a);
-
-    a *= attenuation;
-    b *= contribution;
-    c *= (1.0 - phaseAttenuation);
-  }
-
-  return radiance;
-}
-
-float getDensity(vec3 pos){
+float getCloudDensity(vec3 pos){
 
   float coverage = mix(0.09, 0.2, wetness);
 
@@ -90,44 +54,23 @@ float getDensity(vec3 pos){
   return clamp01(density * 0.2);
 }
 
-bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
-  vec3 N = vec3(0.0, sign(O.y - height), 0.0); // plane normal vector
-  vec3 P = vec3(0.0, height, 0.0); // point on the plane
 
-  float NoD = dot(N, D);
-  if(NoD == 0.0){
-    return false;
-  }
-
-  float t = dot(N, P - O)/NoD;
-  if(t < 0){
-    return false;
-  }
-
-
-  point = O + t*D;
-  return true;
-}
 
 
 // march from a ray position towards the sun to calculate how much light makes it there
-vec3 calculateLightEnergy(vec3 rayPos, float jitter, float costh){
+vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh){
   vec3 a = rayPos;
   vec3 b = rayPos;
 
-  if(!getCloudIntersection(rayPos, sunDir, CLOUD_UPPER_PLANE_HEIGHT, b)){ 
-    getCloudIntersection(rayPos, sunDir, CLOUD_LOWER_PLANE_HEIGHT, b);
+  if(!rayPlaneIntersection(rayPos, lightVector, CLOUD_UPPER_PLANE_HEIGHT, b)){ 
+    rayPlaneIntersection(rayPos, lightVector, CLOUD_LOWER_PLANE_HEIGHT, b);
   }
 
   if(b == rayPos) return vec3(0.0); // this should never happen
 
-  b -= cameraPosition;
-
-  if(length(b) > CLOUD_SUBMARCH_LIMIT){
-    b = normalize(b) * CLOUD_SUBMARCH_LIMIT;
+  if(distance(a, b) > CLOUD_SUBMARCH_LIMIT){
+    b = a + normalize(b - a) * CLOUD_SUBMARCH_LIMIT;
   }
-
-  b += cameraPosition;
 
   vec3 increment = (b - a) / CLOUD_SUBSAMPLES;
 
@@ -137,18 +80,18 @@ vec3 calculateLightEnergy(vec3 rayPos, float jitter, float costh){
   subRayPos += increment * jitter;
 
   for(int i = 0; i < CLOUD_SUBSAMPLES; i++, subRayPos += increment){
-    totalDensity += getDensity(subRayPos) * length(increment);
+    totalDensity += getCloudDensity(subRayPos) * length(increment);
     if(totalDensity >= 1.0){
       break;
     }
   }
 
-  return multipleScattering(totalDensity, costh) * clamp01((1.0 - exp(-totalDensity * 2)));
+  return multipleScattering(totalDensity, costh, CLOUD_G, CLOUD_EXTINCTION_COLOR, 32, CLOUD_DUAL_LOBE_WEIGHT) * clamp01((1.0 - exp(-totalDensity * 2)));
 }
 
-vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
+vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
   #ifndef CLOUDS
-  return vec4(0.0);
+  return color;
   #endif
 
   vec3 worldDir = normalize(playerPos);
@@ -159,25 +102,25 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   vec3 firstFogPoint = b;
 
-  if(!getCloudIntersection(cameraPosition, worldDir, CLOUD_LOWER_PLANE_HEIGHT, a)){
+  if(!rayPlaneIntersection(cameraPosition, worldDir, CLOUD_LOWER_PLANE_HEIGHT, a)){
     if(worldDir.y > 0 && cameraPosition.y >= CLOUD_LOWER_PLANE_HEIGHT && cameraPosition.y <= CLOUD_UPPER_PLANE_HEIGHT){ // inside cloud, looking up
       a = cameraPosition;
     } else {
-      return vec4(0.0);
+      return color;
     }
   }
-  if(!getCloudIntersection(cameraPosition, worldDir, CLOUD_UPPER_PLANE_HEIGHT, b)){
+  if(!rayPlaneIntersection(cameraPosition, worldDir, CLOUD_UPPER_PLANE_HEIGHT, b)){
     if(worldDir.y < 0 && cameraPosition.y >= CLOUD_LOWER_PLANE_HEIGHT && cameraPosition.y <= CLOUD_UPPER_PLANE_HEIGHT){ // inside cloud, looking down
       b = cameraPosition;
     } else {
-      return vec4(0.0);
+      return color;
     }
   }
 
   a -= cameraPosition;
   b -= cameraPosition;
 
-  float mu = dot(worldDir, sunDir);
+  float mu = clamp01(dot(worldDir, lightVector));
 
   if(length(a) > length(b)){ // for convenience, a will always be closer to the camera
     vec3 swap = a;
@@ -189,10 +132,12 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
     b = playerPos;
 
     if(b.y + cameraPosition.y < CLOUD_LOWER_PLANE_HEIGHT){ // neither the camera nor the terrain is in the cloud plane
-      return vec4(0.0);
+      return color;
     }
-  } if(length(b) > CLOUD_MARCH_LIMIT){ // limit how far we can march
-    b = normalize(b) * CLOUD_MARCH_LIMIT;
+  } 
+  
+  if(distance(a, b) > CLOUD_MARCH_LIMIT){ // limit how far we can march
+    b = a + normalize(b - a) * CLOUD_MARCH_LIMIT;
   }
 
   a += cameraPosition;
@@ -203,7 +148,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   vec3 rayPos = a;
   vec3 increment = (b - a) / samples;
 
-  float totalTransmittance = 1.0;
+  vec3 totalTransmittance = vec3(1.0);
   vec3 lightEnergy = vec3(0.0);
 
   float jitter = blueNoise(texcoord, frameCounter).r;
@@ -212,10 +157,10 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   vec3 scatter = vec3(0.0);
 
   for(int i = 0; i < samples; i++, rayPos += increment){
-    float density = getDensity(rayPos) * length(increment);
+    float density = getCloudDensity(rayPos) * length(increment);
     // density = mix(density, 0.0, smoothstep(CLOUD_MARCH_LIMIT * 0.5, CLOUD_MARCH_LIMIT, length(rayPos - cameraPosition)));
 
-    float transmittance = exp(-density * CLOUD_EXTINCTION);
+    vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
 
     if(density < 1e-6){
       continue;
@@ -227,22 +172,23 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
     float lightJitter = blueNoise(texcoord, frameCounter + i).r;
 
-    vec3 lightEnergy = calculateLightEnergy(rayPos, lightJitter, mu);
-    vec3 radiance = lightEnergy * sunlightColor + mix(skyLightColor, sunlightColor, 0.05);
-    vec3 integScatter = radiance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION;
+    vec3 lightEnergy = calculateCloudLightEnergy(rayPos, lightJitter, mu);
+    vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
+    vec3 integScatter = radiance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;
 
-    if(totalTransmittance < 0.01){
+    if(max3(totalTransmittance) < 0.01){
       break;
     }
   }
 
-  vec4 cloudColor = vec4(scatter, 1.0 - totalTransmittance);
-  // cloudColor.rgb = getFog(vec4(cloudColor.rgb, 1.0), firstFogPoint).rgb;
+  scatter = getAtmosphericFog(vec4(scatter, 1.0), firstFogPoint - cameraPosition).rgb;
 
-  return cloudColor;
+  color.rgb = color.rgb * totalTransmittance;
+  color.rgb += scatter;
+  return color;
 }
 
 #endif

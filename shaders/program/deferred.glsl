@@ -72,10 +72,9 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:063 */
+  /* DRAWBUFFERS:03 */
   layout(location = 0) out vec4 color;
-  layout(location = 1) out vec4 cloudColor;
-  layout(location = 2) out vec4 tex3;
+  layout(location = 1) out vec4 tex3;
 
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -87,7 +86,7 @@
   #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
-  #include "/lib/atmosphere/fog.glsl"
+
 
 
 
@@ -98,13 +97,14 @@
     
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
-    cloudColor = hasSkylight ? getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor) : vec4(0.0);
+
     
     tex3 = vec4(0.0); // clear buffer in preparation for translucents to write to it
 
     if(depth == 1.0){
       color = texture(colortex3, texcoord);
       color.rgb = getSky(color, normalize(eyePlayerPos), true);
+      color = hasSkylight ? getClouds(color, eyePlayerPos, depth, sunlightColor, skyLightColor) : color;
       return;
     }
 
@@ -123,10 +123,11 @@
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
     if((isEyeInWater == 1) != materialIsWater(materialID)){
-      color = getFog(color, eyePlayerPos);
+      color = getAtmosphericFog(color, eyePlayerPos);
     }
 
-    color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
+    color = hasSkylight ? getClouds(color, eyePlayerPos, depth, sunlightColor, skyLightColor) : color;
+    // color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
 
   }
 #endif

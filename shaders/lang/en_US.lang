@@ -33,3 +33,6 @@ option.NORMAL_MAPS.comment=Use normal data from the resource pack.
 
 option.SPECULAR_MAPS=Specular Maps
 option.SPECULAR_MAPS.comment=Use specular data from the resource pack.
+
+option.VOLUMETRIC_FOG=Volumetric Fog
+option.VOLUMETRIC_FOG.comment=Adds cloudlike fog at night and in the morning.

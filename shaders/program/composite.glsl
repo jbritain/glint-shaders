@@ -15,7 +15,6 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
-  uniform sampler2D colortex6;
 
   uniform sampler2D shadowtex0;
   uniform sampler2DShadow shadowtex0HW;
@@ -72,7 +71,7 @@
 
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/atmosphere/sky.glsl"
-  #include "/lib/atmosphere/fog.glsl"
+
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/water/waterFog.glsl"
@@ -150,37 +149,20 @@
     #endif
 
     if(waterMask == inWater && opaqueDepth != 1.0){
-      color = getFog(color, opaqueEyePlayerPos);
+      color = getAtmosphericFog(color, opaqueEyePlayerPos);
     }
 
     if(inWater && !waterMask){ // water fog when camera and object are underwater
-      color.rgb = waterFog(color.rgb, vec3(0.0), opaqueEyePlayerPos, sunlightColor, skyLightColor);
+      color.rgb = getWaterFog(color.rgb, vec3(0.0), opaqueEyePlayerPos, sunlightColor, skyLightColor);
     } else if(inWater && waterMask){ // water fog when only camera is underwater
-      color.rgb = waterFog(color.rgb, vec3(0.0), translucentEyePlayerPos, sunlightColor, skyLightColor);
-      translucent.rgb = waterFog(translucent.rgb, vec3(0.0), translucentEyePlayerPos, sunlightColor, skyLightColor);
+      color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentEyePlayerPos, sunlightColor, skyLightColor);
+      translucent.rgb = getWaterFog(translucent.rgb, vec3(0.0), translucentEyePlayerPos, sunlightColor, skyLightColor);
     } else if(!inWater && waterMask){ // water fog when only object is underwater
-      color.rgb = waterFog(color.rgb, translucentEyePlayerPos, opaqueEyePlayerPos, sunlightColor, skyLightColor);
-    }
-
-    // this is for deciding whether to blend the translucents with clouds or not
-    // 0 - below cloud plane
-    // 1 - in cloud plane
-    // 2 - above cloud plane
-    // we don't blend if both are in the same state (unless the state is 1)
-    uint cameraPlaneState = 0;
-    uint positionPlaneState = 0;
-
-    if(cameraPosition.y > CLOUD_LOWER_PLANE_HEIGHT) cameraPlaneState++;
-    if(cameraPosition.y > CLOUD_UPPER_PLANE_HEIGHT) cameraPlaneState++;
-    if(translucentEyePlayerPos.y + cameraPosition.y > CLOUD_LOWER_PLANE_HEIGHT) positionPlaneState++;
-    if(translucentEyePlayerPos.y + cameraPosition.y > CLOUD_UPPER_PLANE_HEIGHT) positionPlaneState++;
-
-    if(cameraPlaneState != positionPlaneState || positionPlaneState == 1 && translucent.a != 0.0){
-      vec4 cloud = texture(colortex6, texcoord);
-
-      translucent = mix(translucent, cloud, cloud.a);
+      color.rgb = getWaterFog(color.rgb, translucentEyePlayerPos, opaqueEyePlayerPos, sunlightColor, skyLightColor);
     }
 
     color.rgb = mix(color.rgb, translucent.rgb, clamp01(translucent.a));
+
+
   }
 #endif

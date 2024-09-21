@@ -61,7 +61,6 @@
   uniform sampler2D depthtex0; // do not use this in gbuffers it is a bad idea
   uniform sampler2D depthtex2;
   uniform sampler2D colortex0;
-  uniform sampler2D colortex6;
   uniform sampler2D colortex4;
 
   uniform float alphaTestRef;
@@ -119,7 +118,7 @@
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/lighting/specularShading.glsl"
-  #include "/lib/atmosphere/fog.glsl"
+
 
 
 
@@ -203,6 +202,6 @@
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
 
-    color = getFog(color, eyePlayerPos);
+    color = getAtmosphericFog(color, eyePlayerPos);
   }
 #endif

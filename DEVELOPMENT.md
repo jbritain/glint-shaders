@@ -23,6 +23,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `deferred2` cloud blur (vertical) and blending with opaques
 
 `composite` some fog, translucency blending
+`composite1` cloud fog
 
 `composite89` writing frame data for next frame to access (previous frame data), blending hand
 

@@ -6,7 +6,7 @@
 #include "/lib/lighting/getSunlight.glsl"
 
 #ifndef VOLUMETRIC_WATER
-vec3 waterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 skyLightColor){
+vec3 getWaterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 skyLightColor){
   float dist = distance(frontPos, backPos);
 
   vec3 extinction = exp(-WATER_EXTINCTION * dist);
@@ -17,7 +17,7 @@ vec3 waterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 
 }
 #else
 //takes player space positions
-vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor){
+vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor){
   vec3 rayPos = a;
 
   vec3 increment = (b - a) / VOLUMETRIC_WATER_SAMPLES;

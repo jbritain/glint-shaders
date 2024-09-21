@@ -6,7 +6,6 @@ const int colortex2Format = RGBA16;  || mapped normal, specular map data
 const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
 const int colortex4Format = RGBA32F; || previous frame data - color rgb, opaque depth
 const int colortex5Format = RGBA16F; || hand
-const int colortex6Format = RGBA16F; || clouds
 
 */
 
@@ -15,14 +14,12 @@ const bool colortex4Clear = false;
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0;
 const int shadowMapResolution = 4096; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
-const float sunPathRotation = -40;
+const float sunPathRotation = 60;
 
 #define SKYLIGHT_STRENGTH 1.0
 #define AMBIENT_STRENGTH 0.01
 #define SUNLIGHT_STRENGTH 1.0
 #define BLOCKLIGHT_STRENGTH 0.1
-
-#define WATER_NORMALS
 
 #define SSR
 #define SSR_FADE
@@ -47,8 +44,6 @@ const float sunPathRotation = -40;
 #define SPECULAR_MAPS
 
 #define FOG
-#define FOG_POWER 8.0
-#define FOG_START 0.2
 
 #define CLOUDS
 #define CLOUD_BLUR_RADIUS_THRESHOLD 4.0
@@ -61,14 +56,19 @@ const float sunPathRotation = -40;
 #define BLOOM_RADIUS 1.0
 #define BLOOM_STRENGTH 1.0
 
+#define WATER_NORMALS
+
 // #define REFRACTION
 #define REFRACTION_AMOUNT 0.5
 
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10
-#define VOLUMETRIC_WATER_SUBSAMPLES 4
 #define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 5.0)
 #define WATER_G 0.99
+
+#define VOLUMETRIC_FOG
+#define VOLUMETRIC_FOG_SAMPLES 20
+#define VOLUMETRIC_FOG_SUBSAMPLES 4
 
 #define WAVE_DEPTH 0.2
 #define WAVE_E 0.01

@@ -3,6 +3,8 @@
 
 #include "/lib/atmosphere/eBrunetonAtmosphere.glsl"
 
+vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0);
+
 vec3 getSky(vec4 color, vec3 dir, bool includeSun){
   if(!hasSkylight){
     return vec3(0.0);
@@ -10,7 +12,6 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
 
   // return vec3(0.0);
   vec3 transmit = vec3(1.0);
-  vec3 kCamera = vec3(0.0, (128 + cameraPosition.y) + ATMOSPHERE.bottom_radius, 0.0);
   vec3 radiance = GetSkyRadiance(
     kCamera, dir, 0.0, sunVector, transmit
   );
@@ -27,7 +28,6 @@ vec3 getSky(vec3 dir, bool includeSun){
 }
 
 void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor){
-  vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0);
 
   sunlightColor = GetSunAndSkyIrradiance(
 		kCamera, sunVector, skyLightColor
@@ -40,5 +40,19 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor){
     sunlightColor += vec3(0.01, 0.01, 0.02);
   }
   
+}
+
+vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
+  #ifndef FOG
+  return color;
+  #endif
+
+  vec3 transmit = vec3(1.0);
+
+  vec3 dir = normalize(playerPos);
+
+  vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit);
+
+  return vec4(color.rgb * transmit + fog, color.a);
 }
 #endif
