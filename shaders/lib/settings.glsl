@@ -41,6 +41,8 @@ const float sunPathRotation = -40;
 #define SHADOW_SAMPLES 16 // [4 8 16 32 64]
 #define SUBSURFACE_SCATTERING
 
+#define cloudBlur blur0
+
 #define NORMAL_MAPS
 #define SPECULAR_MAPS
 

@@ -4,9 +4,9 @@
 #include "/lib/textures/cloudNoise.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
-#include "/lib/atmosphere/sky.glsl"
+#include "/lib/atmosphere/fog.glsl"
 
-#define CLOUD_LOWER_PLANE_HEIGHT 128.0
+#define CLOUD_LOWER_PLANE_HEIGHT 196.0
 #define CLOUD_UPPER_PLANE_HEIGHT 256.0
 
 #define CLOUD_SHAPE_SCALE 1000
@@ -22,34 +22,37 @@
 
 #define CLOUD_EXTINCTION 0.9
 #define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
-#define CLOUD_G 0.85
 #define CLOUD_SAMPLES 50
 #define CLOUD_SUBSAMPLES 4
+#define DUAL_LOBE_WEIGHT 0.7
 
 #define SCATTERING_OCTAVES 4
 
 vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
 
-float henyeyGreenstein(float g, float costh)
-{
-  float g2 = pow2(g);
-  return (1.0 - g2) / (4.0 * PI * pow(1.0 + g2 - 2.0 * g * costh, 3.0/2.0));
+float henyeyGreenstein(float g, float mu) {
+  float gg = g * g;
+	return (1.0 / (4.0 * PI))  * ((1.0 - gg) / pow(1.0 + gg - 2.0 * g * mu, 1.5));
+}
+
+float dualHenyeyGreenstein(float g, float costh) {
+  return mix(henyeyGreenstein(-g, costh), henyeyGreenstein(g, costh), DUAL_LOBE_WEIGHT);
 }
 
 vec3 multipleScattering(float density, float costh){
   vec3 radiance = vec3(0.0);
 
-  float attenuation = 0.95;
-  float contribution = 0.95;
-  float phaseAttenuation = 0.8;
+  float attenuation = 0.2;
+  float contribution = 0.2;
+  float phaseAttenuation = 0.5;
 
-  float g = CLOUD_G;
+  float g = 0.85;
   float a = 1.0;
   float b = 1.0;
   float c = 1.0;
 
   for(int n = 0; n < SCATTERING_OCTAVES; n++){
-    float phase = henyeyGreenstein(g * c, costh);
+    float phase = dualHenyeyGreenstein(g * c, costh);
     radiance += b * phase * exp(-density * CLOUD_EXTINCTION_COLOR * a);
 
     a *= attenuation;
@@ -84,7 +87,7 @@ float getDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return density * 0.1;
+  return clamp01(density * 0.2);
 }
 
 bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
@@ -154,6 +157,8 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   vec3 a;
   vec3 b;
 
+  vec3 firstFogPoint = b;
+
   if(!getCloudIntersection(cameraPosition, worldDir, CLOUD_LOWER_PLANE_HEIGHT, a)){
     if(worldDir.y > 0 && cameraPosition.y >= CLOUD_LOWER_PLANE_HEIGHT && cameraPosition.y <= CLOUD_UPPER_PLANE_HEIGHT){ // inside cloud, looking up
       a = cameraPosition;
@@ -208,6 +213,7 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   for(int i = 0; i < samples; i++, rayPos += increment){
     float density = getDensity(rayPos) * length(increment);
+    // density = mix(density, 0.0, smoothstep(CLOUD_MARCH_LIMIT * 0.5, CLOUD_MARCH_LIMIT, length(rayPos - cameraPosition)));
 
     float transmittance = exp(-density * CLOUD_EXTINCTION);
 
@@ -215,10 +221,14 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
       continue;
     }
 
+    if(firstFogPoint == b){
+      firstFogPoint = rayPos;
+    }
+
     float lightJitter = blueNoise(texcoord, frameCounter + i).r;
 
     vec3 lightEnergy = calculateLightEnergy(rayPos, lightJitter, mu);
-    vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
+    vec3 radiance = lightEnergy * sunlightColor + mix(skyLightColor, sunlightColor, 0.05);
     vec3 integScatter = radiance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION;
 
     totalTransmittance *= transmittance;
@@ -228,7 +238,11 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
       break;
     }
   }
-  return vec4(scatter, 1.0 - totalTransmittance);
+
+  vec4 cloudColor = vec4(scatter, 1.0 - totalTransmittance);
+  // cloudColor.rgb = getFog(vec4(cloudColor.rgb, 1.0), firstFogPoint).rgb;
+
+  return cloudColor;
 }
 
 #endif

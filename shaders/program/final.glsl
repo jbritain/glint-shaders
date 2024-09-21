@@ -20,6 +20,7 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform sampler3D clouderosionnoisetex;
 
   in vec2 texcoord;
 
@@ -47,7 +48,5 @@
     color.rgb = setSaturationLevel(color.rgb, SATURATION);
 
     color.rgb = invGammaCorrect(color.rgb);
-
-    
   }
 #endif

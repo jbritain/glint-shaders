@@ -39,7 +39,7 @@
 
     float depth = texture(depthtex0, texcoord).r;
     if(depth == 1.0 && all(equal(textureGatherOffsets(depthtex0, texcoord, offsets), vec4(1.0)))){
-      cloudColor = blur13(colortex6, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
+      cloudColor = cloudBlur(colortex6, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
     } else {
       cloudColor = texture(colortex6, texcoord);
     }
