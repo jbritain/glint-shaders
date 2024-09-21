@@ -533,6 +533,14 @@ vec3 GetSkyRadianceToPoint(vec3 camera, in vec3 point, float shadow_length,
   float d = length(point - camera);
   bool ray_r_mu_intersects_ground = RayIntersectsGround(ATMOSPHERE, r, mu);
 
+  // Hack to avoid rendering artifacts near the horizon, due to finite
+  // atmosphere texture resolution and finite floating point precision.
+  if (!ray_r_mu_intersects_ground) {
+    float mu_horiz = -SafeSqrt(
+        1.0 - (ATMOSPHERE.bottom_radius / r) * (ATMOSPHERE.bottom_radius / r));
+    mu = max(mu, mu_horiz + 0.004);
+  }
+
   transmittance = GetTransmittance(r, mu, d, ray_r_mu_intersects_ground);
 
   vec3 single_mie_scattering;
@@ -562,37 +570,6 @@ vec3 GetSkyRadianceToPoint(vec3 camera, in vec3 point, float shadow_length,
   scattering = scattering - shadow_transmittance * scattering_p;
   single_mie_scattering =
       single_mie_scattering - shadow_transmittance * single_mie_scattering_p;
-
-  if(!ray_r_mu_intersects_ground)
-  {
-
-    const float EPS = 0.004;
-    float muHoriz = -sqrt(1.0 - (ATMOSPHERE.bottom_radius / r) * (ATMOSPHERE.bottom_radius / r));
-    
-     if (abs(mu - muHoriz) < EPS) 
-    {
-    
-      float a = ((mu - muHoriz) + EPS) / (2.0 * EPS);
-      mu = muHoriz + EPS;      
-      vec3 single_mie_scattering0;
-      vec3 single_mie_scattering1; 
-          
-
-      float r0 = ClampRadius(ATMOSPHERE, sqrt(d * d + 2.0 * r * mu * d + r * r));
-      
-      float mu0 = clamp((r * mu + d) / r0,-1.0,1.0);
-      float mu_s_0 = clamp((r * mu_s + d * nu) / r0,-1.0,1.0); 
-      
-      vec3 inScatter0 =  GetCombinedScattering(r, mu, mu_s, nu, ray_r_mu_intersects_ground, single_mie_scattering0); 
-                 
-      vec3 inScatter1 = GetCombinedScattering(r0, mu0, mu_s_0, nu, ray_r_mu_intersects_ground, single_mie_scattering1);
-      vec3 inScatter = max(inScatter0 - shadow_transmittance * inScatter1, 0.0);
-      vec3 mie_scattering = max(single_mie_scattering0 - shadow_transmittance * single_mie_scattering1, 0.0);
-      scattering = inScatter;
-      single_mie_scattering = mie_scattering;
-    }
-    
-  }
 
   single_mie_scattering = GetExtrapolatedSingleMieScattering(vec4(scattering, single_mie_scattering.r));
 

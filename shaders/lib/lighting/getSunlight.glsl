@@ -5,7 +5,7 @@
 #include "/lib/util/noise.glsl"
 #include "/lib/util/materialIDs.glsl"
 
-vec4 noise;
+vec4 shadowNoise;
 
 vec2 vogelDiscSample(int stepIndex, int stepCount, float rotation) {
   const float goldenAngle = 2.4;
@@ -38,7 +38,7 @@ float computeSSS(float blockerDistance, float SSS, vec3 normal){
 		return 0.0;
 	}
 
-	float s = 1.0 / (SSS * 0.06);
+	float s = 1.0 / (SSS * 0.2);
 	float z = blockerDistance * 255 * 2; // multiply by 2 to account for distortion halving z
 
 
@@ -108,7 +108,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	float blockerCount = 0;
 
 	for(int i = 0; i < BLOCKER_SEARCH_SAMPLES; i++){
-		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, noise.r);
+		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, shadowNoise.r);
 		vec3 newShadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset * range, 0.0, 0.0), normal).xyz;
 		float newBlockerDepth = texture(shadowtex0, newShadowScreenPos.xy).r;
 		if (newBlockerDepth < receiverDepth){
@@ -133,7 +133,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 	vec3 shadowSum = vec3(0.0);
 
 	for(int i = 0; i < samples; i++){
-		vec2 offset = vogelDiscSample(i, samples, noise.g);
+		vec2 offset = vogelDiscSample(i, samples, shadowNoise.g);
 		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth, 0.0, 0.0), normal);
 	}
 	shadowSum /= float(samples);
@@ -143,9 +143,9 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-	noise = vec4(
-		interleavedGradientNoise(floor(gl_FragCoord.xy), 0),
-		interleavedGradientNoise(floor(gl_FragCoord.xy), 1),
+	shadowNoise = vec4(
+		interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+		interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter + 1),
 		0.0,
 		0.0
 	);

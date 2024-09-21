@@ -43,7 +43,8 @@ vec3 waterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor
     float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));
     vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * WATER_EXTINCTION);
 
-    vec3 sunlight = computeShadow(shadowClipPos, 0.0, lightVector, 2) + skyLightColor * skylightTransmittance * EBS.y;
+    shadowNoise.g = interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1);
+    vec3 sunlight = computeShadow(shadowClipPos, 0.1, lightVector, 2) + skyLightColor * skylightTransmittance * EBS.y;
     sunlight *= clamp01(phase) * sunlightColor;
 
     vec3 integScatter = sunlight * (1.0 - clamp01(transmittance)) / WATER_EXTINCTION;

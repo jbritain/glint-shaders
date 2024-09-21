@@ -6,7 +6,7 @@
 #include "/lib/textures/blueNoise.glsl"
 #include "/lib/atmosphere/sky.glsl"
 
-#define CLOUD_LOWER_PLANE_HEIGHT 192.0
+#define CLOUD_LOWER_PLANE_HEIGHT 128.0
 #define CLOUD_UPPER_PLANE_HEIGHT 256.0
 
 #define CLOUD_SHAPE_SCALE 1000
@@ -26,17 +26,43 @@
 #define CLOUD_SAMPLES 50
 #define CLOUD_SUBSAMPLES 4
 
+#define SCATTERING_OCTAVES 4
+
 vec3 sunDir = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
 
-float henyeyGreenstein(float costh)
+float henyeyGreenstein(float g, float costh)
 {
-  float g2 = pow2(CLOUD_G);
-  return (1.0 - g2) / (4.0 * PI * pow(1.0 + g2 - 2.0 * CLOUD_G * costh, 3.0/2.0));
+  float g2 = pow2(g);
+  return (1.0 - g2) / (4.0 * PI * pow(1.0 + g2 - 2.0 * g * costh, 3.0/2.0));
+}
+
+vec3 multipleScattering(float density, float costh){
+  vec3 radiance = vec3(0.0);
+
+  float attenuation = 0.95;
+  float contribution = 0.95;
+  float phaseAttenuation = 0.8;
+
+  float g = CLOUD_G;
+  float a = 1.0;
+  float b = 1.0;
+  float c = 1.0;
+
+  for(int n = 0; n < SCATTERING_OCTAVES; n++){
+    float phase = henyeyGreenstein(g * c, costh);
+    radiance += b * phase * exp(-density * CLOUD_EXTINCTION_COLOR * a);
+
+    a *= attenuation;
+    b *= contribution;
+    c *= (1.0 - phaseAttenuation);
+  }
+
+  return radiance;
 }
 
 float getDensity(vec3 pos){
 
-  float coverage = mix(0.1, 0.2, wetness);
+  float coverage = mix(0.09, 0.2, wetness);
 
   float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
@@ -58,7 +84,7 @@ float getDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return density * 0.5;
+  return density * 0.1;
 }
 
 bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
@@ -82,7 +108,7 @@ bool getCloudIntersection(vec3 O, vec3 D, float height, inout vec3 point){
 
 
 // march from a ray position towards the sun to calculate how much light makes it there
-vec3 subMarch(vec3 rayPos, float jitter){
+vec3 calculateLightEnergy(vec3 rayPos, float jitter, float costh){
   vec3 a = rayPos;
   vec3 b = rayPos;
 
@@ -114,7 +140,7 @@ vec3 subMarch(vec3 rayPos, float jitter){
     }
   }
 
-  return clamp01(exp(-totalDensity * CLOUD_EXTINCTION_COLOR)) * clamp01((1.0 - exp(-totalDensity * 2)));
+  return multipleScattering(totalDensity, costh) * clamp01((1.0 - exp(-totalDensity * 2)));
 }
 
 vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
@@ -145,6 +171,8 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   a -= cameraPosition;
   b -= cameraPosition;
+
+  float mu = dot(worldDir, sunDir);
 
   if(length(a) > length(b)){ // for convenience, a will always be closer to the camera
     vec3 swap = a;
@@ -178,12 +206,9 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
   vec3 scatter = vec3(0.0);
 
-  float phase = henyeyGreenstein(dot(worldDir, sunDir));
-
   for(int i = 0; i < samples; i++, rayPos += increment){
     float density = getDensity(rayPos) * length(increment);
 
-    // density = mix(density, 0.0, smoothstep(CLOUD_MARCH_LIMIT * 0.5, CLOUD_MARCH_LIMIT, length(rayPos - cameraPosition)));
     float transmittance = exp(-density * CLOUD_EXTINCTION);
 
     if(density < 1e-6){
@@ -192,10 +217,9 @@ vec4 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
 
     float lightJitter = blueNoise(texcoord, frameCounter + i).r;
 
-    vec3 lightTransmittance = subMarch(rayPos, lightJitter);
-    vec3 luminance = sunlightColor * phase * lightTransmittance + skyLightColor; // I do not like these numbers but they are what they are
-    luminance /= 2.0;
-    vec3 integScatter = luminance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION;
+    vec3 lightEnergy = calculateLightEnergy(rayPos, lightJitter, mu);
+    vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
+    vec3 integScatter = radiance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;
