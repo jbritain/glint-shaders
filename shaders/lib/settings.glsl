@@ -14,7 +14,7 @@ const bool colortex4Clear = false;
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0;
 const int shadowMapResolution = 4096; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
-const float sunPathRotation = 60;
+const float sunPathRotation = -40;
 
 #define SKYLIGHT_STRENGTH 1.0
 #define AMBIENT_STRENGTH 0.01
@@ -48,6 +48,27 @@ const float sunPathRotation = 60;
 #define CLOUDS
 #define CLOUD_BLUR_RADIUS_THRESHOLD 4.0
 
+#define CLOUD_LOWER_PLANE_HEIGHT 500.0
+#define CLOUD_UPPER_PLANE_HEIGHT 700.0
+
+#define CLOUD_SHAPE_SCALE 2342
+#define CLOUD_SHAPE_SCALE_2 7573
+#define CLOUD_EROSION_SCALE 234.426
+
+#define CLOUD_MARCH_LIMIT 1000.0
+#define CLOUD_SUBMARCH_LIMIT 500.0
+
+// blocks per second
+#define CLOUD_SHAPE_SPEED 0.001
+#define CLOUD_EROSION_SPEED 0.005
+
+#define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
+#define CLOUD_EXTINCTION length(CLOUD_EXTINCTION_COLOR)
+#define CLOUD_SAMPLES 50
+#define CLOUD_SUBSAMPLES 4
+#define CLOUD_DUAL_LOBE_WEIGHT 0.7
+#define CLOUD_G 0.6
+
 #define FXAA
 #define FXAA_SUBPIXEL 0.75 //[0.00 0.25 0.50 0.75 1.00]
 #define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]
@@ -64,7 +85,7 @@ const float sunPathRotation = 60;
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10
 #define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 5.0)
-#define WATER_G 0.99
+#define WATER_G 0.95
 
 #define VOLUMETRIC_FOG
 #define VOLUMETRIC_FOG_SAMPLES 20

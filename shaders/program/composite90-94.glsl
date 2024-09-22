@@ -20,7 +20,7 @@
 
   in vec2 texcoord;
 
-  #include "/lib/postProcessing/bloom.glsl"
+  #include "/lib/post/bloom.glsl"
   #include "/lib/util.glsl"
 
   /* DRAWBUFFERS:3 */

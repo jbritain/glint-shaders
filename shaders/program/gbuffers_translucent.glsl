@@ -62,6 +62,7 @@
   uniform sampler2D depthtex2;
   uniform sampler2D colortex0;
   uniform sampler2D colortex4;
+  uniform sampler2D colortex6;
 
   uniform float alphaTestRef;
   uniform float frameTimeCounter;
@@ -108,16 +109,16 @@
   in vec3 viewPos;
 
   #include "/lib/util.glsl"
-  #include "/lib/postProcessing/tonemap.glsl"
+  #include "/lib/post/tonemap.glsl"
   #include "/lib/util/packing.glsl"
   #include "/lib/lighting/diffuseShading.glsl"
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/water/waveNormals.glsl"
   #include "/lib/util/material.glsl"
   #include "/lib/atmosphere/sky.glsl"
-  #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/lighting/specularShading.glsl"
+  #include "/lib/atmosphere/common.glsl"
 
 
 
@@ -152,6 +153,11 @@
     #ifdef gbuffers_weather
       if(biome_precipitation != 2){
         color = vec4(0.2);
+      }
+
+      color.a *= (1.0 - smoothstep(CLOUD_LOWER_PLANE_HEIGHT, CLOUD_UPPER_PLANE_HEIGHT, eyePlayerPos.y + cameraPosition.y));
+      if (color.a < alphaTestRef) {
+        discard;
       }
       
     #endif

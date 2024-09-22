@@ -67,7 +67,7 @@
   in vec3 viewPos;
 
   #include "/lib/util.glsl"
-  #include "/lib/postProcessing/tonemap.glsl"
+  #include "/lib/post/tonemap.glsl"
   #include "/lib/util/packing.glsl"
 
   vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){

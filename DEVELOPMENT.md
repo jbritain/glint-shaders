@@ -15,9 +15,11 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex3` stars [gbuffers > deferred] translucents [gbuffers translucent>composite89] bloom [composite90>]
 `colortex4` previous frame data - color rgb, opaque depth
 `colortex5` hand
-`colortex6` clouds
+`colortex6` cloud shadow map (256x256)
 
 # Passes
+`prepare` cloud shadow map
+
 `deferred` opaques shading, sky, cloud generation
 `deferred1` cloud blur pass (horizontal)
 `deferred2` cloud blur (vertical) and blending with opaques

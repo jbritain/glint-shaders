@@ -6,6 +6,7 @@
 #include "/lib/textures/blueNoise.glsl"
 #include "/lib/atmosphere/common.glsl"
 #include "/lib/lighting/getSunlight.glsl"
+#include "/lib/atmosphere/clouds.glsl"
 
 #define FOG_MARCH_LIMIT far
 #define FOG_SUBMARCH_LIMIT 150.0
@@ -17,19 +18,20 @@
 #define FOG_G 0.85
 
 #define FOG_LOWER_HEIGHT 63
-#define FOG_UPPER_HEIGHT 103
+float FOG_UPPER_HEIGHT = mix(103.0, CLOUD_UPPER_PLANE_HEIGHT, wetness);
 
 #define FOG_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
 
 float getFogDensity(vec3 pos){
   float fogFactor = 0.0;
   if(worldTime < 2000){
-    fogFactor = 1.0 - smoothstep(0, 2000, worldTime);
+    fogFactor = 1.0 - smoothstep(0, 2000, worldTime) * 0.8;
   } else if (worldTime > 12000){
-    fogFactor = smoothstep(12000, 14000, worldTime);
+    fogFactor = smoothstep(12000, 14000, worldTime) * 0.8;
   }
+  fogFactor += 0.2;
   
-  fogFactor *= wetness + 1.0;
+  fogFactor += wetness;
   
   
   float heightFactor = 1.0 - pow2(smoothstep(FOG_LOWER_HEIGHT, FOG_UPPER_HEIGHT, pos.y));
@@ -50,7 +52,7 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
   vec3 b = rayPos;
 
   vec4 shadowClipPos = getShadowClipPos(rayPos - cameraPosition);
-  vec3 sunlight = computeShadow(shadowClipPos, 0.1, lightVector, 2);
+  vec3 sunlight = computeShadow(shadowClipPos, 0.1, lightVector, 2, true);
 
   if(sunlight == vec3(0.0)){
     return vec3(0.0);

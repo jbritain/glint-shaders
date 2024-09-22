@@ -4,6 +4,7 @@
 #include "/lib/textures/blueNoise.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/lighting/getSunlight.glsl"
+#include "/lib/atmosphere/common.glsl"
 
 #ifndef VOLUMETRIC_WATER
 vec3 getWaterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 skyLightColor){
@@ -24,8 +25,8 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
   float jitter = blueNoise(texcoord, frameCounter).r;
   // float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
 
-  float cosTheta = dot(normalize(increment), lightVector);
-  float phase = (1.0 - pow2(WATER_G)) / pow(1.0 + pow2(WATER_G) - 2 * WATER_G * cosTheta, 3.0/2.0);
+  float cosTheta = clamp01(dot(normalize(increment), lightVector));
+  float phase = dualHenyeyGreenstein(WATER_G, cosTheta, 0.2);
 
   rayPos += increment * jitter;
 
@@ -44,7 +45,7 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * WATER_EXTINCTION);
 
     shadowNoise.g = interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1);
-    vec3 sunlight = computeShadow(shadowClipPos, 0.1, lightVector, 2) + skyLightColor * skylightTransmittance * EBS.y;
+    vec3 sunlight = computeShadow(shadowClipPos, 0.1, lightVector, 2, true) + skyLightColor * skylightTransmittance * EBS.y;
     sunlight *= clamp01(phase) * sunlightColor;
 
     vec3 integScatter = sunlight * (1.0 - clamp01(transmittance)) / WATER_EXTINCTION;

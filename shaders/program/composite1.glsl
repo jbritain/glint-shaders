@@ -62,17 +62,8 @@
 
   in vec2 texcoord;
 
-  vec3 albedo;
-  int materialID;
-  vec3 faceNormal;
-  vec2 lightmap;
-
-  vec3 mappedNormal;
-  vec4 specularData;
-
-  #include "/lib/util/gbufferData.glsl"
+  #include "/lib/util.glsl"
   #include "/lib/atmosphere/sky.glsl"
-
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/textures/blueNoise.glsl"
@@ -86,7 +77,6 @@
     getLightColors(sunlightColor, skyLightColor);
 
     color = texture(colortex0, texcoord);
-    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
 
     float translucentDepth = texture(depthtex0, texcoord).r;
     float opaqueDepth = texture(depthtex2, texcoord).r;

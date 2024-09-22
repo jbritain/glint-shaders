@@ -125,7 +125,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	return clamp01(blockerDistance);
 }
 
-vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int samples){
+vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int samples, bool direct){
 	if(penumbraWidth == 0.0){
 		return(sampleShadow(shadowClipPos, normal));
 	}
@@ -137,6 +137,13 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth, 0.0, 0.0), normal);
 	}
 	shadowSum /= float(samples);
+
+	if(direct){
+		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos, normal).xyz;
+		vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
+		cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
+		shadowSum *= cloudShadow;
+	}
 
 	return shadowSum;
 }
@@ -154,7 +161,6 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	float NoL = NoLSafe(mappedNormal) * step(0.00001, faceNoL);
 
 	#ifdef SHADOWS
-		
 
 		vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 
@@ -169,7 +175,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 		float scatter = computeSSS(blockerDistance, SSS, faceNormal);
 
-		vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES);
+		vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false);
 
 		if(distFade > 0.0){
 			float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
@@ -184,7 +190,17 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
 	#endif
 
+	scatter = mix(scatter, 0.0, wetness);
+
   vec3 sunlight = max(shadow * NoL, vec3(scatter));
+
+	#ifdef SHADOWS
+		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos, faceNormal).xyz;
+		vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
+		cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
+
+		sunlight *= cloudShadow;
+	#endif
 
 	return sunlight;
 }

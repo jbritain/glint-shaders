@@ -5,27 +5,7 @@
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
 #include "/lib/atmosphere/common.glsl"
-
-#define CLOUD_LOWER_PLANE_HEIGHT 500.0
-#define CLOUD_UPPER_PLANE_HEIGHT 650.0
-
-#define CLOUD_SHAPE_SCALE 2000
-#define CLOUD_SHAPE_SCALE_2 4000
-#define CLOUD_EROSION_SCALE 100
-
-#define CLOUD_MARCH_LIMIT 1000.0
-#define CLOUD_SUBMARCH_LIMIT 500.0
-
-// blocks per second
-#define CLOUD_SHAPE_SPEED 0.001
-#define CLOUD_EROSION_SPEED 0.005
-
-#define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
-#define CLOUD_EXTINCTION length(CLOUD_EXTINCTION_COLOR)
-#define CLOUD_SAMPLES 50
-#define CLOUD_SUBSAMPLES 4
-#define CLOUD_DUAL_LOBE_WEIGHT 0.7
-#define CLOUD_G 0.6
+#include "/lib/atmosphere/sky.glsl"
 
 float getCloudDensity(vec3 pos){
 
@@ -51,7 +31,7 @@ float getCloudDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return clamp01(density * 0.2);
+  return clamp01(density * mix(0.2, 1.0, wetness));
 }
 
 

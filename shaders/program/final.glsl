@@ -13,7 +13,6 @@
 #ifdef fsh
   uniform sampler2D colortex0;
   uniform sampler2D colortex3;
-  uniform sampler2D colortex4;
 
   uniform sampler2D depthtex0;
 
@@ -25,8 +24,8 @@
   in vec2 texcoord;
 
   #include "/lib/util.glsl"
-  #include "/lib/postProcessing/tonemap.glsl"
-  #include "/lib/postProcessing/FXAA.glsl"
+  #include "/lib/post/tonemap.glsl"
+  #include "/lib/post/FXAA.glsl"
   #include "/lib/textures/blueNoise.glsl"
 
   layout(location = 0) out vec4 color;

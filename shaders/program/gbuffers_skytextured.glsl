@@ -21,7 +21,7 @@
   in vec4 glcolor;
 
   #include "/lib/util.glsl"
-  #include "/lib/postProcessing/tonemap.glsl"
+  #include "/lib/post/tonemap.glsl"
 
   /* DRAWBUFFERS:3 */
   layout(location = 0) out vec4 color;

@@ -2,6 +2,7 @@
 #define SKY_INCLUDE
 
 #include "/lib/atmosphere/eBrunetonAtmosphere.glsl"
+#include "/lib/atmosphere/common.glsl"
 
 vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0);
 

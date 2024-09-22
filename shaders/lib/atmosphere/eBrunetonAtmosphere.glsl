@@ -1,9 +1,6 @@
 #ifndef ATMOSPHERE_INCLUDE
 #define ATMOSPHERE_INCLUDE
 
-const vec3 sunVector = normalize(mat3(gbufferModelViewInverse) * sunPosition);
-const vec3 lightVector = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
-
 uniform sampler3D atmospheretex;
 
 const int TRANSMITTANCE_TEXTURE_WIDTH = 256;
