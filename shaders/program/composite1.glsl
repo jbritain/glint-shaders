@@ -6,6 +6,8 @@
   void main() {
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+
+    texcoord /= VOLUMETRIC_RESOLUTION;
   }
 #endif
 
@@ -69,26 +71,37 @@
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/atmosphere/cloudFog.glsl"
 
-  /* DRAWBUFFERS:0 */
-  layout(location = 0) out vec4 color;
+  /* DRAWBUFFERS:78 */
+  layout(location = 0) out vec4 fogScatter;
+  layout(location = 1) out vec4 fogTransmittance;
 
   void main() {
+    if(clamp01(texcoord) != texcoord){
+      return;
+    }
+
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 
-    color = texture(colortex0, texcoord);
+    const ivec2 offsets[4] = ivec2[4](
+      ivec2(0),
+      ivec2(1, 0),
+      ivec2(0, 1),
+      ivec2(1, 1)
+    );
 
-    float translucentDepth = texture(depthtex0, texcoord).r;
-    float opaqueDepth = texture(depthtex2, texcoord).r;
+    vec2 texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
 
-    vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
-    vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+    float translucentDepth = min4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
 
     vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
     vec3 translucentEyePlayerPos = mat3(gbufferModelViewInverse) * translucentViewPos;
     
     if(isEyeInWater == 0.0){
-      color = getCloudFog(color, vec3(0.0), translucentEyePlayerPos, translucentDepth, sunlightColor, skyLightColor);
+      fogScatter.rgb = getCloudFog(vec3(0.0), translucentEyePlayerPos, translucentDepth, sunlightColor, skyLightColor, fogTransmittance.rgb);
+    } else {
+      fogScatter.rgb = vec3(0.0);
+      fogTransmittance.rgb = vec3(1.0);
     }
     
   }

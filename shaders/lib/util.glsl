@@ -191,6 +191,19 @@ float mean(vec3 x) {
     return (x.x + x.y + x.z) * rcp(3.0);
 }
 
+float max4(float x, float y, float z, float w) {
+    return max(x, max(y, max(z, w)));
+}
+float max4(vec4 x) {
+    return max(x.x, max(x.y, max(x.z, x.w)));
+}
+float min4(float x, float y, float z, float w) {
+    return min(x, min(y, min(z, w)));
+}
+float min4(vec4 x) {
+    return min(x.x, min(x.y, min(x.z, x.w)));
+}
+
 float log10(in float x) {
     return _log10(x, 10.0);
 }

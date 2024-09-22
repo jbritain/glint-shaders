@@ -25,8 +25,6 @@
 
   in vec2 texcoord;
 
-  #include "/lib/util/bilateralFilter.glsl"
-
   /* DRAWBUFFERS:78 */
   layout(location = 0) out vec4 cloudScatter;
   layout(location = 1) out vec4 cloudTransmittance;

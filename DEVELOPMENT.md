@@ -23,11 +23,13 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 
 `deferred` opaques shading, sky
 `deferred1` cloud generation
-`deferred2` cloud upscaling
-`deferred3` cloud filtering and blending
+`deferred2` cloud upscaling (`volumetricUpscaling.glsl`)
+`deferred3` cloud filtering and blending (`volumetricFilter.glsl`)
 
 `composite` some fog, translucency blending
 `composite1` cloud fog
+`composite2` cloud fog upscaling (`volumetricUpscaling.glsl`)
+`composite3` cloud fog filtering and blending (`volumetricFilter.glsl`)
 
 `composite89` writing frame data for next frame to access (previous frame data), blending hand
 

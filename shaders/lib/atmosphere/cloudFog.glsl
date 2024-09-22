@@ -87,13 +87,14 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
   return multipleScattering(totalDensity, costh, FOG_G, FOG_EXTINCTION, 1, FOG_DUAL_LOBE_WEIGHT) * clamp01((1.0 - exp(-totalDensity * 2))) * sunlight;
 }
 
-vec4 getCloudFog(vec4 color, vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightColor){
+vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightColor, out vec3 transmit){
+  transmit = vec3(1.0);
   #ifndef VOLUMETRIC_FOG
-  return color;
+  return vec3(0.0);
   #endif
 
   if(getFogDensity(vec3(0.0, FOG_LOWER_HEIGHT, 0.0)) == 0.0){
-    return color;
+    return vec3(0.0);
   }
 
   vec3 worldDir = normalize(b - a);
@@ -162,15 +163,8 @@ vec4 getCloudFog(vec4 color, vec3 a, vec3 b, float depth, vec3 sunlightColor, ve
 
     
   }
-
-
-
-  vec3 fog = scatter;
-
-  color.rgb *= totalTransmittance;
-  color.rgb += fog;
-
-  return color;
+  transmit = totalTransmittance;
+  return scatter;
 }
 
 #endif

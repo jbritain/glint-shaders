@@ -19,12 +19,16 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform float far;
+
   uniform mat4 gbufferModelViewInverse;
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
 
   in vec2 texcoord;
 
+  #include "/lib/util.glsl"
+  #include "/lib/util/spaceConversions.glsl"
   #include "/lib/util/bilateralFilter.glsl"
 
   /* DRAWBUFFERS:0 */
@@ -33,21 +37,8 @@
   void main() {
     color = texture(colortex0, texcoord);
 
-    float depth = texture(depthtex0, texcoord).r;
-
-    vec3 cloudScatter;
-    vec3 cloudTransmittance;
-
-    if(depth == 1.0){
-      cloudScatter = bilateral(colortex7, texcoord).rgb;
-      cloudTransmittance = bilateral(colortex8, texcoord).rgb;
-    } else {
-      cloudScatter = texture(colortex7, texcoord).rgb;
-      cloudTransmittance = texture(colortex8, texcoord).rgb;
-    }
-
-
-    // 
+    vec3 cloudScatter = bilateral(colortex7, texcoord).rgb;
+    vec3 cloudTransmittance = bilateral(colortex8, texcoord).rgb;
 
     color.rgb = color.rgb * cloudTransmittance + cloudScatter;
   }

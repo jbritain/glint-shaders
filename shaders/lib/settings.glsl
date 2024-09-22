@@ -8,7 +8,7 @@ const int colortex4Format = RGBA32F; || previous frame data - color rgb, opaque 
 const int colortex5Format = RGBA16F; || hand
 const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGB16F;  || cloud and fog scattering
-const int colortex8Format = RGB8F;  || cloud and fog transmittance 
+const int colortex8Format = RGB8;  || cloud and fog transmittance 
 
 */
 
@@ -95,6 +95,7 @@ const float sunPathRotation = -40;
 #define VOLUMETRIC_FOG_SUBSAMPLES 4
 
 #define VOLUMETRIC_RESOLUTION 0.5
+#define VOLUMETRIC_FILTERING
 
 #define WAVE_DEPTH 0.2
 #define WAVE_E 0.01

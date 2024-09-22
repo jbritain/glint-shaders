@@ -57,10 +57,10 @@
 
     vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
 
-    vec3 a;
+    vec3 a = vec3(0.0);
     rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CLOUD_LOWER_PLANE_HEIGHT, a);
 
-    vec3 b;
+    vec3 b = vec3(0.0);
     rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CLOUD_UPPER_PLANE_HEIGHT, b);
 
     const int samples = 10;

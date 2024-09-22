@@ -65,7 +65,16 @@
       return;
     }
 
-    float depth = texture(depthtex0, texcoord).r;
+    vec2 texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
+
+    const ivec2 offsets[4] = ivec2[4](
+      ivec2(0),
+      ivec2(1, 0),
+      ivec2(0, 1),
+      ivec2(1, 1)
+    );
+
+    float depth = max4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
