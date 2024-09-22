@@ -105,7 +105,6 @@
     if(depth == 1.0){
       color = texture(colortex3, texcoord);
       color.rgb = getSky(color, normalize(eyePlayerPos), true);
-      color = hasSkylight ? getClouds(color, eyePlayerPos, depth, sunlightColor, skyLightColor) : color;
       return;
     }
 
@@ -126,8 +125,6 @@
     if((isEyeInWater == 1) != materialIsWater(materialID)){
       color = getAtmosphericFog(color, eyePlayerPos);
     }
-
-    color = hasSkylight ? getClouds(color, eyePlayerPos, depth, sunlightColor, skyLightColor) : color;
     // color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
 
   }

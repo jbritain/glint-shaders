@@ -16,13 +16,15 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex4` previous frame data - color rgb, opaque depth
 `colortex5` hand
 `colortex6` cloud shadow map (256x256)
+`colortex7` clouds, fog (pre upsample). Scattering stored in RGB, transmittance packed into A
 
 # Passes
 `prepare` cloud shadow map
 
-`deferred` opaques shading, sky, cloud generation
-`deferred1` cloud blur pass (horizontal)
-`deferred2` cloud blur (vertical) and blending with opaques
+`deferred` opaques shading, sky
+`deferred1` cloud generation
+`deferred2` cloud upscaling
+`deferred3` cloud filtering and blending
 
 `composite` some fog, translucency blending
 `composite1` cloud fog

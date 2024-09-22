@@ -56,4 +56,14 @@ vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
 
   return vec4(color.rgb * transmit + fog, color.a);
 }
+
+vec3 getAtmosphericFogColor(vec3 playerPos){
+  vec3 transmit = vec3(1.0);
+
+  vec3 dir = normalize(playerPos);
+
+  vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit);
+
+  return fog;
+}
 #endif

@@ -6,6 +6,9 @@ const int colortex2Format = RGBA16;  || mapped normal, specular map data
 const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
 const int colortex4Format = RGBA32F; || previous frame data - color rgb, opaque depth
 const int colortex5Format = RGBA16F; || hand
+const int colortex6Format = RGB8;    || cloud shadow map
+const int colortex7Format = RGB16F;  || cloud and fog scattering
+const int colortex8Format = RGB8F;  || cloud and fog transmittance 
 
 */
 
@@ -90,6 +93,8 @@ const float sunPathRotation = -40;
 #define VOLUMETRIC_FOG
 #define VOLUMETRIC_FOG_SAMPLES 20
 #define VOLUMETRIC_FOG_SUBSAMPLES 4
+
+#define VOLUMETRIC_RESOLUTION 0.5
 
 #define WAVE_DEPTH 0.2
 #define WAVE_E 0.01

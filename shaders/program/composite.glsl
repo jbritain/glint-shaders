@@ -136,7 +136,7 @@
         refract = materialIsWater(refractedMaterialID);
       }
 
-      refract = refract && (refractedCoord.z >= translucentDepth);
+      refract = refract && (refractedCoord.z >= translucentDepth); // another check for it being underwater
 
 
       if(refract){

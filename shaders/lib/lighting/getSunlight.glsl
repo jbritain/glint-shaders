@@ -125,6 +125,8 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	return clamp01(blockerDistance);
 }
 
+// 'direct' is for whether we're coming via the `getSunlight` function.
+// this is so that we don't compute the cloud shadows twice if not necessary
 vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int samples, bool direct){
 	if(penumbraWidth == 0.0){
 		return(sampleShadow(shadowClipPos, normal));
@@ -189,8 +191,6 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		vec3 shadow = vec3(lightmapShadow);
 		float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
 	#endif
-
-	scatter = mix(scatter, 0.0, wetness);
 
   vec3 sunlight = max(shadow * NoL, vec3(scatter));
 

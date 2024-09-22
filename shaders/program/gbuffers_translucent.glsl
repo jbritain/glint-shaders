@@ -155,6 +155,7 @@
         color = vec4(0.2);
       }
 
+      // hide rain above the clouds
       color.a *= (1.0 - smoothstep(CLOUD_LOWER_PLANE_HEIGHT, CLOUD_UPPER_PLANE_HEIGHT, eyePlayerPos.y + cameraPosition.y));
       if (color.a < alphaTestRef) {
         discard;

@@ -69,9 +69,10 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh){
   return multipleScattering(totalDensity, costh, CLOUD_G, CLOUD_EXTINCTION_COLOR, 32, CLOUD_DUAL_LOBE_WEIGHT) * clamp01((1.0 - exp(-totalDensity * 2)));
 }
 
-vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor){
+vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, out vec3 transmit){
+  transmit = vec3(1.0);
   #ifndef CLOUDS
-  return color;
+  return vec3(0.0);
   #endif
 
   vec3 worldDir = normalize(playerPos);
@@ -86,14 +87,14 @@ vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3
     if(worldDir.y > 0 && cameraPosition.y >= CLOUD_LOWER_PLANE_HEIGHT && cameraPosition.y <= CLOUD_UPPER_PLANE_HEIGHT){ // inside cloud, looking up
       a = cameraPosition;
     } else {
-      return color;
+      return vec3(0.0);
     }
   }
   if(!rayPlaneIntersection(cameraPosition, worldDir, CLOUD_UPPER_PLANE_HEIGHT, b)){
     if(worldDir.y < 0 && cameraPosition.y >= CLOUD_LOWER_PLANE_HEIGHT && cameraPosition.y <= CLOUD_UPPER_PLANE_HEIGHT){ // inside cloud, looking down
       b = cameraPosition;
     } else {
-      return color;
+      return vec3(0.0);
     }
   }
 
@@ -112,7 +113,7 @@ vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3
     b = playerPos;
 
     if(b.y + cameraPosition.y < CLOUD_LOWER_PLANE_HEIGHT){ // neither the camera nor the terrain is in the cloud plane
-      return color;
+      return vec3(0.0);
     }
   } 
   
@@ -131,7 +132,7 @@ vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3
   vec3 totalTransmittance = vec3(1.0);
   vec3 lightEnergy = vec3(0.0);
 
-  float jitter = blueNoise(texcoord, frameCounter).r;
+  float jitter = blueNoise(texcoord).r;
   rayPos += increment * jitter;
 
   vec3 scatter = vec3(0.0);
@@ -150,7 +151,7 @@ vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3
       firstFogPoint = rayPos;
     }
 
-    float lightJitter = blueNoise(texcoord, frameCounter + i).r;
+    float lightJitter = blueNoise(texcoord, i).r;
 
     vec3 lightEnergy = calculateCloudLightEnergy(rayPos, lightJitter, mu);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
@@ -164,11 +165,10 @@ vec4 getClouds(vec4 color, vec3 playerPos, float depth, vec3 sunlightColor, vec3
     }
   }
 
-  scatter = getAtmosphericFog(vec4(scatter, 1.0), firstFogPoint - cameraPosition).rgb;
+  scatter = getAtmosphericFog(vec4(scatter, 1.0), (firstFogPoint - cameraPosition)).rgb;
 
-  color.rgb = color.rgb * totalTransmittance;
-  color.rgb += scatter;
-  return color;
+  transmit = totalTransmittance;
+  return scatter;
 }
 
 #endif
