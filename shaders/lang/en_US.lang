@@ -1,20 +1,111 @@
-option.WATER_NORMALS=Water Normals
-option.WATER_NORMALS.comment=Makes water 'wave'.
+screen.SHADOWS=Shadows
+screen.MATERIALS=Materials
+  screen.REFLECTIONS=Reflectionss
+screen.ATMOSPHERICS=Atmospherics
+screen.WATER=Water
+screen.POST=Post-Processing
+
+option.WATER_NORMALS=Water Waves
 
 option.SSR=Screen Space Reflections
 option.SSR.comment=Allows reflective surfaces to...reflect what's onscreen.
 
+option.SSR_FADE=Fade Reflections
+option.SSR_FADE.comment=Fades reflections at the edge of the screen to hide the hard edge.
+
+option.SSR_SAMPLES=Rough Reflection Samples
+option.SSR_SAMPLES.comment=How many samples to take when calculating reflections for rougher surfaces.
+
+option.ROUGH_REFLECTION_THRESHOLD=Rough Reflection Threshold
+option.ROUGH_REFLECTION_THRESHOLD.comment=Materials rougher than this will not reflect.
+
 option.SHADOWS=Shadows
-option.SHADOWS.comment=Makes objects block sunlight.
+
+option.SHADOW_SAMPLES=Shadow Samples
+
+option.shadowDistance=Shadow Distance
+value.shadowDistance.16.0=1 Chunk
+value.shadowDistance.32.0=2 Chunks    
+value.shadowDistance.48.0=3 Chunks    
+value.shadowDistance.64.0=4 Chunks    
+value.shadowDistance.80.0=5 Chunks    
+value.shadowDistance.96.0=6 Chunks    
+value.shadowDistance.112.0=7 Chunks   
+value.shadowDistance.128.0=8 Chunks   
+value.shadowDistance.144.0=9 Chunks   
+value.shadowDistance.160.0=10 Chunks  
+value.shadowDistance.176.0=11 Chunks  
+value.shadowDistance.192.0=12 Chunks  
+value.shadowDistance.208.0=13 Chunks  
+value.shadowDistance.224.0=14 Chunks  
+value.shadowDistance.240.0=15 Chunks  
+value.shadowDistance.256.0=16 Chunks  
+value.shadowDistance.272.0=17 Chunks  
+value.shadowDistance.288.0=18 Chunks  
+value.shadowDistance.304.0=19 Chunks  
+value.shadowDistance.320.0=20 Chunks  
+value.shadowDistance.336.0=21 Chunks  
+value.shadowDistance.352.0=22 Chunks  
+value.shadowDistance.368.0=23 Chunks  
+value.shadowDistance.384.0=24 Chunks  
+value.shadowDistance.400.0=25 Chunks  
+value.shadowDistance.416.0=26 Chunks  
+value.shadowDistance.432.0=27 Chunks  
+value.shadowDistance.448.0=28 Chunks  
+value.shadowDistance.464.0=29 Chunks  
+value.shadowDistance.480.0=30 Chunks  
+value.shadowDistance.496.0=31 Chunks  
+value.shadowDistance.512.0=32 Chunks 
+
+option.shadowMapResolution=Shadow Quality
+
+option.sunPathRotation=Sun Angle
+value.sunPathRotation.-90.0=-90°
+value.sunPathRotation.-85.0=-85°      
+value.sunPathRotation.-80.0=-80°      
+value.sunPathRotation.-75.0=-75°      
+value.sunPathRotation.-70.0=-70°      
+value.sunPathRotation.-65.0=-65°      
+value.sunPathRotation.-60.0=-60°      
+value.sunPathRotation.-55.0=-55°      
+value.sunPathRotation.-50.0=-50°      
+value.sunPathRotation.-45.0=-45°      
+value.sunPathRotation.-40.0=-40°      
+value.sunPathRotation.-35.0=-35°      
+value.sunPathRotation.-30.0=-30°      
+value.sunPathRotation.-25.0=-25°      
+value.sunPathRotation.-20.0=-20°      
+value.sunPathRotation.-15.0=-15°      
+value.sunPathRotation.-10.0=-10°      
+value.sunPathRotation.-5.0=-5°        
+value.sunPathRotation.0.0=0°
+value.sunPathRotation.5.0=5°
+value.sunPathRotation.10.0=10°        
+value.sunPathRotation.15.0=15°        
+value.sunPathRotation.20.0=20°        
+value.sunPathRotation.25.0=25°        
+value.sunPathRotation.30.0=30°        
+value.sunPathRotation.35.0=35°        
+value.sunPathRotation.40.0=40°        
+value.sunPathRotation.45.0=45°        
+value.sunPathRotation.50.0=50°        
+value.sunPathRotation.55.0=55°        
+value.sunPathRotation.60.0=60°        
+value.sunPathRotation.65.0=65°        
+value.sunPathRotation.70.0=70°        
+value.sunPathRotation.75.0=75°        
+value.sunPathRotation.80.0=80°        
+value.sunPathRotation.85.0=85°        
+value.sunPathRotation.90.0=90°
 
 option.FXAA=FXAA
 option.FXAA.comment=Attempts to remove jagged edges caused by aliasing artefacts.
 
-option.FOG=Fog
-option.FOG.comment=Makes things fade into the distance.
+option.ATMOSPHERE_FOG=Atmospheric Fog
 
 option.CLOUDS=Clouds
-option.CLOUDS.comment=Clouds.
+option.CLOUD_SAMPLES=Cloud Samples
+option.CLOUD_SUBSAMPLES=Cloud Subsamples
 
 option.SUBSURFACE_SCATTERING=Subsurface Scattering
 option.SUBSURFACE_SCATTERING.comment=Lets sunlight pass through some materials.
@@ -22,11 +113,15 @@ option.SUBSURFACE_SCATTERING.comment=Lets sunlight pass through some materials.
 option.REFRACTION=Refraction
 option.REFRACTION.comment=Bends light as it passes through water.
 
+option.REFRACTION_AMOUNT=Refraction Amount
+
 option.BLOOM=Bloom
 option.BLOOM.comment=Makes bright stuff glow.
 
 option.VOLUMETRIC_WATER=Volumetric Water
 option.VOLUMETRIC_WATER.comment=Scatters sunlight through water.
+
+option.VOLUMETRIC_WATER_SAMPLES=Volumetric Water Samples
 
 option.NORMAL_MAPS=Normal Maps
 option.NORMAL_MAPS.comment=Use normal data from the resource pack.
@@ -34,5 +129,24 @@ option.NORMAL_MAPS.comment=Use normal data from the resource pack.
 option.SPECULAR_MAPS=Specular Maps
 option.SPECULAR_MAPS.comment=Use specular data from the resource pack.
 
-option.VOLUMETRIC_FOG=Volumetric Fog
-option.VOLUMETRIC_FOG.comment=Adds cloudlike fog at night and in the morning.
+option.CLOUD_FOG=Cloudy Fog
+option.CLOUD_FOG.comment=Adds cloudlike fog at night and in the morning.
+
+option.CLOUD_FOG_SAMPLES=Cloudy Fog Samples
+option.CLOUD_FOG_SUBSAMPLES=Cloudy Fog Subsamples
+
+option.VOLUMETRIC_FILTERING=Filter Volumetrics
+option.VOLUMETRIC_FILTERING.comment=Use a bilateral filter to reduce noise in volumetric effects.
+
+option.VOLUMETRIC_RESOLUTION=Volumetrics Render Scale
+option.VOLUMETRIC_RESOLUTION.comment=The resolution scale volumetric effects are rendered at.
+value.VOLUMETRIC_RESOLUTION.0.25=0.25x
+value.VOLUMETRIC_RESOLUTION.0.5=0.5x
+value.VOLUMETRIC_RESOLUTION.0.75=0.75x
+value.VOLUMETRIC_RESOLUTION.1.0=1x
+
+option.EXPOSURE=Exposure
+option.EXPOSURE.comment=Set to 0 for auto exposure.
+value.EXPOSURE.0=Auto
+
+option.SATURATION=Saturation

@@ -1,6 +1,6 @@
 /*
 
-const int colortex0Format = RGB32F;  || scene colour
+const int colortex0Format = RGBA32F;  || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
 const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
@@ -15,19 +15,19 @@ const int colortex8Format = RGB8;  || cloud and fog transmittance
 const bool colortex4Clear = false;
 
 const bool shadowHardwareFiltering = true;
-const float shadowDistance = 160.0;
-const int shadowMapResolution = 4096; //Resolution of the shadow map. Higher numbers mean more accurate shadows. [128 256 512 1024 2048 4096 8192]
-const float sunPathRotation = -40;
+const float shadowDistance = 160.0; // [16.0 32.0 48.0 64.0 80.0 96.0 112.0 128.0 144.0 160.0 176.0 192.0 208.0 224.0 240.0 256.0 272.0 288.0 304.0 320.0 336.0 352.0 368.0 384.0 400.0 416.0 432.0 448.0 464.0 480.0 496.0 512.0]
+const int shadowMapResolution = 4096; // [128 256 512 1024 2048 4096 8192]
+const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60.0 -55.0 -50.0 -45.0 -40.0 -35.0 -30.0 -25.0 -20.0 -15.0 -10.0 -5.0 0.0 5.0 10.0 15.0 20.0 25.0 30.0 35.0 40.0 45.0 50.0 55.0 60.0 65.0 70.0 75.0 80.0 85.0 90.0]
 
 #define SKYLIGHT_STRENGTH 1.0
-#define AMBIENT_STRENGTH 0.01
+#define AMBIENT_STRENGTH 0.001
 #define SUNLIGHT_STRENGTH 1.0
 #define BLOCKLIGHT_STRENGTH 0.1
 
 #define SSR
 #define SSR_FADE
-#define SSR_SAMPLES 4
-#define ROUGH_REFLECTION_THRESHOLD 0.3
+#define SSR_SAMPLES 4 // [1 2 4 8 16 32 64]
+#define ROUGH_REFLECTION_THRESHOLD 0.3 // [0.0, 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 
@@ -38,18 +38,15 @@ const float sunPathRotation = -40;
 #define MIN_PENUMBRA_WIDTH 0.1
 #define BLOCKER_SEARCH_SAMPLES 8
 #define BLOCKER_SEARCH_RADIUS 2.0
-#define SHADOW_SAMPLES 16 // [4 8 16 32 64]
+#define SHADOW_SAMPLES 16 // [1 2 4 8 16 32 64]
 #define SUBSURFACE_SCATTERING
-
-#define cloudBlur blur0
 
 #define NORMAL_MAPS
 #define SPECULAR_MAPS
 
-#define FOG
+#define ATMOSPHERE_FOG
 
 #define CLOUDS
-#define CLOUD_BLUR_RADIUS_THRESHOLD 4.0
 
 #define CLOUD_LOWER_PLANE_HEIGHT 500.0
 #define CLOUD_UPPER_PLANE_HEIGHT 700.0
@@ -67,8 +64,8 @@ const float sunPathRotation = -40;
 
 #define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
 #define CLOUD_EXTINCTION length(CLOUD_EXTINCTION_COLOR)
-#define CLOUD_SAMPLES 50
-#define CLOUD_SUBSAMPLES 4
+#define CLOUD_SAMPLES 50 // [10 20 30 40 50 60 70 80 90 100]
+#define CLOUD_SUBSAMPLES 4 // [4 5 6 7 8 9 10]
 #define CLOUD_DUAL_LOBE_WEIGHT 0.7
 #define CLOUD_G 0.6
 
@@ -77,28 +74,32 @@ const float sunPathRotation = -40;
 #define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]
 
 #define BLOOM
-#define BLOOM_RADIUS 1.0
-#define BLOOM_STRENGTH 1.0
+#define BLOOM_RADIUS 1.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+#define BLOOM_STRENGTH 1.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 
 #define WATER_NORMALS
 
 // #define REFRACTION
-#define REFRACTION_AMOUNT 0.5
+#define REFRACTION_AMOUNT 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #define VOLUMETRIC_WATER
-#define VOLUMETRIC_WATER_SAMPLES 10
+#define VOLUMETRIC_WATER_SAMPLES 10 // [5 10 15 20 25 30 35 40 45 50]
 #define WATER_EXTINCTION (vec3(0.7, 0.1, 0.05) * 5.0)
 #define WATER_G 0.95
 
-#define VOLUMETRIC_FOG
-#define VOLUMETRIC_FOG_SAMPLES 20
-#define VOLUMETRIC_FOG_SUBSAMPLES 4
+#define CLOUD_FOG
+#define CLOUD_FOG_SAMPLES 20 // [5 10 15 20 25 30 35 40 45 50]
+#define CLOUD_FOG_SUBSAMPLES 4 // [4 5 6 7 8 9 10]
 
-#define VOLUMETRIC_RESOLUTION 0.5
+#define VOLUMETRIC_RESOLUTION 0.5 // [0.25 0.5 0.75 1.0]
 #define VOLUMETRIC_FILTERING
 
 #define WAVE_DEPTH 0.2
 #define WAVE_E 0.01
 
-#define SATURATION 1.0
-#define EXPOSURE 4.0
+#define SATURATION 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+
+#define EXPOSURE 2.0 // [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0]
+#if EXPOSURE == 0
+#define AUTO_EXPOSURE
+#endif

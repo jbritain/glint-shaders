@@ -83,16 +83,18 @@
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 
+    const int pixelsExpanded = int(1.0/VOLUMETRIC_RESOLUTION - 1.0);
+
     const ivec2 offsets[4] = ivec2[4](
       ivec2(0),
-      ivec2(1, 0),
-      ivec2(0, 1),
-      ivec2(1, 1)
+      ivec2(pixelsExpanded, 0),
+      ivec2(0, pixelsExpanded),
+      ivec2(pixelsExpanded, pixelsExpanded)
     );
 
     vec2 texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
 
-    float translucentDepth = min4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
+    float translucentDepth = max4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
 
     vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
     vec3 translucentEyePlayerPos = mat3(gbufferModelViewInverse) * translucentViewPos;

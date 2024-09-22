@@ -40,6 +40,10 @@ float getFogDensity(vec3 pos){
 
   fogFactor *= heightFactor;
 
+  // float distanceFactor = smoothstep(far / 2, far, length(pos.xz - cameraPosition.xz));
+
+  // fogFactor = mix(fogFactor, 0.1 * heightFactor, distanceFactor);
+
   
 
   return fogFactor;
@@ -89,7 +93,7 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
 
 vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightColor, out vec3 transmit){
   transmit = vec3(1.0);
-  #ifndef VOLUMETRIC_FOG
+  #ifndef CLOUD_FOG
   return vec3(0.0);
   #endif
 
@@ -127,7 +131,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
   vec3 totalTransmittance = vec3(1.0);
   vec3 lightEnergy = vec3(0.0);
 
-  float jitter = blueNoise(texcoord, frameCounter).r;
+  float jitter = blueNoise(texcoord).r;
   rayPos += increment * jitter;
 
   vec3 scatter = vec3(0.0);
@@ -148,7 +152,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
       continue;
     }
 
-    float lightJitter = blueNoise(texcoord, frameCounter + i).r;
+    float lightJitter = blueNoise(texcoord, i).r;
 
     vec3 lightEnergy = calculateFogLightEnergy(rayPos, lightJitter, mu);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor * EBS.y;

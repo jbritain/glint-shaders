@@ -38,6 +38,8 @@
 
   uniform int frameCounter;
 
+  uniform ivec2 eyeBrightnessSmooth;
+
   uniform bool hasSkylight;
 
   in vec2 texcoord;

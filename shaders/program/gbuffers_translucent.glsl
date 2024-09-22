@@ -100,6 +100,8 @@
   uniform bool hasSkylight;
   uniform vec3 fogColor;
 
+  uniform ivec2 eyeBrightnessSmooth;
+
   in vec2 lmcoord;
   in vec2 texcoord;
   in vec4 glcolor;
