@@ -10,6 +10,8 @@
 #endif
 
 #ifdef fsh
+  
+
   uniform sampler2D colortex0;
   uniform sampler2D colortex1;
   uniform sampler2D colortex2;
@@ -90,6 +92,8 @@
   layout(location = 0) out vec4 color;
 
   void main() {
+    show(texcoord);
+
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 

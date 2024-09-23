@@ -1,3 +1,9 @@
+// #define DEBUG_ENABLE
+
+#ifdef fsh
+#include "/lib/debug.glsl"
+#endif
+
 /*
 
 const int colortex0Format = RGBA32F;  || scene colour

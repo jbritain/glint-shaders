@@ -16,6 +16,8 @@
 
   uniform sampler2D depthtex0;
 
+  uniform sampler2D debugtex;
+
   uniform float viewWidth;
   uniform float viewHeight;
 
@@ -48,6 +50,8 @@
 
     color.rgb = invGammaCorrect(color.rgb);
 
-
+    #ifdef DEBUG_ENABLE
+    color = texture(debugtex, texcoord);
+    #endif
   }
 #endif

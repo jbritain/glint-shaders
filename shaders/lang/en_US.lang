@@ -5,6 +5,8 @@ screen.ATMOSPHERICS=Atmospherics
 screen.WATER=Water
 screen.POST=Post-Processing
 
+option.DEBUG_ENABLE=Debug Mode
+
 option.WATER_NORMALS=Water Waves
 
 option.SSR=Screen Space Reflections
