@@ -20,7 +20,8 @@
   layout(location = 0) out vec4 color;
 
   void main() {
-    color.rgb = texture(colortex0, texcoord).rgb;
-    color.a = dot(color.rgb, vec3(0.2125, 0.7154, 0.0721));
+    color.rgb = max0(texture(colortex0, texcoord).rgb);
+    float luminance = dot(color.rgb, vec3(0.2125, 0.7154, 0.0721));
+    color.a = log2(luminance + 1e-6);
   }
 #endif

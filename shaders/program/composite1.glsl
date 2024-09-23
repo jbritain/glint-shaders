@@ -26,6 +26,7 @@
   uniform sampler2D shadowcolor1;
 
   uniform sampler2D depthtex0;
+  uniform sampler2D depthtex1;
   uniform sampler2D depthtex2;
 
   uniform mat4 gbufferModelView;
@@ -95,6 +96,10 @@
     vec2 texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
 
     float translucentDepth = max4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
+
+    if(texture(depthtex1, texcoord).r != texture(depthtex2, texcoord).r){
+      translucentDepth = texture(depthtex2, texcoord).r;
+    }
 
     vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
     vec3 translucentEyePlayerPos = mat3(gbufferModelViewInverse) * translucentViewPos;

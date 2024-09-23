@@ -11,7 +11,7 @@
 #endif
 
 #ifdef fsh
-  uniform sampler2D depthtex0;
+  uniform sampler2D depthtex2;
 
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
@@ -76,7 +76,7 @@
       ivec2(1, 1)
     );
 
-    float depth = max4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
+    float depth = max4(textureGatherOffsets(depthtex2, texcoord, offsets, 0));
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     

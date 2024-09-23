@@ -47,5 +47,7 @@
     color.rgb = setSaturationLevel(color.rgb, SATURATION);
 
     color.rgb = invGammaCorrect(color.rgb);
+
+
   }
 #endif

@@ -31,7 +31,8 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `composite2` cloud fog upscaling (`volumetricUpscaling.glsl`)
 `composite3` cloud fog filtering and blending (`volumetricFilter.glsl`)
 
-`composite89` writing frame data for next frame to access (previous frame data), blending hand
+`composite88` luminance calculation for auto exposure
+`composite89` writing frame data for next frame to access (previous frame data), blending hand, auto exposure
 
 `composite90` bloom downsample full>A
 `composite91` bloom downsample A>B
