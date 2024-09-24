@@ -11,15 +11,15 @@ void show(vec4 x){
 }
 
 void show(vec3 x){
-  imageStore(debug, ivec2(gl_FragCoord.xy), vec4(x, 1.0));
+  show(vec4(x, 1.0));
 }
 
 void show(vec2 x){
-  imageStore(debug, ivec2(gl_FragCoord.xy), vec4(x, 0.0, 1.0));
+  show(vec3(x, 0.0));
 }
 
 void show(float x){
-  imageStore(debug, ivec2(gl_FragCoord.xy), vec4(vec3(x), 1.0));
+  show(vec3(x));
 }
 
 void show(bool x){

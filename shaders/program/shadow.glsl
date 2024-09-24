@@ -75,6 +75,8 @@
   uniform mat4 shadowProjection;
   uniform mat4 shadowModelView;
 
+  uniform int renderStage;
+
   in vec2 lmcoord;
   in vec2 texcoord;
   in vec4 glcolor;
@@ -120,6 +122,11 @@
     
     float encodedMaterialID = clamp01(float(materialID - 10000) * rcp(255.0));
     vec2 encodedNormal = normal.xy * 0.5 + 0.5;
+
+    // so we can detect entities casting shadows since for stuff like GI it looks wrong
+    if(renderStage == MC_RENDER_STAGE_ENTITIES){
+      encodedMaterialID = 1.0;
+    }
 
     shadowData = vec4(encodedMaterialID, encodedNormal, 1.0);
     worldPos = vec4(feetPlayerPos, 0.0);

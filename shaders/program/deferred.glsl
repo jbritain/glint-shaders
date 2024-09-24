@@ -74,6 +74,16 @@
   vec3 mappedNormal;
   vec4 specularData;
 
+  // a vogel disk but with the samples still biased towards the centre
+  vec2 weightedVogelDiscSample(int stepIndex, int stepCount, float rotation) {
+    const float goldenAngle = 2.4;
+
+    float r = stepIndex/float(stepCount);
+    float theta = stepIndex * goldenAngle + rotation;
+
+    return r * vec2(cos(theta), sin(theta));
+  }
+
   /* DRAWBUFFERS:8 */
   layout(location = 0) out vec4 outGI;
 
@@ -87,6 +97,7 @@
 
   void main() {
     #ifdef GLOBAL_ILLUMINATION
+
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
@@ -124,13 +135,10 @@
 
     vec3 GI = vec3(0.0);
 
-    for(int i = 0; i < samples; i++){
-      vec2 noise = blueNoise(texcoord, i).xy;
+    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter);
 
-      vec2 offset = vec2(
-        radius * noise.x * sin(2 * PI * noise.y),
-        radius * noise.x * cos(2 * PI * noise.y)
-      );
+    for(int i = 0; i < samples; i++){
+      vec2 offset = weightedVogelDiscSample(i, samples, jitter) * radius;
 
       vec4 offsetPos = shadowClipPos + vec4(offset, 0.0, 0.0);
 
@@ -138,6 +146,10 @@
 
       vec3 flux = texture(shadowcolor0, offsetScreenPos.xy).rgb;
       vec3 sampleNormal = texture(shadowcolor1, offsetScreenPos.xy).yzx; // this is in world space
+
+      if(sampleNormal.z == 1.0){ // material ID is in the r channel which we put into the z/b component, and it's 1.0 for entities
+        continue;
+      }
 
       // z component reconstruction
       sampleNormal = sampleNormal * 2.0 - 1.0;
@@ -150,13 +162,14 @@
       flux *= max0(dot(feetPlayerPos - samplePos, sampleNormal));
       flux *= max0(dot(worldFaceNormal, samplePos - feetPlayerPos));
       flux /= pow4(distance(samplePos, feetPlayerPos));
-      flux *= pow2(noise.x);
+      flux *= pow2(float(i)/samples);
 
       GI += flux;
     }
 
     GI /= samples;
     GI *= GI_BRIGHTNESS;
+
     GI *= sunlightColor * cloudShadow;
 
     outGI.rgb = GI;
