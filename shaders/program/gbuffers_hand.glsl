@@ -164,7 +164,7 @@
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
     vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material);
+    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0));
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
   }
 #endif

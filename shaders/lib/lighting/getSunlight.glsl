@@ -73,11 +73,11 @@ vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 		float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 		float blockerDistance = blockerDistanceRaw * 255 * 2;
 
-		// absolutely awful hack
-		// but it's this or passing a bool through 50 million functions
-		#ifdef WATER_FOG_INCLUDE
-		shadowColorData.a *= (isEyeInWater == 1) ? 0.5 : 0.2;
-		#endif
+		// // absolutely awful hack
+		// // but it's this or passing a bool through 50 million functions
+		// #ifdef WATER_FOG_INCLUDE
+		// shadowColorData.a *= (isEyeInWater == 1) ? 0.5 : 0.2;
+		// #endif
 
 		vec3 extinction = exp(-WATER_EXTINCTION * blockerDistance) * (1.0 - shadowColorData.a);
 
@@ -134,11 +134,22 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 
 	vec3 shadowSum = vec3(0.0);
 
+	vec3 worldNormal = mat3(gbufferModelViewInverse) * normal;
+	vec3 shadowViewNormal = mat3(shadowModelView) * worldNormal;
+	vec3 shadowClipNormal = mat3(shadowProjection) * shadowViewNormal;
+
+	int sampleCount = 0;
+
 	for(int i = 0; i < samples; i++){
 		vec2 offset = vogelDiscSample(i, samples, shadowNoise.g);
+		if(dot(shadowClipNormal.xy, normalize(offset)) < 0){
+			continue;
+		}
+
 		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth, 0.0, 0.0), normal);
+		sampleCount++;
 	}
-	shadowSum /= float(samples);
+	shadowSum /= float(sampleCount);
 
 	if(direct){
 		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos, normal).xyz;

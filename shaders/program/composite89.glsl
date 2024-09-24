@@ -70,7 +70,7 @@
 
     // color.rgb = vec3(averageLuminance);
     #else
-    color.rgb *= pow2(EXPOSURE);
+    color.rgb *= pow2(float(EXPOSURE) / 10.0);
     #endif
 
   }

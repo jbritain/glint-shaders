@@ -21,6 +21,7 @@
   out vec2 lmcoord;
   out vec2 texcoord;
   out vec4 glcolor;
+  out vec3 normal;
   flat out int materialID;
   out vec3 feetPlayerPos;
   out vec3 shadowViewPos;
@@ -39,6 +40,7 @@
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord  = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
+    normal = gl_NormalMatrix * gl_Normal; // shadow view space
 
     materialID = int(mc_Entity.x + 0.5);
 
@@ -79,14 +81,21 @@
   flat in int materialID;
   in vec3 feetPlayerPos;
   in vec3 shadowViewPos;
+  in vec3 normal;
 
   #include "/lib/util.glsl"
+  #include "/lib/util/packing.glsl"
   #include "/lib/water/waveNormals.glsl"
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/lighting/shadowBias.glsl"
 
+  /* DRAWBUFFERS:012 */
+  layout(location = 0) out vec4 color;
+  layout(location = 1) out vec4 shadowData;
+  layout(location = 2) out vec4 worldPos;
+
   void main(){
-    vec4 color = texture(gtexture, texcoord) * glcolor;
+    color = texture(gtexture, texcoord) * glcolor;
     
     if(materialIsWater(materialID)){
       vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
@@ -108,9 +117,12 @@
 
       color.a = 1.0 - oldArea / newArea;
     }
+    
+    float encodedMaterialID = clamp01(float(materialID - 10000) * rcp(255.0));
+    vec2 encodedNormal = normal.xy * 0.5 + 0.5;
 
-	  gl_FragData[0] = color;
-    gl_FragData[1] = vec4(clamp01(float(materialID - 10000) * rcp(255.0)), 0.0, 0.0, 1.0);
+    shadowData = vec4(encodedMaterialID, encodedNormal, 1.0);
+    worldPos = vec4(feetPlayerPos, 0.0);
   }
   
 #endif

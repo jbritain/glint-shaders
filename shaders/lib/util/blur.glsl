@@ -1,4 +1,7 @@
-// https://github.com/Experience-Monks/glsl-fast-gaussian-blu
+#ifndef BLUR_INCLUDE
+#define BLUR_INCLUDE
+
+// https://github.com/Experience-Monks/glsl-fast-gaussian-blur
 
 vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
   vec4 color = vec4(0.0);
@@ -39,3 +42,5 @@ vec4 blur5(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
 vec4 blur0(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
   return texture(image, uv);
 }
+
+#endif

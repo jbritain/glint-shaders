@@ -92,8 +92,6 @@
   layout(location = 0) out vec4 color;
 
   void main() {
-    show(texcoord);
-
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 
