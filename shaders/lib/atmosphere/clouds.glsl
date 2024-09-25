@@ -66,7 +66,9 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh){
     }
   }
 
-  return multipleScattering(totalDensity, costh, CLOUD_G, CLOUD_EXTINCTION_COLOR, 32, CLOUD_DUAL_LOBE_WEIGHT) * clamp01((1.0 - exp(-totalDensity * 2)));
+  vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
+
+  return multipleScattering(totalDensity, costh, CLOUD_G, CLOUD_EXTINCTION_COLOR, 32, CLOUD_DUAL_LOBE_WEIGHT) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
 }
 
 vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, out vec3 transmit){
@@ -101,7 +103,7 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   a -= cameraPosition;
   b -= cameraPosition;
 
-  float mu = clamp01(dot(worldDir, lightVector));
+  float mu = dot(worldDir, lightVector);
 
   if(length(a) > length(b)){ // for convenience, a will always be closer to the camera
     vec3 swap = a;

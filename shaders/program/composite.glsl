@@ -18,6 +18,7 @@
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
   uniform sampler2D colortex6;
+  uniform sampler2D colortex9;
 
   uniform sampler2D shadowtex0;
   uniform sampler2DShadow shadowtex0HW;
@@ -81,6 +82,7 @@
   #include "/lib/util/screenSpaceRaytrace.glsl"
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/atmosphere/clouds.glsl"
+  #include "/lib/util/spheremap.glsl"
 
   // Kneemund's Border Attenuation
   float kneemundAttenuation(vec2 pos, float edgeFactor) {
@@ -142,11 +144,14 @@
 
 
       if(refract){
-        refractedCoord.xy = mix(texcoord, refractedCoord.xy, kneemundAttenuation(refractedCoord.xy, 0.03));
+        // refractedCoord.xy = mix(texcoord, refractedCoord.xy, kneemundAttenuation(refractedCoord.xy, 0.03));
         color = texture(colortex0, refractedCoord.xy);
         refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
         opaqueViewPos = screenSpaceToViewSpace(refractedCoord);
         opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+      } else if (!refract && inWater){
+        vec2 refractedSkyUV = mapSphere(refractedDir);
+        color.rgb = texture(colortex9, refractedSkyUV).rgb;
       }
     }
     #endif
