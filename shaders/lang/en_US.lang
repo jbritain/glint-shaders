@@ -2,12 +2,13 @@ screen.LIGHTING=Lighting & Shadows
   screen.GI=Global Illumination
   screen.SHADOWS=Shadows
 screen.MATERIALS=Materials
-  screen.REFLECTIONS=Reflectionss
+  screen.REFLECTIONS=Reflections
 screen.ATMOSPHERICS=Atmospherics
 screen.WATER=Water
 screen.POST=Post-Processing
 
 option.DEBUG_ENABLE=Debug Mode
+option.DEBUG_ENABLE.comment=Makes the `show()` function write to the screen
 
 option.WATER_NORMALS=Water Waves
 
