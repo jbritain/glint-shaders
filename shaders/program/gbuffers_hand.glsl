@@ -4,8 +4,7 @@
   out vec2 lmcoord;
   out vec2 texcoord;
   out vec4 glcolor;
-  out vec3 faceNormal;
-  out vec3 faceTangent;
+  out mat3 tbnMatrix;
   flat out int materialID;
   out vec3 viewPos;
 
@@ -19,7 +18,7 @@
 
   uniform vec3 cameraPosition;
 
-  in vec3 at_tangent;
+  in vec4 at_tangent;
   in vec2 mc_Entity;
   in vec3 at_midBlock;
 
@@ -32,8 +31,10 @@
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
     glcolor = gl_Color;
-    faceNormal = gl_NormalMatrix * gl_Normal;
-    faceTangent = gl_NormalMatrix * at_tangent;
+    
+    tbnMatrix[0] = normalize(gl_NormalMatrix * at_tangent.xyz);
+    tbnMatrix[2] = normalize(gl_NormalMatrix * gl_Normal);
+    tbnMatrix[1] = normalize(cross(tbnMatrix[0], tbnMatrix[2]) * at_tangent.w);
 
     viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
   }
@@ -99,8 +100,7 @@
   in vec2 lmcoord;
   in vec2 texcoord;
   in vec4 glcolor;
-  in vec3 faceTangent;
-  in vec3 faceNormal;
+  in mat3 tbnMatrix;
   flat in int materialID;
   in vec3 viewPos;
 
@@ -119,12 +119,11 @@
 
 
 
-  vec3 getMappedNormal(vec2 texcoord, vec3 faceNormal, vec3 faceTangent){
+  vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
     mappedNormal = mappedNormal * 2.0 - 1.0;
     mappedNormal.z = sqrt(1.0 - dot(mappedNormal.xy, mappedNormal.xy)); // reconstruct z due to labPBR encoding
     
-    mat3 tbnMatrix = tbnNormalTangent(faceNormal, faceTangent);
     return tbnMatrix * mappedNormal;
   }
 
@@ -132,9 +131,9 @@
   layout(location = 0) out vec4 color; // shaded colour
 
   void main() {
-    vec3 faceNormal = faceNormal;
-
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
+
+    vec3 faceNormal = tbnMatrix[2];
 
     color = texture(gtexture, texcoord) * glcolor;
 
@@ -147,7 +146,7 @@
     vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
 
     #ifdef NORMAL_MAPS
-      vec3 mappedNormal = getMappedNormal(texcoord, faceNormal, faceTangent);
+      vec3 mappedNormal = getMappedNormal(texcoord);
     #else
       vec3 mappedNormal = faceNormal;
     #endif

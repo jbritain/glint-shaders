@@ -154,6 +154,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
 }
 
 vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, vec3 viewPos, Material material){
+
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
@@ -179,12 +180,16 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     reflectedColor /= SSR_SAMPLES;
   }
 
+  #ifdef gbuffers_hand
+    reflectedColor.a = 1.0; // not sure why I need to do this
+  #endif
+
   return reflectedColor;
 }
 
 vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight){
   if(material.roughness == 1.0){
-  return color;
+    return color;
   }
 
   vec3 V = normalize(-viewPos);
