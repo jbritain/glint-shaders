@@ -83,6 +83,8 @@
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 
+    cloudTransmittance.rgb = vec3(1.0);
+
     cloudScatter.rgb = hasSkylight ? getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor, cloudTransmittance.rgb) : vec3(0.0);
   }
 #endif

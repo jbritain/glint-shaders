@@ -64,6 +64,7 @@
   uniform sampler2D colortex0;
   uniform sampler2D colortex4;
   uniform sampler2D colortex6;
+  uniform sampler2D colortex9;
 
   uniform float alphaTestRef;
   uniform float frameTimeCounter;
@@ -154,6 +155,7 @@
     #ifdef gbuffers_weather
       if(biome_precipitation != 2){
         color = vec4(0.2);
+        color.a = 0.1;
       }
 
       // hide rain above the clouds
@@ -198,17 +200,24 @@
       material = waterMaterial;
     } else {
       material = materialFromSpecularMap(color.rgb, specularData);
+
+      float wetnessFactor = wetness * (1.0 - material.porosity);
+
+      material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
+      material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
     }
 
     outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
     outData2.y = pack2x8F(specularData.rg);
     outData2.z = pack2x8F(specularData.ba);
 
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
-    vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0));
-    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
+    #ifndef gbuffers_weather
+      vec3 sunlightColor; vec3 skyLightColor;
+      getLightColors(sunlightColor, skyLightColor);
+      vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
+      color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0));
+      color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
+    #endif
 
     color = getAtmosphericFog(color, eyePlayerPos);
   }

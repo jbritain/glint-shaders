@@ -113,7 +113,6 @@
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
 
     outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
-    show(outGI.rgb);
     #endif
 
   }

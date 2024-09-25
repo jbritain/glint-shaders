@@ -58,6 +58,7 @@
   uniform sampler2D colortex0;
   uniform sampler2D colortex4;
   uniform sampler2D colortex6;
+  uniform sampler2D colortex9;
 
   uniform float alphaTestRef;
   uniform float frameTimeCounter;

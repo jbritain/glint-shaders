@@ -19,6 +19,7 @@
   uniform sampler2D colortex5;
   uniform sampler2D colortex6;
   uniform sampler2D colortex8;
+  uniform sampler2D colortex9;
 
   uniform sampler2D depthtex2;
 
@@ -115,6 +116,12 @@
     if(materialIsPlant(materialID)){
       material.sss = 1.0;
     }
+
+    float wetnessFactor = wetness * (1.0 - material.porosity);
+
+    material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
+    material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
+
 
     vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
 

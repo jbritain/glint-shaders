@@ -8,6 +8,7 @@
 #include "/lib/atmosphere/clouds.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
+#include "/lib/util/spheremap.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL) {
@@ -129,12 +130,15 @@ vec3 sampleVNDFGGX(
 vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   vec3 reflectionPos = vec3(0.0);
 
+  vec3 worldDir = mat3(gbufferModelViewInverse) * viewRay;
+  vec2 environmentUV = mapSphere(normalize(worldDir));
+
   if(!traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos, true)){
-    return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+    return texture(colortex9, environmentUV).rgb * skyLightmap;
   }
 
   if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){
-    return getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap;
+    return texture(colortex9, environmentUV).rgb * skyLightmap;
   }
 
 
@@ -146,7 +150,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
   float fadeFactor = smoothstep(0.8, 1.0, max2(abs(reflectionPos.xy - 0.5)) * 2);
 
   if(fadeFactor > 0.0){
-    reflectedColor = mix(reflectedColor, getSky(mat3(gbufferModelViewInverse) * viewRay, false) * skyLightmap, fadeFactor);
+    reflectedColor = mix(reflectedColor, texture(colortex9, environmentUV).rgb * skyLightmap, fadeFactor);
   }
   #endif
   
@@ -208,7 +212,10 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
   reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material);
   #else
   if(material.roughness == 0.0){
-    reflectedColor.rgb = getSky(mat3(gbufferModelViewInverse) * normalize(viewPos), false) * lightmap.y;
+    vec3 worldDir = mat3(gbufferModelViewInverse) * normalize(viewPos);
+    vec2 environmentUV = mapSphere(normalize(worldDir));
+
+    reflectedColor.rgb = texture(colortex9, environmentUV).rgb * lightmap.y;
   } else {
     reflectedColor = color;
   }

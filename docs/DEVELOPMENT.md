@@ -18,10 +18,11 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex6` cloud shadow map (256x256)
 `colortex7` clouds, fog (pre upsample). Scattering stored in RGB, transmittance packed into A.
 `colortex8` global illumination
+`colortex9` sky environment map
 
 # Passes
 `prepare` cloud shadow map
-`prepare1` global illumination
+`prepare1` sky environment map
 
 `deferred` rsm global illumination
 `deferred1` global illumination filtering
