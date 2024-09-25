@@ -238,4 +238,3 @@ option.SATURATION=Saturation
 option.GLOBAL_ILLUMINATION=Global Illumination
 option.GI_RADIUS=Radius
 option.GI_SAMPLES=Samples
-option.GI_BRIGHTNESS=Brightness

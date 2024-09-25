@@ -84,18 +84,24 @@
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 
-    const int pixelsExpanded = int(1.0/VOLUMETRIC_RESOLUTION - 1.0);
+    vec2 texcoord = texcoord;
+    float translucentDepth;
+    if(VOLUMETRIC_RESOLUTION != 1.0){
+      const int pixelsExpanded = int(1.0/VOLUMETRIC_RESOLUTION - 1.0);
 
-    const ivec2 offsets[4] = ivec2[4](
-      ivec2(0),
-      ivec2(pixelsExpanded, 0),
-      ivec2(0, pixelsExpanded),
-      ivec2(pixelsExpanded, pixelsExpanded)
-    );
+      const ivec2 offsets[4] = ivec2[4](
+        ivec2(0),
+        ivec2(pixelsExpanded, 0),
+        ivec2(0, pixelsExpanded),
+        ivec2(pixelsExpanded, pixelsExpanded)
+      );
 
-    vec2 texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
+      texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
 
-    float translucentDepth = max4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
+      translucentDepth = max4(textureGatherOffsets(depthtex0, texcoord, offsets, 0));
+    } else {
+      translucentDepth = texture(depthtex0, texcoord).r;
+    }
 
     if(texture(depthtex1, texcoord).r != texture(depthtex2, texcoord).r){
       translucentDepth = texture(depthtex2, texcoord).r;

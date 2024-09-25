@@ -114,6 +114,5 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #endif
 
 #define GLOBAL_ILLUMINATION
-#define GI_BRIGHTNESS 40.0 // [10.0 20.0 30.0 40.0 50.0 60.0 70.0 80.0 90.0 100.0]
 #define GI_SAMPLES 16 // [16 32 64 128 256]
 #define GI_RADIUS 4.0 // [1.0 2.0 4.0 8.0 16.0 32.0]

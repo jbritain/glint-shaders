@@ -51,7 +51,7 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     vec3 integScatter = sunlight * (1.0 - clamp01(transmittance)) / WATER_EXTINCTION;
 
     totalTransmittance *= transmittance;
-    scatter += integScatter * totalTransmittance;
+    scatter += max0(integScatter) * totalTransmittance;
 
     if(length(totalTransmittance) < 0.01){
       break;
