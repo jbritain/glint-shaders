@@ -16,8 +16,8 @@ float dualHenyeyGreenstein(float g, float costh, float weight) {
 vec3 multipleScattering(float density, float costh, float g, vec3 extinction, int octaves, float lobeWeight){
   vec3 radiance = vec3(0.0);
 
-  float attenuation = 0.5;
-  float contribution = 0.5;
+  float attenuation = 0.9;
+  float contribution = 0.8;
   float phaseAttenuation = 0.1;
 
   float a = 1.0;

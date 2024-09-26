@@ -31,7 +31,7 @@ float getCloudDensity(vec3 pos){
   }
   density = mix(density, 0.0, 1.0 - heightDenseFactor);
 
-  return clamp01(density * mix(0.2, 1.0, wetness));
+  return clamp01(density * mix(0.1, 1.0, wetness));
 }
 
 
