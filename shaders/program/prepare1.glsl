@@ -71,7 +71,5 @@
 
     color.rgb *= cloudTransmittance;
     color.rgb += cloudScatter;
-
-    show(color.rgb);
   }
 #endif

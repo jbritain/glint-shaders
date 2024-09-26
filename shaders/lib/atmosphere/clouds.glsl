@@ -7,16 +7,35 @@
 #include "/lib/atmosphere/common.glsl"
 #include "/lib/atmosphere/sky.glsl"
 
+#define CLOUD_LOWER_PLANE_HEIGHT 500.0
+#define CLOUD_UPPER_PLANE_HEIGHT 700.0
+
+#define CLOUD_SHAPE_SCALE 2342
+#define CLOUD_SHAPE_SCALE_2 7573
+#define CLOUD_EROSION_SCALE 234.426
+
+#define CLOUD_DISTANCE 10000.0
+
+// blocks per second
+#define CLOUD_SHAPE_SPEED 0.001
+#define CLOUD_EROSION_SPEED 0.005
+
+#define CLOUD_EXTINCTION_COLOR vec3(1.0)
+#define CLOUD_SAMPLES 50 // [10 20 30 40 50 60 70 80 90 100]
+#define CLOUD_SUBSAMPLES 4 // [4 5 6 7 8 9 10]
+#define CLOUD_DUAL_LOBE_WEIGHT 0.7
+#define CLOUD_G 0.6
+
 float getCloudDensity(vec3 pos){
 
-  float coverage = mix(0.09, 0.2, wetness);
+  float coverage = mix(0.08, 0.15, wetness);
 
   float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   
   float density = clamp01(shapeDensity2 - (1.0 - coverage));
-  density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
+  // density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
   density -= clamp01(erosionDensity - 0.6);
   
@@ -29,9 +48,9 @@ float getCloudDensity(vec3 pos){
   } else {
     heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CLOUD_UPPER_PLANE_HEIGHT, pos.y);
   }
-  density = mix(density, 0.0, 1.0 - heightDenseFactor);
+  density = mix(density, 0.0, sin(PI * (1.0 - heightDenseFactor) / 2));
 
-  return clamp01(density * mix(0.1, 1.0, wetness));
+  return clamp01(density * mix(0.2, 0.5, wetness));
 }
 
 
@@ -47,10 +66,6 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh){
   }
 
   if(b == rayPos) return vec3(0.0); // this should never happen
-
-  if(distance(a, b) > CLOUD_SUBMARCH_LIMIT){
-    b = a + normalize(b - a) * CLOUD_SUBMARCH_LIMIT;
-  }
 
   vec3 increment = (b - a) / CLOUD_SUBSAMPLES;
 
@@ -100,6 +115,8 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
     }
   }
 
+  worldDir = normalize(a - b);
+
   a -= cameraPosition;
   b -= cameraPosition;
 
@@ -117,10 +134,6 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
     if(b.y + cameraPosition.y < CLOUD_LOWER_PLANE_HEIGHT){ // neither the camera nor the terrain is in the cloud plane
       return vec3(0.0);
     }
-  } 
-  
-  if(distance(a, b) > CLOUD_MARCH_LIMIT){ // limit how far we can march
-    b = a + normalize(b - a) * CLOUD_MARCH_LIMIT;
   }
 
   a += cameraPosition;
@@ -140,14 +153,17 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   vec3 scatter = vec3(0.0);
 
   for(int i = 0; i < samples; i++, rayPos += increment){
-    float density = getCloudDensity(rayPos) * length(increment);
-    // density = mix(density, 0.0, smoothstep(CLOUD_MARCH_LIMIT * 0.5, CLOUD_MARCH_LIMIT, length(rayPos - cameraPosition)));
 
-    vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
+    if(length(rayPos.xz - cameraPosition.xz) > CLOUD_DISTANCE) break;
+
+    float density = getCloudDensity(rayPos) * length(increment);
+    density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.5, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
 
     if(density < 1e-6){
       continue;
     }
+
+    vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
 
     if(firstFogPoint == b){
       firstFogPoint = rayPos;
