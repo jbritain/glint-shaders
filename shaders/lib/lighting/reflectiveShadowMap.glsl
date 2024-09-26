@@ -10,13 +10,13 @@ vec3 reflectShadowMap(vec3 faceNormal, vec3 feetPlayerPos, vec3 sunlightColor){
   // assumption - if we are in cloud shadow, so is the indirect light caster
   vec3 cloudShadow = texture(colortex6, cloudShadowScreenPos.xy).rgb;
 
-  if(cloudShadow * sunlightColor == 0.0){
+  if(length(cloudShadow * sunlightColor) < 0.01){
     return vec3(0.0);
   }
 
   // assumption - if we are in direct sunlight, the indirect lighting will not be noticeable
   vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos, faceNormal).xyz;
-  if(shadow2D(shadowtex0HW, shadowScreenPos) == 1.0 && dot(worldFaceNormal, lightVector) > 0.9){
+  if(shadow2D(shadowtex0HW, shadowScreenPos).r == 1.0 && dot(worldFaceNormal, lightVector) > 0.9){
     return vec3(0.0);
   }
 

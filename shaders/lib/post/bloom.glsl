@@ -26,11 +26,11 @@ struct BloomTile {
   float scale;
 };
 
-const BloomTile tileA = BloomTile(vec2(0.0), 1, 0.5); // 1/2 scale
-const BloomTile tileB = BloomTile(vec2(0.5 + 2/viewWidth, 0.0), 2, 0.25); // 1/4 scale
-const BloomTile tileC = BloomTile(vec2(0.75 + 4/viewWidth, 0.0), 3, 0.125); // 1/8 scale
-const BloomTile tileD = BloomTile(vec2(0.875 + 6/viewWidth, 0.0), 4, 0.0625); // 1/16 scale
-const BloomTile tileE = BloomTile(vec2(0.9375 + 8/viewWidth, 0.0), 5, 0.03125); // 1/32 scale
+BloomTile tileA = BloomTile(vec2(0.0), 1, 0.5); // 1/2 scale
+BloomTile tileB = BloomTile(vec2(0.5 + 2/viewWidth, 0.0), 2, 0.25); // 1/4 scale
+BloomTile tileC = BloomTile(vec2(0.75 + 4/viewWidth, 0.0), 3, 0.125); // 1/8 scale
+BloomTile tileD = BloomTile(vec2(0.875 + 6/viewWidth, 0.0), 4, 0.0625); // 1/16 scale
+BloomTile tileE = BloomTile(vec2(0.9375 + 8/viewWidth, 0.0), 5, 0.03125); // 1/32 scale
 
 BloomTile tiles[5] = BloomTile[5](tileA, tileB, tileC, tileD, tileE);
 

@@ -36,7 +36,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define SSR
 #define SSR_FADE
 #define SSR_SAMPLES 4 // [1 2 4 8 16 32 64]
-#define ROUGH_REFLECTION_THRESHOLD 0.3 // [0.0, 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define ROUGH_REFLECTION_THRESHOLD 0.3 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
 

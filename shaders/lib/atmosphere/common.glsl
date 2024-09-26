@@ -1,8 +1,8 @@
 #ifndef ATMOSPHERE_COMMON_INCLUDE
 #define ATMOSPHERE_COMMON_INCLUDE
 
-const vec3 sunVector = normalize(mat3(gbufferModelViewInverse) * sunPosition);
-const vec3 lightVector = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
+vec3 sunVector = normalize(mat3(gbufferModelViewInverse) * sunPosition);
+vec3 lightVector = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
 
 float henyeyGreenstein(float g, float mu) {
   float gg = g * g;

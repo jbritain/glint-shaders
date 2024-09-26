@@ -30,6 +30,7 @@ A work in progress shaderpack for Minecraft.
 - Occasionally reflections turn completely black until shader reload
 - Obvious repeating pattern in cloud shapes
 - Artifacts in atmospheric fog near the horizon
+- Water waves broken on AMD
 - Runs terribly
 
 ## Acknowledgements
