@@ -37,8 +37,9 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor){
   vec3 transmit;
   skyLightColor = GetSkyRadiance(kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit);
 
-  if(worldTime > 12785 && worldTime < 23215){
-    sunlightColor += vec3(0.01, 0.01, 0.02);
+  if(sunVector != lightVector) {
+    vec3 moonColor = vec3(0.62, 0.65, 0.74);
+    sunlightColor += getSky(vec4(moonColor * 0.05, 1.0), -sunVector, false);
   }
   
 }

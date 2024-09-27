@@ -8,7 +8,23 @@
 #include "/lib/atmosphere/sky.glsl"
 
 #define CLOUD_LOWER_PLANE_HEIGHT 500.0
+// turn up to enable other cloud layers
 #define CLOUD_UPPER_PLANE_HEIGHT 700.0
+
+#define CUMULUS_DENSITY 0.2
+#define CUMULUS_COVERAGE 0.08
+#define CUMULUS_LOWER_HEIGHT 500.0
+#define CUMULUS_UPPER_HEIGHT 700.0
+
+#define ALTOCUMULUS_LOWER_HEIGHT 1500.0
+#define ALTOCUMULUS_UPPER_HEIGHT 1600.0
+#define ALTOCUMULUS_DENSITY 0.1
+#define ALTOCUMULUS_COVERAGE 0.08
+
+#define CIRRUS_DENSITY 0.002
+#define CIRRUS_COVERAGE 0.2
+#define CIRRUS_LOWER_HEIGHT 1900.0
+#define CIRRUS_UPPER_HEIGHT 2000.0
 
 #define CLOUD_SHAPE_SCALE 2342
 #define CLOUD_SHAPE_SCALE_2 7573
@@ -28,7 +44,40 @@
 
 float getCloudDensity(vec3 pos){
 
-  float coverage = mix(0.08, 0.15, wetness);
+  float coverage = 0;
+  float densityFactor = 0;
+  float heightDenseFactor = 1.0;
+
+  if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
+    coverage = CUMULUS_COVERAGE;
+    densityFactor = CUMULUS_DENSITY;
+
+    float cumulusCentreHeight = mix(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, 0.3); // widest part of our cumulus clouds
+
+    if(pos.y <= cumulusCentreHeight){
+      heightDenseFactor = smoothstep(CUMULUS_LOWER_HEIGHT, cumulusCentreHeight, pos.y);
+    } else {
+      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CLOUD_UPPER_PLANE_HEIGHT, pos.y);
+    }
+
+  } else if(pos.y >= ALTOCUMULUS_LOWER_HEIGHT && pos.y <= ALTOCUMULUS_UPPER_HEIGHT){
+    coverage = ALTOCUMULUS_COVERAGE;
+    densityFactor = ALTOCUMULUS_DENSITY;
+
+    float cumulusCentreHeight = mix(ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, 0.3); // widest part of our cumulus clouds
+
+    if(pos.y <= cumulusCentreHeight){
+      heightDenseFactor = smoothstep(ALTOCUMULUS_LOWER_HEIGHT, cumulusCentreHeight, pos.y);
+    } else {
+      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CLOUD_UPPER_PLANE_HEIGHT, pos.y);
+    }
+
+  } else if (pos.y >= CIRRUS_LOWER_HEIGHT && pos.y <= CIRRUS_UPPER_HEIGHT){
+    coverage = CIRRUS_COVERAGE;
+    densityFactor = CIRRUS_DENSITY;
+  } else {
+    return 0;
+  }
 
   float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
@@ -38,19 +87,10 @@ float getCloudDensity(vec3 pos){
   // density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
   density -= clamp01(erosionDensity - 0.6);
-  
-  float cumulusCentreHeight = mix(CLOUD_LOWER_PLANE_HEIGHT, CLOUD_UPPER_PLANE_HEIGHT, 0.3); // widest part of our cumulus clouds
 
-  float heightDenseFactor;
-
-  if(pos.y <= cumulusCentreHeight){
-    heightDenseFactor = smoothstep(CLOUD_LOWER_PLANE_HEIGHT, cumulusCentreHeight, pos.y);
-  } else {
-    heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CLOUD_UPPER_PLANE_HEIGHT, pos.y);
-  }
   density = mix(density, 0.0, sin(PI * (1.0 - heightDenseFactor) / 2));
 
-  return clamp01(density * mix(0.2, 0.5, wetness));
+  return clamp01(density * densityFactor);
 }
 
 
