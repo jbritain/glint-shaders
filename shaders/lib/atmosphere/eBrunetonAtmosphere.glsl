@@ -500,7 +500,7 @@ vec3 GetSkyRadiance(
   vec3 in_scatter = scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
       MiePhaseFunction(ATMOSPHERE.mie_phase_function_g, nu);
 
-  // in_scatter = setSaturationLevel(in_scatter, 1.5);
+  in_scatter = setSaturationLevel(in_scatter, SKY_SATURATION);
 
   return in_scatter;
 }
@@ -577,7 +577,7 @@ vec3 GetSkyRadianceToPoint(vec3 camera, in vec3 point, float shadow_length,
   vec3 in_scatter = scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
       MiePhaseFunction(ATMOSPHERE.mie_phase_function_g, nu);
 
-  // in_scatter = setSaturationLevel(in_scatter, 1.5);
+  in_scatter = setSaturationLevel(in_scatter, SKY_SATURATION);
 
   return in_scatter;
 }
@@ -593,7 +593,7 @@ vec3 GetSunAndSkyIrradiance(in vec3 point, in vec3 sun_direction,
   // Direct float.
   vec3 irradiance = ATMOSPHERE.solar_irradiance *
       GetTransmittanceToSun(r, mu_s);
-  // irradiance = setSaturationLevel(irradiance, 1.5);
+  irradiance = setSaturationLevel(irradiance, SKY_SATURATION);
 
   return irradiance;
 }

@@ -55,6 +55,7 @@
 
   uniform float viewWidth;
   uniform float viewHeight;
+  uniform float aspectRatio;
 
   uniform ivec2 eyeBrightnessSmooth;
 
@@ -116,22 +117,25 @@
 
     #ifdef REFRACTION
 
-    // this is cheating at refraction
-    // instead of actually tracing the refracted ray we just step the distance of the original ray in the refracted direction
-    // also we refract in player space
     if(waterMask){
       vec3 dir = normalize(opaqueEyePlayerPos);
+
+      // the actual refracted ray direction
       vec3 refractedDir = normalize(refract(dir, mat3(gbufferModelViewInverse) * mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
 
       float waterDepth = distance(opaqueEyePlayerPos, translucentEyePlayerPos);
 
-      vec3 refractedPlayerPos = (translucentEyePlayerPos + refractedDir * REFRACTION_AMOUNT * (waterDepth / refractedDir.y * dir.y));
-      vec3 refractedCoord = viewSpaceToScreenSpace(mat3(gbufferModelView) * refractedPlayerPos);
+      // the refracted offset we use for terrain
+      // method from BSL
+      vec2 refractDir = mappedNormal.xy - faceNormal.xy;
+      refractDir *= vec2(1.0 / aspectRatio, 1.0) * (gbufferProjection[1][1] / 1.37) / max(length(opaqueEyePlayerPos), 8.0); // sorcery
+      vec3 refractedCoord = vec3(texcoord + refractDir, 0.0);
+      refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
 
       bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy; // don't refract offscreen
 
       refract = refract && (
-        refractedCoord.z > translucentDepth
+        inWater ? refractedCoord.z < translucentDepth : refractedCoord.z > translucentDepth
       );
 
       if(refract){ // don't refract stuff that's not underwater
@@ -143,13 +147,13 @@
       refract = refract && (refractedCoord.z >= translucentDepth); // another check for it being underwater
 
 
-      if(refract){
+      if(refract && refractedCoord.z != 1.0){
         // refractedCoord.xy = mix(texcoord, refractedCoord.xy, kneemundAttenuation(refractedCoord.xy, 0.03));
         color = texture(colortex0, refractedCoord.xy);
         refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
         opaqueViewPos = screenSpaceToViewSpace(refractedCoord);
         opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
-      } else if (!refract && inWater){
+      } else if (inWater && refractedCoord.z == 1.0){
         vec2 refractedSkyUV = mapSphere(refractedDir);
         color.rgb = texture(colortex9, refractedSkyUV).rgb;
       }

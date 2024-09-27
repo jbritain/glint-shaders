@@ -57,7 +57,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define CLOUDS
 
-
+#define SKY_SATURATION 1.2
 
 #define FXAA
 #define FXAA_SUBPIXEL 0.75 //[0.00 0.25 0.50 0.75 1.00]
@@ -69,8 +69,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define WATER_NORMALS
 
-// #define REFRACTION
-#define REFRACTION_AMOUNT 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define REFRACTION
 
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10 // [5 10 15 20 25 30 35 40 45 50]
