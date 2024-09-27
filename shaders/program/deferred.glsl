@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/deferred.glsl
+    - Reflective shadow map global illumination
+*/
+
 #include "/lib/settings.glsl"
 #include "/lib/util.glsl"
 

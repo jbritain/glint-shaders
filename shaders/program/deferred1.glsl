@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/deferred1.glsl
+    - Global illumination filtering - horizontal
+*/
+
 #include "/lib/settings.glsl"
 #include "/lib/util.glsl"
 

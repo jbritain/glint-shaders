@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/deferred3.glsl
+    - Cloud generation
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

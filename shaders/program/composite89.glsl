@@ -1,3 +1,15 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/composite89.glsl
+    - Auto exposure
+    - Hand blending
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

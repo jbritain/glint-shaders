@@ -1,5 +1,17 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/deferred2.glsl
+    - Opaque shading
+    - Sky
+    - Clear sky buffer for translucents
+*/
+
 #include "/lib/settings.glsl"
-#include "/lib/util.glsl"
 
 #ifdef vsh
   out vec2 texcoord;
@@ -81,6 +93,7 @@
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 tex3;
 
+  #include "/lib/util.glsl"
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/util/noise.glsl"

@@ -1,3 +1,17 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/composite.glsl
+    - Refraction
+    - Translucent blending
+    - Water fog
+    - Atmospheric fog
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

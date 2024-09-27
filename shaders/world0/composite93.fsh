@@ -3,4 +3,4 @@
 
 #define TILE_INDEX 3
 
-#include "/program/composite90-94.glsl"
+#include "/program/bloomDownsample.glsl"

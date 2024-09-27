@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/gbuffers_hand.glsl
+    - Hand, both opaque and translucent
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

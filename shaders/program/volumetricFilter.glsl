@@ -1,3 +1,16 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/volumetricFilter.glsl
+    - Applies bilateral filter to any volumetric effects stored in colortexes 7 and 8
+
+    **THIS PROGRAM RUNS MULTIPLE TIMES**
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/prepare1.glsl
+    - Sky environment map
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

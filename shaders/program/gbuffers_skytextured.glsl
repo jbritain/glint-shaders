@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/gbuffers_skytextured.glsl
+    - Moon
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

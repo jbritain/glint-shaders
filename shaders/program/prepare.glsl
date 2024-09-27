@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/prepare.glsl
+    - Cloud shadow map
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

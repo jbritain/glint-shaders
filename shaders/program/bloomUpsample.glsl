@@ -1,3 +1,16 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/bloomUpsample.glsl
+    - Bloom upsampling
+
+    **THIS PROGRAM RUNS MULTIPLE TIMES**
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

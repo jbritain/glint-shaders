@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/gbuffers_skybasic.glsl
+    - Stars
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

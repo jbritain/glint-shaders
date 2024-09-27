@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/discard.glsl
+    - For gbuffer passes which should be disabled
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

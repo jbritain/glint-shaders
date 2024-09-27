@@ -1,3 +1,15 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/gbuffers_solid.glsl
+    - Solid terrain
+    - Solid entities
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

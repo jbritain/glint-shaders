@@ -1,3 +1,16 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/bloomDownsample.glsl
+    - Bloom downsampling
+
+    **THIS PROGRAM RUNS MULTIPLE TIMES**
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

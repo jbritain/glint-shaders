@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/shadow.glsl
+    - Shadow map
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

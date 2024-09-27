@@ -1,3 +1,15 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/gbuffers_translucent.glsl
+    - Translucent terrain
+    - Translucent entities
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

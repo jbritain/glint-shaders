@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/composite88.glsl
+    - Luminance sampling for auto exposure
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

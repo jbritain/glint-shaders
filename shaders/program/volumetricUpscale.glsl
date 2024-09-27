@@ -1,3 +1,16 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/volumetricUpscale.glsl
+    - Upscales any volumetric effects stored in colortexes 7 and 8 to full resolution
+
+    **THIS PROGRAM RUNS MULTIPLE TIMES**
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

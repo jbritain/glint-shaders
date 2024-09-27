@@ -1,3 +1,14 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/composite1.glsl
+    - 'Cloudy' fog generation
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh

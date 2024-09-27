@@ -1,3 +1,17 @@
+/*
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+    /program/final.glsl
+    - Bloom blending
+    - Anti Aliasing
+    - Tonemapping
+    - Debug rendering
+*/
+
 #include "/lib/settings.glsl"
 
 #ifdef vsh
