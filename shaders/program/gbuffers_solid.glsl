@@ -65,6 +65,8 @@
   uniform sampler2D normals;
   uniform sampler2D specular;
 
+  uniform vec4 entityColor;
+
   uniform float alphaTestRef;
 
   uniform vec3 cameraPosition;
@@ -97,6 +99,7 @@
   void main() {
     vec4 color;
     color = texture(gtexture, texcoord) * glcolor;
+    color.rgb = mix(color.rgb, entityColor.rgb, entityColor.a);
     color.rgb = gammaCorrect(color.rgb);
 
     if (color.a < alphaTestRef) {

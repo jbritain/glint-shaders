@@ -65,6 +65,8 @@
   uniform sampler2D normals;
   uniform sampler2D specular;
 
+  uniform vec4 entityColor;
+
   uniform sampler2D shadowtex0;
   uniform sampler2DShadow shadowtex0HW;
   uniform sampler2DShadow shadowtex1HW;
@@ -157,6 +159,7 @@
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
     color = texture(gtexture, texcoord) * glcolor;
+    color.rgb = mix(color.rgb, entityColor.rgb, entityColor.a);
 
     color.rgb = gammaCorrect(color.rgb);
 
