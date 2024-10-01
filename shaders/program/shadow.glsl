@@ -78,6 +78,8 @@
   uniform int worldDay;
   uniform float frameTimeCounter;
 
+  uniform float alphaTestRef;
+
   uniform vec3 cameraPosition;
   uniform vec3 shadowLightPosition;
 
@@ -109,6 +111,10 @@
 
   void main(){
     color = texture(gtexture, texcoord) * glcolor;
+
+    if(color.a < alphaTestRef){
+      discard;
+    }
     
     if(materialIsWater(materialID)){
       vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
