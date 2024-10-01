@@ -47,13 +47,14 @@ bool rayPlaneIntersection(vec3 O, vec3 D, float height, inout vec3 point){
     return false;
   }
 
-  float t = dot(N, P - O)/NoD;
+  float t = dot(N, P - O) / NoD;
+
+  point = O + t*D;
+
   if(t < 0){
     return false;
   }
 
-
-  point = O + t*D;
   return true;
 }
 

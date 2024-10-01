@@ -109,8 +109,6 @@ option.FXAA.comment=Attempts to remove jagged edges caused by aliasing artefacts
 option.ATMOSPHERE_FOG=Atmospheric Fog
 
 option.CLOUDS=Clouds
-option.CLOUD_SAMPLES=Cloud Samples
-option.CLOUD_SUBSAMPLES=Cloud Subsamples
 
 option.SUBSURFACE_SCATTERING=Subsurface Scattering
 option.SUBSURFACE_SCATTERING.comment=Lets sunlight pass through some materials.

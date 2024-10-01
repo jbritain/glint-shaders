@@ -74,30 +74,23 @@
     vec3 shadowViewPos = shadowHomPos.xyz / shadowHomPos.w;
 
     vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
+    vec3 rayPos;
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CUMULUS_LOWER_HEIGHT, rayPos);
+    rayPos.y += 0.1;
 
-    vec3 a = vec3(0.0);
-    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CLOUD_LOWER_PLANE_HEIGHT, a);
+    float jitter = 0.0;
 
-    vec3 b = vec3(0.0);
-    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CLOUD_UPPER_PLANE_HEIGHT, b);
+    float totalDensity = getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SUBSAMPLES);
+    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, ALTOCUMULUS_SUBSAMPLES);
+    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SUBSAMPLES);
 
-    const int samples = 10;
-    vec3 increment = (b - a) / float(samples);
-
-    vec3 rayPos = a;
-
-    vec3 totalTransmittance = vec3(1.0);
-
-    for (int i = 0; i < samples; i++){
-      float density = getCloudDensity(rayPos) * length(increment);
-      vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
-
-      totalTransmittance *= transmittance;
-
-      rayPos += increment;
-    }
+    vec3 totalTransmittance = exp(-totalDensity * CLOUD_EXTINCTION_COLOR);
 
     color.rgb = totalTransmittance;
     color.a = 1.0;
+    show(totalTransmittance);
+    // show(feetPlayerPos.xz);
+
+    // color = vec4(1.0);
   }
 #endif
