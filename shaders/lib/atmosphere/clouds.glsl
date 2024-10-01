@@ -57,7 +57,7 @@ float getCloudDensity(vec3 pos){
     if(pos.y <= cumulusCentreHeight){
       heightDenseFactor = smoothstep(CUMULUS_LOWER_HEIGHT, cumulusCentreHeight, pos.y);
     } else {
-      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CLOUD_UPPER_PLANE_HEIGHT, pos.y);
+      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CUMULUS_UPPER_HEIGHT, pos.y);
     }
 
   } else if(pos.y >= ALTOCUMULUS_LOWER_HEIGHT && pos.y <= ALTOCUMULUS_UPPER_HEIGHT){
@@ -69,7 +69,7 @@ float getCloudDensity(vec3 pos){
     if(pos.y <= cumulusCentreHeight){
       heightDenseFactor = smoothstep(ALTOCUMULUS_LOWER_HEIGHT, cumulusCentreHeight, pos.y);
     } else {
-      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CLOUD_UPPER_PLANE_HEIGHT, pos.y);
+      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, ALTOCUMULUS_UPPER_HEIGHT, pos.y);
     }
 
   } else if (pos.y >= CIRRUS_LOWER_HEIGHT && pos.y <= CIRRUS_UPPER_HEIGHT){
@@ -116,9 +116,6 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh){
 
   for(int i = 0; i < CLOUD_SUBSAMPLES; i++, subRayPos += increment){
     totalDensity += getCloudDensity(subRayPos) * length(increment);
-    if(totalDensity >= 1.0){
-      break;
-    }
   }
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
