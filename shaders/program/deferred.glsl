@@ -95,7 +95,7 @@
     return r * vec2(cos(theta), sin(theta));
   }
 
-  /* DRAWBUFFERS:8 */
+  /* RENDERTARGETS: 10 */
   layout(location = 0) out vec4 outGI;
 
   #include "/lib/util/gbufferData.glsl"

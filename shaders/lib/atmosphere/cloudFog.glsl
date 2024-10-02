@@ -83,9 +83,6 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
 
   for(int i = 0; i < FOG_SUBSAMPLES; i++, subRayPos += increment){
     totalDensity += getFogDensity(subRayPos) * length(increment);
-    if(totalDensity >= 1.0){
-      break;
-    }
   }
 
   return max0(multipleScattering(totalDensity, costh, FOG_G, FOG_EXTINCTION, 1, FOG_DUAL_LOBE_WEIGHT) * clamp01((1.0 - exp(-totalDensity * 2))) * sunlight);

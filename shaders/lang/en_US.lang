@@ -138,16 +138,6 @@ option.CLOUD_FOG.comment=Adds cloudlike fog at night and in the morning.
 option.CLOUD_FOG_SAMPLES=Cloudy Fog Samples
 option.CLOUD_FOG_SUBSAMPLES=Cloudy Fog Subsamples
 
-option.VOLUMETRIC_FILTERING=Filter Volumetrics
-option.VOLUMETRIC_FILTERING.comment=Use a bilateral filter to reduce noise in volumetric effects.
-
-option.VOLUMETRIC_RESOLUTION=Volumetrics Render Scale
-option.VOLUMETRIC_RESOLUTION.comment=The resolution scale volumetric effects are rendered at.
-value.VOLUMETRIC_RESOLUTION.0.25=0.25x
-value.VOLUMETRIC_RESOLUTION.0.5=0.5x
-value.VOLUMETRIC_RESOLUTION.0.75=0.75x
-value.VOLUMETRIC_RESOLUTION.1.0=1x
-
 option.EXPOSURE=Exposure
 option.EXPOSURE.comment=Set to 0 for auto exposure.
 value.EXPOSURE.0=Auto

@@ -17,11 +17,15 @@
   void main() {
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
-    texcoord /= VOLUMETRIC_RESOLUTION;
   }
 #endif
 
 #ifdef fsh
+  uniform sampler2D colortex0;
+  uniform sampler2D colortex4;
+  uniform sampler2D colortex7;
+  uniform sampler2D colortex8;
+
   uniform sampler2D depthtex2;
 
   uniform mat4 gbufferProjection;
@@ -62,9 +66,10 @@
 
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:78 */
+  /* DRAWBUFFERS:780 */
   layout(location = 0) out vec4 cloudScatter;
   layout(location = 1) out vec4 cloudTransmittance;
+  layout(location = 2) out vec4 color;
 
   #include "/lib/util.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -74,22 +79,12 @@
 
 
   void main() {
-    if(clamp01(texcoord) != texcoord){
-      return;
-    }
 
-    vec2 texcoord = floor(gl_FragCoord.xy / VOLUMETRIC_RESOLUTION) / vec2(viewWidth, viewHeight);
-
-    const ivec2 offsets[4] = ivec2[4](
-      ivec2(0),
-      ivec2(1, 0),
-      ivec2(0, 1),
-      ivec2(1, 1)
-    );
-
-    float depth = max4(textureGatherOffsets(depthtex2, texcoord, offsets, 0));
+    float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
+
+    color = texture(colortex0, texcoord);
     
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
@@ -97,5 +92,19 @@
     cloudTransmittance.rgb = vec3(1.0);
 
     cloudScatter.rgb = hasSkylight ? getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor, cloudTransmittance.rgb) : vec3(0.0);
+
+    vec3 screenPos = vec3(texcoord, depth);
+    vec3 previousScreenPos = reproject(screenPos);
+    previousScreenPos.z = texture(colortex4, previousScreenPos.xy).a;
+
+    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && depth == previousScreenPos.z){
+      vec3 previousCloudScatter = texture(colortex7, previousScreenPos.xy).rgb;
+      vec3 previousCloudTransmittance = texture(colortex8, previousScreenPos.xy).rgb;  
+
+      cloudScatter.rgb = mix(previousCloudScatter, cloudScatter.rgb, CLOUD_BLEND);
+      cloudTransmittance.rgb = mix(previousCloudTransmittance, cloudTransmittance.rgb, CLOUD_BLEND);
+    }
+
+    color.rgb = color.rgb * cloudTransmittance.rgb + cloudScatter.rgb;
   }
 #endif

@@ -98,6 +98,7 @@
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/spheremap.glsl"
+  #include "/lib/atmosphere/cloudFog.glsl"
 
   // Kneemund's Border Attenuation
   float kneemundAttenuation(vec2 pos, float edgeFactor) {
@@ -189,6 +190,9 @@
 
     color.rgb = mix(color.rgb, translucent.rgb, clamp01(translucent.a));
 
+    vec3 fogTransmit = vec3(1.0);
+    vec3 fogScatter = getCloudFog(vec3(0.0), translucentEyePlayerPos, translucentDepth, sunlightColor, skyLightColor, fogTransmit);
 
+    color.rgb = color.rgb * fogTransmit + fogScatter;
   }
 #endif

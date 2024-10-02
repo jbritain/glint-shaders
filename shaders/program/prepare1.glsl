@@ -10,6 +10,7 @@
 */
 
 #include "/lib/settings.glsl"
+#define HIGH_CLOUD_SAMPLES
 
 #ifdef vsh
   out vec2 texcoord;
@@ -39,6 +40,7 @@
   uniform int worldDay;
 
   uniform vec3 cameraPosition;
+  uniform vec3 previousCameraPosition;
 
   uniform float far;
   uniform float wetness;

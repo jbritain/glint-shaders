@@ -6,26 +6,27 @@
 #include "/lib/textures/blueNoise.glsl"
 #include "/lib/atmosphere/common.glsl"
 #include "/lib/atmosphere/sky.glsl"
+#include "/lib/util/reproject.glsl"
 
 #define CUMULUS_DENSITY 0.2
 const float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 700.0
-#define CUMULUS_SAMPLES 50
+#define CUMULUS_SAMPLES 12
 #define CUMULUS_SUBSAMPLES 4
 
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
 #define ALTOCUMULUS_UPPER_HEIGHT 1600.0
 #define ALTOCUMULUS_DENSITY 0.1
 const float ALTOCUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
-#define ALTOCUMULUS_SAMPLES 25
+#define ALTOCUMULUS_SAMPLES 6
 #define ALTOCUMULUS_SUBSAMPLES 4
 
 #define CIRRUS_DENSITY 0.001
 const float CIRRUS_COVERAGE = mix(0.2, 1.0, wetness);
 #define CIRRUS_LOWER_HEIGHT 1900.0
 #define CIRRUS_UPPER_HEIGHT 2000.0
-#define CIRRUS_SAMPLES 5
+#define CIRRUS_SAMPLES 1
 #define CIRRUS_SUBSAMPLES 1
 
 #define CLOUD_SHAPE_SCALE 2342
@@ -136,6 +137,10 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){
   vec3 worldDir = normalize(playerPos);
 
+  #ifdef HIGH_CLOUD_SAMPLES
+  samples *= 4;
+  #endif
+
   // we trace from a to b
   vec3 a;
   vec3 b;
@@ -186,7 +191,11 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
   vec3 lightEnergy = vec3(0.0);
 
+  #ifdef HIGH_CLOUD_SAMPLES
   float jitter = blueNoise(texcoord).r;
+  #else
+  float jitter = blueNoise(texcoord, frameCounter).r;
+  #endif
   rayPos += increment * jitter;
 
   vec3 scatter = vec3(0.0);
@@ -208,7 +217,11 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
       firstFogPoint = rayPos;
     }
 
+    #ifdef HIGH_CLOUD_SAMPLES
     float lightJitter = blueNoise(texcoord, i).r;
+    #else
+    float lightJitter = blueNoise(texcoord, i + frameCounter * samples).r;
+    #endif
 
     vec3 lightEnergy = calculateCloudLightEnergy(rayPos, lightJitter, mu, subsamples);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
