@@ -12,7 +12,7 @@
 const float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 700.0
-#define CUMULUS_SAMPLES 12
+#define CUMULUS_SAMPLES 25
 #define CUMULUS_SUBSAMPLES 4
 
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
@@ -39,6 +39,7 @@ const float CIRRUS_COVERAGE = mix(0.2, 1.0, wetness);
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
+// don't make the extinction colour rgb!!!
 #define CLOUD_EXTINCTION_COLOR vec3(1.0)
 #define CLOUD_DUAL_LOBE_WEIGHT 0.7
 #define CLOUD_G 0.6

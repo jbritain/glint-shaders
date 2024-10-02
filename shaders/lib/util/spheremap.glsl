@@ -6,9 +6,7 @@ vec2 mapSphere(vec3 dir){
 
   float theta = atan(dir.z, dir.x);
 
-  if (theta < 0.0) {
-    theta += 2.0 * PI;
-  }
+  theta = mod(theta, 2 * PI);
 
   float phi = acos(dir.y);
 

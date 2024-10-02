@@ -16,9 +16,9 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex4` previous frame data - color rgb, opaque depth
 `colortex5` hand
 `colortex6` cloud shadow map (256x256)
-`colortex7` cloud scattering
-`colortex8` cloud transmittance
-`colortex9` sky environment map
+`colortex7` cloud scattering (transmittance in alpha)
+`colortex8` fog scattering (transmittance in alpha)
+`colortex9` sky environment map (256x256)
 `colortex10` global illumination
 
 # Passes

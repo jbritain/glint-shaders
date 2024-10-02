@@ -9,6 +9,7 @@ const float TAU = radians(360.0);
 #define clamp01(x) clamp(x, 0.0, 1.0)
 #define max0(x) max(x, 0.0)
 
+#define sum3(v) (((v).x + (v).y) + (v).z)
 #define sum4(v) (((v).x + (v).y) + ((v).z + (v).w))
 
 #define _square(x) (x*x)

@@ -12,7 +12,7 @@
 #define FOG_SUBMARCH_LIMIT 150.0
 
 #define FOG_EXTINCTION vec3(0.8, 0.8, 1.0)
-#define FOG_SAMPLES 20
+#define FOG_SAMPLES 5
 #define FOG_SUBSAMPLES 4
 #define FOG_DUAL_LOBE_WEIGHT 0.7
 #define FOG_G 0.85
@@ -128,7 +128,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
   vec3 totalTransmittance = vec3(1.0);
   vec3 lightEnergy = vec3(0.0);
 
-  float jitter = blueNoise(texcoord).r;
+  float jitter = blueNoise(texcoord, frameCounter).r;
   rayPos += increment * jitter;
 
   vec3 scatter = vec3(0.0);
@@ -146,7 +146,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
       continue;
     }
 
-    float lightJitter = blueNoise(texcoord, i).r;
+    float lightJitter = blueNoise(texcoord, i + frameCounter * samples).r;
 
     vec3 lightEnergy = calculateFogLightEnergy(rayPos, lightJitter, mu);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor * EBS.y;

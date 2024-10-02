@@ -13,8 +13,8 @@ const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents
 const int colortex4Format = RGBA32F; || previous frame data - color rgb, opaque depth
 const int colortex5Format = RGBA16F; || hand
 const int colortex6Format = RGB8;    || cloud shadow map
-const int colortex7Format = RGB16F;  || cloud and fog scattering
-const int colortex8Format = RGB8;    || cloud and fog transmittance 
+const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
+const int colortex8Format = RGBA16F; || fog scattering (transmittance in alpha)
 const int colortex9Format = RGB16F;  || sky environment map
 const int colortex10Format = RGB8F;  || global illumination
 

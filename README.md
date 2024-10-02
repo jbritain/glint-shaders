@@ -14,9 +14,9 @@ A work in progress shaderpack for Minecraft.
 - Nice bloom
 
 ## The To-Do List
+- Fix noise on reflections
 - Ambient Occlusion
 - Complete LabPBR support - porosity & texture AO
-- Multiple cloud layers/cloud shape revamp
 - DoF
 - Motion blur
 - Other dimensions

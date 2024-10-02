@@ -216,7 +216,7 @@
     } else {
       material = materialFromSpecularMap(color.rgb, specularData);
 
-      float wetnessFactor = wetness * (1.0 - material.porosity);
+      float wetnessFactor = wetness * (1.0 - material.porosity) * lightmap.y;
 
       material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
       material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);

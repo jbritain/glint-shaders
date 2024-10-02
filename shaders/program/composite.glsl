@@ -189,10 +189,5 @@
     }
 
     color.rgb = mix(color.rgb, translucent.rgb, clamp01(translucent.a));
-
-    vec3 fogTransmit = vec3(1.0);
-    vec3 fogScatter = getCloudFog(vec3(0.0), translucentEyePlayerPos, translucentDepth, sunlightColor, skyLightColor, fogTransmit);
-
-    color.rgb = color.rgb * fogTransmit + fogScatter;
   }
 #endif
