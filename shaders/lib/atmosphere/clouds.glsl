@@ -8,6 +8,8 @@
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/reproject.glsl"
 
+uniform sampler2D vanillacloudtex;
+
 #define CUMULUS_DENSITY 0.2
 const float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define CUMULUS_LOWER_HEIGHT 500.0
@@ -28,6 +30,12 @@ const float CIRRUS_COVERAGE = mix(0.2, 1.0, wetness);
 #define CIRRUS_UPPER_HEIGHT 2000.0
 #define CIRRUS_SAMPLES 1
 #define CIRRUS_SUBSAMPLES 1
+
+const float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
+#define VANILLA_CLOUD_LOWER_HEIGHT 192.0
+#define VANILLA_CLOUD_UPPER_HEIGHT 196.0
+#define VANILLA_CLOUD_SAMPLES 10
+#define VANILLA_CLOUD_SUBSAMPLES 4
 
 #define CLOUD_SHAPE_SCALE 2342
 #define CLOUD_SHAPE_SCALE_2 7573
@@ -50,7 +58,15 @@ float getCloudDensity(vec3 pos){
   float densityFactor = 0;
   float heightDenseFactor = 1.0;
 
-  if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
+  if (pos.y >= VANILLA_CLOUD_LOWER_HEIGHT && pos.y <= VANILLA_CLOUD_UPPER_HEIGHT){
+    // 12 blocks per pixel in vanilla cloud texture
+    // 256x256 texture
+    ivec2 cloudSamplePos = ivec2(floor(mod(pos.xz / 12, 256)));
+    float density = texelFetch(vanillacloudtex, cloudSamplePos, 0).r * VANILLA_CLOUD_DENSITY;
+
+    return density;
+
+  } else if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
     coverage = CUMULUS_COVERAGE;
     densityFactor = CUMULUS_DENSITY;
 
@@ -126,9 +142,19 @@ float getTotalDensityTowardsLight(vec3 rayPos, float jitter, float lowerHeight, 
 
 // march from a ray position towards the sun to calculate how much light makes it there
 vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int samples){
-  float totalDensity = getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, samples);
+  float totalDensity = 0.0;
+  #ifdef VANILLA_CLOUDS
+  totalDensity += getTotalDensityTowardsLight(rayPos, jitter, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, samples);
+  #endif
+  #ifdef CUMULUS_CLOUDS
+  totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, samples);
+  #endif
+  #ifdef ALTOCUMULUS_CLOUDS
   totalDensity += getTotalDensityTowardsLight(rayPos, jitter, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, samples);
+  #endif
+  #ifdef CIRRUS_CLOUDS
   totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, samples);
+  #endif
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
 
@@ -247,10 +273,18 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   #endif
 
   vec3 scatter = vec3(0.0);
-
+  #ifdef VANILLA_CLOUDS
+  scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, VANILLA_CLOUD_SAMPLES, VANILLA_CLOUD_SUBSAMPLES);
+  #endif
+  #ifdef CUMULUS_CLOUDS
   scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SAMPLES, CUMULUS_SUBSAMPLES);
+  #endif
+  #ifdef ALTOCUMULUS_CLOUDS
   scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, ALTOCUMULUS_SAMPLES, ALTOCUMULUS_SUBSAMPLES);
+  #endif
+  #ifdef CIRRUS_CLOUDS
   scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SAMPLES, CIRRUS_SUBSAMPLES);
+  #endif
 
 
   return scatter;

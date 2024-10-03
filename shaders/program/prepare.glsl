@@ -11,6 +11,7 @@
 
 #include "/lib/settings.glsl"
 #define HIGH_CLOUD_SAMPLES
+#define GENERATE_SKY_LUT
 
 #ifdef vsh
   out vec2 texcoord;
@@ -77,14 +78,33 @@
 
     vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
     vec3 rayPos;
-    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CUMULUS_LOWER_HEIGHT, rayPos);
-    rayPos.y += 0.1;
 
     float jitter = 0.0;
 
-    float totalDensity = getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SUBSAMPLES);
+    float totalDensity = 0.0;
+
+    #ifdef VANILLA_CLOUDS
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, VANILLA_CLOUD_LOWER_HEIGHT, rayPos);
+    rayPos.y += 0.1;
+    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, VANILLA_CLOUD_SUBSAMPLES);
+    #endif
+    #ifdef CUMULUS_CLOUDS
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CUMULUS_LOWER_HEIGHT, rayPos);
+    rayPos.y += 0.1;
+    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SUBSAMPLES);
+    #endif
+    #ifdef ALTOCUMULUS_CLOUDS
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, ALTOCUMULUS_LOWER_HEIGHT, rayPos);
+    rayPos.y += 0.1;
     totalDensity += getTotalDensityTowardsLight(rayPos, jitter, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, ALTOCUMULUS_SUBSAMPLES);
+    #endif
+    #ifdef CIRRUS_CLOUDS
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CIRRUS_LOWER_HEIGHT, rayPos);
+    rayPos.y += 0.1;
     totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SUBSAMPLES);
+    #endif
+
+    // TODO: DECOUPLE FROM SHADOW SPACE AND MAYBE MAKE THINGS SOFTER
 
     vec3 totalTransmittance = exp(-totalDensity * CLOUD_EXTINCTION_COLOR);
 

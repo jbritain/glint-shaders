@@ -15,18 +15,24 @@ A work in progress shaderpack for Minecraft.
 
 ## The To-Do List
 - Fix noise on reflections
+- Cloud shape overhaul
+- Biome based weather
+- iPBR
+- Puddles
 - Ambient Occlusion
 - Complete LabPBR support - porosity & texture AO
 - DoF
 - Motion blur
-- Other dimensions
+- Skyboxes/atmospherics for other dimensions
 - Floodfill
 - Improve performance
 - ~~TAA~~
 
 ## Known Issues
+- POM looks weird and isn't deep enough
 - Noticeable noise on fog
-- Upscaled volumetrics bleed over terrain edges
+- Ghosting on clouds when player moves
+- Volumetric fog has artifacts
 - Occasionally reflections turn completely black until shader reload
 - Obvious repeating pattern in cloud shapes
 - Artifacts in atmospheric fog near the horizon

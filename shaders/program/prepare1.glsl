@@ -22,6 +22,8 @@
 #endif
 
 #ifdef fsh
+  uniform sampler2D colortex9;
+
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
 
@@ -62,6 +64,8 @@
   #include "/lib/atmosphere/common.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/spheremap.glsl"
+
+  const bool colortex9MipmapEnabled = true; // for later
 
   /* DRAWBUFFERS:9 */
   layout(location = 0) out vec4 color;

@@ -233,3 +233,8 @@ option.POM.comment=Creates the illusion of depth using the heightmap from the re
 
 option.POM_HEIGHT=POM Height
 option.POM_HEIGHT.comment=How deep into the block the heightmap makes things.
+
+option.CUMULUS_CLOUDS=Cumulus Clouds
+option.ALTOCUMULUS_CLOUDS=Altocumulus Clouds
+option.CIRRUS_CLOUDS=Cirrus Clouds
+option.VANILLA_CLOUDS=Vanilla Clouds

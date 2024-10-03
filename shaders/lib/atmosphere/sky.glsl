@@ -35,7 +35,11 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor){
   );
 
   vec3 transmit;
+  // #ifdef GENERATE_SKY_LUT
   skyLightColor = GetSkyRadiance(kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit);
+  // #else
+  // skyLightColor = (texelFetch(colortex9, ivec2(0), 8).rgb + texelFetch(colortex9, ivec2(0, 1), 8).rgb) / 2.0;
+  // #endif
 
   if(sunVector != lightVector) {
     vec3 moonColor = vec3(0.62, 0.65, 0.74);

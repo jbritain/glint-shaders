@@ -67,5 +67,7 @@
     #ifdef DEBUG_ENABLE
     color = texture(debugtex, texcoord);
     #endif
+
+
   }
 #endif

@@ -143,8 +143,8 @@
 
     vec3 GI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0)).rgb;
 
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI);
-    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight);
+    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);
+    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
 
     if((isEyeInWater == 1) != materialIsWater(materialID)){
       color = getAtmosphericFog(color, eyePlayerPos);

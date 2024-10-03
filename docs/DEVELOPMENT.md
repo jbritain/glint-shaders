@@ -28,14 +28,10 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `deferred` rsm global illumination
 `deferred1` global illumination filtering
 `deferred2` opaques shading, sky
-`deferred3` cloud generation
-`deferred4` cloud upscaling (`volumetricUpscaling.glsl`)
-`deferred5` cloud filtering and blending (`volumetricFilter.glsl`)
+`deferred3` clouds
 
 `composite` some fog, translucency blending
 `composite1` cloud fog
-`composite2` cloud fog upscaling (`volumetricUpscaling.glsl`)
-`composite3` cloud fog filtering and blending (`volumetricFilter.glsl`)
 
 `composite88` luminance calculation for auto exposure
 `composite89` writing frame data for next frame to access (previous frame data), blending hand, auto exposure
@@ -53,6 +49,3 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `composite99` bloom upsample A>full
 
 `final` post processing
-
-# Things to know
-- Sampling shadows in any program with `/lib/water/waterFog.glsl` included will make caustics very faint. This is so the fog doesn't look weird.
