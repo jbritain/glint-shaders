@@ -3,7 +3,7 @@
 
 #include "/lib/util.glsl"
 #include "/lib/util/material.glsl"
-#include "/lib/util/screenSpaceRaytrace.glsl"
+#include "/lib/util/screenSpaceRayTrace.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/clouds.glsl"
 #include "/lib/util/noise.glsl"

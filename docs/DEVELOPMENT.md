@@ -13,7 +13,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex1` gbuffer data - albedo, material ID, face normal, lightmap
 `colortex2` gbuffer data - mapped normal, specular map data
 `colortex3` stars [gbuffers > deferred] translucents [gbuffers translucent>composite89] bloom [composite90>]
-`colortex4` previous frame data - color rgb, opaque depth
+`colortex4` previous frame data - color rgb, depth a
 `colortex5` hand
 `colortex6` cloud shadow map (256x256)
 `colortex7` cloud scattering (transmittance in alpha)

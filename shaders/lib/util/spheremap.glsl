@@ -3,6 +3,7 @@
 
 vec2 mapSphere(vec3 dir){
   dir = normalize(dir);
+  dir = dir.xzy;
 
   float theta = atan(dir.z, dir.x);
 
@@ -20,11 +21,14 @@ vec3 unmapSphere(vec2 uv){
   float theta = uv.x * 2 * PI;
   float phi = uv.y * PI;
 
-  return normalize(vec3(
+  vec3 dir = normalize(vec3(
     sin(phi) * cos(theta),
     cos(phi),
     sin(phi) * sin(theta)
   ));
+
+  dir = dir.xzy;
+  return dir;
 }
 
 #endif

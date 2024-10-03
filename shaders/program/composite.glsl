@@ -94,7 +94,7 @@
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/water/waterFog.glsl"
-  #include "/lib/util/screenSpaceRaytrace.glsl"
+  #include "/lib/util/screenSpaceRayTrace.glsl"
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/spheremap.glsl"

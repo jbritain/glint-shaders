@@ -7,6 +7,7 @@
 
     /program/composite89.glsl
     - Auto exposure
+    - Write data for next frame
     - Hand blending
 */
 
