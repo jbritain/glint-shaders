@@ -1,3 +1,13 @@
+'''
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+
+		Generate block.properties file and related ID definitions
+'''
+
 from block_wrangler import *
 from pathlib import Path
 
