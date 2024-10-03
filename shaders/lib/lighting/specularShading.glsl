@@ -164,7 +164,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
     float jitter = blueNoise(screenPos, frameCounter).r;
     reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
-  } else if (material.roughness < ROUGH_REFLECTION_THRESHOLD) { // we must take multiple samples
+  } else { // we must take multiple samples
 
     // we need a TBN to get into tangent space for the VNDF
     vec3 tangent;
@@ -209,7 +209,12 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
   vec4 reflectedColor = vec4(0.0, 0.0, 0.0, 1.0);
 
   #ifdef SSR
-  reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material);
+  if (material.roughness < ROUGH_REFLECTION_THRESHOLD){
+    reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material);
+  } else {
+    reflectedColor = color;
+  }
+  
   #else
   if(material.roughness == 0.0){
     vec3 worldDir = mat3(gbufferModelViewInverse) * normalize(viewPos);

@@ -227,3 +227,9 @@ option.SATURATION=Saturation
 option.GLOBAL_ILLUMINATION=Global Illumination
 option.GI_RADIUS=Radius
 option.GI_SAMPLES=Samples
+
+option.POM=Parallax Occlusion Mapping
+option.POM.comment=Creates the illusion of depth using the heightmap from the resource pack.
+
+option.POM_HEIGHT=POM Height
+option.POM_HEIGHT.comment=How deep into the block the heightmap makes things.

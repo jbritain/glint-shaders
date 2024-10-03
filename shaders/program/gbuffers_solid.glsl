@@ -20,6 +20,10 @@
   flat out int materialID;
   out vec3 viewPos;
 
+  out vec2 singleTexSize;
+  out ivec2 pixelTexSize;
+  out vec4 textureBounds;
+
   uniform int worldTime;
   uniform int worldDay;
 
@@ -30,9 +34,12 @@
 
   uniform vec3 cameraPosition;
 
+  uniform ivec2 atlasSize;
+
   in vec4 at_tangent;
   in vec2 mc_Entity;
   in vec3 at_midBlock;
+  in vec2 mc_midTexCoord;
 
   #include "/lib/util.glsl"
   #include "/lib/misc/sway.glsl"
@@ -55,6 +62,12 @@
     viewPos = (gbufferModelView * vec4(feetPlayerPos, 1.0)).xyz;
 
     gl_Position = gbufferProjection * vec4(viewPos, 1.0);
+
+    vec2 halfSize      = abs(texcoord - mc_midTexCoord);
+    textureBounds = vec4(mc_midTexCoord.xy - halfSize, mc_midTexCoord.xy + halfSize);
+
+    singleTexSize = halfSize * 2.0;
+    pixelTexSize  = ivec2(singleTexSize * atlasSize);
   }
 #endif
 //------------------------------------------------------------------
@@ -80,9 +93,14 @@
   flat in int materialID;
   in vec3 viewPos;
 
+  in vec2 singleTexSize;
+  in ivec2 pixelTexSize;
+  in vec4 textureBounds;
+
   #include "/lib/util.glsl"
   #include "/lib/post/tonemap.glsl"
   #include "/lib/util/packing.glsl"
+  #include "/lib/misc/parallax.glsl"
 
   vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -97,6 +115,10 @@
   layout(location = 1) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
+    #ifdef POM
+    vec2 texcoord = getParallaxTexcoord(texcoord, normalize(-viewPos) * tbnMatrix);
+    #endif
+
     vec4 color;
     color = texture(gtexture, texcoord) * glcolor;
     color.rgb = mix(color.rgb, entityColor.rgb, entityColor.a);
