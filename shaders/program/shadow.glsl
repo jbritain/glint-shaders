@@ -43,10 +43,10 @@
 
   void main(){
 
-    if(!hasSkylight){
+    #ifdef WORLD_THE_NETHER
       gl_Position = vec4(1e2);
       return;
-    }
+    #endif
 
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord  = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;

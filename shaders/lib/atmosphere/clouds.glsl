@@ -272,6 +272,10 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   return vec3(0.0);
   #endif
 
+  #ifndef WORLD_OVERWORLD
+    return vec3(0.0);
+  #endif
+
   vec3 scatter = vec3(0.0);
   #ifdef VANILLA_CLOUDS
   scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, VANILLA_CLOUD_SAMPLES, VANILLA_CLOUD_SUBSAMPLES);

@@ -137,7 +137,7 @@
     material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
 
 
-    vec3 sunlight = hasSkylight ? getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor : vec3(0.0);
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
 
     color.rgb = albedo;
 

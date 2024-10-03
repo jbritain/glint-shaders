@@ -10,12 +10,16 @@ vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material, v
 
   vec3 ambient = vec3(AMBIENT_STRENGTH);
 
+  #ifndef WORLD_OVERWORLD
+  ambient *= 3.0;
+  #endif
+
   return color * (
     (skyLight +
     blockLight +
     sunlight +
     GI) / PI +
-    ambient * (hasSkylight ? 1.0 : 3.0) +
+    ambient +
     material.emission * 2
   );
 }

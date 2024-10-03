@@ -71,10 +71,6 @@
   layout(location = 0) out vec4 color;
 
   void main() {
-    if(!hasSkylight){
-      color = vec4(0.0);
-      return;
-    }
 
     vec3 dir = unmapSphere(texcoord);
 

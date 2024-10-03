@@ -91,7 +91,7 @@
 
     vec3 cloudTransmittance = vec3(1.0);
 
-    vec3 cloudScatter = hasSkylight ? getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor, cloudTransmittance) : vec3(0.0);
+    vec3 cloudScatter = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor, cloudTransmittance);
 
     vec3 screenPos = vec3(texcoord, depth);
     vec3 previousScreenPos = reproject(screenPos);

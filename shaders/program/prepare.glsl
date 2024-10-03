@@ -66,10 +66,11 @@
   layout(location = 0) out vec4 color;
 
   void main() {
-    if(!hasSkylight){
-      color = vec4(0.0);
-      return;
-    }
+    color = vec4(1.0);
+
+    #ifndef WORLD_OVERWORLD
+    return;
+    #endif
 
     vec3 shadowScreenPos = vec3(texcoord, 1.0);
     vec3 shadowNDCPos = shadowScreenPos * 2.0 - 1.0;
