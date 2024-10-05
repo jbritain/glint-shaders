@@ -26,6 +26,7 @@
 
   uniform int worldTime;
   uniform int worldDay;
+  uniform float frameTimeCounter;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -58,6 +59,11 @@
     vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
     vec3 worldPos = feetPlayerPos + cameraPosition;
     worldPos = getSway(materialID, worldPos, at_midBlock);
+
+    if(materialIsWater(materialID)){
+      worldPos.y += (getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5);
+    }
+
     feetPlayerPos = worldPos - cameraPosition;
     viewPos = (gbufferModelView * vec4(feetPlayerPos, 1.0)).xyz;
 
@@ -154,6 +160,7 @@
   #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/common.glsl"
   #include "/lib/misc/parallax.glsl"
+  #include "/lib/water/waveNormals.glsl"
 
   vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -170,8 +177,13 @@
 
   void main() {
     #ifdef POM
-    vec2 texcoord = getParallaxTexcoord(texcoord, normalize(-viewPos) * tbnMatrix);
+    vec2 texcoord = texcoord;
+    
+    if(length(viewPos) < 32.0){
+      texcoord = getParallaxTexcoord(texcoord, normalize(-viewPos) * tbnMatrix);
+    }
     #endif
+
 
     vec3 faceNormal = tbnMatrix[2];
 
@@ -211,8 +223,8 @@
     #endif
 
     if(materialIsWater(materialID)){
+      #ifdef CUSTOM_WATER
       color = vec4(0.0);
-      #ifdef WATER_NORMALS
       mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, WAVE_E, WAVE_DEPTH);
       #endif
     }
@@ -230,6 +242,7 @@
     #endif
 
     Material material;
+
     if(materialIsWater(materialID)) {
       material = waterMaterial;
     } else {

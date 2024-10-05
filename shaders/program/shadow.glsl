@@ -26,7 +26,7 @@
   uniform int worldTime;
   uniform int worldDay;
   uniform vec3 cameraPosition;
-
+  uniform float frameTimeCounter;
   uniform bool hasSkylight;
 
   out vec2 lmcoord;
@@ -40,6 +40,7 @@
   #include "/lib/util.glsl"
   #include "/lib/lighting/shadowBias.glsl"
   #include "/lib/misc/sway.glsl"
+  #include "/lib/water/waveNormals.glsl"
 
   void main(){
 
@@ -59,6 +60,11 @@
     feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
     vec3 worldPos = feetPlayerPos + cameraPosition;
     worldPos = getSway(materialID, worldPos, at_midBlock);
+
+    if(materialIsWater(materialID)){
+      worldPos.y += getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5;
+    }
+
     feetPlayerPos = worldPos - cameraPosition;
     shadowViewPos = (shadowModelView * vec4(feetPlayerPos, 1.0)).xyz;
 

@@ -10,7 +10,8 @@ screen.POST=Post-Processing
 option.DEBUG_ENABLE=Debug Mode
 option.DEBUG_ENABLE.comment=Makes the `show()` function write to the screen
 
-option.WATER_NORMALS=Water Waves
+option.CUSTOM_WATER=Realistic Water
+option.CUSTOM_WATER.comment=Adds waves to water and hides the texture
 
 option.SSR=Screen Space Reflections
 option.SSR.comment=Allows reflective surfaces to...reflect what's onscreen.

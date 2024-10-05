@@ -1,3 +1,6 @@
+#ifndef WAVE_NORMALS_INCLUDE
+#define WAVE_NORMALS_INCLUDE
+
 // "Very fast procedural ocean" by afl_ext
 // https://www.shadertoy.com/view/MdXyzX
 // https://opensource.org/license/mit
@@ -8,8 +11,12 @@
 // Calculates wave value and its derivative, 
 // for the wave direction, position in space, wave frequency and time
 vec2 wavedx(vec2 position, vec2 direction, float frequency, float timeshift) {
+  #ifndef CUSTOM_WATER
+    return vec2(0.5, 0.0);
+  #endif
+
   float x = dot(direction, position) * frequency + timeshift;
-  float wave = exp(sin(x) - 1.0);
+  float wave = exp(sin(x) - 1.0) * 0.5;
   float dx = wave * cos(x);
   return vec2(wave, -dx);
 }
@@ -66,3 +73,5 @@ vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float e, float depth) {
   waveNormal = rotate(waveNormal, vec3(0.0, 1.0, 0.0), worldFaceNormal);
   return waveNormal;
 }
+
+#endif

@@ -16,7 +16,7 @@ const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
 const int colortex8Format = RGBA16F; || fog scattering (transmittance in alpha)
 const int colortex9Format = RGB16F;  || sky environment map
-const int colortex10Format = RGB8F;  || global illumination
+const int colortex10Format = RGB8;  || global illumination
 
 const int shadowcolor2Format = RGB16F;
 
@@ -75,7 +75,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define BLOOM_RADIUS 1.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 #define BLOOM_STRENGTH 1.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 
-#define WATER_NORMALS
+#define CUSTOM_WATER
 
 #define REFRACTION
 
@@ -105,5 +105,5 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define CLOUD_BLEND 0.1
 
-// #define POM
+#define POM
 #define POM_HEIGHT 0.25 // [0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]

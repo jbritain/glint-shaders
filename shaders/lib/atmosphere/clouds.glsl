@@ -10,7 +10,7 @@
 
 uniform sampler2D vanillacloudtex;
 
-#define CUMULUS_DENSITY 0.2
+#define CUMULUS_DENSITY 0.1
 const float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 700.0

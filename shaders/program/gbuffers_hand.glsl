@@ -34,7 +34,6 @@
   in vec3 at_midBlock;
 
   #include "/lib/util.glsl"
-  #include "/lib/misc/sway.glsl"
 
   void main() {
     gl_Position = ftransform();

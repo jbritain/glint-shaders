@@ -26,6 +26,7 @@
 
   uniform int worldTime;
   uniform int worldDay;
+  uniform float frameTimeCounter;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -116,7 +117,11 @@
 
   void main() {
     #ifdef POM
-    vec2 texcoord = getParallaxTexcoord(texcoord, normalize(-viewPos) * tbnMatrix);
+    vec2 texcoord = texcoord;
+    
+    if(length(viewPos) < 32.0){
+      texcoord = getParallaxTexcoord(texcoord, normalize(-viewPos) * tbnMatrix);
+    }
     #endif
 
     vec4 color;

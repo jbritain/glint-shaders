@@ -2,6 +2,7 @@
 #define SWAY_INCLUDE
 
 #include "/lib/util/materialIDs.glsl"
+#include "/lib/water/waveNormals.glsl"
 
 vec3 getWave(vec3 pos){
   float magnitude = 0.1;
@@ -35,7 +36,7 @@ vec3 hangingSway(vec3 pos, vec3 midblock){ // stuff hanging from a block
 }
 
 vec3 floatingSway(vec3 pos){ // stuff on the water
-  return pos + getWave(pos * vec3(1.0, 1.0, 0.0));
+  return pos + vec3(0.0, getwaves(pos.xz, ITERATIONS_NORMAL) - 0.5, 0.0);
 }
 
 vec3 fullSway(vec3 pos){ // leaves, mainly
