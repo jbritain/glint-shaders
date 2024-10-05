@@ -6,7 +6,7 @@
 
 /*
 
-const int colortex0Format = RGBA32F; || scene colour
+const int colortex0Format = RGBA16F; || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
 const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
@@ -16,7 +16,7 @@ const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
 const int colortex8Format = RGBA16F; || fog scattering (transmittance in alpha)
 const int colortex9Format = RGB16F;  || sky environment map
-const int colortex10Format = RGB8;  || global illumination
+const int colortex10Format = RGB8;   || global illumination
 
 const int shadowcolor2Format = RGB16F;
 
