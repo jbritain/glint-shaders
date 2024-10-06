@@ -27,6 +27,7 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex6;
   uniform sampler2D colortex9;
+  uniform sampler2D colortex10;
 
   uniform sampler2D depthtex2;
 
@@ -110,6 +111,7 @@
 
   void main() {
     #ifdef GLOBAL_ILLUMINATION
+    outGI = texture(colortex10, texcoord);
 
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));

@@ -136,12 +136,13 @@
     material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
     material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
 
-
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
+    float parallaxShadow = texture(colortex10, texcoord).a;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxShadow;
 
     color.rgb = albedo;
 
     vec3 GI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0)).rgb;
+
 
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);

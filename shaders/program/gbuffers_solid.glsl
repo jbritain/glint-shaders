@@ -84,8 +84,11 @@
   uniform float alphaTestRef;
 
   uniform vec3 cameraPosition;
+  uniform vec3 shadowLightPosition;
 
   uniform mat4 gbufferModelViewInverse;
+  uniform mat4 gbufferProjection;
+  uniform mat4 gbufferProjectionInverse;
 
   in vec2 lmcoord;
   in vec2 texcoord;
@@ -93,6 +96,9 @@
   in mat3 tbnMatrix;
   flat in int materialID;
   in vec3 viewPos;
+
+  uniform float viewWidth;
+  uniform float viewHeight;
 
   in vec2 singleTexSize;
   in ivec2 pixelTexSize;
@@ -111,18 +117,27 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:12 */
+  /* RENDERTARGETS: 1,2,10 */
   layout(location = 0) out vec4 outData1; // albedo, material ID, face normal, lightmap
   layout(location = 1) out vec4 outData2; // mapped normal, specular map data
+  layout(location = 2) out vec4 outData3; // nothing in the rgb but parallax shadow in the a
 
   void main() {
+    float parallaxSunlight = 1.0;
     #ifdef POM
     vec2 texcoord = texcoord;
-    
+    vec2 dx = dFdx(texcoord);
+    vec2 dy = dFdy(texcoord);
+    vec3 parallaxPos;
     if(length(viewPos) < 32.0){
-      texcoord = getParallaxTexcoord(texcoord, normalize(-viewPos) * tbnMatrix);
+      vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rg;
+      texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
+      #ifdef POM_SHADOW
+      parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(length(viewPos), 0.0, 32.0) : 1.0;
+      #endif
     }
     #endif
+    outData3 = vec4(0.0, 0.0, 0.0, parallaxSunlight);
 
     vec4 color;
     color = texture(gtexture, texcoord) * glcolor;

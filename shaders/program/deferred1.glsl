@@ -37,6 +37,7 @@
   #include "/lib/util/blur.glsl"
 
   void main() {
-    outGI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(0.0, 1.0));
+    outGI.rgb = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(0.0, 1.0)).rgb;
+    outGI.a = texture(colortex10, texcoord).a;
   }
 #endif
