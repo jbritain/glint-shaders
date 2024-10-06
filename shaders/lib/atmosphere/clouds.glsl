@@ -158,7 +158,7 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
 
-  return multipleScattering(totalDensity, costh, CLOUD_G, CLOUD_EXTINCTION_COLOR, 32, CLOUD_DUAL_LOBE_WEIGHT) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
+  return multipleScattering(totalDensity, costh, 0.8, -0.5, CLOUD_EXTINCTION_COLOR, 4, 0.5) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
 }
 
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){
@@ -172,7 +172,7 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
   vec3 a;
   vec3 b;
 
-  vec3 firstFogPoint = b;
+  float fogDepth = 0.0;
 
   if(!rayPlaneIntersection(cameraPosition, worldDir, lowerHeight, a)){
     if(worldDir.y > 0 && cameraPosition.y >= lowerHeight && cameraPosition.y <= upperHeight){ // inside cloud, looking up
@@ -239,10 +239,7 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
     }
 
     vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
-
-    if(firstFogPoint == b){
-      firstFogPoint = rayPos;
-    }
+    fogDepth += distance(cameraPosition, rayPos) * 1.0 - mean(clamp01(transmittance));
 
     #ifdef HIGH_CLOUD_SAMPLES
     float lightJitter = blueNoise(texcoord, i).r;
@@ -252,17 +249,19 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
     vec3 lightEnergy = calculateCloudLightEnergy(rayPos, lightJitter, mu, subsamples);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
-    vec3 integScatter = radiance * (1.0 - clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
+    vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
+
+    scatter += integScatter * totalTransmittance;
 
     totalTransmittance *= transmittance;
-    scatter += integScatter * totalTransmittance;
 
     if(max3(totalTransmittance) < 0.01){
       break;
     }
   }
 
-  scatter = getAtmosphericFog(vec4(scatter, 1.0), (firstFogPoint - cameraPosition)).rgb;
+  // TODO: atmospheric fog should change based on cloud coverage
+  scatter = getAtmosphericFog(vec4(scatter, 1.0), (worldDir * fogDepth)).rgb;
   return scatter;
 }
 

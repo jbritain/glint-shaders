@@ -26,7 +26,7 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
   // float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
 
   float cosTheta = clamp01(dot(normalize(increment), lightVector));
-  float phase = dualHenyeyGreenstein(0.97, cosTheta, 0.7);
+  float phase = dualHenyeyGreenstein(-0.97, 0.97, cosTheta, 0.7);
 
   rayPos += increment * jitter;
 
