@@ -186,7 +186,7 @@
       vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rg;
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
-      parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(length(viewPos), 0.0, 32.0) : 1.0;
+            parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
       #endif
     }
     #endif

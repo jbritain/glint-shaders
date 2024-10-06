@@ -9,7 +9,9 @@ float getDepth(vec2 texcoord, vec2 dx, vec2 dy){
 }
 
 vec2 localToAtlas(vec2 texcoord){
-  return (mod(texcoord, 1.0) * singleTexSize) + textureBounds.xy;
+  vec2 localCoord = 1.0 - abs(mod(texcoord, 2.0) - 1.0); // mirror the texture coordinate if it goes out of bounds instead of wrapping it
+
+  return localCoord * singleTexSize + textureBounds.xy;
 }
 
 vec2 atlasToLocal(vec2 texcoord){
@@ -43,6 +45,11 @@ vec2 getParallaxTexcoord(vec2 texcoord, vec3 viewPos, mat3 tbnMatrix, out vec3 p
 }
 
 bool getParallaxShadow(vec3 pos, mat3 tbnMatrix, vec2 dx, vec2 dy, float jitter){
+  float NoL = clamp01(dot(normalize(shadowLightPosition), tbnMatrix[2]));
+  if(NoL < 0.01){
+    return false;
+  }
+
   vec3 lightDir = normalize(shadowLightPosition) * tbnMatrix;
   vec3 rayStep = vec3(lightDir.xy * rcp(lightDir.z) * POM_HEIGHT, -1.0) * pos.z * rcp(PARALLAX_SHADOW_SAMPLES);
 

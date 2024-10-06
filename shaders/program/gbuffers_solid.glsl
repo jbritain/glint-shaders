@@ -100,6 +100,8 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform int frameCounter;
+
   in vec2 singleTexSize;
   in ivec2 pixelTexSize;
   in vec4 textureBounds;
@@ -108,6 +110,7 @@
   #include "/lib/post/tonemap.glsl"
   #include "/lib/util/packing.glsl"
   #include "/lib/misc/parallax.glsl"
+  #include "/lib/util/noise.glsl"
 
   vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -130,10 +133,10 @@
     vec2 dy = dFdy(texcoord);
     vec3 parallaxPos;
     if(length(viewPos) < 32.0){
-      vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rg;
+      vec2 pomJitter = vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
-      parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(length(viewPos), 0.0, 32.0) : 1.0;
+      parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
       #endif
     }
     #endif
