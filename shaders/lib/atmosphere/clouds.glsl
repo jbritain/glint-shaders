@@ -32,13 +32,7 @@ const float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
 
 float getCloudDensity(vec3 pos){
 
-  CloudWeather weather = CloudWeather(
-    1.0,
-    0.5,
-    0.0
-  );
-
-  float density = cloudDensitySample(pos, weather) * 0.1;
+  float density = cloudDensitySample(pos);
 
   return density;
   // return clamp01(density * densityFactor);
@@ -81,14 +75,8 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
   #ifdef VANILLA_CLOUDS
   totalDensity += getTotalDensityTowardsLight(rayPos, jitter, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, samples);
   #endif
-  #ifdef CUMULUS_CLOUDS
-  totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, samples);
-  #endif
-  #ifdef STRATOCUMULUS_CLOUDS
-  totalDensity += getTotalDensityTowardsLight(rayPos, jitter, STRATOCUMULUS_LOWER_HEIGHT, STRATOCUMULUS_UPPER_HEIGHT, samples);
-  #endif
-  #ifdef STRATUS_CLOUDS
-  totalDensity += getTotalDensityTowardsLight(rayPos, jitter, STRATUS_LOWER_HEIGHT, STRATUS_UPPER_HEIGHT, samples);
+  #ifdef CLOUD_BOTTOM_LAYER
+  totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CLOUD_BOTTOM_LOWER_HEIGHT, CLOUD_BOTTOM_UPPER_HEIGHT, samples);
   #endif
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
@@ -215,14 +203,8 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   #ifdef VANILLA_CLOUDS
   scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, VANILLA_CLOUD_SAMPLES, VANILLA_CLOUD_SUBSAMPLES);
   #endif
-  #ifdef CUMULUS_CLOUDS
-  scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SAMPLES, CUMULUS_SUBSAMPLES);
-  #endif
-  #ifdef STRATOCUMULUS_CLOUDS
-  scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, STRATOCUMULUS_LOWER_HEIGHT, STRATOCUMULUS_UPPER_HEIGHT, STRATOCUMULUS_SAMPLES, STRATOCUMULUS_SUBSAMPLES);
-  #endif
-  #ifdef STRATUS_CLOUDS
-  scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, STRATUS_LOWER_HEIGHT, STRATUS_UPPER_HEIGHT, STRATUS_SAMPLES, STRATUS_SUBSAMPLES);
+  #ifdef CLOUD_BOTTOM_LAYER
+  scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, CLOUD_BOTTOM_LOWER_HEIGHT, CLOUD_BOTTOM_UPPER_HEIGHT, CLOUD_BOTTOM_SAMPLES, CLOUD_BOTTOM_SUBSAMPLES);
   #endif
 
 
