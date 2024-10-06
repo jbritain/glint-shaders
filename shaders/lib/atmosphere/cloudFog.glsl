@@ -18,7 +18,7 @@
 #define FOG_G 0.85
 
 #define FOG_LOWER_HEIGHT 63
-float FOG_UPPER_HEIGHT = mix(103.0, CLOUD_BOTTOM_LOWER_HEIGHT, wetness);
+float FOG_UPPER_HEIGHT = mix(103.0, CUMULUS_LOWER_HEIGHT, wetness);
 
 #define FOG_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
 

@@ -239,6 +239,6 @@ option.POM_SHADOW=POM Self-Shadow
 option.POM_SHADOW.comment=Allows parallax mapped textures to cast shadows on themselves.
 
 option.CUMULUS_CLOUDS=Cumulus Clouds
-option.STRATOCUMULUS_CLOUDS=Stratocumulus Clouds
-option.STRATUS_CLOUDS=Stratus Clouds
+option.ALTOCUMULUS_CLOUDS=Altocumulus Clouds
+option.CIRRUS_CLOUDS=Cirrus Clouds
 option.VANILLA_CLOUDS=Vanilla Clouds
