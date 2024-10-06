@@ -94,15 +94,15 @@
     rayPos.y += 0.1;
     totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SUBSAMPLES);
     #endif
-    #ifdef ALTOCUMULUS_CLOUDS
-    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, ALTOCUMULUS_LOWER_HEIGHT, rayPos);
+    #ifdef STRATOCUMULUS_CLOUDS
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, STRATOCUMULUS_LOWER_HEIGHT, rayPos);
     rayPos.y += 0.1;
-    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, ALTOCUMULUS_SUBSAMPLES);
+    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, STRATOCUMULUS_LOWER_HEIGHT, STRATOCUMULUS_UPPER_HEIGHT, STRATOCUMULUS_SUBSAMPLES);
     #endif
-    #ifdef CIRRUS_CLOUDS
-    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, CIRRUS_LOWER_HEIGHT, rayPos);
+    #ifdef STRATUS_CLOUDS
+    rayPlaneIntersection(feetPlayerPos + cameraPosition, lightVector, STRATUS_LOWER_HEIGHT, rayPos);
     rayPos.y += 0.1;
-    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SUBSAMPLES);
+    totalDensity += getTotalDensityTowardsLight(rayPos, jitter, STRATUS_LOWER_HEIGHT, STRATUS_UPPER_HEIGHT, STRATUS_SUBSAMPLES);
     #endif
 
     // TODO: DECOUPLE FROM SHADOW SPACE AND MAYBE MAKE THINGS SOFTER

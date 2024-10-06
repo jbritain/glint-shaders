@@ -351,6 +351,11 @@ float quinticStep(float edge0, float edge1, float x) {
     return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
 }
 
+float remap(float originalValue, float originalMin, float originalMax, float newMin, float newMax)
+{
+	return newMin + (((originalValue - originalMin) / (originalMax - originalMin)) * (newMax - newMin));
+}
+
 #define worldTimeCounter ((worldTime / 20.0) + (worldDay * 1200.0))
 #define EBS (vec2(eyeBrightnessSmooth) / 240.0)
 
