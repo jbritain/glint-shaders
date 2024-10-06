@@ -4,6 +4,7 @@
 #include "/lib/lighting/shadowBias.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/util/materialIDs.glsl"
+#include "/lib/util/dh.glsl"
 
 vec4 shadowNoise;
 
@@ -166,6 +167,15 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 	float faceNoL = NoLSafe(faceNormal);
 	float NoL = NoLSafe(mappedNormal) * step(0.00001, faceNoL);
+
+	if(DH_MASK){
+		float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
+
+		vec3 shadow = vec3(lightmapShadow);
+		float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
+
+		return max(shadow * NoL, vec3(scatter));
+	}
 
 	#ifdef SHADOWS
 

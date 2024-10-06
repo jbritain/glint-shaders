@@ -108,6 +108,7 @@
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/util/noise.glsl"
   #include "/lib/lighting/reflectiveShadowMap.glsl"
+  #include "/lib/util/dh.glsl"
 
   void main() {
     #ifdef GLOBAL_ILLUMINATION
@@ -115,6 +116,7 @@
 
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+    dhOverride(depth, viewPos, false);
     vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
 
     if(depth == 1.0){

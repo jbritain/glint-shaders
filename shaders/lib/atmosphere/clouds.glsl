@@ -41,14 +41,13 @@ const float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
 #define CLOUD_SHAPE_SCALE_2 7573
 #define CLOUD_EROSION_SCALE 234.426
 
-#define CLOUD_DISTANCE 10000.0
+#define CLOUD_DISTANCE 100000.0
 
 // blocks per second
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-// don't make the extinction colour rgb!!!
-#define CLOUD_EXTINCTION_COLOR vec3(1.0)
+#define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
 #define CLOUD_DUAL_LOBE_WEIGHT 0.7
 #define CLOUD_G 0.6
 
@@ -158,7 +157,7 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
 
-  return multipleScattering(totalDensity, costh, 0.8, -0.5, CLOUD_EXTINCTION_COLOR, 4, 0.5) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
+  return multipleScattering(totalDensity, costh, 0.8, -0.8, CLOUD_EXTINCTION_COLOR, 4, 0.5) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
 }
 
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){
@@ -232,14 +231,14 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
     if(length(rayPos.xz - cameraPosition.xz) > CLOUD_DISTANCE) break;
 
     float density = getCloudDensity(rayPos) * length(increment);
-    density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.8, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
+    // density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.8, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
 
     if(density < 1e-6){
       continue;
     }
 
     vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
-    fogDepth += distance(cameraPosition, rayPos) * 1.0 - mean(clamp01(transmittance));
+    fogDepth += distance(cameraPosition, rayPos) * (1.0 - mean(clamp01(transmittance)));
 
     #ifdef HIGH_CLOUD_SAMPLES
     float lightJitter = blueNoise(texcoord, i).r;

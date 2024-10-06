@@ -99,6 +99,7 @@
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/spheremap.glsl"
   #include "/lib/atmosphere/cloudFog.glsl"
+  #include "/lib/util/dh.glsl"
 
   // Kneemund's Border Attenuation
   float kneemundAttenuation(vec2 pos, float edgeFactor) {
@@ -120,9 +121,11 @@
     float opaqueDepth = texture(depthtex2, texcoord).r;
 
     vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
+    dhOverride(opaqueDepth, opaqueViewPos, true);
     vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
 
     vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
+    dhOverride(translucentDepth, translucentViewPos, false);
     vec3 translucentEyePlayerPos = mat3(gbufferModelViewInverse) * translucentViewPos;
     
     vec4 translucent = texture(colortex3, texcoord);

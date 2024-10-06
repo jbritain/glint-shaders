@@ -76,12 +76,14 @@
   #include "/lib/util/noise.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
+  #include "/lib/util/dh.glsl"
 
 
   void main() {
 
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+    dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
     color = texture(colortex0, texcoord);
@@ -106,6 +108,6 @@
 
     color.rgb = color.rgb * cloudTransmittance.rgb + cloudScatter.rgb;
     cloudData.rgb = cloudScatter;
-    cloudData.a = sum3(cloudTransmittance) / 3.0;
+    cloudData.a = mean(cloudTransmittance);
   }
 #endif

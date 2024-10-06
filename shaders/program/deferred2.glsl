@@ -106,10 +106,12 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/blur.glsl"
+  #include "/lib/util/dh.glsl"
 
   void main() {
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+    dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
     vec3 sunlightColor; vec3 skyLightColor;
@@ -137,7 +139,13 @@
     material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
 
     float parallaxShadow = texture(colortex10, texcoord).a;
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxShadow;
+
+    if(DH_MASK){
+      parallaxShadow = 1.0;
+    }
+    vec3 sunlight = SUNLIGHT_STRENGTH * sunlightColor;
+    sunlight *= getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * parallaxShadow;
+    
 
     color.rgb = albedo;
 

@@ -84,6 +84,7 @@
   #include "/lib/util/noise.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/cloudFog.glsl"
+  #include "/lib/util/dh.glsl"
 
 
   void main() {
@@ -97,6 +98,7 @@
 
     float depth = texture(depthtex0, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+    dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
     vec3 sunlightColor; vec3 skyLightColor;
