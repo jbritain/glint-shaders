@@ -110,3 +110,5 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define POM_SAMPLES 32.0
 #define PARALLAX_SHADOW_SAMPLES 8.0
 #define POM_SHADOW
+
+#define WATERMARK

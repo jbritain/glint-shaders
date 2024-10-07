@@ -35,7 +35,7 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
-  uniform sampler3D clouderosionnoisetex;
+  uniform sampler2D watermarktex;
 
   in vec2 texcoord;
 
@@ -56,6 +56,14 @@
 
     #ifdef BLOOM
     color.rgb = mix(color.rgb, bloom, 0.01 * BLOOM_STRENGTH);
+    #endif
+
+    #ifdef WATERMARK
+    ivec2 watermarkCoord = ivec2(vec2(2 * gl_FragCoord.x, viewHeight) - gl_FragCoord.xy);
+    watermarkCoord.x -= (int(viewWidth) - 300);
+    watermarkCoord.y -= (int(viewHeight) - 200);
+    vec4 watermark = texelFetch(watermarktex, watermarkCoord, 0);
+    color.rgb = mix(color.rgb, bloom.rgb, watermark.a);
     #endif
 
     color.rgb = tonemap(color.rgb);
