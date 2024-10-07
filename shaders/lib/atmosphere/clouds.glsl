@@ -14,7 +14,7 @@ uniform sampler2D vanillacloudtex;
 const float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 700.0
-#define CUMULUS_SAMPLES 25
+#define CUMULUS_SAMPLES 15
 #define CUMULUS_SUBSAMPLES 4
 
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
@@ -92,6 +92,7 @@ float getCloudDensity(vec3 pos){
   } else if (pos.y >= CIRRUS_LOWER_HEIGHT && pos.y <= CIRRUS_UPPER_HEIGHT){
     coverage = CIRRUS_COVERAGE;
     densityFactor = CIRRUS_DENSITY;
+    pos.x /= 4;
   } else {
     return 0;
   }
@@ -157,7 +158,7 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
 
-  return multipleScattering(totalDensity, costh, 0.8, -0.8, CLOUD_EXTINCTION_COLOR, 4, 0.5) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
+  return multipleScattering(totalDensity, costh, -0.5, 0.85, CLOUD_EXTINCTION_COLOR, 4, 0.5) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
 }
 
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){
@@ -165,6 +166,8 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
   #ifdef HIGH_CLOUD_SAMPLES
   samples *= 4;
+  #else
+  samples = int(ceil(mix(samples * 0.75, float(samples), worldDir.y)));
   #endif
 
   // we trace from a to b
