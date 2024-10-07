@@ -124,10 +124,17 @@
   layout(location = 1) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
+    if(length(viewPos) < far * 0.8){
+      discard;
+      return;
+    } 
+
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
     vec4 color = texture(gtexture, texcoord) * glcolor;
     color.rgb = mix(color.rgb, entityColor.rgb, entityColor.a);
+
+
 
     color.rgb = gammaCorrect(color.rgb);
 

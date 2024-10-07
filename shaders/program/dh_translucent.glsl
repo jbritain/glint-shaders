@@ -55,7 +55,8 @@
 
   uniform vec4 entityColor;
 
-  uniform sampler2D depthtex0; // do not use this in gbuffers it is a bad idea
+  uniform sampler2D depthtex0;
+  uniform sampler2D depthtex1;
   uniform sampler2D depthtex2;
   uniform sampler2D colortex0;
   uniform sampler2D colortex4;
@@ -126,6 +127,19 @@
   layout(location = 2) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
+    if(length(viewPos) < far * 0.8){
+      discard;
+      return;
+    } 
+
+    float opaqueDepth = texture(depthtex1, gl_FragCoord.xy / vec2(viewWidth, viewHeight)).r;
+    float opaqueDistance = screenSpaceToViewSpace(opaqueDepth);
+
+    if(opaqueDistance > viewPos.z){
+      discard;
+      return;
+    }
+
     DH_MASK = true;
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
 
@@ -147,9 +161,7 @@
       #ifdef CUSTOM_WATER
       color = vec4(0.0);
 
-      #ifdef DISTANT_HORIZONS
       color.a = smoothstep(0.8 * far, far, length(viewPos));
-      #endif
 
       mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, WAVE_E, WAVE_DEPTH);
       #endif

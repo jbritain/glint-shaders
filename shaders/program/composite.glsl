@@ -131,7 +131,7 @@
     vec4 translucent = texture(colortex3, texcoord);
 
     bool inWater = isEyeInWater == 1;
-    bool waterMask = materialIsWater(materialID);
+    bool waterMask = materialIsWater(materialID) && translucent.a < 1.0;
 
     #ifdef REFRACTION
 

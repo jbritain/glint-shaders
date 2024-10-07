@@ -232,6 +232,11 @@
     if(materialIsWater(materialID)){
       #ifdef CUSTOM_WATER
       color = vec4(0.0);
+
+      #ifdef DISTANT_HORIZONS
+      color.a = smoothstep(0.8 * far, far, length(viewPos));
+      #endif
+
       mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, WAVE_E, WAVE_DEPTH);
       #endif
     }
