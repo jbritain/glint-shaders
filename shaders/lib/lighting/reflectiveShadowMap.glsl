@@ -30,7 +30,7 @@ vec3 reflectShadowMap(vec3 faceNormal, vec3 feetPlayerPos, vec3 sunlightColor){
     return vec3(0.0);
   }
 
-  float radius = GI_RADIUS / shadowDistance;
+  float radius = GI_RADIUS * shadowProjection[0][0];
 
   int samples = GI_SAMPLES;
 

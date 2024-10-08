@@ -108,20 +108,6 @@
 
     vec3 fogScatter = hasSkylight ? getCloudFog(vec3(0.0), eyePlayerPos, depth, sunlightColor, skyLightColor, fogTransmittance) : vec3(0.0);
 
-    vec3 screenPos = vec3(texcoord, depth);
-    vec3 previousScreenPos = reproject(screenPos);
-    previousScreenPos.z = texture(colortex4, previousScreenPos.xy).a;
-
-    // TODO: ABANDON ACCUMULATING FOG
-    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && depth == previousScreenPos.z){
-      vec4 previousFogData = texture(colortex8, previousScreenPos.xy);
-
-      fogScatter.rgb = mix(previousFogData.rgb, fogScatter.rgb, CLOUD_BLEND);
-      fogTransmittance.rgb = mix(vec3(previousFogData.a), fogTransmittance, CLOUD_BLEND);
-    }
-
     color.rgb = color.rgb * fogTransmittance.rgb + fogScatter.rgb;
-    fogData.rgb = fogScatter;
-    fogData.a = sum3(fogTransmittance) / 3.0;
   }
 #endif

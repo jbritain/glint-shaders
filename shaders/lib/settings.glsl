@@ -14,9 +14,9 @@ const int colortex4Format = RGBA32F; || previous frame data - color rgb, depth a
 const int colortex5Format = RGBA16F; || hand
 const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
-const int colortex8Format = RGBA16F; || fog scattering (transmittance in alpha)
+const int colortex8Format = RGB8;    || unused
 const int colortex9Format = RGB16F;  || sky environment map
-const int colortex10Format = RGBA8;   || global illumination
+const int colortex10Format = RGBA8;  || global illumination
 
 const int shadowcolor2Format = RGB16F;
 
@@ -25,7 +25,6 @@ const int shadowcolor2Format = RGB16F;
 const bool colortex4Clear = false;
 
 const bool colortex7Clear = false;
-const bool colortex8Clear = false;
 
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 160.0; // [16.0 32.0 48.0 64.0 80.0 96.0 112.0 128.0 144.0 160.0 176.0 192.0 208.0 224.0 240.0 256.0 272.0 288.0 304.0 320.0 336.0 352.0 368.0 384.0 400.0 416.0 432.0 448.0 464.0 480.0 496.0 512.0]

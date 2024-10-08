@@ -103,7 +103,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	float blockerCount = 0;
 
 	for(int i = 0; i < BLOCKER_SEARCH_SAMPLES; i++){
-		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, shadowNoise.r) / shadowDistance;
+		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, shadowNoise.r) * shadowProjection[0][0];
 		vec3 newShadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset * range, 0.0, 0.0), normal).xyz;
 		float newBlockerDepth = texture(shadowtex0, newShadowScreenPos.xy).r;
 		if (newBlockerDepth < receiverDepth){
@@ -141,7 +141,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 			continue;
 		}
 
-		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth / shadowDistance, 0.0, 0.0), normal);
+		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth * shadowProjection[0][0], 0.0, 0.0), normal);
 		sampleCount++;
 	}
 	shadowSum /= float(sampleCount);
@@ -184,15 +184,19 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		float taxicabDistance = max(abs(feetPlayerPos.x), abs(feetPlayerPos.z));
 		float distFade = smoothstep(0.8 * shadowDistance, shadowDistance, taxicabDistance);
 
-		float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal);
-		float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
+		bool inShadowDistance = distFade < 1.0;
+
+		float blockerDistance = inShadowDistance ? getBlockerDistance(shadowClipPos, faceNormal) : 0.0;
+		float penumbraWidth = inShadowDistance ? mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance) : 0.0;
 		
-		vec3 bias = getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
-		shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
+		vec3 bias = inShadowDistance ? getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * faceNormal, faceNoL) : vec3(0.0);
+		if(inShadowDistance){
+			shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
+		}
+		
+		float scatter = inShadowDistance ? computeSSS(blockerDistance, SSS, faceNormal) : 0.0;
 
-		float scatter = computeSSS(blockerDistance, SSS, faceNormal);
-
-		vec3 shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false);
+		vec3 shadow = inShadowDistance ? computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false) : vec3(0.0);
 
 		if(distFade > 0.0){
 			float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
