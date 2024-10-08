@@ -5,9 +5,8 @@
     By jbritain
     https://jbritain.net
 
-    /program/gbuffers_translucent.glsl
-    - Translucent terrain
-    - Translucent entities
+    /program/gbuffers_unlit.glsl
+    - Glowing entity eyes
 */
 
 #include "/lib/settings.glsl"
@@ -60,10 +59,6 @@
     vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
     vec3 worldPos = feetPlayerPos + cameraPosition;
     worldPos = getSway(materialID, worldPos, at_midBlock);
-
-    if(materialIsWater(materialID)){
-      worldPos.y += (getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5);
-    }
 
     feetPlayerPos = worldPos - cameraPosition;
     viewPos = (gbufferModelView * vec4(feetPlayerPos, 1.0)).xyz;
@@ -171,10 +166,8 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* DRAWBUFFERS:312 */
+  /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color; // shaded colour
-  layout(location = 1) out vec4 outData1; // albedo, material ID, face normal, lightmap
-  layout(location = 2) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
     float parallaxSunlight = 1.0;
@@ -203,27 +196,11 @@
 
     color.rgb = gammaCorrect(color.rgb);
 
-    #ifdef gbuffers_spidereyes
-    color.a = 1.0;
-    #endif
+
 
     if (color.a < alphaTestRef) {
       discard;
     }
-
-    #ifdef gbuffers_weather
-      if(biome_precipitation != 2){
-        color = vec4(0.2);
-        color.a = 0.1;
-      }
-
-      // hide rain above the clouds
-      // color.a *= (1.0 - smoothstep(CLOUD_LOWER_PLANE_HEIGHT, CLOUD_UPPER_PLANE_HEIGHT, eyePlayerPos.y + cameraPosition.y));
-      if (color.a < alphaTestRef) {
-        discard;
-      }
-      
-    #endif
 
     
 
@@ -234,24 +211,6 @@
     #else
       vec3 mappedNormal = faceNormal;
     #endif
-
-    if(materialIsWater(materialID)){
-      #ifdef CUSTOM_WATER
-      color = vec4(0.0);
-
-      #ifdef DISTANT_HORIZONS
-      color.a = smoothstep(0.8 * far, far, length(viewPos));
-      #endif
-
-      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, WAVE_E, WAVE_DEPTH);
-      #endif
-    }
-
-    // encode gbuffer data
-    outData1.x = pack2x8F(color.r, color.g);
-    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
-    outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
-    outData1.w = pack2x8F(lightmap);
 
     #ifdef SPECULAR_MAPS
     vec4 specularData = texture(specular, texcoord);
@@ -272,13 +231,7 @@
       material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
     }
 
-    #ifdef gbuffers_spidereyes
     material.emission = 1.0;
-    #endif
-
-    outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
-    outData2.y = pack2x8F(specularData.rg);
-    outData2.z = pack2x8F(specularData.ba);
 
     #ifndef gbuffers_weather
       vec3 sunlightColor; vec3 skyLightColor;

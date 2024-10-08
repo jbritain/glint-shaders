@@ -127,7 +127,7 @@
 
   void main() {
     float parallaxSunlight = 1.0;
-    #ifdef POM
+    #if defined POM && !defined gbuffers_spidereyes
     vec2 texcoord = texcoord;
     vec2 dx = dFdx(texcoord);
     vec2 dy = dFdy(texcoord);
@@ -169,7 +169,7 @@
     #ifdef SPECULAR_MAPS
     vec4 specularData = texture(specular, texcoord);
     #else
-    vec4 specularData= vec4(0.0);
+    vec4 specularData = vec4(0.0);
     #endif
 
     outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));

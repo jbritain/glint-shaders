@@ -12,7 +12,7 @@ vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0)
 
 vec3 getSky(vec4 color, vec3 dir, bool includeSun){
   #ifdef WORLD_THE_END
-    return endSky(dir);
+    return endSky(dir, includeSun);
   #endif
 
   #ifndef WORLD_OVERWORLD

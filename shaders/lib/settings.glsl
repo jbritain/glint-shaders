@@ -113,6 +113,8 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define POM_SHADOW
 
 #define WATERMARK
+#define GLINT_SHADERS 0 // [0 1]
+#define WEBSITE 0 // [0 1]
 
 // this is stupid
 #ifdef CLOUD_SHADOWS

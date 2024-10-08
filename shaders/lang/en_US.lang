@@ -245,3 +245,11 @@ option.VANILLA_CLOUDS=Vanilla Clouds
 option.CLOUD_SHADOWS=Cloud Shadows
 
 option.WATERMARK=Show Watermark
+
+option.GLINT_SHADERS=Glint Shaders
+value.GLINT_SHADERS.0=By jbritain
+value.GLINT_SHADERS.1=By jbritain
+
+option.WEBSITE=https://
+value.WEBSITE.0=jbritain.net
+value.WEBSITE.1=jbritain.net

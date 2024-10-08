@@ -11,9 +11,9 @@
 #include "/lib/util/spheremap.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
-float getNoHSquared(float NoL, float NoV, float VoL) {
-  float radiusCos = cos(ATMOSPHERE.sun_angular_radius);
-		float radiusTan = tan(ATMOSPHERE.sun_angular_radius);
+float getNoHSquared(float NoL, float NoV, float VoL, float radius) {
+  float radiusCos = cos(radius);
+	float radiusTan = tan(radius);
   
   float RoL = 2.0 * NoL * NoV - VoL;
   if (RoL >= radiusCos)
@@ -64,7 +64,7 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float K) {
 // https://mudstack.com/blog/tutorials/physically-based-rendering-study-part-2/
 float calculateSpecularHighlight(vec3 N, vec3 V, vec3 L, float roughness){
   float alpha = roughness;
-	float dotNHSquared = getNoHSquared(dot(N, L), dot(N, V), dot(V, L));
+	float dotNHSquared = getNoHSquared(dot(N, L), dot(N, V), dot(V, L), ATMOSPHERE.sun_angular_radius);
 	float distr = dotNHSquared * (alpha - 1.0) + 1.0;
 	return alpha / (PI * pow2(distr));
 }

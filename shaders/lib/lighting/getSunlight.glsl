@@ -157,6 +157,10 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 }
 
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
+	#ifdef WORLD_THE_END
+	lightmap.y = 1.0;
+	#endif
+
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 	shadowNoise = vec4(
 		interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
