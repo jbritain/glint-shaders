@@ -87,16 +87,6 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  // a vogel disk but with the samples still biased towards the centre
-  vec2 weightedVogelDiscSample(int stepIndex, int stepCount, float rotation) {
-    const float goldenAngle = 2.4;
-
-    float r = stepIndex/float(stepCount);
-    float theta = stepIndex * goldenAngle + rotation;
-
-    return r * vec2(cos(theta), sin(theta));
-  }
-
   /* RENDERTARGETS: 10 */
   layout(location = 0) out vec4 outGI;
 
@@ -111,9 +101,8 @@
   #include "/lib/util/dh.glsl"
 
   void main() {
-    #ifdef GLOBAL_ILLUMINATION
     outGI = texture(colortex10, texcoord);
-
+    #ifdef GLOBAL_ILLUMINATION
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);

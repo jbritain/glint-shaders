@@ -1,6 +1,16 @@
 #ifndef REFLECTIVE_SHADOW_MAP_INCLUDE
 #define REFLECTIVE_SHADOW_MAP_INCLUDE
 
+// a vogel disk but with the samples still biased towards the centre
+vec2 weightedVogelDiscSample(int stepIndex, int stepCount, float rotation) {
+  const float goldenAngle = 2.4;
+
+  float r = stepIndex/float(stepCount);
+  float theta = stepIndex * goldenAngle + rotation;
+
+  return r * vec2(cos(theta), sin(theta));
+}
+
 vec3 reflectShadowMap(vec3 faceNormal, vec3 feetPlayerPos, vec3 sunlightColor){
   vec3 worldFaceNormal = mat3(gbufferModelViewInverse) * faceNormal;
 
@@ -20,7 +30,7 @@ vec3 reflectShadowMap(vec3 faceNormal, vec3 feetPlayerPos, vec3 sunlightColor){
     return vec3(0.0);
   }
 
-  float radius = GI_RADIUS;
+  float radius = GI_RADIUS / shadowDistance;
 
   int samples = GI_SAMPLES;
 

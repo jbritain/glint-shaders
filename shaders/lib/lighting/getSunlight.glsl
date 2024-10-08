@@ -103,7 +103,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	float blockerCount = 0;
 
 	for(int i = 0; i < BLOCKER_SEARCH_SAMPLES; i++){
-		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, shadowNoise.r);
+		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, shadowNoise.r) / shadowDistance;
 		vec3 newShadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset * range, 0.0, 0.0), normal).xyz;
 		float newBlockerDepth = texture(shadowtex0, newShadowScreenPos.xy).r;
 		if (newBlockerDepth < receiverDepth){
@@ -141,7 +141,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 			continue;
 		}
 
-		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth, 0.0, 0.0), normal);
+		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth / shadowDistance, 0.0, 0.0), normal);
 		sampleCount++;
 	}
 	shadowSum /= float(sampleCount);

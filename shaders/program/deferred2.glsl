@@ -149,7 +149,11 @@
 
     color.rgb = albedo;
 
+    #ifdef GLOBAL_ILLUMINATION
     vec3 GI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0)).rgb;
+    #else
+    vec3 GI = vec3(0.0);
+    #endif
 
 
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);

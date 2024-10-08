@@ -47,7 +47,7 @@ const float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
 #define CLOUD_SHAPE_SPEED 0.001
 #define CLOUD_EROSION_SPEED 0.005
 
-#define CLOUD_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
+#define CLOUD_EXTINCTION_COLOR vec3(1.0)
 #define CLOUD_DUAL_LOBE_WEIGHT 0.7
 #define CLOUD_G 0.6
 
@@ -158,7 +158,7 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
 
-  return multipleScattering(totalDensity, costh, -0.5, 0.85, CLOUD_EXTINCTION_COLOR, 4, 0.5) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
+  return multipleScattering(totalDensity, costh, 0.9, -0.4, CLOUD_EXTINCTION_COLOR, 4, 0.85) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
 }
 
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){
