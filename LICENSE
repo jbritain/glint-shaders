@@ -1,0 +1,22 @@
+Copyright (c) 2024 Joshua Britain
+All Rights Reserved.
+
+This project contains original code authored by Joshua Britain, which is licensed under the following terms:
+
+All Rights Reserved. No part of the original code may be reproduced, distributed, or transmitted in any form or by any means, without the prior written permission of the copyright holder.
+
+### Open Source Code
+
+This project includes open-source code from third-party projects. Such code is clearly marked inline in the relevant files using the following format:
+
+BEGIN OPEN SOURCE CODE
+=================================================================
+[OPEN SOURCE CODE HERE]
+=================================================================
+END OPEN SOURCE CODE
+
+Each section of open-source code will also include the license governing that specific code, directly below the code block.
+
+### Disclaimer:
+
+The original code (outside the scope of the open-source contributions) is provided "as-is" without warranty of any kind. All warranties, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement are disclaimed to the extent permitted by law.
