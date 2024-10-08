@@ -1,8 +1,6 @@
 #ifndef UTIL_INCLUDE
 #define UTIL_INCLUDE
 
-// a lotta stuff from https://github.com/Jessie-LC/open-source-utility-code
-
 const float PI = radians(180.0);
 const float TAU = radians(360.0);
 
@@ -12,48 +10,12 @@ const float TAU = radians(360.0);
 #define sum3(v) (((v).x + (v).y) + (v).z)
 #define sum4(v) (((v).x + (v).y) + ((v).z + (v).w))
 
-#define _square(x) (x*x)
-#define _cube(x) (x*x*x)
-#define _saturate(x) clamp(x, 0.0, 1.0)
-#define _saturateInt(x) clamp(x, 0, 1)
 #define _rcp(x) (1.0 / x)
 #define _log10(x, y) (log2(x) / log2(y))
 #define _pow2(x) (x*x)
 #define _pow3(x) (x*x*x)
 #define _pow4(x) (x*x*x*x)
 #define _pow5(x) (x*x*x*x*x)
-
-float square(in float x) {
-    return _square(x);
-}
-int square(in int x) {
-    return _square(x);
-}
-vec2 square(in vec2 x) {
-    return _square(x);
-}
-vec3 square(in vec3 x) {
-    return _square(x);
-}
-vec4 square(in vec4 x) {
-    return _square(x);
-}
-
-float cube(in float x) {
-    return _cube(x);
-}
-int cube(in int x) {
-    return _cube(x);
-}
-vec2 cube(in vec2 x) {
-    return _cube(x);
-}
-vec3 cube(in vec3 x) {
-    return _cube(x);
-}
-vec4 cube(in vec4 x) {
-    return _cube(x);
-}
 
 float pow2(in float x) {
     return _pow2(x);
@@ -117,42 +79,6 @@ vec3 pow5(in vec3 x) {
 }
 vec4 pow5(in vec4 x) {
     return _pow5(x);
-}
-
-float saturate(in float x) {
-    return _saturate(x);
-}
-int saturate(in int x) {
-    return _saturateInt(x);
-}
-vec2 saturate(in vec2 x) {
-    return _saturate(x);
-}
-vec3 saturate(in vec3 x) {
-    return _saturate(x);
-}
-vec4 saturate(in vec4 x) {
-    return _saturate(x);
-}
-
-float minof(vec2 x) { 
-    return min(x.x, x.y); 
-}
-float minof(vec3 x) { 
-    return min(min(x.x, x.y), x.z); 
-}
-float minof(vec4 x) { 
-    x.xy = min(x.xy, x.zw); return min(x.x, x.y); 
-}
-
-float maxof(vec2 x) { 
-    return max(x.x, x.y); 
-}
-float maxof(vec3 x) { 
-    return max(max(x.x, x.y), x.z); 
-}
-float maxof(vec4 x) { 
-    x.xy = max(x.xy, x.zw); return max(x.x, x.y); 
 }
 
 float rcp(in float x) {
@@ -224,31 +150,6 @@ vec4 log10(in vec4 x) {
     return _log10(x, 10.0);
 }
 
-float linearstep(in float x, float low, float high) {
-    float data = x;
-    float mapped = (data-low)/(high-low);
-
-    return saturate(mapped);
-}
-vec2 linearstep(in vec2 x, float low, float high) {
-    vec2 data = x;
-    vec2 mapped = (data-low)/(high-low);
-
-    return saturate(mapped);
-}
-vec3 linearstep(in vec3 x, float low, float high) {
-    vec3 data = x;
-    vec3 mapped = (data-low)/(high-low);
-
-    return saturate(mapped);
-}
-vec4 linearstep(in vec4 x, float low, float high) {
-    vec4 data = x;
-    vec4 mapped = (data-low)/(high-low);
-
-    return saturate(mapped);
-}
-
 vec2 sincos(float x) { return vec2(sin(x), cos(x)); }
 
 mat2 rotate(float a) {
@@ -279,24 +180,6 @@ vec3 rotate(vec3 vector, vec3 from, vec3 to) {
 
 	vec2 sc = vec2(sqrt(1.0 - cosTheta * cosTheta), cosTheta);
 	return sc.y * vector + sc.x * cross(axis, vector) + (1.0 - sc.y) * dot(axis, vector) * axis;
-}
-
-vec2 circleMap(in float index, in float count) {
-    float goldenAngle = TAU / ((sqrt(5.0) * 0.5 + 0.5) + 1.0);
-    return vec2(cos(index * goldenAngle), sin(index * goldenAngle)) * sqrt(index / count);
-}
-
-vec3 generateUnitVector(vec2 hash) {
-    hash.x *= TAU; hash.y = hash.y * 2.0 - 1.0;
-    return vec3(vec2(sin(hash.x), cos(hash.x)) * sqrt(1.0 - hash.y * hash.y), hash.y);
-}
-
-vec3 generateConeVector(vec3 vector, vec2 xy, float angle) {
-    xy.x *= radians(360.0);
-    float cosAngle = cos(angle);
-    xy.y = xy.y * (1.0 - cosAngle) + cosAngle;
-    vec3 sphereCap = vec3(vec2(cos(xy.x), sin(xy.x)) * sqrt(1.0 - xy.y * xy.y), xy.y);
-    return rotate(sphereCap, vec3(0, 0, 1), vector);
 }
 
 // Creates a TBN matrix from a normal and a tangent
@@ -347,7 +230,7 @@ vec3 rgb(vec3 c) {
 }
 
 float quinticStep(float edge0, float edge1, float x) {
-    x = saturate((x - edge0) / (edge1 - edge0));
+    x = clamp01((x - edge0) / (edge1 - edge0));
     return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
 }
 
