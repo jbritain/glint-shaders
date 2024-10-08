@@ -64,6 +64,8 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define CIRRUS_CLOUDS
 // #define VANILLA_CLOUDS
 
+#define CLOUD_SHADOWS
+
 #define SKY_SATURATION 1.2
 
 #define FXAA
@@ -98,7 +100,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define AUTO_EXPOSURE
 #endif
 
-#define GLOBAL_ILLUMINATION
+// #define GLOBAL_ILLUMINATION
 #define GI_SAMPLES 16 // [16 32 64 128 256]
 #define GI_RADIUS 4.0 // [1.0 2.0 4.0 8.0 16.0 32.0]
 
@@ -111,3 +113,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define POM_SHADOW
 
 #define WATERMARK
+
+// this is stupid
+#ifdef CLOUD_SHADOWS
+#endif

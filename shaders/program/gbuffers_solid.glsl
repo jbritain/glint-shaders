@@ -156,7 +156,7 @@
     #ifdef NORMAL_MAPS
       vec3 mappedNormal = getMappedNormal(texcoord);
     #else
-      vec3 mappedNormal = faceNormal;
+      vec3 mappedNormal = tbnMatrix[2];
     #endif
 
 

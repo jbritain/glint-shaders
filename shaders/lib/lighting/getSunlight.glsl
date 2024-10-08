@@ -213,7 +213,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
   vec3 sunlight = max(shadow * NoL, vec3(scatter));
 
-	#ifdef SHADOWS
+	#if defined SHADOWS && defined CLOUD_SHADOWS
 		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos, faceNormal).xyz;
 		vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
 		cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));

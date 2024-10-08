@@ -68,7 +68,7 @@
   void main() {
     color = vec4(1.0);
 
-    #ifndef WORLD_OVERWORLD
+    #if !defined WORLD_OVERWORLD || !defined CLOUD_SHADOWS
     return;
     #endif
 

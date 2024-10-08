@@ -242,5 +242,6 @@ option.CUMULUS_CLOUDS=Cumulus Clouds
 option.ALTOCUMULUS_CLOUDS=Altocumulus Clouds
 option.CIRRUS_CLOUDS=Cirrus Clouds
 option.VANILLA_CLOUDS=Vanilla Clouds
+option.CLOUD_SHADOWS=Cloud Shadows
 
 option.WATERMARK=Show Watermark
