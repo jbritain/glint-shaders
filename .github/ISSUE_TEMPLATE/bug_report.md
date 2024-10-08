@@ -36,7 +36,7 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 **PLEASE READ THE FOLLOWING BEFORE SUBMITTING AN ISSUE**
- - If this isn't a bug, but a general problem you are having, consider asking in my [Discord Server](https://discord.gg/b9SHNcvs6c) instead.
+ - If this isn't a bug, but a general problem you are having, consider asking in my channel `#jbritains-shaderpacks` in the [shaderLABS Discord Server](https://discord.gg/RpzWN9S) instead.
  - Mods which add additional blocks, biomes, or dimensions (i.e Create) are not supported.
  - The shader not loading without an error message does not constitute a bug. Ensure your folder structure is correct.
  - MacOS is unsupported because I don't have a Mac. Things may break.
