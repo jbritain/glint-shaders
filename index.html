@@ -6,56 +6,64 @@
     <link rel="stylesheet" href="https://jbritain.net/stylesheet.css">
   </head>
   <body>
-    <h1 style="margin-bottom: 0px;">Glint</h1>
-    <small>by jbritain</small>
-    <hr>
+    <main>
+      <h1 style="margin-bottom: 0px;">Glint</h1>
+      <small>by jbritain</small>
+      <hr>
 
-    <p>Glint is my shaderpack for Minecraft. It's still in development, but available to download in alpha!</p>
+      <p>Glint is my shaderpack for Minecraft. It's still in development, but available to download in alpha!</p>
 
-    <a href="https://github.com/jbritain/glint-shaders/releases/latest"><button>Download Latest Alpha Release</button></a>
-    <br>
-    <small>click the dropdown and then 'Source code (zip)'</small>
-    <br><br>
+      <article>
+        <a href="https://github.com/jbritain/glint-shaders/releases/latest"><button>Download Latest Alpha Release</button></a>
+        <br>
+        <small>click the dropdown and then 'Source code (zip)'</small>
+        <p>Bear in mind that this is an <i>alpha</i>, so things may be missing or broken. If you encounter issues, please let me know by submitting a <a href="https://github.com/jbritain/glint-shaders/issues">Github Issue</a>!</p>
+      </article>
 
-    <img style="width: 600px; max-width: 100%;" src="./assets/2024-10-08_01.16.39.png" />
-    <img style="width: 600px; max-width: 100%;" src="./assets/2024-10-08_01.17.25.png" />
-    <img style="width: 600px; max-width: 100%;" src="./assets/2024-10-08_01.19.15.png" />
+      <br><br>
 
-    <p><strong>Want to see more?</strong> Check out <code>#jbritains-shaderpacks</code> in the <a href="https://discord.gg/RpzWN9S">shaderLABS Discord Server</a>.</p>
 
-    <h2>Features</h2>
-    <ul>
-      <li>LabPBR support</li>
-      <li>Fully forward rendered translucents even with SSR (everything has reflections)</li>
-      <li>PCSS 'Variable Penumbra' shadows</li>
-      <li>Volumetric clouds, fog, and water</li>
-      <li>Cloud shadows</li>
-      <li>Global illumination</li>
-      <li>Auto exposure</li>
-      <li>Nice bloom</li>
-    </ul>
 
-    More stuff is planned, such as...
-    <ul>
-      <li>Distant Horizons support</li>
-      <li>Coloured blocklight</li>
-      <li>Ambient occlusion</li>
-      <li>Depth-of-field</li>
-      <li>Motion blur</li>
-      <li>Fancy volumetric effects in the Nether and End dimensions</li>
-    </ul>
+      <img style="width: 550px; max-width: 100%;" src="./assets/2024-10-08_01.16.39.png" />
+      <img style="width: 550px; max-width: 100%;" src="./assets/2024-10-08_01.17.25.png" />
+      <img style="width: 550px; max-width: 100%;" src="./assets/2024-10-08_01.19.15.png" />
 
-    <h2>The Glint Guarantee™</h2>
-    <img style="width: 600px; max-width: 100%;" src="./assets/taa.png" />
-    <p>I do not like temporal anti-aliasing. I especially don't like temporal anti aliasing <i>as a denoiser</i>. That's why I guarantee that Glint <i>will not have TAA</i>. There <i>will</i> be no ghosting<sup>[1]</sup>, performance <i>may</i> suffer as a result and you <i>will</i> be happy, as will I.</p>
-    <small>If this message ever disappears I will probably have implemented TAA into glint and become the very thing I swore to destroy.</small>
-    <hr>
-    <small>
+      <p><strong>Want to see more?</strong> Check out <code>#jbritains-shaderpacks</code> in the <a href="https://discord.gg/RpzWN9S">shaderLABS Discord Server</a>.</p>
+
+      <h2>Features</h2>
       <ul>
-        <li>[1] currently clouds have ghosting because they are temporally accumulated but I will fix this!!!!</li>
+        <li>LabPBR support</li>
+        <li>Fully forward rendered translucents even with SSR (everything has reflections)</li>
+        <li>PCSS 'Variable Penumbra' shadows</li>
+        <li>Volumetric clouds, fog, and water</li>
+        <li>Cloud shadows</li>
+        <li>Global illumination</li>
+        <li>Auto exposure</li>
+        <li>Nice bloom</li>
       </ul>
-    </small>
 
-    <img src="./assets/heavy.png" />
+      More stuff is planned, such as...
+      <ul>
+        <li>Distant Horizons support</li>
+        <li>Coloured blocklight</li>
+        <li>Ambient occlusion</li>
+        <li>Depth-of-field</li>
+        <li>Motion blur</li>
+        <li>Fancy volumetric effects in the Nether and End dimensions</li>
+      </ul>
+
+      <h2>The Glint Guarantee™</h2>
+      <img style="width: 600px; max-width: 100%;" src="./assets/taa.png" />
+      <p>I do not like temporal anti-aliasing. I especially don't like temporal anti aliasing <i>as a denoiser</i>. That's why I guarantee that Glint <i>will not have TAA</i>. There <i>will</i> be no ghosting<sup>[1]</sup>, performance <i>may</i> suffer as a result and you <i>will</i> be happy, as will I.</p>
+      <small>If this message ever disappears I will probably have implemented TAA into glint and become the very thing I swore to destroy.</small>
+      <hr>
+      <small>
+        <ul>
+          <li>[1] currently clouds have ghosting because they are temporally accumulated but I will fix this!!!!</li>
+        </ul>
+      </small>
+
+      <img src="./assets/heavy.png" />
+    </main>
   </body>
 </html>
