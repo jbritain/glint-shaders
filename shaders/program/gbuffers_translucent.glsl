@@ -23,9 +23,9 @@
   flat out int materialID;
   out vec3 viewPos;
 
-  out vec2 singleTexSize;
-  out ivec2 pixelTexSize;
-  out vec4 textureBounds;
+  flat out vec2 singleTexSize;
+  flat out ivec2 pixelTexSize;
+  flat out vec4 textureBounds;
 
   uniform int worldTime;
   uniform int worldDay;
@@ -148,9 +148,9 @@
   flat in int materialID;
   in vec3 viewPos;
 
-  in vec2 singleTexSize;
-  in ivec2 pixelTexSize;
-  in vec4 textureBounds;
+  flat in vec2 singleTexSize;
+  flat in ivec2 pixelTexSIze;
+  flat in vec4 textureBounds;
 
   #include "/lib/util.glsl"
   #include "/lib/post/tonemap.glsl"
