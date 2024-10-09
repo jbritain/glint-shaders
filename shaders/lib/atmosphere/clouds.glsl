@@ -18,8 +18,8 @@ const float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define CUMULUS_SUBSAMPLES 4
 
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
-#define ALTOCUMULUS_UPPER_HEIGHT 1600.0
-#define ALTOCUMULUS_DENSITY 0.05
+#define ALTOCUMULUS_UPPER_HEIGHT 1700.0
+#define ALTOCUMULUS_DENSITY 0.02
 const float ALTOCUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define ALTOCUMULUS_SAMPLES 6
 #define ALTOCUMULUS_SUBSAMPLES 4
@@ -66,7 +66,7 @@ float getCloudDensity(vec3 pos){
     return density;
 
   } else if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
-    coverage = CUMULUS_COVERAGE;
+    coverage = mix(CUMULUS_COVERAGE, 1.0, smoothstep(0.0, 50000.0, distance(cameraPosition.xz, pos.xz)));
     densityFactor = CUMULUS_DENSITY;
 
     float cumulusCentreHeight = mix(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, 0.3); // widest part of our cumulus clouds
