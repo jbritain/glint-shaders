@@ -1,3 +1,14 @@
+/*
+    Copyright (c) 2024 Joshua Britain
+    Licensed under the GNU General Public License, Version 3
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+*/
+
 #ifndef REFLECTIVE_SHADOW_MAP_INCLUDE
 #define REFLECTIVE_SHADOW_MAP_INCLUDE
 

@@ -1,3 +1,14 @@
+/*
+    Copyright (c) 2024 Joshua Britain
+    Licensed under the GNU General Public License, Version 3
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+*/
+
 #ifndef SCREEN_SPACE_RAY_TRACE_INCLUDE
 #define SCREEN_SPACE_RAY_TRACE_INCLUDE
 

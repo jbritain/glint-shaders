@@ -1,3 +1,14 @@
+/*
+    Copyright (c) 2024 Joshua Britain
+    Licensed under the GNU General Public License, Version 3
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+*/
+
 #ifndef PACKING_INCLUDE
 #define PACKING_INCLUDE
 

@@ -1,3 +1,14 @@
+/*
+    Copyright (c) 2024 Joshua Britain
+    Licensed under the GNU General Public License, Version 3
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    By jbritain
+    https://jbritain.net
+*/
+
 // implemented following https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom
 // which is in turn an implementation of Sledgehammer Games' bloom used for COD Advanced Warfare
 

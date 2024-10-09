@@ -1,4 +1,7 @@
 /*
+    Copyright (c) 2024 Joshua Britain
+    Licensed under the GNU General Public License, Version 3
+
     ┏┓┓•   
     ┃┓┃┓┏┓╋
     ┗┛┗┗┛┗┗

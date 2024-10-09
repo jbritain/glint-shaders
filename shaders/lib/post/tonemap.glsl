@@ -1,3 +1,6 @@
+#ifndef TONEMAP_INCLUDE
+#define TONEMAP_INCLUDE
+
 vec3 gammaCorrect(vec3 col){
   return pow(col, vec3(2.2));
 }
@@ -35,3 +38,5 @@ vec3 uncharted2_filmic(vec3 v)
 }
 
 #define tonemap uncharted2_filmic
+
+#endif

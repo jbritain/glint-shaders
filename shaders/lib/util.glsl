@@ -1,3 +1,8 @@
+/*
+Some (but not all) functions by Jessie-LC
+https://github.com/Jessie-LC/open-source-utility-code/
+*/
+
 #ifndef UTIL_INCLUDE
 #define UTIL_INCLUDE
 

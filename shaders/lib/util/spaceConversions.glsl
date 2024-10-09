@@ -1,3 +1,8 @@
+/*
+Space conversions by Jessie-LC
+https://github.com/Jessie-LC/open-source-utility-code/
+*/
+
 #ifndef SPACE_CONVERSIONS_INCLUDE
 #define SPACE_CONVERSIONS_INCLUDE
 
