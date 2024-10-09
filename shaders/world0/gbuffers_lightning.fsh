@@ -2,5 +2,5 @@
 
 #define fsh
 #define WORLD_OVERWORLD
-#define gbuffers_spidereyes
+#define gbuffers_lightning
 #include "/program/gbuffers_glows.glsl"

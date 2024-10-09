@@ -51,6 +51,7 @@
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
+  uniform vec4 lightningBoltPosition;
 
   uniform vec3 cameraPosition;
   uniform vec3 previousCameraPosition;
@@ -65,6 +66,7 @@
   uniform int frameCounter;
 
   uniform float wetness;
+uniform float thunderStrength;
 
   uniform float near;
   uniform float far;

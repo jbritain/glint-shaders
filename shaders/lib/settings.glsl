@@ -22,6 +22,8 @@ const int shadowcolor2Format = RGB16F;
 
 */
 
+const float wetnessHalflife = 50.0;
+
 const bool colortex4Clear = false;
 
 const bool colortex7Clear = false;

@@ -22,7 +22,7 @@
 uniform sampler2D vanillacloudtex;
 
 #define CUMULUS_DENSITY 0.1
-float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
+float CUMULUS_COVERAGE = mix(0.08, 0.17, wetness * 0.5 + thunderStrength * 0.5);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 700.0
 #define CUMULUS_SAMPLES 15
@@ -31,7 +31,7 @@ float CUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
 #define ALTOCUMULUS_UPPER_HEIGHT 1700.0
 #define ALTOCUMULUS_DENSITY 0.02
-float ALTOCUMULUS_COVERAGE = mix(0.08, 0.13, wetness);
+float ALTOCUMULUS_COVERAGE = mix(0.08, 0.17, wetness * 0.5 + thunderStrength * 0.5);
 #define ALTOCUMULUS_SAMPLES 6
 #define ALTOCUMULUS_SUBSAMPLES 4
 
@@ -262,6 +262,17 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
     vec3 lightEnergy = calculateCloudLightEnergy(rayPos, lightJitter, mu, subsamples);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor;
+
+    if(lightningBoltPosition != vec4(0.0)){
+      vec3 worldLightningPos = lightningBoltPosition.xyz + cameraPosition;
+      worldLightningPos.y = rayPos.y; // lightning is a column
+
+      float lightningDistance = distance(rayPos, worldLightningPos);
+      float potentialEnergy = pow(1.0 - clamp01(lightningDistance / 1000.0), 12.0);
+      float pseudoAttenuation = (1.0 - clamp01(density * 5.0));
+      radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0) * 10.0;
+    }
+
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
 
     scatter += integScatter * totalTransmittance;

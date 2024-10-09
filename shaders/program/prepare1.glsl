@@ -40,6 +40,7 @@
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
+  uniform vec4 lightningBoltPosition;
 
   uniform int worldTime;
   uniform int worldDay;
@@ -49,6 +50,7 @@
 
   uniform float far;
   uniform float wetness;
+uniform float thunderStrength;
   uniform int isEyeInWater;
 
   uniform float viewWidth;

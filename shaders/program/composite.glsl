@@ -67,7 +67,9 @@
   uniform float near;
   uniform float far;
   uniform float wetness;
+uniform float thunderStrength;
   uniform int isEyeInWater;
+  uniform vec4 lightningBoltPosition;
 
   uniform int frameCounter;
 

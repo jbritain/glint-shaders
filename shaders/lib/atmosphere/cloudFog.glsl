@@ -161,7 +161,18 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
 
     vec3 lightEnergy = calculateFogLightEnergy(rayPos, lightJitter, mu);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor * EBS.y;
-    vec3 integScatter = radiance * (1.0 - clamp01(transmittance)) / FOG_EXTINCTION;
+
+    if(lightningBoltPosition != vec4(0.0)){
+      vec3 worldLightningPos = lightningBoltPosition.xyz + cameraPosition;
+      worldLightningPos.y = rayPos.y; // lightning is a column
+
+      float lightningDistance = distance(rayPos, worldLightningPos);
+      float potentialEnergy = pow(1.0 - clamp01(lightningDistance / 100.0), 12.0);
+      float pseudoAttenuation = (1.0 - clamp01(density * 5.0));
+      radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0);
+    }
+
+     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;

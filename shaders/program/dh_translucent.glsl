@@ -91,6 +91,7 @@
   uniform float far;
 
   uniform float wetness;
+uniform float thunderStrength;
 
   uniform int frameCounter;
   uniform int worldTime;

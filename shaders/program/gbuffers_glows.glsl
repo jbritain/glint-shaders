@@ -106,6 +106,7 @@
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
+  uniform vec4 lightningBoltPosition;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -123,6 +124,7 @@
   uniform float far;
 
   uniform float wetness;
+uniform float thunderStrength;
 
   uniform int frameCounter;
   uniform int worldTime;
@@ -223,26 +225,16 @@
 
     Material material;
 
-    if(materialIsWater(materialID)) {
-      material = waterMaterial;
-    } else {
-      material = materialFromSpecularMap(color.rgb, specularData);
-
-      float wetnessFactor = wetness * (1.0 - material.porosity) * lightmap.y;
-
-      material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
-      material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
-    }
-
     material.emission = 1.0;
-
-    #ifndef gbuffers_weather
-      vec3 sunlightColor; vec3 skyLightColor;
-      getLightColors(sunlightColor, skyLightColor);
-      vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
-      color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
-      color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    #ifdef gbuffers_lightning
+    color.rgb *= 10.0;
     #endif
+
+    vec3 sunlightColor; vec3 skyLightColor;
+    getLightColors(sunlightColor, skyLightColor);
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
+    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
+    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
 
     color = getAtmosphericFog(color, eyePlayerPos);
   }

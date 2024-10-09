@@ -81,6 +81,7 @@
 
   uniform vec3 sunPosition;
   uniform vec3 shadowLightPosition;
+  uniform vec4 lightningBoltPosition;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -98,6 +99,7 @@
   uniform float far;
 
   uniform float wetness;
+uniform float thunderStrength;
 
   uniform int frameCounter;
   uniform int worldTime;
