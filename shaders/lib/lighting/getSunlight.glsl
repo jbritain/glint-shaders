@@ -85,6 +85,10 @@ vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 		float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 		float blockerDistance = blockerDistanceRaw * 255 * 2;
 
+		#ifdef composite
+		// shadowColorData.a = mix(shadowColorData.a, 0.0, 0.9);
+		#endif
+
 		vec3 extinction = exp(-WATER_EXTINCTION * blockerDistance) * (1.0 - shadowColorData.a);
 
 		return extinction;

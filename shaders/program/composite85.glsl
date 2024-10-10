@@ -64,12 +64,18 @@
     float depth = tentFilter(depthtex0, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
-    // viewPos.yz = rotate(viewPos.yz, -PI / 4.0);
-
     float dist = viewPos.z;
+
+    const float tiltAngle = PI * TILT_ANGLE/180;
+
+    #ifdef TILT_SHIFT
+    dist = dist / cos(tiltAngle) + (viewPos.y * sin(tiltAngle)) / cos(tiltAngle);
+    #endif
 
     float focusDist = screenSpaceToViewSpace(centerDepthSmooth);
     float CoC = clamp(1.0 - focusDist / dist, -1.0, 1.0);
+
+    show(vec2(-CoC, CoC));
 
     circleOfConfusion.rgb = vec3(0.0);
     circleOfConfusion.a = CoC * 0.5 + 0.5;
