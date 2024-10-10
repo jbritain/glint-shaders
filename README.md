@@ -21,7 +21,6 @@ A work in progress shaderpack for Minecraft.
 - Puddles
 - Ambient Occlusion
 - Complete LabPBR support - porosity & texture AO
-- DoF
 - Motion blur
 - Skyboxes/atmospherics for other dimensions
 - Floodfill
@@ -37,6 +36,7 @@ A work in progress shaderpack for Minecraft.
 - Obvious repeating pattern in cloud shapes
 - Artifacts in atmospheric fog near the horizon
 - Water waves broken on AMD
+- Artifacts around edge of screen with DoF enabled
 - Runs terribly
 
 ## Acknowledgements

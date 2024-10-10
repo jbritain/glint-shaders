@@ -216,7 +216,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		if(distFade > 0.0){
 			float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
 
-			scatter = mix(scatter, NoL * lightmapShadow, distFade);
+			scatter = mix(scatter, mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow, distFade);
 			shadow = mix(shadow, vec3(lightmapShadow), distFade);
 		}
 	#else

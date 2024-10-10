@@ -33,6 +33,8 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `composite` some fog, translucency blending
 `composite1` cloud fog
 
+`composite85` DoF circle of confusion calculation
+
 `composite88` luminance calculation for auto exposure
 `composite89` writing frame data for next frame to access (previous frame data), blending hand, auto exposure
 

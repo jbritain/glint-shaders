@@ -26,7 +26,7 @@ float CUMULUS_COVERAGE = mix(0.08, 0.17, wetness * 0.5 + thunderStrength * 0.5);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 700.0
 #define CUMULUS_SAMPLES 15
-#define CUMULUS_SUBSAMPLES 4
+#define CUMULUS_SUBSAMPLES 6
 
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
 #define ALTOCUMULUS_UPPER_HEIGHT 1700.0
@@ -68,6 +68,8 @@ float getCloudDensity(vec3 pos){
   float densityFactor = 0;
   float heightDenseFactor = 1.0;
 
+  float heightInPlane = 0.0;
+
   if (pos.y >= VANILLA_CLOUD_LOWER_HEIGHT && pos.y <= VANILLA_CLOUD_UPPER_HEIGHT){
     // 12 blocks per pixel in vanilla cloud texture
     // 256x256 texture
@@ -88,6 +90,8 @@ float getCloudDensity(vec3 pos){
       heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CUMULUS_UPPER_HEIGHT, pos.y);
     }
 
+    heightInPlane = smoothstep(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, pos.y);
+
   } else if(pos.y >= ALTOCUMULUS_LOWER_HEIGHT && pos.y <= ALTOCUMULUS_UPPER_HEIGHT){
     coverage = ALTOCUMULUS_COVERAGE;
     densityFactor = ALTOCUMULUS_DENSITY;
@@ -99,6 +103,8 @@ float getCloudDensity(vec3 pos){
     } else {
       heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, ALTOCUMULUS_UPPER_HEIGHT, pos.y);
     }
+
+    heightInPlane = smoothstep(ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, pos.y);
 
   } else if (pos.y >= CIRRUS_LOWER_HEIGHT && pos.y <= CIRRUS_UPPER_HEIGHT){
     coverage = CIRRUS_COVERAGE;
@@ -112,6 +118,8 @@ float getCloudDensity(vec3 pos){
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   
+  // erosionDensity = mix(1.0 - erosionDensity, erosionDensity, heightInPlane * 0.5 + 0.5);
+
   float density = clamp01(shapeDensity2 - (1.0 - coverage));
   // density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
@@ -126,6 +134,8 @@ float getCloudDensity(vec3 pos){
 float getTotalDensityTowardsLight(vec3 rayPos, float jitter, float lowerHeight, float upperHeight, int samples){
   vec3 a = rayPos;
   vec3 b = rayPos;
+
+  samples = int(mix(float(samples), samples * 2.0, 1.0 - abs(lightVector.y)));
 
   bool goingDown = lightVector.y < 0;
   bool belowLayer = rayPos.y < lowerHeight;

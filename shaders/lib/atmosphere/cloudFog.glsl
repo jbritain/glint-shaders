@@ -172,7 +172,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
       radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0);
     }
 
-     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
+     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / FOG_EXTINCTION;
 
     totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;

@@ -126,8 +126,6 @@ uniform float thunderStrength;
     float translucentDepth = texture(depthtex0, texcoord).r;
     float opaqueDepth = texture(depthtex2, texcoord).r;
 
-    show(linearizeDepth(translucentDepth, near, far) * 20 / far);
-
     vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
     dhOverride(opaqueDepth, opaqueViewPos, true);
     vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;

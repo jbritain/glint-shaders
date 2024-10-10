@@ -244,6 +244,8 @@ option.CIRRUS_CLOUDS=Cirrus Clouds
 option.VANILLA_CLOUDS=Vanilla Clouds
 option.CLOUD_SHADOWS=Cloud Shadows
 
+option.DOF=Depth of Field
+
 option.WATERMARK=Show Watermark
 
 option.GLINT_SHADERS=Glint Shaders

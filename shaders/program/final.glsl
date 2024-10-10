@@ -69,13 +69,17 @@
     color.rgb = mix(color.rgb, bloom.rgb, watermark.a);
     #endif
 
+    #if defined DEBUG_ENABLE && defined POST_PROCESS_DEBUG
+    color = texture(debugtex, texcoord);
+    #endif
+
     color.rgb = tonemap(color.rgb);
 
     color.rgb = setSaturationLevel(color.rgb, SATURATION);
 
     color.rgb = invGammaCorrect(color.rgb);
 
-    #ifdef DEBUG_ENABLE
+    #if defined DEBUG_ENABLE && !defined POST_PROCESS_DEBUG
     color = texture(debugtex, texcoord);
     #endif
 
