@@ -104,7 +104,7 @@ uniform float thunderStrength;
     vec3 previousScreenPos = reproject(screenPos);
     previousScreenPos.z = texture(colortex4, previousScreenPos.xy).a;
 
-    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && depth == previousScreenPos.z){
+    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && depth == previousScreenPos.z && lightningBoltPosition == vec4(0.0)){
       vec4 previousCloudData = texture(colortex7, previousScreenPos.xy);
 
       cloudScatter.rgb = mix(previousCloudData.rgb, cloudScatter.rgb, CLOUD_BLEND);
