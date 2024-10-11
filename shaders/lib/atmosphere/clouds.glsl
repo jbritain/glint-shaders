@@ -114,15 +114,24 @@ float getCloudDensity(vec3 pos){
     return 0;
   }
 
-  float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
-  float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
-  float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;
+  float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
+  float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
+  
   
   // erosionDensity = mix(1.0 - erosionDensity, erosionDensity, heightInPlane * 0.5 + 0.5);
 
-  float density = clamp01(shapeDensity2 - (1.0 - coverage));
-  // density = mix(density, clamp01(shapeDensity - (1.0 - coverage) - 0.05), 0.3);
+  float density = clamp01(shapeDensity - (1.0 - coverage));
+  density = mix(density, clamp01(shapeDensity2 - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
+
+  if(density == 0.0){
+    return density;
+  }
+
+  float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;
+
+  erosionDensity = mix(erosionDensity, erosionDensity, smoothstep(0.4, 0.6, 1.0 - heightInPlane));
+
   density -= clamp01(erosionDensity - 0.6);
 
   density = mix(density, 0.0, sin(PI * (1.0 - heightDenseFactor) / 2));
