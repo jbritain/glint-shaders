@@ -60,28 +60,32 @@ bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool re
   }
   
   rayDir -= rayPos;
-  rayDir *= min3((sign(rayDir) - rayPos) / rayDir); // set length of ray to trace to the nearest screen edge (I think)
-  rayDir *= rcp(maxSteps); // split ray up into our steps
+  rayDir = normalize(rayDir);
 
-  float depthLenience = max(abs(rayDir.z), 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
+  float rayLength = min3(abs(sign(rayDir) - rayPos) / max(abs(rayDir), 0.00001));
+  float stepLength = rayLength * rcp(float(maxSteps));
+
+  vec3 rayStep = rayDir * stepLength;
+
+  float depthLenience = max(abs(rayDir.z) * 3.0, 0.02 / sqrt(viewOrigin.z)); // Provided by DrDesten
 
   bool intersect = false;
 
-  rayPos += rayDir * jitter;
+  rayPos += rayStep * (jitter) + length(vec2(rcp(viewWidth), rcp(viewHeight))) * rayDir;
 
-  for(int i = 0; i < maxSteps && !intersect; i++, rayPos += rayDir){
-    if(clamp01(rayPos.xy) != rayPos.xy) return false; // we went offscreen
+  for(int i = 0; i < maxSteps && !intersect; ++i, rayPos += rayStep){
+    if(clamp01(rayPos.xyz) != rayPos.xyz) return false; // we went offscreen
 
     float depth = getDepth(rayPos.xy, previousFrame); // sample depth at ray position
 
-    intersect = abs(depthLenience - (rayPos.z - depth)) < depthLenience && depth > handDepth; // check if our ray is inside geometry
+    intersect = abs(depthLenience - (rayPos.z - depth)) < depthLenience && depth < rayPos.z; // check if our ray is inside geometry
   }
 
   if(refine && intersect){
     binarySearch(rayPos, rayDir, previousFrame);
   }
 
-  if(clamp01(rayPos.xy) != rayPos.xy){
+  if(clamp01(rayPos.xy) != rayPos.xy || rayPos.z < handDepth){
     intersect = false;
   }
 

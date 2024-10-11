@@ -28,7 +28,7 @@ vec3 distort(vec3 pos) {
 
 vec4 getShadowClipPos(vec3 playerPos){
 	vec4 shadowViewPos = shadowModelView * vec4(playerPos, 1.0);
-	vec4 shadowClipPos = shadowProjection * shadowViewPos; //convert to shadow ndc space.
+	vec4 shadowClipPos = shadowProjection * shadowViewPos;
 	return shadowClipPos;
 }
 

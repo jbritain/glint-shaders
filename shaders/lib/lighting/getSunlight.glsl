@@ -200,8 +200,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 		vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 
-		float taxicabDistance = max(abs(feetPlayerPos.x), abs(feetPlayerPos.z));
-		float distFade = smoothstep(0.8 * shadowDistance, shadowDistance, taxicabDistance);
+		float distFade = smoothstep(0.5, 1.0, max3(abs(shadowClipPos).xyz));
 
 		bool inShadowDistance = distFade < 1.0;
 

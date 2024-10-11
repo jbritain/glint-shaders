@@ -138,13 +138,13 @@ vec3 sampleVNDFGGX(
   return normalize(vec3(alpha * halfway.xy, halfway.z));
 }
 
-vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter){
+vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, float roughness){
   vec3 reflectionPos = vec3(0.0);
 
   vec3 worldDir = mat3(gbufferModelViewInverse) * viewRay;
   vec2 environmentUV = mapSphere(normalize(worldDir));
 
-  if(!traceRay(viewOrigin, viewRay, 32, jitter, true, reflectionPos, true)){
+  if(!traceRay(viewOrigin, viewRay, roughness == 0.0 ? 16 : 8, jitter, true, reflectionPos, true)){
     return texture(colortex9, environmentUV).rgb * skyLightmap;
   }
 
@@ -173,8 +173,8 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = blueNoise(screenPos).r;
-    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
+    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
+    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness);
   } else { // we must take multiple samples
 
     // we need a TBN to get into tangent space for the VNDF
@@ -185,11 +185,15 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     mat3 tbn = mat3(tangent, bitangent, normal);
 
     for(int i = 0; i < SSR_SAMPLES; i++){
-      vec3 noise = blueNoise(screenPos, int(length(gbufferModelViewInverse[2]) * 1000) * SSR_SAMPLES + i).rgb;
+      vec3 noise = vec3(
+        interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i),
+        interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i),
+        interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i)
+      );
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
-      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, noise.z);
+      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, noise.z, material.roughness);
     }
 
     reflectedColor /= SSR_SAMPLES;

@@ -140,7 +140,7 @@ uniform float thunderStrength;
       material.sss = 1.0;
     }
 
-    float wetnessFactor = wetness * (1.0 - material.porosity) * smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y) * float(biome_precipitation == PPT_RAIN);
+    float wetnessFactor = wetness * (1.0 - material.porosity) * smoothstep(0.66, 1.0, lightmap.y) * float(biome_precipitation == PPT_RAIN);
 
     material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
     material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
