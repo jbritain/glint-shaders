@@ -159,7 +159,7 @@ uniform float thunderStrength;
       bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy; // don't refract offscreen
 
       refract = refract && (
-        inWater ? refractedCoord.z < translucentDepth : refractedCoord.z > translucentDepth
+        refractedCoord.z > translucentDepth
       );
 
       if(refract){ // don't refract stuff that's not underwater
@@ -168,18 +168,15 @@ uniform float thunderStrength;
         refract = materialIsWater(refractedMaterialID);
       }
 
-      refract = refract && (refractedCoord.z >= translucentDepth); // another check for it being underwater
+      // refract = refract && (refractedCoord.z >= translucentDepth); // another check for it being underwater
 
 
-      if(refract && refractedCoord.z != 1.0){
+      if(refract){
         // refractedCoord.xy = mix(texcoord, refractedCoord.xy, kneemundAttenuation(refractedCoord.xy, 0.03));
         color = texture(colortex0, refractedCoord.xy);
         refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
         opaqueViewPos = screenSpaceToViewSpace(refractedCoord);
         opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
-      } else if (inWater && refractedCoord.z == 1.0){
-        vec2 refractedSkyUV = mapSphere(refractedDir);
-        color.rgb = texture(colortex9, refractedSkyUV).rgb;
       }
     }
     #endif

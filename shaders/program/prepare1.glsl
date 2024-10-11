@@ -50,7 +50,7 @@
 
   uniform float far;
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
   uniform int isEyeInWater;
 
   uniform float viewWidth;
@@ -89,5 +89,11 @@ uniform float thunderStrength;
 
     color.rgb *= cloudTransmittance;
     color.rgb += cloudScatter;
+
+    if(isEyeInWater == 1){
+      float distanceBelowSeaLevel = max0(-1 * (cameraPosition.y - 63));
+
+      color.rgb *= exp(-WATER_EXTINCTION * distanceBelowSeaLevel);
+    }
   }
 #endif

@@ -217,7 +217,7 @@ uniform float thunderStrength;
     }
 
     #ifdef gbuffers_weather
-      if(biome_precipitation != 2){
+      if(color.rgb != vec3(1.0)){
         color = vec4(0.2);
         color.a = 0.1;
       }
@@ -271,7 +271,7 @@ uniform float thunderStrength;
     } else {
       material = materialFromSpecularMap(color.rgb, specularData);
 
-      float wetnessFactor = wetness * (1.0 - material.porosity) * lightmap.y;
+      float wetnessFactor = wetness * (1.0 - material.porosity) * smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y) * float(biome_precipitation == PPT_RAIN);
 
       material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
       material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);

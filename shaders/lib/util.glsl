@@ -242,5 +242,9 @@ float quinticStep(float edge0, float edge1, float x) {
 #define worldTimeCounter ((worldTime / 20.0) + (worldDay * 1200.0))
 #define EBS (vec2(eyeBrightnessSmooth) / 240.0)
 
+#define PPT_NONE 0
+#define PPT_RAIN 1
+#define PPT_SNOW 2
+
 
 #endif

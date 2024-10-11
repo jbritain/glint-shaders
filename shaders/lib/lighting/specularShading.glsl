@@ -173,7 +173,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = blueNoise(screenPos, frameCounter).r;
+    float jitter = blueNoise(screenPos).r;
     reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter);
   } else { // we must take multiple samples
 
@@ -185,7 +185,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     mat3 tbn = mat3(tangent, bitangent, normal);
 
     for(int i = 0; i < SSR_SAMPLES; i++){
-      vec3 noise = blueNoise(screenPos, frameCounter * SSR_SAMPLES + i).rgb;
+      vec3 noise = blueNoise(screenPos, int(length(gbufferModelViewInverse[2]) * 1000) * SSR_SAMPLES + i).rgb;
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
@@ -228,8 +228,8 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
   
   #else
   if(material.roughness == 0.0){
-    vec3 worldDir = mat3(gbufferModelViewInverse) * normalize(viewPos);
-    vec2 environmentUV = mapSphere(normalize(worldDir));
+    vec3 reflectedDir = mat3(gbufferModelViewInverse) * reflect(normalize(viewPos), normal);
+    vec2 environmentUV = mapSphere(reflectedDir);
 
     reflectedColor.rgb = texture(colortex9, environmentUV).rgb * lightmap.y;
   } else {
