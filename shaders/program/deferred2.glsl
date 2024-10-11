@@ -169,7 +169,6 @@ uniform float thunderStrength;
     if((isEyeInWater == 1) != materialIsWater(materialID)){
       color = getAtmosphericFog(color, eyePlayerPos);
     }
-    // color.rgb = mix(color.rgb, cloudColor.rgb, cloudColor.a);
 
   }
 #endif

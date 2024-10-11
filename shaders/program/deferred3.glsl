@@ -82,6 +82,7 @@ uniform float thunderStrength;
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
   #include "/lib/util/dh.glsl"
+  #include "/lib/atmosphere/aurora.glsl"
 
 
   void main() {
@@ -111,7 +112,13 @@ uniform float thunderStrength;
       cloudTransmittance.rgb = mix(vec3(previousCloudData.a), cloudTransmittance, CLOUD_BLEND);
     }
 
+    // if(depth == 1.0){
+    //   color.rgb += getAurora(normalize(eyePlayerPos));
+    // }
+
+
     color.rgb = color.rgb * cloudTransmittance.rgb + cloudScatter.rgb;
+
     cloudData.rgb = cloudScatter;
     cloudData.a = mean(cloudTransmittance);
   }

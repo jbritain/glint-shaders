@@ -17,7 +17,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex5` hand
 `colortex6` cloud shadow map (256x256)
 `colortex7` cloud scattering (transmittance in alpha) (non-clearing)
-`colortex8` unused
+`colortex8` volumetric stuff
 `colortex9` sky environment map (256x256)
 `colortex10` global illumination rgb, opaque parallax shadowing a
 
@@ -32,6 +32,8 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 
 `composite` some fog, translucency blending
 `composite1` cloud fog
+`composite2` cloud fog blur pass 1
+`composite2` cloud fog blending
 
 `composite85` DoF circle of confusion calculation
 

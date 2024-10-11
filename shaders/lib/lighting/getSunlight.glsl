@@ -178,8 +178,8 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
 	shadowNoise = vec4(
-		interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
-		interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter + 1),
+		interleavedGradientNoise(floor(gl_FragCoord.xy), 0),
+		interleavedGradientNoise(floor(gl_FragCoord.xy), 1),
 		0.0,
 		0.0
 	);

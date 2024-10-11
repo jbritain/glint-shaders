@@ -8,8 +8,8 @@
     By jbritain
     https://jbritain.net
 
-    /program/deferred3.glsl
-    - Cloud generation
+    /program/composite1.glsl
+    - Cloud fog
 */
 
 #include "/lib/settings.glsl"
@@ -66,7 +66,7 @@
   uniform int frameCounter;
 
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
 
   uniform float near;
   uniform float far;
@@ -80,9 +80,8 @@ uniform float thunderStrength;
 
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:80 */
+  /* DRAWBUFFERS:8 */
   layout(location = 0) out vec4 fogData;
-  layout(location = 1) out vec4 color;
 
   #include "/lib/util.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -93,9 +92,6 @@ uniform float thunderStrength;
 
 
   void main() {
-
-    color = texture(colortex0, texcoord);
-
     // TODO: VOLUMETRIC FOG BEHIND TRANSLUCENTS
     if(isEyeInWater != 0){
       return;
@@ -113,6 +109,8 @@ uniform float thunderStrength;
 
     vec3 fogScatter = hasSkylight ? getCloudFog(vec3(0.0), eyePlayerPos, depth, sunlightColor, skyLightColor, fogTransmittance) : vec3(0.0);
 
-    color.rgb = color.rgb * fogTransmittance.rgb + fogScatter.rgb;
+    fogData.rgb = fogScatter;
+    fogData.a = sum3(fogScatter) / 3.0;
+
   }
 #endif

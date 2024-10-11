@@ -139,7 +139,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
   vec3 totalTransmittance = vec3(1.0);
   vec3 lightEnergy = vec3(0.0);
 
-  float jitter = blueNoise(texcoord, frameCounter).r;
+  float jitter = blueNoise(texcoord).r;
   rayPos += increment * jitter;
 
   vec3 scatter = vec3(0.0);
@@ -157,7 +157,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
       continue;
     }
 
-    float lightJitter = blueNoise(texcoord, i + frameCounter * samples).r;
+    float lightJitter = blueNoise(texcoord, i + 1).r;
 
     vec3 lightEnergy = calculateFogLightEnergy(rayPos, lightJitter, mu);
     vec3 radiance = lightEnergy * sunlightColor + skyLightColor * EBS.y;
