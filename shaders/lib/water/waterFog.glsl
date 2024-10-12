@@ -21,6 +21,12 @@ vec3 getWaterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, ve
 vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor){
   vec3 rayPos = a;
 
+  vec3 worldDir = normalize(b - a);
+
+  if(distance(a, b) > far){
+    b = a + worldDir * far;
+  }
+
   vec3 increment = (b - a) / VOLUMETRIC_WATER_SAMPLES;
   float jitter = blueNoise(texcoord, frameCounter).r;
   // float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));

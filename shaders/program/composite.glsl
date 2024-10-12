@@ -153,6 +153,7 @@ uniform float thunderStrength;
       // method from BSL
       vec2 refractDir = mappedNormal.xy - faceNormal.xy;
       refractDir *= vec2(1.0 / aspectRatio, 1.0) * (gbufferProjection[1][1] / 1.37) / max(length(opaqueEyePlayerPos), 8.0); // sorcery
+      refractDir *= 4.0;
       vec3 refractedCoord = vec3(texcoord + refractDir, 0.0);
       refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
 
