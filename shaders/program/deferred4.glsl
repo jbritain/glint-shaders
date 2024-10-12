@@ -57,8 +57,8 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:8 */
-  layout(location = 0) out vec4 reflectedColor;
+  /* DRAWBUFFERS:0 */
+  layout(location = 0) out vec4 color;
 
   #include "/lib/util.glsl"
   #include "/lib/util/blur.glsl"
@@ -68,7 +68,27 @@
   #include "/lib/util/gbufferData.glsl"
 
   void main() {
-    // TODO: how the fuck do I denoise reflections
-    reflectedColor = texture(colortex8, texcoord);
+    float depth = texture(depthtex0, texcoord).r;
+    color = texture(colortex0, texcoord);
+
+    if(depth == 1.0){
+      return;
+    }
+
+    vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+    vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
+
+    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
+
+    vec4 reflectedColor;
+    
+    reflectedColor = blur1(colortex8, texcoord, vec2(viewWidth, viewHeight));
+
+
+    color.rgb += reflectedColor.rgb;
+
+    if((isEyeInWater == 1) != materialIsWater(materialID)){
+      color = getAtmosphericFog(color, eyePlayerPos);
+    }
   }
 #endif

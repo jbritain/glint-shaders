@@ -17,7 +17,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex5` hand
 `colortex6` cloud shadow map (256x256)
 `colortex7` cloud scattering (transmittance in alpha) (non-clearing)
-`colortex8` volumetric stuff
+`colortex8` volumetric stuff, opaque specular
 `colortex9` sky environment map (256x256)
 `colortex10` global illumination rgb, opaque parallax shadowing a
 
@@ -28,9 +28,11 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `deferred` rsm global illumination
 `deferred1` global illumination filtering
 `deferred2` opaques shading, sky
-`deferred3` clouds
+`deferred3` blur opaque specular
+`deferred4` blur and blend opaque specular
+`deferred5` clouds
 
-`composite` some fog, translucency blending
+`composite` atmospheric and water fog, translucency blending
 `composite1` cloud fog
 `composite2` cloud fog blur pass 1
 `composite2` cloud fog blending

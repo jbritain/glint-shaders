@@ -13,6 +13,17 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+vec4 blur1(sampler2D image, vec2 uv, vec2 resolution){
+  vec4 color = vec4(0.0);
+  vec2 off1 = vec2(0.5, -0.5);
+  vec2 off2 = vec2(0.5, 0.5);
+  color += texture2D(image, uv + (off1 / resolution)) * 0.25;
+  color += texture2D(image, uv - (off1 / resolution)) * 0.25;
+  color += texture2D(image, uv + (off2 / resolution)) * 0.25;
+  color += texture2D(image, uv - (off2 / resolution)) * 0.25;
+  return color;  
+}
+
 vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
   vec4 color = vec4(0.0);
   vec2 off1 = vec2(1.411764705882353) * direction;

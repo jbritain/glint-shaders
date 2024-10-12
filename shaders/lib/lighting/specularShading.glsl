@@ -173,7 +173,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
+    float jitter = blueNoise(texcoord).x;
     reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness);
   } else { // we must take multiple samples
 
@@ -186,9 +186,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
 
     for(int i = 0; i < SSR_SAMPLES; i++){
       vec3 noise = vec3(
-        interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i),
-        interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i),
-        interleavedGradientNoise(floor(gl_FragCoord.xy), SSR_SAMPLES + i)
+        blueNoise(texcoord).xyz
       );
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
@@ -206,18 +204,12 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   return reflectedColor;
 }
 
-vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight, vec3 skyLightColor){
-  if(material.roughness == 1.0){
-    return color;
-  }
-
+vec4 getSpecularShading(vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight, vec3 skyLightColor){
   vec3 V = normalize(-viewPos);
   vec3 N = normal;
   vec3 L = normalize(shadowLightPosition);
   
   float NoV = dot(N, V);
-
-  vec3 fresnel = schlick(material, NoV);
 
   vec3 specularHighlight = calculateSpecularHighlight(N, V, L, max(material.roughness, 0.0001)) * sunlight * clamp01(geometrySmith(N, V, L, material.roughness));
 
@@ -247,9 +239,27 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
     reflectedColor.rgb *= material.albedo;
   }
 
+  return reflectedColor;
+}
+
+vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight, vec3 skyLightColor){
+  if(material.roughness == 1.0){
+    return color;
+  }
+
+  vec3 V = normalize(-viewPos);
+  vec3 N = normal;
+  
+  float NoV = dot(N, V);
+
+  vec3 fresnel = schlick(material, NoV);
+  vec4 reflectedColor = getSpecularShading(color, lightmap, normal, viewPos, material, sunlight, skyLightColor);
+
+  if(reflectedColor == vec4(-1.0)){
+    reflectedColor = color;
+  }
+
   color = mix(color, reflectedColor, vec4(clamp01(fresnel), clamp01(length(fresnel))));
-  // vec3 reflectedScreenPos = viewSpaceToSceneSpace(reflectionPos);
-  // color = reflectionPos;
   return color;
 }
 

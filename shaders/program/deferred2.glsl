@@ -75,7 +75,7 @@
   uniform int frameCounter;
 
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
 
   uniform float near;
   uniform float far;
@@ -97,9 +97,10 @@ uniform float thunderStrength;
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:03 */
+  /* DRAWBUFFERS:038 */
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 tex3;
+  layout(location = 2) out vec4 reflectedColor;
 
   #include "/lib/util.glsl"
   #include "/lib/util/gbufferData.glsl"
@@ -164,11 +165,19 @@ uniform float thunderStrength;
 
 
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);
-    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    // color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
 
-    if((isEyeInWater == 1) != materialIsWater(materialID)){
-      color = getAtmosphericFog(color, eyePlayerPos);
-    }
+    reflectedColor.rgb = getSpecularShading(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor).rgb;
+
+    vec3 V = normalize(-viewPos);
+    vec3 N = mappedNormal;
+    
+    float NoV = dot(N, V);
+
+    vec3 fresnel = schlick(material, NoV);
+
+    color.rgb *= (1.0 - clamp01(fresnel));
+    reflectedColor.rgb *= clamp01(fresnel);
 
   }
 #endif

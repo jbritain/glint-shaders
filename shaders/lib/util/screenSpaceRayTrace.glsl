@@ -44,7 +44,7 @@ void binarySearch(inout vec3 rayPos, vec3 rayDir, bool previousFrame){
   rayPos = lastGoodPos;
 }
 
-// traces through view space to find intersection point
+// traces through screen space to find intersection point
 // thanks, belmu!!
 // https://gist.github.com/BelmuTM/af0fe99ee5aab386b149a53775fe94a3#file-raytracer-glsl-L31
 bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool refine, out vec3 rayPos, bool previousFrame){
