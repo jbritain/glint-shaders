@@ -97,11 +97,9 @@
   vec3 mappedNormal;
   vec4 specularData;
 
-  /* DRAWBUFFERS:038 */
+  /* DRAWBUFFERS:03 */
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 tex3;
-  layout(location = 2) out vec4 reflectedColor;
-
   #include "/lib/util.glsl"
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -165,19 +163,7 @@
 
 
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);
-    // color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
-
-    reflectedColor.rgb = getSpecularShading(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor).rgb;
-
-    vec3 V = normalize(-viewPos);
-    vec3 N = mappedNormal;
-    
-    float NoV = dot(N, V);
-
-    vec3 fresnel = schlick(material, NoV);
-
-    color.rgb *= (1.0 - clamp01(fresnel));
-    reflectedColor.rgb *= clamp01(fresnel);
+    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
 
   }
 #endif
