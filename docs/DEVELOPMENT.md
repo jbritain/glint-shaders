@@ -20,6 +20,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex8` volumetric stuff, opaque specular
 `colortex9` sky environment map (256x256)
 `colortex10` global illumination rgb, opaque parallax shadowing a
+`colortex11` SMAA
 
 # Passes
 `prepare` cloud shadow map
@@ -35,9 +36,14 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `composite` atmospheric and water fog, translucency blending
 `composite1` cloud fog
 `composite2` cloud fog blur pass 1
-`composite2` cloud fog blending
+`composite3` cloud fog blending
 
-`composite85` DoF circle of confusion calculation
+`composite82` DoF circle of confusion calculation
+`composite83` DoF blur
+`composite84` DoF blending
+`composite85` SMAA edge detection
+`composite86` SMAA blend weight calculation
+`composite87` SMAA blending
 
 `composite88` luminance calculation for auto exposure
 `composite89` writing frame data for next frame to access (previous frame data), blending hand, auto exposure

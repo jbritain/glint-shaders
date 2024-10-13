@@ -143,13 +143,14 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
 
   vec3 worldDir = mat3(gbufferModelViewInverse) * viewRay;
   vec2 environmentUV = mapSphere(normalize(worldDir));
+  vec3 skyReflection = texture(colortex9, environmentUV).rgb * skyLightmap;
 
   if(!traceRay(viewOrigin, viewRay, roughness == 0.0 ? 16 : 8, jitter, true, reflectionPos, true)){
-    return texture(colortex9, environmentUV).rgb * skyLightmap;
+    return skyReflection;
   }
 
   if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){
-    return texture(colortex9, environmentUV).rgb * skyLightmap;
+    return skyReflection;
   }
 
 
@@ -161,7 +162,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   float fadeFactor = smoothstep(0.8, 1.0, max2(abs(reflectionPos.xy - 0.5)) * 2);
 
   if(fadeFactor > 0.0){
-    reflectedColor = mix(reflectedColor, texture(colortex9, environmentUV).rgb * skyLightmap, fadeFactor);
+    reflectedColor = mix(reflectedColor, skyReflection, fadeFactor);
   }
   #endif
   

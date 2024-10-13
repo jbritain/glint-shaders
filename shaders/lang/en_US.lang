@@ -104,8 +104,11 @@ value.sunPathRotation.80.0=80°
 value.sunPathRotation.85.0=85°        
 value.sunPathRotation.90.0=90°
 
-option.FXAA=FXAA
+option.FXAA=Anti Aliasing
 option.FXAA.comment=Attempts to remove jagged edges caused by aliasing artefacts.
+value.AA.0=Off
+value.AA.1=FXAA
+value.AA.2=SMAA
 
 option.ATMOSPHERE_FOG=Atmospheric Fog
 

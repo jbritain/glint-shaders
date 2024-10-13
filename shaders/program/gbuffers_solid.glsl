@@ -136,7 +136,7 @@
     vec2 dy = dFdy(texcoord);
     vec3 parallaxPos;
     if(length(viewPos) < 32.0){
-      vec2 pomJitter = vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
+      vec2 pomJitter = vec2(interleavedGradientNoise(floor(gl_FragCoord.xy)));
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
       parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;

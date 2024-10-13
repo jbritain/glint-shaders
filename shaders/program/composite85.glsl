@@ -9,75 +9,45 @@
     https://jbritain.net
 
     /program/composite85.glsl
-    - DoF Circle of Confusion Calculation
+    - SMAA Edge Detection
 */
 
 #include "/lib/settings.glsl"
 
 #ifdef vsh
+  #define SMAA_INCLUDE_VS
+  #include "/lib/post/SMAA.glsl"
+
   out vec2 texcoord;
+  out vec4 offset[3];
 
   void main() {
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+
+    SMAAEdgeDetectionVS(texcoord, offset);
   }
 #endif
 
 #ifdef fsh
-  uniform sampler2D depthtex0;
-  uniform float centerDepthSmooth;
-
-  uniform float near;
-  uniform float far;
-
-  uniform float viewWidth;
-  uniform float viewHeight;
-
-  uniform mat4 gbufferProjectionInverse;
-  uniform mat4 gbufferProjection;
-
-  uniform mat4 gbufferModelViewInverse;
+  #define SMAA_INCLUDE_PS
+  #include "/lib/post/SMAA.glsl"
 
   in vec2 texcoord;
+  in vec4 offset[3];
 
-  #include "/lib/util.glsl"
-  #include "/lib/util/spaceConversions.glsl"
+  uniform sampler2D colortex0;
+  uniform sampler2D colortex1;
 
-  float tentFilter(sampler2D sourceTexture, vec2 coord){
-    vec2 offset = 0.5 / vec2(viewWidth, viewHeight);
-
-    float usample = 0.0;
-    usample += texture(sourceTexture, coord + offset * vec2(1.0)).r;
-    usample += texture(sourceTexture, coord + offset * vec2(1.0, -1.0)).r;
-    usample += texture(sourceTexture, coord + offset * vec2(-1.0)).r;
-    usample += texture(sourceTexture, coord + offset * vec2(-1.0, 1.0)).r;
-
-    usample /= 4.0;
-
-    return usample;
-  }
-
-  /* DRAWBUFFERS:1 */
-  layout(location = 0) out vec4 circleOfConfusion;
+  /* RENDERTARGETS: 11 */
+  layout(location = 0) out vec4 edges;
+  
 
   void main() {
-    float depth = tentFilter(depthtex0, texcoord).r;
-    vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
-
-    float dist = viewPos.z;
-
-    const float tiltAngle = PI * TILT_ANGLE/180;
-
-    #ifdef TILT_SHIFT
-    dist = dist / cos(tiltAngle) + (viewPos.y * sin(tiltAngle)) / cos(tiltAngle);
+    edges.rg = SMAAColorEdgeDetectionPS(texcoord, offset, colortex0
+    #ifdef SMAA_PREDICATION
+    , colortex1
     #endif
-
-    float focusDist = screenSpaceToViewSpace(centerDepthSmooth);
-    float CoC = clamp(1.0 - focusDist / dist, -1.0, 1.0);
-
-    show(vec2(-CoC, CoC));
-
-    circleOfConfusion.rgb = vec3(0.0);
-    circleOfConfusion.a = CoC * 0.5 + 0.5;
+    );
   }
 #endif

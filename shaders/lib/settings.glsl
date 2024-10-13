@@ -18,6 +18,7 @@ const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha
 const int colortex8Format = RGB16;   || opaque specular, volumetrics
 const int colortex9Format = RGB16F;  || sky environment map
 const int colortex10Format = RGBA8;  || global illumination, parallax shadow
+const int colortex11Format = RGBA16F;|| SMAA
 
 const int shadowcolor2Format = RGB16F;
 
@@ -42,7 +43,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define SSR
 #define SSR_FADE
-#define SSR_SAMPLES 4 // [1 2 4 8 16 32 64]
+#define SSR_SAMPLES 16 // [1 2 4 8 16 32 64]
 #define ROUGH_REFLECTION_THRESHOLD 0.3 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
@@ -72,7 +73,15 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define SKY_SATURATION 1.2
 
+#define AA 1 // [0 1 2]
+
+#if AA == 1
 #define FXAA
+#elif AA == 2
+#define SMAA
+#endif
+
+// 
 #define FXAA_SUBPIXEL 0.5 //[0.00 0.25 0.50 0.75 1.00]
 #define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]
 

@@ -9,60 +9,47 @@
     https://jbritain.net
 
     /program/composite87.glsl
-    - DoF Blending
+    - SMAA Blending
 */
 
 #include "/lib/settings.glsl"
 
 #ifdef vsh
+  #define SMAA_INCLUDE_VS
+  #include "/lib/post/SMAA.glsl"
+
   out vec2 texcoord;
+  out vec4 offset;
 
   void main() {
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+    SMAANeighborhoodBlendingVS(texcoord, offset);
   }
 #endif
 
 #ifdef fsh
+  #define SMAA_INCLUDE_PS
+  #include "/lib/post/SMAA.glsl"
+  #include "/lib/post/tonemap.glsl"
+
+  uniform sampler2D areaTex;
+  uniform sampler2D searchTex;
   uniform sampler2D colortex0;
-  uniform sampler2D colortex1;
-
-  uniform float near;
-  uniform float far;
-
-  uniform float viewWidth;
-  uniform float viewHeight;
+  uniform sampler2D colortex11;
 
   in vec2 texcoord;
-
-  #include "/lib/util.glsl"
-
-  vec3 tentFilter(sampler2D sourceTexture, vec2 coord){
-    vec2 offset = 0.5 / vec2(viewWidth, viewHeight);
-
-    vec3 usample = vec3(0.0);
-    usample += texture(sourceTexture, coord + offset * vec2(1.0)).rgb;
-    usample += texture(sourceTexture, coord + offset * vec2(1.0, -1.0)).rgb;
-    usample += texture(sourceTexture, coord + offset * vec2(-1.0)).rgb;
-    usample += texture(sourceTexture, coord + offset * vec2(-1.0, 1.0)).rgb;
-
-    usample /= 4.0;
-
-    return usample;
-  }
+  in vec4 offset;
 
   /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
   
 
   void main() {
-    vec4 bokeh = vec4(tentFilter(colortex1, texcoord / 2.0), texture(colortex1, texcoord / 2.0).a);
-    color = texture(colortex0, texcoord);
+    vec4 oldColor = texture(colortex0, texcoord);
+    color = SMAANeighborhoodBlendingPS(texcoord, offset, colortex0, colortex11);
+    show(abs(color - oldColor));
+    color.rgb = gammaCorrect(color.rgb);
 
-    float CoC = (bokeh.a - 0.5) / 0.5;
-
-
-    float DoFStrength = smoothstep(0.1, 1.0, abs(CoC));
-    color.rgb = mix(color.rgb, bokeh.rgb, DoFStrength);
   }
 #endif
