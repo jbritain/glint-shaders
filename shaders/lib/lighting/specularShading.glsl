@@ -145,7 +145,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   vec2 environmentUV = mapSphere(normalize(worldDir));
   vec3 skyReflection = texture(colortex9, environmentUV).rgb * skyLightmap;
 
-  if(!traceRay(viewOrigin, viewRay, roughness == 0.0 ? 16 : 8, jitter, true, reflectionPos, true)){
+  if(!traceRay(viewOrigin, viewRay, roughness < 0.01 ? 16 : 8, jitter, true, reflectionPos, true)){
     return skyReflection;
   }
 
@@ -169,10 +169,10 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   return reflectedColor;
 }
 
-vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, vec3 viewPos, Material material){
+vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 fresnel){
 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-  if(material.roughness == 0.0){ // we only need to make one reflection sample for perfectly smooth surfaces
+  if(material.roughness < 0.01){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
     float jitter = blueNoise(texcoord).x;
     reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness);
@@ -185,9 +185,11 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
 
     mat3 tbn = mat3(tangent, bitangent, normal);
 
-    for(int i = 0; i < SSR_SAMPLES; i++){
+    int samples = int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
+
+    for(int i = 0; i < samples; i++){
       vec3 noise = vec3(
-        blueNoise(texcoord).xyz
+        blueNoise(texcoord, i).xyz
       );
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
@@ -205,7 +207,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   return reflectedColor;
 }
 
-vec4 getSpecularShading(vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight, vec3 skyLightColor){
+vec4 getSpecularShading(vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Material material, vec3 sunlight, vec3 skyLightColor, vec3 fresnel){
   vec3 V = normalize(-viewPos);
   vec3 N = normal;
   vec3 L = normalize(shadowLightPosition);
@@ -218,13 +220,13 @@ vec4 getSpecularShading(vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Ma
 
   #ifdef SSR
   if (material.roughness < ROUGH_REFLECTION_THRESHOLD){
-    reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material);
+    reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material, fresnel);
   } else {
     reflectedColor = color;
   }
   
   #else
-  if(material.roughness == 0.0){
+  if(material.roughness < 0.01){
     vec3 reflectedDir = mat3(gbufferModelViewInverse) * reflect(normalize(viewPos), normal);
     vec2 environmentUV = mapSphere(reflectedDir);
 
@@ -254,7 +256,7 @@ vec4 shadeSpecular(in vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Mate
   float NoV = dot(N, V);
 
   vec3 fresnel = schlick(material, NoV);
-  vec4 reflectedColor = getSpecularShading(color, lightmap, normal, viewPos, material, sunlight, skyLightColor);
+  vec4 reflectedColor = getSpecularShading(color, lightmap, normal, viewPos, material, sunlight, skyLightColor, fresnel);
 
   if(reflectedColor == vec4(-1.0)){
     reflectedColor = color;

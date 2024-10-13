@@ -70,15 +70,19 @@ float getCloudDensity(vec3 pos){
 
   float heightInPlane = 0.0;
 
+  #ifdef VANILLA_CLOUDS
   if (pos.y >= VANILLA_CLOUD_LOWER_HEIGHT && pos.y <= VANILLA_CLOUD_UPPER_HEIGHT){
     // 12 blocks per pixel in vanilla cloud texture
     // 256x256 texture
-    ivec2 cloudSamplePos = ivec2(floor(mod(pos.xz / 12, 256)));
+    ivec2 cloudSamplePos = ivec2(floor(mod((pos.xz) / 12, 256)));
     float density = texelFetch(vanillacloudtex, cloudSamplePos, 0).r * VANILLA_CLOUD_DENSITY;
 
     return density;
 
-  } else if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
+  } else 
+  #endif
+  #ifdef CUMULUS_CLOUDS
+  if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
     coverage = mix(CUMULUS_COVERAGE, 1.0, smoothstep(0.0, 50000.0, distance(cameraPosition.xz, pos.xz)));
     densityFactor = CUMULUS_DENSITY;
 
@@ -92,7 +96,10 @@ float getCloudDensity(vec3 pos){
 
     heightInPlane = smoothstep(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, pos.y);
 
-  } else if(pos.y >= ALTOCUMULUS_LOWER_HEIGHT && pos.y <= ALTOCUMULUS_UPPER_HEIGHT){
+  } else 
+  #endif
+  #ifdef ALTOCUMULUS_CLOUDS
+  if(pos.y >= ALTOCUMULUS_LOWER_HEIGHT && pos.y <= ALTOCUMULUS_UPPER_HEIGHT){
     coverage = ALTOCUMULUS_COVERAGE;
     densityFactor = ALTOCUMULUS_DENSITY;
 
@@ -106,11 +113,16 @@ float getCloudDensity(vec3 pos){
 
     heightInPlane = smoothstep(ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, pos.y);
 
-  } else if (pos.y >= CIRRUS_LOWER_HEIGHT && pos.y <= CIRRUS_UPPER_HEIGHT){
+  } else
+  #endif
+  #ifdef CIRRUS_CLOUDS
+   if (pos.y >= CIRRUS_LOWER_HEIGHT && pos.y <= CIRRUS_UPPER_HEIGHT){
     coverage = CIRRUS_COVERAGE;
     densityFactor = CIRRUS_DENSITY;
     pos.x /= 4;
-  } else {
+  } else
+  #endif
+  {
     return 0;
   }
 

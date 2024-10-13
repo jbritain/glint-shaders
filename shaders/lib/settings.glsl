@@ -55,7 +55,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define MIN_PENUMBRA_WIDTH 0.1
 #define BLOCKER_SEARCH_SAMPLES 8
 #define BLOCKER_SEARCH_RADIUS 0.5
-#define SHADOW_SAMPLES 16 // [1 2 4 8 16 32 64]
+#define SHADOW_SAMPLES 8 // [1 2 4 8 16 32 64]
 #define SUBSURFACE_SCATTERING
 
 #define NORMAL_MAPS
