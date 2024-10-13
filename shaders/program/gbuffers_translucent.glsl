@@ -294,5 +294,6 @@ uniform float thunderStrength;
     #endif
 
     color = getAtmosphericFog(color, eyePlayerPos);
+    color = getBorderFog(color, eyePlayerPos);
   }
 #endif

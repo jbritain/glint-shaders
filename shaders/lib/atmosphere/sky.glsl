@@ -36,6 +36,15 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
     kCamera, dir, 0.0, sunVector, transmit
   );
 
+  // override sky color below horizon
+  if(dir.y < 0.0){
+    vec3 tempDir = dir;
+    tempDir.y = clamp01(tempDir.y);
+    tempDir = normalize(tempDir);
+    vec3 tempTransmit;
+    radiance = GetSkyRadiance(kCamera, tempDir, 0.0, sunVector, tempTransmit);
+  }
+
   if(includeSun && dot(dir, sunVector) > cos(ATMOSPHERE.sun_angular_radius)){
     radiance += transmit * GetSolarRadiance();
   }
@@ -82,8 +91,28 @@ vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
 
   vec3 dir = normalize(playerPos);
 
+  // playerPos = mix(playerPos, playerPos * vec3(10000.0, 1.0, 10000.0), smoothstep(0.8 * far, far, length(playerPos)));
+
   vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit) * EBS.y;
 
   return vec4(color.rgb * transmit + fog, color.a);
+}
+
+vec4 getBorderFog(vec4 color, vec3 playerPos){
+  #ifndef BORDER_FOG
+  return color;
+  #endif
+
+  #ifndef WORLD_OVERWORLD
+  return color;
+  #endif
+  
+  float distFactor = smoothstep(0.8 * far, far, length(playerPos));
+  distFactor = pow2(distFactor);
+
+  vec3 fog = getSky(normalize(playerPos), false);
+
+  color = mix(color, vec4(fog, 1.0), distFactor);
+  return color;
 }
 #endif

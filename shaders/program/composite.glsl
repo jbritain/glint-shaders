@@ -184,6 +184,7 @@ uniform float thunderStrength;
 
     if(waterMask == inWater && opaqueDepth != 1.0){
       color = getAtmosphericFog(color, opaqueEyePlayerPos);
+      color = getBorderFog(color, opaqueEyePlayerPos);
     }
 
     if(inWater && !waterMask){ // water fog when camera and object are underwater
