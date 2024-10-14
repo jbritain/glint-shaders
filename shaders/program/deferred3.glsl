@@ -42,6 +42,5 @@
   void main() {
     color = texture(colortex0, texcoord);
     color.rgb += blur1(colortex8, texcoord, vec2(viewWidth, viewHeight)).rgb;
-
   }
 #endif

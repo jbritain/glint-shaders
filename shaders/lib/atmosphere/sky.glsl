@@ -36,6 +36,7 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
     kCamera, dir, 0.0, sunVector, transmit
   );
 
+  #ifdef BORDER_FOG
   // override sky color below horizon
   if(dir.y < 0.0){
     vec3 tempDir = dir;
@@ -44,6 +45,7 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
     vec3 tempTransmit;
     radiance = GetSkyRadiance(kCamera, tempDir, 0.0, sunVector, tempTransmit);
   }
+  #endif
 
   if(includeSun && dot(dir, sunVector) > cos(ATMOSPHERE.sun_angular_radius)){
     radiance += transmit * GetSolarRadiance();

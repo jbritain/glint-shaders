@@ -14,7 +14,6 @@ A work in progress shaderpack for Minecraft.
 - Nice bloom
 
 ## The To-Do List
-- Fix noise on reflections
 - Cloud shape overhaul
 - Biome based weather
 - iPBR
@@ -28,8 +27,7 @@ A work in progress shaderpack for Minecraft.
 - ~~TAA~~
 
 ## Known Issues
-- POM looks weird and isn't deep enough
-- Noticeable noise on fog
+- Reflections on hand broken
 - Ghosting on clouds when player moves
 - Volumetric fog has artifacts
 - Occasionally reflections turn completely black until shader reload

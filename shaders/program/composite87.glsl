@@ -48,7 +48,6 @@
   void main() {
     vec4 oldColor = texture(colortex0, texcoord);
     color = SMAANeighborhoodBlendingPS(texcoord, offset, colortex0, colortex11);
-    show(abs(color - oldColor));
     color.rgb = gammaCorrect(color.rgb);
 
   }

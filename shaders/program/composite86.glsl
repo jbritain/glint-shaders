@@ -52,5 +52,6 @@
     color = texture(colortex0, texcoord);
     color.rgb = invGammaCorrect(color.rgb);
     blendWeight = SMAABlendingWeightCalculationPS(texcoord, pixcoord, offset, colortex11, areaTex, searchTex, vec4(0.0));
+    // show(blendWeight);
   }
 #endif

@@ -1,6 +1,8 @@
 #ifndef BLUR_INCLUDE
 #define BLUR_INCLUDE
 
+#include "/lib/util.glsl"
+
 // https://github.com/Experience-Monks/glsl-fast-gaussian-blur
 
 /*
@@ -14,14 +16,26 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 vec4 blur1(sampler2D image, vec2 uv, vec2 resolution){
-  vec4 color = vec4(0.0);
-  vec2 off1 = vec2(0.5, -0.5);
-  vec2 off2 = vec2(0.5, 0.5);
-  color += texture2D(image, uv + (off1 / resolution)) * 0.25;
-  color += texture2D(image, uv - (off1 / resolution)) * 0.25;
-  color += texture2D(image, uv + (off2 / resolution)) * 0.25;
-  color += texture2D(image, uv - (off2 / resolution)) * 0.25;
-  return color;  
+  float x = rcp(resolution.x);
+  float y = rcp(resolution.y);
+  vec4 a = texture(image, vec2(uv.x - x, uv.y + y));
+  vec4 b = texture(image, vec2(uv.x,     uv.y + y));
+  vec4 c = texture(image, vec2(uv.x + x, uv.y + y));
+
+  vec4 d = texture(image, vec2(uv.x - x, uv.y));
+  vec4 e = texture(image, vec2(uv.x,     uv.y));
+  vec4 f = texture(image, vec2(uv.x + x, uv.y));
+
+  vec4 g = texture(image, vec2(uv.x - x, uv.y - y));
+  vec4 h = texture(image, vec2(uv.x,     uv.y - y));
+  vec4 i = texture(image, vec2(uv.x + x, uv.y - y));
+
+  vec4 usample = e*4.0;
+  usample += (b + d + f + h) * 2.0;
+  usample += (a + c + g + i);
+  usample /= 16.0;
+
+  return usample;
 }
 
 vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
