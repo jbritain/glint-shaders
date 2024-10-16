@@ -1,6 +1,8 @@
 #ifndef ATMOSPHERE_INCLUDE
 #define ATMOSPHERE_INCLUDE
 
+#include "/lib/atmosphere/common.glsl"
+
 uniform sampler3D atmospheretex;
 
 const int TRANSMITTANCE_TEXTURE_WIDTH = 256;
@@ -174,7 +176,7 @@ const AtmosphereParameters ATMOSPHERE = AtmosphereParameters(
     // that are valid only if this angle is smaller than 0.1 radians.
 	  0.004675,
     // The distance between the planet center and the bottom of the atmosphere.
-    6371e3 - 1000,
+    earthRadius,
     // The distance between the planet center and the top of the atmosphere.
     6371e3 + 11e4,
     // The density profile of air molecules, i.e. a function from altitude to

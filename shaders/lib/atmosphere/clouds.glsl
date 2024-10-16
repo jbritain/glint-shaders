@@ -64,6 +64,8 @@ float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
 
 float getCloudDensity(vec3 pos){
 
+  pos.y = distance(pos, earthCentre) - earthRadius;
+
   float coverage = 0;
   float densityFactor = 0;
   float heightDenseFactor = 1.0;
@@ -83,7 +85,7 @@ float getCloudDensity(vec3 pos){
   #endif
   #ifdef CUMULUS_CLOUDS
   if(pos.y >= CUMULUS_LOWER_HEIGHT && pos.y <= CUMULUS_UPPER_HEIGHT){
-    coverage = mix(CUMULUS_COVERAGE, 1.0, smoothstep(0.0, 50000.0, distance(cameraPosition.xz, pos.xz)));
+    coverage = mix(CUMULUS_COVERAGE, 1.0, smoothstep(0.0, 50000.0, 0.0));
     densityFactor = CUMULUS_DENSITY;
 
     float cumulusCentreHeight = mix(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, 0.3); // widest part of our cumulus clouds
@@ -126,6 +128,7 @@ float getCloudDensity(vec3 pos){
     return 0;
   }
 
+
   float shapeDensity2 = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   float shapeDensity = cloudShapeNoiseSample(pos / CLOUD_SHAPE_SCALE_2 + vec3(CLOUD_SHAPE_SPEED * worldTimeCounter, 0.0, 0.0)).r;
   
@@ -162,11 +165,9 @@ float getTotalDensityTowardsLight(vec3 rayPos, float jitter, float lowerHeight, 
   bool belowLayer = rayPos.y < lowerHeight;
   if(goingDown != belowLayer) return 0.0;
 
-  if(!rayPlaneIntersection(rayPos, lightVector, lowerHeight, b)){ 
-    rayPlaneIntersection(rayPos, lightVector, upperHeight, b);
+  if(!raySphereIntersectionPlanet(rayPos, lightVector, lowerHeight, b)){ 
+    raySphereIntersectionPlanet(rayPos, lightVector, upperHeight, b);
   }
-
-  if(b == rayPos) return 0.0; // this should never happen
 
   vec3 increment = (b - a) / float(samples);
 
@@ -206,6 +207,16 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){
   vec3 worldDir = normalize(playerPos);
 
+  // prevent clouds rendering behind planet (technically wrong but does the job)
+  if(depth == 1.0){
+    if(worldDir.y < 0.0 && cameraPosition.y < lowerHeight){ // below cloud, looking down
+      vec3 p;
+      if(raySphereIntersectionPlanet(cameraPosition, worldDir, 0.0, p)){
+        return vec3(0.0);
+      }
+    }
+  }
+
   #ifdef HIGH_CLOUD_SAMPLES
   samples *= 4;
   #else
@@ -217,15 +228,16 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
   vec3 b;
 
   float fogDepth = 0.0;
+  float fogDepthWeight = 0.0;
 
-  if(!rayPlaneIntersection(cameraPosition, worldDir, lowerHeight, a)){
+  if(!raySphereIntersectionPlanet(cameraPosition, worldDir, lowerHeight, a)){
     if(worldDir.y > 0 && cameraPosition.y >= lowerHeight && cameraPosition.y <= upperHeight){ // inside cloud, looking up
       a = cameraPosition;
     } else {
       return vec3(0.0);
     }
   }
-  if(!rayPlaneIntersection(cameraPosition, worldDir, upperHeight, b)){
+  if(!raySphereIntersectionPlanet(cameraPosition, worldDir, upperHeight, b)){
     if(worldDir.y < 0 && cameraPosition.y >= lowerHeight && cameraPosition.y <= upperHeight){ // inside cloud, looking down
       b = cameraPosition;
     } else {
@@ -273,8 +285,6 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
   for(int i = 0; i < samples; i++, rayPos += increment){
 
-    if(length(rayPos.xz - cameraPosition.xz) > CLOUD_DISTANCE) break;
-
     float density = getCloudDensity(rayPos) * length(increment);
     // density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.8, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
 
@@ -284,6 +294,7 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
     vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
     fogDepth += distance(cameraPosition, rayPos) * (1.0 - mean(clamp01(transmittance)));
+    fogDepthWeight += (1.0 - mean(clamp01(transmittance)));
 
     #ifdef HIGH_CLOUD_SAMPLES
     float lightJitter = blueNoise(texcoord, i).r;
@@ -306,7 +317,7 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;
 
-    scatter += integScatter * totalTransmittance;
+    scatter += getAtmosphericFog(vec4(integScatter, 1.0), rayPos - cameraPosition).rgb * totalTransmittance;
 
     totalTransmittance *= transmittance;
 
@@ -315,8 +326,6 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
     }
   }
 
-  // TODO: atmospheric fog should change based on cloud coverage
-  scatter = getAtmosphericFog(vec4(scatter, 1.0), (worldDir * fogDepth)).rgb;
   return scatter;
 }
 
@@ -344,6 +353,8 @@ vec3 getClouds(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightCol
   scatter += marchCloudLayer(playerPos, depth, sunlightColor, skyLightColor, transmit, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SAMPLES, CIRRUS_SUBSAMPLES);
   #endif
 
+  scatter = max0(scatter);
+  transmit = max0(transmit);
 
   return scatter;
 }

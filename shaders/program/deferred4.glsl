@@ -121,5 +121,9 @@ uniform float thunderStrength;
 
     cloudData.rgb = cloudScatter;
     cloudData.a = mean(cloudTransmittance);
+
+    vec3 p;
+    // color.rgb += float(raySphereIntersectionPlanet(cameraPosition, normalize(eyePlayerPos), 1.0, p));
+    // show(p - cameraPosition);
   }
 #endif

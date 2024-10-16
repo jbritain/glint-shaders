@@ -69,4 +69,39 @@ bool rayPlaneIntersection(vec3 O, vec3 D, float height, inout vec3 point){
   return true;
 }
 
+const float earthRadius = 6371e3 - 1000;
+const vec3 earthCentre = vec3(cameraPosition.x, -earthRadius, cameraPosition.z);
+vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + earthRadius, 0.0);
+
+// https://gist.github.com/wwwtyro/beecc31d65d1004f5a9d
+bool raySphereIntersection(vec3 r0, vec3 rd, vec3 s0, float sr, inout vec3 point) {
+    // - r0: ray origin
+    // - rd: normalized ray direction
+    // - s0: sphere center
+    // - sr: sphere radius
+    float a = dot(rd, rd);
+    vec3 s0_r0 = r0 - s0;
+    float b = 2.0 * dot(rd, s0_r0);
+    float c = dot(s0_r0, s0_r0) - (sr * sr);
+    if (b*b - 4.0*a*c < 0.0) {
+        return false;
+    }
+    float dist = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+    if(dist < 0.0){
+      dist = (-b + sqrt((b*b) - 4.0*a*c))/(2.0*a);
+    }
+    if(dist < 0.0){
+      return false;
+    }
+
+    point = r0 + dist * rd;
+    return true;
+}
+
+// should be plug and play for rayPlaneIntersection
+bool raySphereIntersectionPlanet(vec3 O, vec3 D, float height, inout vec3 point){
+  float trueRadius = earthRadius + height;
+  return raySphereIntersection(O, D, earthCentre, trueRadius, point);
+}
+
 #endif

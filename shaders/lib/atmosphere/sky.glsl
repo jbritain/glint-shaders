@@ -19,7 +19,7 @@
 #include "/lib/atmosphere/endSky.glsl"
 #endif
 
-vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + ATMOSPHERE.bottom_radius, 0.0);
+
 
 vec3 getSky(vec4 color, vec3 dir, bool includeSun){
   #ifdef WORLD_THE_END
@@ -80,7 +80,7 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor){
   #endif
 }
 
-vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
+vec4 getAtmosphericFog(vec4 color, vec3 playerPos, vec3 transmit){
   #ifndef ATMOSPHERE_FOG
   return color;
   #endif
@@ -89,8 +89,6 @@ vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
   return color;
   #endif
 
-  vec3 transmit = vec3(1.0);
-
   vec3 dir = normalize(playerPos);
 
   // playerPos = mix(playerPos, playerPos * vec3(10000.0, 1.0, 10000.0), smoothstep(0.8 * far, far, length(playerPos)));
@@ -98,6 +96,11 @@ vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
   vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit) * EBS.y;
 
   return vec4(color.rgb * transmit + fog, color.a);
+}
+
+vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
+  vec3 transmit;
+  return getAtmosphericFog(color, playerPos, transmit);
 }
 
 vec4 getBorderFog(vec4 color, vec3 playerPos){

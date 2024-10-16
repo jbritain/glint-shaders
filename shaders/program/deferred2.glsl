@@ -164,7 +164,9 @@
 
 
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);
-    // color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    #ifndef BLUR_SPECULAR
+    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    #else
   
     float NoV = dot(mappedNormal, normalize(-viewPos));
 
@@ -173,6 +175,7 @@
 
     reflectedColor.rgb *= fresnel;
     color.rgb *= (1.0 - clamp01(fresnel));
-
+    color.a = material.roughness; // we use this when blurring to decide how much to blur by
+    #endif
   }
 #endif
