@@ -20,8 +20,8 @@ float getDepth(vec2 texcoord, vec2 dx, vec2 dy){
 }
 
 vec2 localToAtlas(vec2 texcoord){
-  vec2 localCoord = 1.0 - abs(mod(texcoord, 2.0) - 1.0); // mirror the texture coordinate if it goes out of bounds instead of wrapping it
-  // vec2 localCoord = mod(texcoord, 1.0); // wrap texture coordinate
+  // vec2 localCoord = 1.0 - abs(mod(texcoord, 2.0) - 1.0); // mirror the texture coordinate if it goes out of bounds instead of wrapping it
+  vec2 localCoord = mod(texcoord, 1.0); // wrap texture coordinate
 
   return localCoord * singleTexSize + textureBounds.xy;
 }

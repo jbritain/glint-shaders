@@ -78,6 +78,10 @@ bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool re
 
     float depth = getDepth(rayPos.xy, previousFrame); // sample depth at ray position
 
+    if(depth < handDepth){
+      return false;
+    }
+
     intersect = abs(depthLenience - (rayPos.z - depth)) < depthLenience && depth < rayPos.z; // check if our ray is inside geometry
   }
 

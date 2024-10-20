@@ -40,6 +40,12 @@
   vec3 tentFilter(sampler2D sourceTexture, vec2 coord){
     vec2 offset = 0.5 / vec2(viewWidth, viewHeight);
 
+    // // check if pixel is within 1px of the edge of the screen
+    // if(coord.x + offset.x >= 1.0 || coord.x - offset.x <= 1.0 || coord.y + offset.y >= 1.0 || coord.y - offset.y <= 1.0){
+    //   return vec3(1e5);
+    //   return texture(sourceTexture, coord).rgb;
+    // }
+
     vec3 usample = vec3(0.0);
     usample += texture(sourceTexture, coord + offset * vec2(1.0)).rgb;
     usample += texture(sourceTexture, coord + offset * vec2(1.0, -1.0)).rgb;

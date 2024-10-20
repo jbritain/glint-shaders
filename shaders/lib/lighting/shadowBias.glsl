@@ -42,7 +42,7 @@ vec3 getShadowScreenPos(vec4 shadowClipPos, vec3 normal){
 
 vec4 getUndistortedShadowScreenPos(vec4 shadowClipPos, vec3 normal){
 
-	vec4 shadowScreenPos = shadowProjection * shadowClipPos; //convert to shadow ndc space.
+	vec4 shadowScreenPos = shadowClipPos; //convert to shadow ndc space.
   shadowScreenPos.xyz = shadowScreenPos.xyz * 0.5 + 0.5; //convert from -1 ~ +1 to 0 ~ 1
 
 

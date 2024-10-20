@@ -72,7 +72,7 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor){
   skyLightColor = GetSkyRadiance(kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit);
 
   if(sunVector != lightVector) {
-    vec3 moonColor = vec3(0.62, 0.65, 0.74);
+    vec3 moonColor = vec3(0.62, 0.65, 0.74) * vec3(0.5, 0.5, 1.0);
     sunlightColor += getSky(vec4(moonColor * 0.05, 1.0), -sunVector, false);
   }
   #elif defined WORLD_THE_END

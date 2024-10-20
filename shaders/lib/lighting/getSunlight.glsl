@@ -19,6 +19,31 @@
 
 vec4 shadowNoise;
 
+vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
+	vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos * vec4(vec2(shadowDistance / far), vec2(1.0)), faceNormal).xyz;
+
+	if(clamp01(undistortedShadowScreenPos.xy) != undistortedShadowScreenPos.xy){
+		return vec3(0.0);
+	}
+
+	const vec2 offsets[4] =  vec2[](
+		vec2(0.5, 0.5),
+		vec2(0.5, -0.5),
+		vec2(-0.5, 0.5),
+		vec2(-0.5, -0.5)
+	);
+
+	vec3 cloudShadow = vec3(0.0);
+
+	for(int i = 0; i < offsets.length(); i++){
+		cloudShadow += texture(colortex6, undistortedShadowScreenPos.xy + offsets[i] * rcp(512.0)).rgb * rcp(offsets.length());
+	}
+
+	cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
+
+	return cloudShadow;
+}
+
 vec2 vogelDiscSample(int stepIndex, int stepCount, float rotation) {
   const float goldenAngle = 2.4;
 
@@ -234,11 +259,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
   vec3 sunlight = max(shadow * NoL, vec3(scatter));
 
 	#if defined SHADOWS && defined CLOUD_SHADOWS
-		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos, faceNormal).xyz;
-		vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
-		cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
-
-		sunlight *= cloudShadow;
+		sunlight *= sampleCloudShadow(shadowClipPos, faceNormal);
 	#endif
 
 	return sunlight;

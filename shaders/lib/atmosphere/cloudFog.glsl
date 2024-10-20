@@ -51,6 +51,8 @@ float getFogDensity(vec3 pos){
 
   fogFactor *= heightFactor;
 
+  fogFactor = mix(fogFactor, fogFactor * 2.0, thunderStrength);
+
   // float distanceFactor = smoothstep(far / 2, far, length(pos.xz - cameraPosition.xz));
 
   // fogFactor = mix(fogFactor, 0.1 * heightFactor, distanceFactor);

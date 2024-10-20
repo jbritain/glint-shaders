@@ -65,7 +65,7 @@
     worldPos = getSway(materialID, worldPos, at_midBlock);
 
     if(materialIsWater(materialID)){
-      worldPos.y += (getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5);
+      worldPos.y += (getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5) * (1.0 - smoothstep(-32.0, 32.0, at_midBlock.y));
     }
 
     feetPlayerPos = worldPos - cameraPosition;
@@ -129,7 +129,7 @@
   uniform float far;
 
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
 
   uniform int frameCounter;
   uniform int worldTime;

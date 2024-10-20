@@ -66,9 +66,10 @@
 
     float dist = viewPos.z;
 
-    const float tiltAngle = PI * TILT_ANGLE/180;
+
 
     #ifdef TILT_SHIFT
+    const float tiltAngle = PI * TILT_ANGLE/180;
     dist = dist / cos(tiltAngle) + (viewPos.y * sin(tiltAngle)) / cos(tiltAngle);
     #endif
 

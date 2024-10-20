@@ -59,13 +59,6 @@
 
     viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
 
-    vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
-    vec3 worldPos = feetPlayerPos + cameraPosition;
-    worldPos = getSway(materialID, worldPos, at_midBlock);
-
-    feetPlayerPos = worldPos - cameraPosition;
-    viewPos = (gbufferModelView * vec4(feetPlayerPos, 1.0)).xyz;
-
     gl_Position = gbufferProjection * vec4(viewPos, 1.0);
 
     vec2 halfSize      = abs(texcoord - mc_midTexCoord);
