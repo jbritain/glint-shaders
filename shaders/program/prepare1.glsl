@@ -94,7 +94,7 @@
     if(isEyeInWater == 1){
       float distanceBelowSeaLevel = max0(-1 * (cameraPosition.y - 63));
 
-      color.rgb *= exp(-WATER_EXTINCTION * distanceBelowSeaLevel);
+      color.rgb *= exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * distanceBelowSeaLevel);
     }
   }
 #endif

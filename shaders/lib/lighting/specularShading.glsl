@@ -145,7 +145,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   vec2 environmentUV = mapSphere(normalize(worldDir));
   vec3 skyReflection = texture(colortex9, environmentUV).rgb * skyLightmap;
 
-  if(!traceRay(viewOrigin, viewRay, roughness < 0.01 ? 16 : 8, jitter, true, reflectionPos, true)){
+  if(!rayIntersects(viewOrigin, viewRay, roughness < 0.01 ? 16 : 8, jitter, true, reflectionPos, true)){
     return skyReflection;
   }
 

@@ -19,6 +19,8 @@ vec3 getWaterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, ve
 #else
 //takes player space positions
 vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightColor){
+  const vec3 waterExtinction = clamp01(WATER_ABSORPTION + WATER_SCATTERING);
+
   vec3 rayPos = a;
 
   vec3 worldDir = normalize(b - a);
@@ -32,7 +34,6 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
   // float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy));
 
   float cosTheta = clamp01(dot(normalize(increment), lightVector));
-  float phase = dualHenyeyGreenstein(-0.97, 0.97, cosTheta, 0.7);
 
   rayPos += increment * jitter;
 
@@ -42,27 +43,31 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
   for(int i = 0; i < VOLUMETRIC_WATER_SAMPLES; i++, rayPos += increment){
     float density = length(increment) * 1.0; // assume uniform water density
 
-    vec3 transmittance = exp(-density * WATER_EXTINCTION);
+    vec3 transmittance = exp(-density * waterExtinction);
 
     vec3 bias = getShadowBias(rayPos, lightVector, 1.0);
     vec4 shadowClipPos = getShadowClipPos(rayPos);
 
     float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));
-    vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * WATER_EXTINCTION);
+    vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * waterExtinction);
 
     shadowNoise.g = interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1);
-    vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true) + skyLightColor * skylightTransmittance * EBS.y;
-    radiance *= clamp01(phase) * sunlightColor;
+    vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true) * sunlightColor + skyLightColor * skylightTransmittance * EBS.y;
 
-    vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / WATER_EXTINCTION;
+    vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / waterExtinction;
 
     totalTransmittance *= transmittance;
     scatter += max0(integScatter) * totalTransmittance;
+
 
     if(length(totalTransmittance) < 0.01){
       break;
     }
   }
+
+  vec3 phase = henyeyGreenstein(0.6, cosTheta) * WATER_SCATTERING;
+
+  scatter *= phase;
 
   color = color * clamp01(totalTransmittance) + scatter;
 

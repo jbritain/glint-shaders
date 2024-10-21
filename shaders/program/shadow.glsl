@@ -113,10 +113,9 @@
   #include "/lib/util/materialIDs.glsl"
   #include "/lib/lighting/shadowBias.glsl"
 
-  /* DRAWBUFFERS:012 */
+  /* DRAWBUFFERS:01 */
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 shadowData;
-  layout(location = 2) out vec4 worldPos;
 
   void main(){
     color = texture(gtexture, texcoord) * glcolor;
@@ -125,7 +124,9 @@
       discard;
     }
     
+
     if(materialIsWater(materialID)){
+      #ifdef CUSTOM_WATER
       vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
       vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
 
@@ -144,7 +145,11 @@
       float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
       color.a = 1.0 - oldArea / newArea;
+      #else
+      color.a = color.g;
+      #endif
     }
+
     
     float encodedMaterialID = clamp01(float(materialID - 10000) * rcp(255.0));
     vec2 encodedNormal = normal.xy * 0.5 + 0.5;
@@ -155,7 +160,6 @@
     }
 
     shadowData = vec4(encodedMaterialID, encodedNormal, 1.0);
-    worldPos = vec4(feetPlayerPos, 0.0);
   }
   
 #endif

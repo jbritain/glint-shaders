@@ -28,10 +28,12 @@
   uniform sampler2D colortex0;
   uniform sampler2D colortex1;
   uniform sampler2D colortex2;
+  uniform sampler2D colortex4;
   uniform sampler2D colortex6;
   uniform sampler2D colortex9;
   uniform sampler2D colortex10;
 
+  uniform sampler2D depthtex0;
   uniform sampler2D depthtex2;
 
   uniform sampler2D shadowtex0;
@@ -70,7 +72,7 @@
   uniform int frameCounter;
 
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
 
   uniform float near;
   uniform float far;
@@ -102,8 +104,8 @@ uniform float thunderStrength;
   #include "/lib/lighting/getSunlight.glsl"
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/util/noise.glsl"
-  #include "/lib/lighting/reflectiveShadowMap.glsl"
   #include "/lib/util/dh.glsl"
+  #include "/lib/lighting/SSGI.glsl"
 
   void main() {
     outGI = texture(colortex10, texcoord);
@@ -122,7 +124,23 @@ uniform float thunderStrength;
 
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
 
-    outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
+    vec3 previousFeetPlayerPos = feetPlayerPos + (cameraPosition - previousCameraPosition);
+    vec3 previousViewPos = (gbufferPreviousModelView * vec4(previousFeetPlayerPos, 1.0)).xyz;
+    vec3 previousScreenPos = previousViewSpaceToPreviousScreenSpace(previousViewPos);
+    // previousScreenPos.z = texture(colortex4, texcoord).a;
+    // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
+    // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
+
+    vec3 oldGI = texture(colortex10, previousScreenPos.xy).rgb;
+    vec3 newGI = SSGI(viewPos, faceNormal);
+
+    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && distance(previousFeetPlayerPos + previousCameraPosition, feetPlayerPos + cameraPosition) < 0.05 && frameCounter != 0){
+      outGI.rgb = mix(oldGI, newGI, 0.1);
+    } else {
+      outGI.rgb = newGI;
+    }
+    
+    // outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
     #endif
 
   }

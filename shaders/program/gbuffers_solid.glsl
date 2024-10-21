@@ -82,6 +82,8 @@
   uniform sampler2D normals;
   uniform sampler2D specular;
 
+  uniform sampler2D colortex10;
+
   uniform vec4 entityColor;
 
   uniform float alphaTestRef;
@@ -143,7 +145,8 @@
       #endif
     }
     #endif
-    outData3 = vec4(0.0, 0.0, 0.0, parallaxSunlight);
+    outData3.rgb = texture(colortex10, gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rgb;
+    outData3.a = parallaxSunlight;
 
     vec4 color;
     color = texture(gtexture, texcoord) * glcolor;

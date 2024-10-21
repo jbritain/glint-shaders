@@ -17,10 +17,8 @@ const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
 const int colortex8Format = RGB16;   || opaque specular, volumetrics
 const int colortex9Format = RGB16F;  || sky environment map
-const int colortex10Format = RGBA8;  || global illumination, parallax shadow
+const int colortex10Format = RGBA16F;  || global illumination, parallax shadow
 const int colortex11Format = RGBA16F;|| SMAA
-
-const int shadowcolor2Format = RGB16F;
 
 */
 
@@ -28,6 +26,8 @@ const float wetnessHalflife = 50.0;
 const float centerDepthHalflife = 5.0;
 
 const bool colortex4Clear = false;
+
+const bool colortex10Clear = false;
 
 const bool colortex7Clear = false;
 
@@ -97,8 +97,9 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10 // [5 10 15 20 25 30 35 40 45 50]
-#define WATER_EXTINCTION vec3(0.7, 0.1, 0.05)
-#define WATER_G 0.95
+#define WATER_ABSORPTION vec3(0.3, 0.09, 0.04)
+#define WATER_SCATTERING vec3(0.01, 0.06, 0.05)
+#define WATER_G 0.6
 
 #define CLOUD_FOG
 #define CLOUD_FOG_SAMPLES 20 // [5 10 15 20 25 30 35 40 45 50]
@@ -115,9 +116,8 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define AUTO_EXPOSURE
 #endif
 
-// #define GLOBAL_ILLUMINATION
-#define GI_SAMPLES 16 // [16 32 64 128 256]
-#define GI_RADIUS 4.0 // [1.0 2.0 4.0 8.0 16.0 32.0]
+#define GLOBAL_ILLUMINATION
+#define GI_SAMPLES 1 // [1 2 4 8 16 32 64 128 256]
 
 #define CLOUD_BLEND 0.1
 

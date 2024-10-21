@@ -98,7 +98,7 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
     totalDensity += getFogDensity(subRayPos) * length(increment);
   }
 
-  return max0(multipleScattering(totalDensity, costh, -FOG_G, FOG_G, FOG_EXTINCTION, 1, FOG_DUAL_LOBE_WEIGHT) * clamp01((1.0 - exp(-totalDensity * 2))) * sunlight);
+  return max0(multipleScattering(totalDensity, costh, -FOG_G, FOG_G, FOG_EXTINCTION, 1, FOG_DUAL_LOBE_WEIGHT, 0.9, 0.8, 0.1) * clamp01((1.0 - exp(-totalDensity * 2))) * sunlight);
 }
 
 vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightColor, out vec3 transmit){

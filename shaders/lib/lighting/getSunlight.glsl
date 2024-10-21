@@ -110,13 +110,13 @@ vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 		float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 		float blockerDistance = blockerDistanceRaw * 255 * 2;
 
-		#ifdef composite
-		if(isEyeInWater != 1){
-			shadowColorData.a = mix(shadowColorData.a, 0.0, 0.8);
-		}
-		#endif
+		// #ifdef composite
+		// if(isEyeInWater != 1){
+		// 	shadowColorData.a = mix(shadowColorData.a, 1.0, 0.4);
+		// }
+		// #endif
 
-		vec3 extinction = exp(-WATER_EXTINCTION * blockerDistance) * (1.0 - shadowColorData.a);
+		vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance) * (1.0 - shadowColorData.a);
 
 		return extinction;
 	}

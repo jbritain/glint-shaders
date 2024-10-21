@@ -201,7 +201,7 @@ vec3 calculateCloudLightEnergy(vec3 rayPos, float jitter, float costh, int sampl
 
   vec3 powder = clamp01((1.0 - exp(-totalDensity * 2 * CLOUD_EXTINCTION_COLOR)));
 
-  return multipleScattering(totalDensity, costh, 0.9, -0.4, CLOUD_EXTINCTION_COLOR, 4, 0.85) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
+  return multipleScattering(totalDensity, costh, 0.9, -0.4, CLOUD_EXTINCTION_COLOR, 4, 0.85, 0.9, 0.8, 0.1) * mix(2.0 * powder, vec3(1.0), costh * 0.5 + 0.5);
 }
 
 vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLightColor, inout vec3 totalTransmittance, float lowerHeight, float upperHeight, int samples, int subsamples){

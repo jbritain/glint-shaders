@@ -46,8 +46,13 @@ void binarySearch(inout vec3 rayPos, vec3 rayDir, bool previousFrame){
 
 // traces through screen space to find intersection point
 // thanks, belmu!!
-// https://gist.github.com/BelmuTM/af0fe99ee5aab386b149a53775fe94a3#file-raytracer-glsl-L31
-bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool refine, out vec3 rayPos, bool previousFrame){
+// https://gist.github.com/BelmuTM/af0fe99ee5aab386b149a53775fe94a3
+bool rayIntersects(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool refine, out vec3 rayPos, bool previousFrame){
+
+  if(viewDir.z > 0.0 && viewDir.z >= -viewOrigin.z){
+    return false;
+  }
+
   rayPos = viewSpaceToScreenSpace(viewOrigin);
   if(previousFrame){
     rayPos = reproject(rayPos);
@@ -66,34 +71,26 @@ bool traceRay(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bool re
   float stepLength = rayLength * rcp(float(maxSteps));
 
   vec3 rayStep = rayDir * stepLength;
+  rayPos += rayStep * jitter + length(vec2(rcp(viewWidth), rcp(viewHeight))) * rayDir;
 
-  float depthLenience = max(abs(rayDir.z) * 3.0, 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
+  float depthLenience = max(abs(rayStep.z) * 3.0, 0.02 / pow2(viewOrigin.z)); // Provided by DrDesten
 
   bool intersect = false;
 
-  rayPos += rayStep * jitter + length(vec2(rcp(viewWidth), rcp(viewHeight))) * rayDir;
-
-  for(int i = 0; i < maxSteps && !intersect; ++i, rayPos += rayStep){
-    if(clamp01(rayPos.xyz) != rayPos.xyz) return false; // we went offscreen
+  for(int i = 0; i < maxSteps; ++i, rayPos += rayStep){
+    if(clamp01(rayPos) != rayPos) return false; // we went offscreen
 
     float depth = getDepth(rayPos.xy, previousFrame); // sample depth at ray position
 
-    if(depth < handDepth){
-      return false;
+    if(depth < rayPos.z && abs(depthLenience - (rayPos.z - depth)) < depthLenience && rayPos.z > handDepth){
+      intersect = true;
+      break;
     }
-
-    intersect = abs(depthLenience - (rayPos.z - depth)) < depthLenience && depth < rayPos.z; // check if our ray is inside geometry
-  }
-
-  if(clamp01(rayPos.xy) != rayPos.xy || rayPos.z < handDepth){
-    intersect = false;
   }
 
   if(refine && intersect){
     binarySearch(rayPos, rayDir, previousFrame);
   }
-
-
 
   return intersect;
 }
