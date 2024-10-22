@@ -115,6 +115,7 @@
   #include "/lib/util/blur.glsl"
   #include "/lib/util/dh.glsl"
 
+
   void main() {
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
@@ -158,7 +159,7 @@
 
     #ifdef GLOBAL_ILLUMINATION
     //vec3 GI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0)).rgb;
-    vec3 GI = texture(colortex10, texcoord).rgb;
+    vec3 GI = texture(colortex10, texcoord / 2.0).rgb;
     #else
     vec3 GI = vec3(0.0);
     #endif

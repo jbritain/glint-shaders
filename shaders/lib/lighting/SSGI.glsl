@@ -21,7 +21,7 @@ void computeFrisvadTangent(in vec3 n, out vec3 f, out vec3 r){
 }
 
 vec3 SSGI(vec3 viewPos, vec3 faceNormal){
-  vec4 noise = blueNoise(texcoord, frameCounter * GI_SAMPLES);
+  
 
   vec3 GI = vec3(0.0);
 
@@ -32,6 +32,8 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal){
   computeFrisvadTangent(normal, tangent, bitangent);
 
   for(int i = 0; i < GI_SAMPLES; i++){
+    // vec3 noise = interleavedGradientNoise3(floor(gl_FragCoord.xy), i + GI_SAMPLES * frameCounter);
+    vec3 noise = blueNoise(texcoord, i).xyz;
     float cosTheta = sqrt(noise.x);
     float sinTheta = sqrt(1.0 - pow2(cosTheta));
     float phi = 2 * PI * noise.y;
@@ -47,7 +49,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal){
     vec3 rayDir = mat3(tangent, bitangent, normal) * hemisphereNormal;
 
     vec3 GIPos;
-    if(!rayIntersects(viewPos, rayDir, 8, noise.z, true, GIPos, false)){
+    if(!rayIntersects(viewPos, rayDir, 8, noise.z, true, GIPos, true)){
       continue;
     }
 

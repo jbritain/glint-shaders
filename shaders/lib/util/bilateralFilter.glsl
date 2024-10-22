@@ -9,73 +9,91 @@
     https://jbritain.net
 */
 
-// https://www.shadertoy.com/view/4dfGDH
 
 #ifndef BILATERAL_INCLUDE
 #define BILATERAL_INCLUDE
 
-// how much neighbouring pixels contribute
-#define BILATERAL_SIGMA 5.0
-
-// edge sensitivity
-#define BILATERAL_BSIGMA 0.1
-
-// sample radius
-#define BILATERAL_MSIZE 5
-
 #include "/lib/util/spaceConversions.glsl"
 
-float normpdf(in float x, in float sigma)
-{
-	return 0.39894*exp(-0.5*x*x/(sigma*sigma))/sigma;
+float gaussWeight(float x, float sigma){
+  return exp(-pow2(x) / (2.0 * pow2(sigma))) / (2.0 * PI * pow2(sigma));
 }
 
-float normpdf3(in vec3 v, in float sigma)
-{
-	return 0.39894*exp(-0.5*dot(v,v)/(sigma*sigma))/sigma;
-}
+vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL){
+  const float factorS = -rcp(2.0 * pow2(sigmaS));
+  const float factorL = -rcp(2.0 * pow2(sigmaL));
 
-vec3 bilateral(sampler2D image, vec2 coord){
-  #ifndef VOLUMETRIC_FILTERING
-    return texture(image, coord).rgb;
-  #endif
+  vec2 off1 = vec2(1.411764705882353);
+  vec2 off2 = vec2(3.2941176470588234);
+  vec2 off3 = vec2(5.176470588235294);
 
-  const int kSize = (BILATERAL_MSIZE-1)/2;
+  float weightSum = 0.0;
+  vec4 sampleSum = vec4(0.0);
+  float halfSize = sigmaS / 2.0;
 
-  float kernel[BILATERAL_MSIZE];
+  float luminance = getLuminance(texture(image, coord).rgb);
 
-  vec3 color;
+  for (float x = -halfSize; x <= halfSize; x++) {
+    for (float y = -halfSize;  y <= halfSize; y++){
+      vec2 offset = vec2(x, y);
 
-  float depth = screenSpaceToViewSpace(texelFetch(depthtex0, ivec2(coord * vec2(viewWidth, viewHeight)), 0).r);
+      vec4 offsetSample = texture(image, coord + offset / vec2(viewWidth, viewHeight));
 
-  float Z = 0.0;
-  for (int j = 0; j <= kSize; ++j){
-    kernel[kSize+j] = kernel[kSize-j] = normpdf(float(j), BILATERAL_SIGMA);
-  }
+      float distS = length(offset);
+      float distL = abs(getLuminance(offsetSample.rgb) - luminance);
 
-  vec3 c = texture(image, coord).rgb;
-  vec3 cc;
-  float factor;
-  float bZ = 1.0/normpdf(0.0, BILATERAL_BSIGMA);
-  //read out the texels
-  for (int i=-kSize; i <= kSize; ++i)
-  {
-    for (int j=-kSize; j <= kSize; ++j)
-    {
-      vec2 sampleCoord = coord + (vec2(float(i),float(j))) / vec2(viewWidth, viewHeight);
+      float weightS = exp(factorS * pow2(distS));
+      float weightL = exp(factorL * pow2(distL));
+      float weight = weightS * weightL * gaussWeight(distS, halfSize / 2);
 
-      float sampleDepth = screenSpaceToViewSpace(texelFetch(depthtex0, ivec2(sampleCoord * vec2(viewWidth, viewHeight)), 0).r);
-
-      cc = texture(image, sampleCoord).rgb;
-      factor = normpdf3(cc-c, BILATERAL_BSIGMA)*bZ*kernel[kSize+j]*kernel[kSize+i];
-      factor *= 1.0 - clamp01(abs(sampleDepth - depth));
-      Z += factor;
-      color += factor*cc;
-
+      weightSum += weight;
+      sampleSum += offsetSample * weight;
     }
   }
 
-  return color/Z;
+  return sampleSum / weightSum;
+}
+
+vec4 bilateralFilterDepth(sampler2D image, sampler2D depthtex, vec2 coord, float sigmaS, float sigmaL, float scale){
+  const float factorS = -rcp(2.0 * pow2(sigmaS));
+  const float factorL = -rcp(2.0 * pow2(sigmaL));
+
+  vec2 off1 = vec2(1.411764705882353);
+  vec2 off2 = vec2(3.2941176470588234);
+  vec2 off3 = vec2(5.176470588235294);
+
+  float weightSum = 0.0;
+  vec4 sampleSum = vec4(0.0);
+  float halfSize = sigmaS / 2.0;
+
+  float depth = linearizeDepth(texture(depthtex, coord / scale).r, near, far) / far;
+
+  for (float x = -halfSize; x <= halfSize; x++) {
+    for (float y = -halfSize;  y <= halfSize; y++){
+      vec2 offset = vec2(x, y);
+
+      float offsetSampleDepth = linearizeDepth(texture(depthtex, coord / scale).r, near, far) / far;
+      if(offsetSampleDepth == 1.0){
+        continue;
+      }
+
+      vec4 offsetSample = texture(image, coord + offset / vec2(viewWidth, viewHeight));
+
+
+      float distS = length(offset);
+      float distL = abs(offsetSampleDepth - depth);
+
+
+      float weightS = exp(factorS * pow2(distS));
+      float weightL = exp(factorL * pow2(distL));
+      float weight = weightS * weightL * gaussWeight(distS, halfSize / 2);
+
+      weightSum += weight;
+      sampleSum += offsetSample * weight;
+    }
+  }
+
+  return sampleSum / weightSum;
 }
 
 #endif

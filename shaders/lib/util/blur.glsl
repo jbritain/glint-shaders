@@ -3,17 +3,21 @@
 
 #include "/lib/util.glsl"
 
-// https://github.com/Experience-Monks/glsl-fast-gaussian-blur
+vec4 variableBoxBlur(sampler2D image, vec2 uv, vec2 resolution, int radius){
+  ivec2 texelCoord = ivec2(floor(uv * resolution));
 
-/*
-The MIT License (MIT) Copyright (c) 2015 Jam3
+  vec4 blurSample;
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+  for (int x = -radius; x < radius; x++){
+    for (int y = -radius; y < radius; y++){
+      ivec2 sampleTexelCoord = texelCoord + ivec2(x, y);
+      vec2 sampleCoord = sampleTexelCoord / resolution;
+      blurSample += texture(image, sampleCoord);
+    }
+  }
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+  return blurSample / pow2(radius * 2.0);
+}
 
 vec4 blur1(sampler2D image, vec2 uv, vec2 resolution){
   float x = rcp(resolution.x);
@@ -37,6 +41,20 @@ vec4 blur1(sampler2D image, vec2 uv, vec2 resolution){
 
   return usample;
 }
+
+
+// https://github.com/Experience-Monks/glsl-fast-gaussian-blur
+
+/*
+The MIT License (MIT) Copyright (c) 2015 Jam3
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 
 vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
   vec4 color = vec4(0.0);

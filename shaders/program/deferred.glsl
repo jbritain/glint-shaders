@@ -109,6 +109,10 @@
 
   void main() {
     outGI = texture(colortex10, texcoord);
+    vec2 texcoord = texcoord * 2.0;
+    if(clamp01(texcoord) != texcoord){
+      return;
+    }
     #ifdef GLOBAL_ILLUMINATION
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
@@ -131,14 +135,9 @@
     // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
     // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
 
-    vec3 oldGI = texture(colortex10, previousScreenPos.xy).rgb;
-    vec3 newGI = SSGI(viewPos, faceNormal);
+    vec3 GI = SSGI(viewPos, mappedNormal);
+    outGI.rgb = GI;
 
-    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && distance(previousFeetPlayerPos + previousCameraPosition, feetPlayerPos + cameraPosition) < 0.05 && frameCounter != 0){
-      outGI.rgb = mix(oldGI, newGI, 0.1);
-    } else {
-      outGI.rgb = newGI;
-    }
     
     // outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
     #endif

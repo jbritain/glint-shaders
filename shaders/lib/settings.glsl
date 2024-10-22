@@ -117,7 +117,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #endif
 
 #define GLOBAL_ILLUMINATION
-#define GI_SAMPLES 1 // [1 2 4 8 16 32 64 128 256]
+#define GI_SAMPLES 4 // [1 2 4 8 16 32 64 128 256]
 
 #define CLOUD_BLEND 0.1
 

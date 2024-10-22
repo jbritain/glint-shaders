@@ -26,7 +26,7 @@ float getDepth(vec2 pos, bool previousFrame){
   if(previousFrame){
     return texelFetch(colortex4, ivec2(pos * vec2(viewWidth, viewHeight)), 0).a;
   } else {
-    return texelFetch(depthtex0, ivec2(pos * vec2(viewWidth, viewHeight)), 0).r;
+    return texelFetch(depthtex2, ivec2(pos * vec2(viewWidth, viewHeight)), 0).r;
   }
   
 }
