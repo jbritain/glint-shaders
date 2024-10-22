@@ -58,6 +58,6 @@
       return;
     }
 
-    outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 15, 50, 0.5).rgb;
+    outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 10, 10, 0.5).rgb;
   }
 #endif

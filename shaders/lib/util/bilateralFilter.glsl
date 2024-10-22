@@ -23,10 +23,6 @@ vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL){
   const float factorS = -rcp(2.0 * pow2(sigmaS));
   const float factorL = -rcp(2.0 * pow2(sigmaL));
 
-  vec2 off1 = vec2(1.411764705882353);
-  vec2 off2 = vec2(3.2941176470588234);
-  vec2 off3 = vec2(5.176470588235294);
-
   float weightSum = 0.0;
   vec4 sampleSum = vec4(0.0);
   float halfSize = sigmaS / 2.0;
@@ -57,10 +53,6 @@ vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL){
 vec4 bilateralFilterDepth(sampler2D image, sampler2D depthtex, vec2 coord, float sigmaS, float sigmaL, float scale){
   const float factorS = -rcp(2.0 * pow2(sigmaS));
   const float factorL = -rcp(2.0 * pow2(sigmaL));
-
-  vec2 off1 = vec2(1.411764705882353);
-  vec2 off2 = vec2(3.2941176470588234);
-  vec2 off3 = vec2(5.176470588235294);
 
   float weightSum = 0.0;
   vec4 sampleSum = vec4(0.0);
