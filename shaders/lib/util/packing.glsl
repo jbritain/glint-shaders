@@ -58,26 +58,29 @@ vec2 unpack2x8F(in float pack) {
 	return xy * vec2(256.0 / 255.0, 1.0 / 255.0);
 }
 
-// https://jcgt.org/published/0003/02/01/
+// https://knarkowicz.wordpress.com/2014/04/16/octahedron-normal-vector-encoding/
 // ---------------------------------------------------------->
-vec2 signNonZero(vec2 v) {
-	return vec2(
-		v.x >= 0.0 ? 1.0 : -1.0,
-		v.y >= 0.0 ? 1.0 : -1.0
-	);
+vec2 octWrap(vec2 v)
+{
+  return (1.0 - abs(v.yx)) * (v.x >= 0.0 && v.y >= 0.0 ? 1.0 : -1.0);
 }
 
-vec2 encodeNormal(vec3 v) {
-	vec2 p = v.xy * (1.0 / (abs(v.x) + abs(v.y) + abs(v.z)));
-	p = v.z <= 0.0 ? ((1.0 - abs(p.yx)) * signNonZero(p)) : p;
-	return 0.5 * p + 0.5;
+vec2 encodeNormal(vec3 n) {
+		n = normalize(n + vec3(0.01)); // what the fuck
+    n /= (abs(n.x) + abs(n.y) + abs(n.z));
+    n.xy = n.z >= 0.0 ? n.xy : octWrap(n.xy);
+    n.xy = n.xy * 0.5 + 0.5;
+    return n.xy;
 }
 
-vec3 decodeNormal(vec2 e) {
-	e = 2.0 * e - 1.0;
-	vec3 v = vec3(e.xy, 1.0 - abs(e.x) - abs(e.y));
-	if (v.z < 0) v.xy = (1.0 - abs(v.yx)) * signNonZero(v.xy);
-	return normalize(v);
+vec3 decodeNormal(vec2 f) {
+    f = f * 2.0 - 1.0;
+ 
+    // https://twitter.com/Stubbesaurus/status/937994790553227264
+    vec3 n = vec3(f.x, f.y, 1.0 - abs(f.x) - abs(f.y));
+    float t = clamp01(-n.z);
+    n.xy += n.x >= 0.0 && n.y >= 0.0 ? -t : t;
+    return normalize(n);
 }
 // <----------------------------------------------------------
 

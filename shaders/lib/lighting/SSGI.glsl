@@ -48,8 +48,10 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal){
 
     vec3 rayDir = mat3(tangent, bitangent, normal) * hemisphereNormal;
 
+    // show(faceNormal);
+
     vec3 GIPos;
-    if(!rayIntersects(viewPos, rayDir, 8, noise.z, true, GIPos, true)){
+    if(!rayIntersects(viewPos + faceNormal * 0.1, rayDir, 8, noise.z, true, GIPos, true)){
       continue;
     }
 
