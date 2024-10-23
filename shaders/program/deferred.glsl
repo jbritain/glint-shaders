@@ -86,13 +86,7 @@
 
   in vec2 texcoord;
 
-  vec3 albedo;
-  int materialID;
-  vec3 faceNormal;
-  vec2 lightmap;
 
-  vec3 mappedNormal;
-  vec4 specularData;
 
   /* RENDERTARGETS: 10 */
   layout(location = 0) out vec4 outGI;
@@ -126,7 +120,8 @@
     vec3 sunlightColor; vec3 skyLightColor;
     getLightColors(sunlightColor, skyLightColor);
 
-    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
+    GbufferData gbufferData;
+    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
 
     vec3 previousFeetPlayerPos = feetPlayerPos + (cameraPosition - previousCameraPosition);
     vec3 previousViewPos = (gbufferPreviousModelView * vec4(previousFeetPlayerPos, 1.0)).xyz;
@@ -135,7 +130,7 @@
     // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
     // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
 
-    vec3 GI = SSGI(viewPos, faceNormal);
+    vec3 GI = SSGI(viewPos, gbufferData.faceNormal);
     outGI.rgb = GI;
 
     

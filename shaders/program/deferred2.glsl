@@ -89,13 +89,7 @@
 
   in vec2 texcoord;
 
-  vec3 albedo;
-  int materialID;
-  vec3 faceNormal;
-  vec2 lightmap;
 
-  vec3 mappedNormal;
-  vec4 specularData;
 
   /* DRAWBUFFERS:038 */
   layout(location = 0) out vec4 color;
@@ -134,17 +128,17 @@
       return;
     }
 
-    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
-    Material material = materialFromSpecularMap(albedo, specularData);
+    GbufferData gbufferData;
+    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
 
-    if(materialIsPlant(materialID)){
-      material.sss = 1.0;
+    if(materialIsPlant(gbufferData.materialID)){
+      gbufferData.material.sss = 1.0;
     }
 
-    float wetnessFactor = wetness * (1.0 - material.porosity) * smoothstep(0.66, 1.0, lightmap.y) * float(biome_precipitation == PPT_RAIN);
+    float wetnessFactor = wetness * (1.0 - gbufferData.material.porosity) * smoothstep(0.66, 1.0, gbufferData.lightmap.y) * float(biome_precipitation == PPT_RAIN);
 
-    material.f0 = mix(material.f0, waterMaterial.f0, wetnessFactor);
-    material.roughness = mix(material.roughness, waterMaterial.roughness, wetnessFactor);
+    gbufferData.material.f0 = mix(gbufferData.material.f0, waterMaterial.f0, wetnessFactor);
+    gbufferData.material.roughness = mix(gbufferData.material.roughness, waterMaterial.roughness, wetnessFactor);
 
     float parallaxShadow = texture(colortex10, texcoord).a;
 
@@ -152,10 +146,10 @@
       parallaxShadow = 1.0;
     }
     vec3 sunlight = SUNLIGHT_STRENGTH * sunlightColor;
-    sunlight *= getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * parallaxShadow;
+    sunlight *= getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
     
 
-    color.rgb = albedo;
+    color.rgb = gbufferData.material.albedo;
 
     #ifdef GLOBAL_ILLUMINATION
     //vec3 GI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0)).rgb;
@@ -165,9 +159,9 @@
     #endif
 
 
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, GI, skyLightColor);
+    color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI, skyLightColor);
     #ifndef BLUR_SPECULAR
-    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
     #else
   
     float NoV = dot(mappedNormal, normalize(-viewPos));

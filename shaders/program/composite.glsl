@@ -67,7 +67,7 @@
   uniform float near;
   uniform float far;
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
   uniform int isEyeInWater;
   uniform vec4 lightningBoltPosition;
 
@@ -86,13 +86,7 @@ uniform float thunderStrength;
 
   in vec2 texcoord;
 
-  vec3 albedo;
-  int materialID;
-  vec3 faceNormal;
-  vec2 lightmap;
 
-  vec3 mappedNormal;
-  vec4 specularData;
 
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/atmosphere/sky.glsl"
@@ -121,7 +115,8 @@ uniform float thunderStrength;
     getLightColors(sunlightColor, skyLightColor);
 
     color = texture(colortex0, texcoord);
-    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord));
+    GbufferData gbufferData;
+    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
 
     float translucentDepth = texture(depthtex0, texcoord).r;
     float opaqueDepth = texture(depthtex2, texcoord).r;
@@ -137,7 +132,7 @@ uniform float thunderStrength;
     vec4 translucent = texture(colortex3, texcoord);
 
     bool inWater = isEyeInWater == 1;
-    bool waterMask = materialIsWater(materialID) && translucent.a < 1.0;
+    bool waterMask = materialIsWater(gbufferData.materialID) && translucent.a < 1.0;
 
     #ifdef REFRACTION
 
@@ -145,13 +140,13 @@ uniform float thunderStrength;
       vec3 dir = normalize(opaqueEyePlayerPos);
 
       // the actual refracted ray direction
-      vec3 refractedDir = normalize(refract(dir, mat3(gbufferModelViewInverse) * mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
+      vec3 refractedDir = normalize(refract(dir, mat3(gbufferModelViewInverse) * gbufferData.mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
 
       float waterDepth = distance(opaqueEyePlayerPos, translucentEyePlayerPos);
 
       // the refracted offset we use for terrain
       // method from BSL
-      vec2 refractDir = mappedNormal.xy - faceNormal.xy;
+      vec2 refractDir = gbufferData.mappedNormal.xy - gbufferData.faceNormal.xy;
       refractDir *= vec2(1.0 / aspectRatio, 1.0) * (gbufferProjection[1][1] / 1.37) / max(length(opaqueEyePlayerPos), 8.0); // sorcery
       refractDir *= 4.0;
       vec3 refractedCoord = vec3(texcoord + refractDir, 0.0);

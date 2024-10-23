@@ -1,3 +1,4 @@
+[!WARNING] This file may be out of date as I frequently forget to update it.
 
 # Implementation Details
 `block.properties` IDs are handled by [block-wrangler](https://camplowell.github.io/block_wrangler) in `block_properties.py`

@@ -13,8 +13,17 @@
 #define GBUFFER_DATA_INCLUDE
 
 #include "/lib/util/packing.glsl"
+#include "/lib/util/material.glsl"
 
-void decodeGbufferData(in vec4 data1, in vec4 data2){
+struct GbufferData {
+  Material material;
+  int materialID;
+  vec3 faceNormal;
+  vec2 lightmap;
+  vec3 mappedNormal;
+};
+
+void decodeGbufferData(in vec4 data1, in vec4 data2, out GbufferData data){
   vec2 decode1x = unpack2x8F(data1.x);
   vec2 decode1y = unpack2x8F(data1.y);
   vec2 decode1z = unpack2x8F(data1.z);
@@ -25,16 +34,17 @@ void decodeGbufferData(in vec4 data1, in vec4 data2){
   vec2 decode2z = unpack2x8F(data2.z);
   vec2 decode2w = unpack2x8F(data2.w);
 
-  albedo.rgb = vec3(decode1x.x, decode1x.y, decode1y.x);
-  materialID = int(decode1y.y * 255 + 0.5) + 10000;
-  if(materialID == 10000){
-    materialID = 0;
-  }
-  faceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);
-  lightmap = decode1w;
+  data.material = materialFromSpecularMap(vec3(decode1x.x, decode1x.y, decode1y.x), vec4(decode2y, decode2z));
 
-  mappedNormal = mat3(gbufferModelView) * decodeNormal(decode2x);
-  specularData = vec4(decode2y, decode2z);
+  data.materialID = int(decode1y.y * 255 + 0.5) + 10000;
+  if(data.materialID == 10000){
+    data.materialID = 0;
+  }
+  data.faceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);
+  data.lightmap = decode1w;
+
+  data.mappedNormal = mat3(gbufferModelView) * decodeNormal(decode2x);
+  
 }
 
 #endif
