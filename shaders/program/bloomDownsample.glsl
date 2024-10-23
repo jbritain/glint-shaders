@@ -60,7 +60,6 @@
 
     #if TILE_INDEX > 0
       tileCoord = scaleFromBloomTile(tileCoord, previousTile); // scale down to encompass the tile we are downscaling
-      bloomColor = vec4(tileCoord / 0.5, 0.0, 1.0);
       bloomColor = vec4(downSample(colortex3, tileCoord, false), 1.0);
     #else
       bloomColor = vec4(downSample(colortex0, tileCoord, true), 1.0);

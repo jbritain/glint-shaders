@@ -185,7 +185,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
 
     mat3 tbn = mat3(tangent, bitangent, normal);
 
-    int samples = int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
+    int samples = SSR_SAMPLES;//int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
 
     for(int i = 0; i < samples; i++){
       vec3 noise = vec3(
@@ -219,7 +219,7 @@ vec4 getSpecularShading(vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Ma
   vec4 reflectedColor = vec4(0.0, 0.0, 0.0, 1.0);
 
   #ifdef SSR
-  if (material.roughness < ROUGH_REFLECTION_THRESHOLD){
+  if (material.roughness <= ROUGH_REFLECTION_THRESHOLD){
     reflectedColor = screenSpaceReflections(reflectedColor, lightmap, normal, viewPos, material, fresnel);
   } else {
     reflectedColor = color;

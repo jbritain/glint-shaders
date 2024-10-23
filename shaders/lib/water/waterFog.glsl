@@ -10,7 +10,7 @@
 vec3 getWaterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 skyLightColor){
   float dist = distance(frontPos, backPos);
 
-  vec3 extinction = exp(-WATER_EXTINCTION * dist);
+  vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * dist);
 
   color.rgb *= extinction;
 
