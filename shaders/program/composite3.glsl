@@ -8,7 +8,7 @@
     By jbritain
     https://jbritain.net
 
-    /program/composite2.glsl
+    /program/composite3.glsl
     - Cloud fog blur
 */
 
