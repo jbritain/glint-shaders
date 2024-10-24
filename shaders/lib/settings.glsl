@@ -17,7 +17,7 @@ const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
 const int colortex8Format = RGB16;   || opaque specular, volumetrics
 const int colortex9Format = RGB16F;  || sky environment map
-const int colortex10Format = RGBA16F;  || global illumination, parallax shadow
+const int colortex10Format = RGB10_A2;  || global illumination, parallax shadow
 const int colortex11Format = RGBA16F;|| SMAA
 
 */

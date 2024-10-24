@@ -17,8 +17,6 @@
 #include "/lib/util/materialIDs.glsl"
 #include "/lib/util/dh.glsl"
 
-vec4 shadowNoise;
-
 vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 	vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos * vec4(vec2(shadowDistance / far), vec2(1.0)), faceNormal).xyz;
 
@@ -134,7 +132,7 @@ float NoLSafe(vec3 n){
   return clamp01(dot(n, normalize(shadowLightPosition)));
 }
 
-float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
+float getBlockerDistance(vec4 shadowClipPos, vec3 normal, float jitter){
 	float range = BLOCKER_SEARCH_RADIUS;
 
 	vec3 receiverShadowScreenPos = getShadowScreenPos(shadowClipPos, normal).xyz;
@@ -145,7 +143,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 	float blockerCount = 0;
 
 	for(int i = 0; i < BLOCKER_SEARCH_SAMPLES; i++){
-		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, shadowNoise.r) * shadowProjection[0][0];
+		vec2 offset = vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, jitter) * shadowProjection[0][0];
 		vec3 newShadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset * range, 0.0, 0.0), normal).xyz;
 		float newBlockerDepth = texture(shadowtex0, newShadowScreenPos.xy).r;
 		if (newBlockerDepth < receiverDepth){
@@ -164,7 +162,7 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal){
 
 // 'direct' is for whether we're coming via the `getSunlight` function.
 // this is so that we don't compute the cloud shadows twice if not necessary
-vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int samples, bool direct){
+vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int samples, bool direct, float jitter){
 	if(penumbraWidth == 0.0){
 		return(sampleShadow(shadowClipPos, normal));
 	}
@@ -178,7 +176,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 	int sampleCount = 0;
 
 	for(int i = 0; i < samples; i++){
-		vec2 offset = vogelDiscSample(i, samples, shadowNoise.g);
+		vec2 offset = vogelDiscSample(i, samples, jitter);
 		if(dot(shadowClipNormal.xy, normalize(offset)) < 0){
 			continue;
 		}
@@ -203,57 +201,40 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	lightmap.y = 1.0;
 	#endif
 
-	vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-	shadowNoise = vec4(
-		interleavedGradientNoise(floor(gl_FragCoord.xy), 0),
-		interleavedGradientNoise(floor(gl_FragCoord.xy), 1),
-		0.0,
-		0.0
-	);
-
 	float faceNoL = NoLSafe(faceNormal);
 	float NoL = NoLSafe(mappedNormal) * step(0.00001, faceNoL);
 
-	if(DH_MASK){
-		float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
-
-		vec3 shadow = vec3(lightmapShadow);
-		float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
-
-		return max(shadow * NoL, vec3(scatter));
-	}
+	float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
+	float lightmapScatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
 
 	#ifdef SHADOWS
 
-		vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
+
+		vec3 bias = getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
+		vec4 shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
 
 		float distFade = smoothstep(0.5, 1.0, max3(abs(shadowClipPos).xyz));
 
 		bool inShadowDistance = distFade < 1.0;
 
-		float blockerDistance = inShadowDistance ? getBlockerDistance(shadowClipPos, faceNormal) : 0.0;
-		float penumbraWidth = inShadowDistance ? mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance) : 0.0;
-		
-		vec3 bias = inShadowDistance ? getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * faceNormal, faceNoL) : vec3(0.0);
-		if(inShadowDistance){
-			shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
-		}
-		
-		float scatter = inShadowDistance ? computeSSS(blockerDistance, SSS, faceNormal) : 0.0;
+		float scatter = 0.0;
+		vec3 shadow = vec3(0.0);
 
-		vec3 shadow = inShadowDistance ? computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false) : vec3(0.0);
+		if(inShadowDistance){
+			float blockerDistance = getBlockerDistance(shadowClipPos, faceNormal, interleavedGradientNoise(floor(gl_FragCoord.xy)));
+			float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
+			scatter = computeSSS(blockerDistance, SSS, faceNormal);
+			
+			shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false, interleavedGradientNoise(floor(gl_FragCoord.xy), 1));
+		}
 
 		if(distFade > 0.0){
-			float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
-
-			scatter = mix(scatter, mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow, distFade);
+			scatter = mix(scatter, lightmapScatter * lightmapShadow, distFade);
 			shadow = mix(shadow, vec3(lightmapShadow), distFade);
 		}
 	#else
-		float lightmapShadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
-
 		vec3 shadow = vec3(lightmapShadow);
-		float scatter = mix(NoL, pow2(NoL / 2 + 0.5), SSS) * lightmapShadow;
+		float scatter = lightmapScatter * lightmapShadow;
 	#endif
 
   vec3 sunlight = max(shadow * NoL, vec3(scatter));
