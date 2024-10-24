@@ -75,7 +75,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define SKY_SATURATION 1.2
 
-#define AA 1 // [0 1 2]
+#define AA 2 // [0 1 2]
 
 #if AA == 1
 #define FXAA

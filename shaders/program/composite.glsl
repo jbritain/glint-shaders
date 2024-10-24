@@ -117,9 +117,6 @@
     color = texture(colortex0, texcoord);
     GbufferData gbufferData;
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
-
-    show(gbufferData.mappedNormal);
-
     float translucentDepth = texture(depthtex0, texcoord).r;
     float opaqueDepth = texture(depthtex2, texcoord).r;
 

@@ -15,43 +15,45 @@
 #include "/lib/settings.glsl"
 
 #ifdef vsh
-  #define SMAA_INCLUDE_VS
-  #include "/lib/post/SMAA.glsl"
-
   out vec2 texcoord;
-  out vec2 pixcoord;
-  out vec4 offset[3];
 
   void main() {
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
-    SMAABlendingWeightCalculationVS(texcoord, pixcoord, offset);
   }
 #endif
 
 #ifdef fsh
-  #define SMAA_INCLUDE_PS
-  #include "/lib/post/SMAA.glsl"
-  #include "/lib/post/tonemap.glsl"
+  
+  uniform sampler2D colortex0;
+  uniform sampler2D colortex1;
+  uniform sampler2D depthtex0;
+  uniform sampler2D colortex11;
 
   uniform sampler2D areaTex;
   uniform sampler2D searchTex;
-  uniform sampler2D colortex0;
-  uniform sampler2D colortex11;
+
+  uniform float near;
+  uniform float far;
+
+  uniform float viewWidth;
+  uniform float viewHeight;
+
+  float linearizeDepth(float depth, float far, float near) {
+	  return far * near / (far + (near - far) * depth);
+  }
+
+  #include "/lib/post/SMAA/SMAABlendingWeightCalculation.glsl"
 
   in vec2 texcoord;
-  in vec2 pixcoord;
-  in vec4 offset[3];
 
-  /* RENDERTARGETS: 11,0 */
-  layout(location = 0) out vec4 blendWeight;
-  layout(location = 1) out vec4 color;
+
+  /* RENDERTARGETS: 11 */
+  layout(location = 0) out vec4 blendWeights;
   
-
   void main() {
-    color = texture(colortex0, texcoord);
-    color.rgb = invGammaCorrect(color.rgb);
-    blendWeight = SMAABlendingWeightCalculationPS(texcoord, pixcoord, offset, colortex11, areaTex, searchTex, vec4(0.0));
-    // show(blendWeight);
+    #ifdef SMAA
+    blendWeights = SMAABlendingWeightCalculation(colortex11, areaTex, searchTex, texcoord, vec2(viewWidth, viewHeight));
+    #endif
   }
 #endif
