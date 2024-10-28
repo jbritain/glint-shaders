@@ -46,6 +46,7 @@
   #include "/lib/post/tonemap.glsl"
   #include "/lib/post/FXAA.glsl"
   #include "/lib/textures/blueNoise.glsl"
+  #include "/lib/util/textRendering.glsl"
 
   layout(location = 0) out vec4 color;
 

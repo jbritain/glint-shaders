@@ -1,5 +1,5 @@
 // #define DEBUG_ENABLE
-// #define POST_PROCESS_DEBUG
+#define POST_PROCESS_DEBUG
 
 #ifdef fsh
 #include "/lib/debug.glsl"

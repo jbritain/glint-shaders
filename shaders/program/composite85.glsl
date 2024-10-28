@@ -52,8 +52,6 @@
     edges.rg = SMAADepthEdgeDetection(depthtex0, texcoord, vec2(viewWidth, viewHeight));
 
     edges.rg = max(edges.rg, SMAAColorEdgeDetection(colortex0, texcoord, vec2(viewWidth, viewHeight)));
-
-    show(edges.rg);
     #endif
   }
 #endif

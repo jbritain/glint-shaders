@@ -57,7 +57,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal){
     vec3 hitFaceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);
 
     if(dot(rayDir, hitFaceNormal) < 0.0){
-      GI += texture(colortex4, GIPos.xy).rgb;
+      GI += textureLod(colortex4, GIPos.xy, 4).rgb;
     }
   }
   

@@ -97,7 +97,7 @@
   #include "/lib/util/screenSpaceRayTrace.glsl"
   #include "/lib/textures/blueNoise.glsl"
   #include "/lib/atmosphere/clouds.glsl"
-  #include "/lib/util/spheremap.glsl"
+  #include "/lib/util/uvmap.glsl"
   #include "/lib/atmosphere/cloudFog.glsl"
   #include "/lib/util/dh.glsl"
 

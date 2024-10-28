@@ -19,7 +19,7 @@
 #include "/lib/atmosphere/clouds.glsl"
 #include "/lib/util/noise.glsl"
 #include "/lib/textures/blueNoise.glsl"
-#include "/lib/util/spheremap.glsl"
+#include "/lib/util/uvmap.glsl"
 
 // https://advances.realtimerendering.com/s2017/DecimaSiggraph2017.pdf
 float getNoHSquared(float NoL, float NoV, float VoL, float radius) {
@@ -138,33 +138,26 @@ vec3 sampleVNDFGGX(
   return normalize(vec3(alpha * halfway.xy, halfway.z));
 }
 
-vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, float roughness){
+vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, float roughness, out bool hit){
   vec3 reflectionPos = vec3(0.0);
+
 
   vec3 worldDir = mat3(gbufferModelViewInverse) * viewRay;
   vec2 environmentUV = mapSphere(normalize(worldDir));
-  vec3 skyReflection = texture(colortex9, environmentUV).rgb * skyLightmap;
-
-  if(!rayIntersects(viewOrigin, viewRay, roughness < 0.01 ? 16 : 8, jitter, true, reflectionPos, true)){
-    return skyReflection;
-  }
-
-  if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){
-    return skyReflection;
-  }
 
 
   vec3 reflectedColor = vec3(0.0);
+  hit = rayIntersects(viewOrigin, viewRay, roughness < 0.01 ? 16 : 8, jitter, true, reflectionPos, true);
 
-  reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
-
-  #ifdef SSR_FADE
-  float fadeFactor = smoothstep(0.8, 1.0, max2(abs(reflectionPos.xy - 0.5)) * 2);
-
-  if(fadeFactor > 0.0){
-    reflectedColor = mix(reflectedColor, skyReflection, fadeFactor);
+  if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){
+    hit = false;
   }
-  #endif
+
+  if(roughness == 0.0 && hit){
+    reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
+  } else {
+    reflectedColor = textureLod(colortex4, reflectionPos.xy, mix(2, 8, roughness)).rgb;
+  }
   
   return reflectedColor;
 }
@@ -175,7 +168,15 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   if(material.roughness < 0.01){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
     float jitter = blueNoise(texcoord).x;
-    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness);
+    bool hit;
+    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness, hit);
+
+    if(!hit){
+      vec3 worldDir = mat3(gbufferModelViewInverse) * reflectedRay;
+      vec2 environmentUV = mapSphere(normalize(worldDir));
+      reflectedColor.rgb = texture(colortex9, environmentUV).rgb * lightmap.y;
+    }
+
   } else { // we must take multiple samples
 
     // we need a TBN to get into tangent space for the VNDF
@@ -187,6 +188,8 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
 
     int samples = SSR_SAMPLES;//int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
 
+    int skyWeight = 0;
+
     for(int i = 0; i < samples; i++){
       vec3 noise = vec3(
         blueNoise(texcoord, i).xyz
@@ -194,7 +197,20 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
-      reflectedColor.rgb += SSRSample(viewPos, reflectedRay, lightmap.y, noise.z, material.roughness);
+      bool hit;
+      vec3 reflection = SSRSample(viewPos, reflectedRay, lightmap.y, noise.z, material.roughness, hit);
+      if(hit){
+        reflectedColor.rgb += reflection;
+      } else {
+        skyWeight++;
+      }
+    }
+
+    if(skyWeight > 0){
+      vec3 worldDir = mat3(gbufferModelViewInverse) * reflect(normalize(viewPos), normal);
+      vec2 environmentUV = mapSphere(worldDir);
+
+      reflectedColor.rgb += textureLod(colortex9, environmentUV, log2(material.roughness * 256 * 2)).rgb * lightmap.y * skyWeight;
     }
 
     reflectedColor /= SSR_SAMPLES;

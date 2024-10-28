@@ -86,6 +86,9 @@
 
   in vec2 texcoord;
 
+  const bool colortex9MipmapEnabled = true; // for later
+  const bool colortex4MipmapEnabled = true;
+
 
 
   /* RENDERTARGETS: 10 */

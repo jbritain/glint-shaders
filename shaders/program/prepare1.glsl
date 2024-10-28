@@ -69,9 +69,7 @@
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/common.glsl"
   #include "/lib/atmosphere/clouds.glsl"
-  #include "/lib/util/spheremap.glsl"
-
-  const bool colortex9MipmapEnabled = true; // for later
+  #include "/lib/util/uvmap.glsl"
 
   /* DRAWBUFFERS:9 */
   layout(location = 0) out vec4 color;

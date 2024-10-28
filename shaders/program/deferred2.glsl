@@ -160,6 +160,7 @@
 
 
     color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI, skyLightColor);
+      show(textureLod(colortex9, texcoord, 0));
     #ifndef BLUR_SPECULAR
     color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
     #else

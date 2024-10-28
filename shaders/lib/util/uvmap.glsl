@@ -11,13 +11,19 @@ vec2 mapSphere(vec3 dir){
 
   float phi = acos(dir.y);
 
-  return vec2(
+  vec2 uv = vec2(
     theta / (2 * PI),
     phi / PI
   );
+
+  uv += 0.025;
+  uv /= 1.05;
+  return uv;
 }
 
 vec3 unmapSphere(vec2 uv){
+  uv *= 1.05;
+  uv -= 0.025;
   float theta = uv.x * 2 * PI;
   float phi = uv.y * PI;
 
