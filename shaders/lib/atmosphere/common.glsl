@@ -86,13 +86,16 @@ bool raySphereIntersection(vec3 r0, vec3 rd, vec3 s0, float sr, inout vec3 point
     if (b*b - 4.0*a*c < 0.0) {
         return false;
     }
-    float dist = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
-    if(dist < 0.0){
-      dist = (-b + sqrt((b*b) - 4.0*a*c))/(2.0*a);
-    }
-    if(dist < 0.0){
-      return false;
-    }
+    float dist1 = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+      
+    float dist2 = (-b + sqrt((b*b) - 4.0*a*c))/(2.0*a);
+
+    if(dist1 < 0.0) dist1 = dist2;
+    if(dist2 < 0.0) dist2 = dist1;
+
+    if(dist1 < 0.0) return false;
+
+    float dist = min(dist1, dist2);
 
     point = r0 + dist * rd;
     return true;

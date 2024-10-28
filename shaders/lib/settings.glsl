@@ -1,5 +1,5 @@
 // #define DEBUG_ENABLE
-#define POST_PROCESS_DEBUG
+// #define POST_PROCESS_DEBUG
 
 #ifdef fsh
 #include "/lib/debug.glsl"
@@ -15,7 +15,7 @@ const int colortex4Format = RGBA32F; || previous frame data - color rgb, depth a
 const int colortex5Format = RGBA16F; || hand
 const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
-const int colortex8Format = RGB16;   || opaque specular, volumetrics
+const int colortex8Format = RGBA16F;   || opaque specular, volumetrics
 const int colortex9Format = RGB16F;  || sky environment map
 const int colortex10Format = RGB10_A2;  || global illumination, parallax shadow
 const int colortex11Format = RGBA16F;|| SMAA

@@ -105,6 +105,9 @@
   uniform float viewWidth;
   uniform float viewHeight;
 
+  uniform float wetness;
+  uniform int biome_precipitation;
+
   uniform int frameCounter;
 
   flat in vec2 singleTexSize;
@@ -116,6 +119,7 @@
   #include "/lib/util/packing.glsl"
   #include "/lib/misc/parallax.glsl"
   #include "/lib/util/noise.glsl"
+  #include "/lib/water/puddles.glsl"
 
   vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -165,18 +169,30 @@
       vec3 mappedNormal = tbnMatrix[2];
     #endif
 
+    #ifdef SPECULAR_MAPS
+    vec4 specularData = texture(specular, texcoord);
+
+    float rainingFactor = float(biome_precipitation == PPT_RAIN) * wetness;
+
+    if(rainingFactor > 0.0){
+      float porosity = specularData.b <= 0.25 ? specularData.b * 4.0 : (1.0 - specularData.r) * specularData.g;
+
+      vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
+      float wetnessFactor = getWetnessFactor(feetPlayerPos + cameraPosition, porosity, texture(normals, texcoord).a, lightmap, mat3(gbufferModelViewInverse) * mappedNormal) * rainingFactor;
+      color.rgb = mix(color.rgb, vec3(0.0), porosity * rainingFactor);
+      specularData.g = specularData.g <= 229.0/255.0 ? mix(specularData.g, 0.02, wetnessFactor) : specularData.g;
+      specularData.r = clamp01(specularData.r + wetnessFactor);
+    }
+    #else
+    vec4 specularData = vec4(0.0);
+    #endif
+
 
     // encode gbuffer data
     outData1.x = pack2x8F(color.r, color.g);
     outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
     outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * tbnMatrix[2]));
     outData1.w = pack2x8F(lightmap);
-
-    #ifdef SPECULAR_MAPS
-    vec4 specularData = texture(specular, texcoord);
-    #else
-    vec4 specularData = vec4(0.0);
-    #endif
 
     outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
     outData2.y = pack2x8F(specularData.rg);

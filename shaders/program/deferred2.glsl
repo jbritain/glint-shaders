@@ -135,10 +135,6 @@
       gbufferData.material.sss = 1.0;
     }
 
-    float wetnessFactor = wetness * (1.0 - gbufferData.material.porosity) * smoothstep(0.66, 1.0, gbufferData.lightmap.y) * float(biome_precipitation == PPT_RAIN);
-
-    gbufferData.material.f0 = mix(gbufferData.material.f0, waterMaterial.f0, wetnessFactor);
-    gbufferData.material.roughness = mix(gbufferData.material.roughness, waterMaterial.roughness, wetnessFactor);
 
     float parallaxShadow = texture(colortex10, texcoord).a;
 
@@ -160,7 +156,6 @@
 
 
     color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI, skyLightColor);
-      show(textureLod(colortex9, texcoord, 0));
     #ifndef BLUR_SPECULAR
     color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
     #else

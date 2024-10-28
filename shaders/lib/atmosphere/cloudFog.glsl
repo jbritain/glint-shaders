@@ -22,7 +22,7 @@
 #define FOG_MARCH_LIMIT far
 #define FOG_SUBMARCH_LIMIT 150.0
 
-#define FOG_EXTINCTION vec3(0.8, 0.8, 1.0)
+#define FOG_EXTINCTION vec3(1.0)
 #define FOG_SAMPLES 5
 #define FOG_SUBSAMPLES 4
 #define FOG_DUAL_LOBE_WEIGHT 0.7
@@ -30,8 +30,6 @@
 
 #define FOG_LOWER_HEIGHT 63
 float FOG_UPPER_HEIGHT = mix(103.0, CUMULUS_LOWER_HEIGHT, wetness);
-
-#define FOG_EXTINCTION_COLOR vec3(0.8, 0.8, 1.0)
 
 float getFogDensity(vec3 pos){
   float fogFactor = 0.0;
@@ -51,13 +49,11 @@ float getFogDensity(vec3 pos){
 
   fogFactor *= heightFactor;
 
-  fogFactor = mix(fogFactor, fogFactor * 2.0, thunderStrength);
+  fogFactor *= 1.0 + wetness;
 
   // float distanceFactor = smoothstep(far / 2, far, length(pos.xz - cameraPosition.xz));
 
   // fogFactor = mix(fogFactor, 0.1 * heightFactor, distanceFactor);
-
-  
 
   return fogFactor;
 }
@@ -115,8 +111,6 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
 
   float mu = clamp01(dot(worldDir, lightVector));
 
-  vec3 oldB = b + cameraPosition;
-
   if(distance(a, b) > FOG_MARCH_LIMIT){ // limit how far we can march
     b = a + normalize(b - a) * FOG_MARCH_LIMIT;
   }
@@ -147,11 +141,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
   vec3 scatter = vec3(0.0);
 
   for(int i = 0; i < samples; i++, rayPos += increment){
-    float density = 0;
-
-
-    density = getFogDensity(rayPos) * length(increment);
-    // density = mix(density, 0.0, smoothstep(CLOUD_MARCH_LIMIT * 0.5, CLOUD_MARCH_LIMIT, length(rayPos - cameraPosition)));
+    float density = length(increment) * getFogDensity(rayPos);
 
     vec3 transmittance = exp(-density * FOG_EXTINCTION);
 
@@ -174,10 +164,11 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
       radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0);
     }
 
-     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / FOG_EXTINCTION;
+    vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / FOG_EXTINCTION;
 
-    totalTransmittance *= transmittance;
     scatter += integScatter * totalTransmittance;
+    totalTransmittance *= transmittance;
+
 
     if(max3(totalTransmittance) < 0.01){
       break;

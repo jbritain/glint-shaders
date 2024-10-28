@@ -231,18 +231,10 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
   float fogDepthWeight = 0.0;
 
   if(!raySphereIntersectionPlanet(cameraPosition, worldDir, lowerHeight, a)){
-    if(worldDir.y > 0 && cameraPosition.y >= lowerHeight && cameraPosition.y <= upperHeight){ // inside cloud, looking up
-      a = cameraPosition;
-    } else {
-      return vec3(0.0);
-    }
+    a = cameraPosition;
   }
   if(!raySphereIntersectionPlanet(cameraPosition, worldDir, upperHeight, b)){
-    if(worldDir.y < 0 && cameraPosition.y >= lowerHeight && cameraPosition.y <= upperHeight){ // inside cloud, looking down
-      b = cameraPosition;
-    } else {
-      return vec3(0.0);
-    }
+    b = cameraPosition;
   }
 
   worldDir = normalize(a - b);

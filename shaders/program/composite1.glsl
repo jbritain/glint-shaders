@@ -94,6 +94,7 @@
   void main() {
     // TODO: VOLUMETRIC FOG BEHIND TRANSLUCENTS
     if(isEyeInWater != 0){
+      fogData.a = 1.0;
       return;
     }
 
@@ -110,7 +111,7 @@
     vec3 fogScatter = hasSkylight ? getCloudFog(vec3(0.0), eyePlayerPos, depth, sunlightColor, skyLightColor, fogTransmittance) : vec3(0.0);
 
     fogData.rgb = fogScatter;
-    fogData.a = sum3(fogScatter) / 3.0;
+    fogData.a = min3(fogTransmittance);
 
   }
 #endif
