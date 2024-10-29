@@ -9,7 +9,7 @@
     https://jbritain.net
 
     /program/deferred4.glsl
-    - Cloud generation
+    - Clouds
 */
 
 #include "/lib/settings.glsl"

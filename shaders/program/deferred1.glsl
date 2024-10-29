@@ -9,7 +9,7 @@
     https://jbritain.net
 
     /program/deferred1.glsl
-    - Global illumination filtering - horizontal
+    - Global illumination filtering
 */
 
 #include "/lib/settings.glsl"
@@ -51,7 +51,7 @@
   #include "/lib/util/bilateralFilter.glsl"
 
   void main() {
-    // outGI.rgb = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(0.0, 1.0)).rgb;
+    #ifdef GLOBAL_ILLUMINATION
     outGI.a = texture(colortex10, texcoord).a;
 
     if(max2(texcoord) > 0.5){
@@ -59,5 +59,6 @@
     }
 
     outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 20, 10, 0.5).rgb;
+    #endif
   }
 #endif

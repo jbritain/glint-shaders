@@ -9,7 +9,7 @@
     https://jbritain.net
 
     /program/deferred2.glsl
-    - Opaque shading
+    - Opaque diffuse shading
     - Sky
     - Clear sky buffer for translucents
 */
@@ -94,7 +94,7 @@
   /* DRAWBUFFERS:038 */
   layout(location = 0) out vec4 color;
   layout(location = 1) out vec4 tex3;
-  layout(location = 2) out vec4 reflectedColor;
+  layout(location = 2) out vec3 sunlight;
   #include "/lib/util.glsl"
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -141,14 +141,13 @@
     if(DH_MASK){
       parallaxShadow = 1.0;
     }
-    vec3 sunlight = SUNLIGHT_STRENGTH * sunlightColor;
+    sunlight = SUNLIGHT_STRENGTH * sunlightColor;
     sunlight *= getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
     
 
     color.rgb = gbufferData.material.albedo;
 
     #ifdef GLOBAL_ILLUMINATION
-    //vec3 GI = blur13(colortex10, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0)).rgb;
     vec3 GI = texture(colortex10, texcoord / 2.0).rgb;
     #else
     vec3 GI = vec3(0.0);
@@ -156,18 +155,6 @@
 
 
     color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI, skyLightColor);
-    #ifndef BLUR_SPECULAR
-    color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
-    #else
-  
-    float NoV = dot(mappedNormal, normalize(-viewPos));
-
-    vec3 fresnel = schlick(material, NoV);
-    reflectedColor = getSpecularShading(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor, fresnel);
-
-    reflectedColor.rgb *= fresnel;
-    color.rgb *= (1.0 - clamp01(fresnel));
-    color.a = material.roughness; // we use this when blurring to decide how much to blur by
-    #endif
+    // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
   }
 #endif

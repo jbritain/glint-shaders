@@ -218,7 +218,7 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
   }
 
   #ifdef HIGH_CLOUD_SAMPLES
-  samples *= 4;
+  samples *= 2;
   #else
   samples = int(ceil(mix(samples * 0.75, float(samples), worldDir.y)));
   #endif

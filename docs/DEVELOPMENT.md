@@ -27,12 +27,11 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `prepare` cloud shadow map
 `prepare1` sky environment map
 
-`deferred` rsm global illumination
+`deferred`  global illumination
 `deferred1` global illumination filtering
 `deferred2` opaques shading, sky
-`deferred3` blur opaque specular
-`deferred4` blur and blend opaque specular
-`deferred5` clouds
+`deferred3` opaques specular shading
+`deferred4` clouds
 
 `composite` atmospheric and water fog, translucency blending
 `composite1` cloud fog

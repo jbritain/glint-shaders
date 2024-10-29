@@ -9,7 +9,7 @@
     https://jbritain.net
 
     /program/deferred.glsl
-    - Reflective shadow map global illumination
+    - Global illumination
 */
 
 #include "/lib/settings.glsl"
@@ -105,12 +105,12 @@
   #include "/lib/lighting/SSGI.glsl"
 
   void main() {
+    #ifdef GLOBAL_ILLUMINATION
     outGI = texture(colortex10, texcoord);
     vec2 texcoord = texcoord * 2.0;
     if(clamp01(texcoord) != texcoord){
       return;
     }
-    #ifdef GLOBAL_ILLUMINATION
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);
