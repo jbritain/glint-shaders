@@ -19,7 +19,7 @@ float gaussWeight(float x, float sigma){
   return exp(-pow2(x) / (2.0 * pow2(sigma))) / (2.0 * PI * pow2(sigma));
 }
 
-vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL, int mipLevel){
+vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL, float scale, int mipLevel){
   const float factorS = -rcp(2.0 * pow2(sigmaS));
   const float factorL = -rcp(2.0 * pow2(sigmaL));
 
@@ -27,7 +27,7 @@ vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL, in
   vec4 sampleSum = vec4(0.0);
   float halfSize = sigmaS / 2.0;
 
-  float luminance = getLuminance(texture(image, coord).rgb);
+  float luminance = getLuminance(texture(image, coord / scale).rgb);
 
   for (float x = -halfSize; x <= halfSize; x++) {
     for (float y = -halfSize;  y <= halfSize; y++){

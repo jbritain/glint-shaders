@@ -58,6 +58,8 @@
     tbnMatrix[1] = normalize(cross(tbnMatrix[0], tbnMatrix[2]) * at_tangent.w);
 
     viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+    vec3 normal = gl_NormalMatrix * gl_Normal;
+    viewPos += normal * 0.001;
 
     gl_Position = gbufferProjection * vec4(viewPos, 1.0);
 
@@ -117,7 +119,7 @@
   uniform float far;
 
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
 
   uniform int frameCounter;
   uniform int worldTime;

@@ -107,7 +107,7 @@
     return 1.0 - quinticStep(edgeFactor, 0.0, min2(pos));
   }
 
-  /* DRAWBUFFERS:0 */
+  /* DRAWBUFFERS:08 */
   layout(location = 0) out vec4 color;
 
   void main() {

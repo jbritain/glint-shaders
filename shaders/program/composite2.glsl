@@ -9,7 +9,7 @@
     https://jbritain.net
 
     /program/composite2.glsl
-    - Cloud fog blur
+    - Cloud fog blur and blend
 */
 
 #include "/lib/settings.glsl"
@@ -24,39 +24,41 @@
 #endif
 
 #ifdef fsh
+  uniform sampler2D colortex0;
   uniform sampler2D colortex8;
 
   uniform sampler2D depthtex0;
-
-  uniform float viewWidth;
-  uniform float viewHeight;
 
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
 
+  uniform float viewWidth;
+  uniform float viewHeight;
+
+  uniform float near;
+  uniform float far;
+
   in vec2 texcoord;
 
-  /* DRAWBUFFERS:8 */
-  layout(location = 0) out vec4 fogData;
+  /* DRAWBUFFERS:0 */
+  layout(location = 0) out vec4 color;
 
   #include "/lib/util.glsl"
   #include "/lib/util/blur.glsl"
   #include "/lib/util/spaceConversions.glsl"
+  #include "/lib/util/bilateralFilter.glsl"
 
 
   void main() {
     float depth = texture(depthtex0, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
-    float dist = length(viewPos);
-    // prevent fog blurring over block edges
-    if(length(vec2(dFdx(dist), dFdy(dist))) > 1.0 || true){
-      fogData = texture(colortex8, texcoord);
-      return;
-    }
+    vec4 fogData = bilateralFilterDepth(colortex8, depthtex0, texcoord, 10, 10, 1.0, 0);
 
-    fogData = blur13(colortex8, texcoord, vec2(viewWidth, viewHeight), vec2(1.0, 0.0));
+    color = texture(colortex0, texcoord);
+
+    color.rgb = color.rgb * fogData.a + fogData.rgb;
   }
 #endif
