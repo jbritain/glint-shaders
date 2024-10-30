@@ -26,6 +26,8 @@
 #endif
 
 #ifdef fsh
+  const bool colortex10MipmapEnabled = true;
+
   uniform sampler2D colortex10;
   uniform sampler2D depthtex0;
 
@@ -58,7 +60,7 @@
       return;
     }
 
-    outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 20, 10, 0.5).rgb;
+    outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 10, 10, 0.5, 4).rgb;
     #endif
   }
 #endif

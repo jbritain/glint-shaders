@@ -52,7 +52,7 @@
 
     float dist = length(viewPos);
     // prevent fog blurring over block edges
-    if(length(vec2(dFdx(dist), dFdy(dist))) > 1.0){
+    if(length(vec2(dFdx(dist), dFdy(dist))) > 1.0 || true){
       fogData = texture(colortex8, texcoord);
       return;
     }

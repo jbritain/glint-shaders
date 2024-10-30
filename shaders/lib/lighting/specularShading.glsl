@@ -138,9 +138,8 @@ vec3 sampleVNDFGGX(
   return normalize(vec3(alpha * halfway.xy, halfway.z));
 }
 
-vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, float roughness, out bool hit){
+vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, float roughness, out bool hit, out float fadeFactor){
   vec3 reflectionPos = vec3(0.0);
-
 
   vec3 worldDir = mat3(gbufferModelViewInverse) * viewRay;
   vec2 environmentUV = mapSphere(normalize(worldDir));
@@ -158,6 +157,12 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   } else {
     reflectedColor = textureLod(colortex4, reflectionPos.xy, mix(2, 8, roughness)).rgb;
   }
+
+  #ifdef SSR_FADE
+  fadeFactor = smoothstep(0.8, 1.0, max2(abs(reflectionPos.xy - 0.5)) * 2);
+  #else
+  fadeFactor = float(!hit);
+  #endif
   
   return reflectedColor;
 }
@@ -169,12 +174,14 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
     float jitter = blueNoise(texcoord).x;
     bool hit;
-    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness, hit);
+    float fadeFactor;
 
-    if(!hit){
+    reflectedColor.rgb = SSRSample(viewPos, reflectedRay, lightmap.y, jitter, material.roughness, hit, fadeFactor);
+
+    if(!hit || fadeFactor > 0.0){
       vec3 worldDir = mat3(gbufferModelViewInverse) * reflectedRay;
       vec2 environmentUV = mapSphere(normalize(worldDir));
-      reflectedColor.rgb = texture(colortex9, environmentUV).rgb * lightmap.y;
+      reflectedColor.rgb = mix(reflectedColor.rgb, texture(colortex9, environmentUV).rgb * lightmap.y, fadeFactor);
     }
 
   } else { // we must take multiple samples
@@ -188,7 +195,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
 
     int samples = SSR_SAMPLES;//int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
 
-    int skyWeight = 0;
+    float skyWeight = 0.0;
 
     for(int i = 0; i < samples; i++){
       vec3 noise = vec3(
@@ -198,11 +205,13 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
       bool hit;
-      vec3 reflection = SSRSample(viewPos, reflectedRay, lightmap.y, noise.z, material.roughness, hit);
+      float fadeFactor;
+      vec3 reflection = SSRSample(viewPos, reflectedRay, lightmap.y, noise.z, material.roughness, hit, fadeFactor);
       if(hit){
         reflectedColor.rgb += reflection;
       } else {
-        skyWeight++;
+        skyWeight += fadeFactor;
+        reflectedColor.rgb += reflection * (1.0 - fadeFactor);
       }
     }
 

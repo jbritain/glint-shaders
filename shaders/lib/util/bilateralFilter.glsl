@@ -19,7 +19,7 @@ float gaussWeight(float x, float sigma){
   return exp(-pow2(x) / (2.0 * pow2(sigma))) / (2.0 * PI * pow2(sigma));
 }
 
-vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL){
+vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL, int mipLevel){
   const float factorS = -rcp(2.0 * pow2(sigmaS));
   const float factorL = -rcp(2.0 * pow2(sigmaL));
 
@@ -33,7 +33,7 @@ vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL){
     for (float y = -halfSize;  y <= halfSize; y++){
       vec2 offset = vec2(x, y);
 
-      vec4 offsetSample = texture(image, coord + offset / vec2(viewWidth, viewHeight));
+      vec4 offsetSample = textureLod(image, coord + offset / vec2(viewWidth, viewHeight), mipLevel);
 
       float distS = length(offset);
       float distL = abs(getLuminance(offsetSample.rgb) - luminance);
@@ -50,7 +50,7 @@ vec4 bilateralFilter(sampler2D image, vec2 coord, float sigmaS, float sigmaL){
   return sampleSum / weightSum;
 }
 
-vec4 bilateralFilterDepth(sampler2D image, sampler2D depthtex, vec2 coord, float sigmaS, float sigmaL, float scale){
+vec4 bilateralFilterDepth(sampler2D image, sampler2D depthtex, vec2 coord, float sigmaS, float sigmaL, float scale, int mipLevel){
   const float factorS = -rcp(2.0 * pow2(sigmaS));
   const float factorL = -rcp(2.0 * pow2(sigmaL));
 
@@ -69,7 +69,7 @@ vec4 bilateralFilterDepth(sampler2D image, sampler2D depthtex, vec2 coord, float
         continue;
       }
 
-      vec4 offsetSample = texture(image, coord + offset / vec2(viewWidth, viewHeight));
+      vec4 offsetSample = textureLod(image, coord + offset / vec2(viewWidth, viewHeight), mipLevel);
 
 
       float distS = length(offset);
