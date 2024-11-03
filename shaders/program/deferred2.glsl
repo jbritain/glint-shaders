@@ -19,7 +19,21 @@
 #ifdef vsh
   out vec2 texcoord;
 
+  uniform vec3 cameraPosition;
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+  uniform mat4 gbufferModelViewInverse;
+  uniform ivec2 eyeBrightnessSmooth;
+  uniform float far;
+
+  flat out vec3 sunlightColor;
+  flat out vec3 skyLightColor;
+
+  #include "/lib/atmosphere/sky.glsl"
+
   void main() {
+    getLightColors(sunlightColor, skyLightColor);
+
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }
@@ -89,6 +103,9 @@
 
   in vec2 texcoord;
 
+  flat in vec3 sunlightColor;
+  flat in vec3 skyLightColor;
+
 
 
   /* DRAWBUFFERS:038 */
@@ -116,8 +133,7 @@
     dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
     
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
+
 
     
     tex3 = vec4(0.0); // clear buffer in preparation for translucents to write to it
@@ -148,7 +164,7 @@
     color.rgb = gbufferData.material.albedo;
 
     #ifdef GLOBAL_ILLUMINATION
-    vec3 GI = texture(colortex10, texcoord / 2.0).rgb;
+    vec3 GI = texture(colortex10, texcoord * GI_RESOLUTION).rgb;
     #else
     vec3 GI = vec3(0.0);
     #endif

@@ -44,7 +44,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define SSR
 #define SSR_FADE
 #define SSR_SAMPLES 8 // [1 2 4 8 16 32 64]
-#define ROUGH_REFLECTION_THRESHOLD 0.3 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define ROUGH_REFLECTION_THRESHOLD 0.1 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 // #define BLUR_SPECULAR
 
 #define TORCH_COLOR vec3(0.8, 0.6, 0.5)
@@ -117,7 +117,8 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #endif
 
 #define GLOBAL_ILLUMINATION
-#define GI_SAMPLES 4 // [1 2 4 8 16 32 64 128 256]
+#define GI_SAMPLES 1 // [1 2 4 8 16 32]
+#define GI_RESOLUTION 1.0 // [0.25 0.5 0.75 1.0]
 
 #define CLOUD_BLEND 0.1
 

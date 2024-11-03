@@ -18,7 +18,21 @@
 #ifdef vsh
   out vec2 texcoord;
 
+  uniform vec3 cameraPosition;
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+  uniform mat4 gbufferModelViewInverse;
+  uniform ivec2 eyeBrightnessSmooth;
+  uniform float far;
+
+  flat out vec3 sunlightColor;
+  flat out vec3 skyLightColor;
+
+  #include "/lib/atmosphere/sky.glsl"
+
   void main() {
+    getLightColors(sunlightColor, skyLightColor);
+
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }
@@ -87,7 +101,6 @@
   in vec2 texcoord;
 
   const bool colortex9MipmapEnabled = true; // for later
-  const bool colortex4MipmapEnabled = true;
 
 
 
@@ -107,7 +120,7 @@
   void main() {
     #ifdef GLOBAL_ILLUMINATION
     outGI = texture(colortex10, texcoord);
-    vec2 texcoord = texcoord * 2.0;
+    vec2 texcoord = texcoord * rcp(GI_RESOLUTION);
     if(clamp01(texcoord) != texcoord){
       return;
     }
@@ -120,8 +133,7 @@
       return;
     }
 
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
+
 
     GbufferData gbufferData;
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);

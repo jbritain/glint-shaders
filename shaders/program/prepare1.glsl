@@ -18,7 +18,21 @@
 #ifdef vsh
   out vec2 texcoord;
 
+  uniform vec3 cameraPosition;
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+  uniform mat4 gbufferModelViewInverse;
+  uniform ivec2 eyeBrightnessSmooth;
+  uniform float far;
+
+  flat out vec3 sunlightColor;
+  flat out vec3 skyLightColor;
+
+  #include "/lib/atmosphere/sky.glsl"
+
   void main() {
+    getLightColors(sunlightColor, skyLightColor);
+
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }
@@ -65,6 +79,9 @@
 
   in vec2 texcoord;
 
+  flat in vec3 sunlightColor;
+  flat in vec3 skyLightColor;
+
   #include "/lib/util.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/common.glsl"
@@ -80,8 +97,7 @@
 
     color.rgb = getSky(color, dir, false);
 
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
+
 
     vec3 cloudTransmittance;
     vec3 cloudScatter = getClouds(dir * far, 1.0, sunlightColor, skyLightColor, cloudTransmittance.rgb);

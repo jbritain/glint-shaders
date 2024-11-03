@@ -24,8 +24,8 @@ float interleavedGradientNoise(vec2 coord, int frame){
 
 vec3 interleavedGradientNoise3(vec2 coord, int frame){
     float h1 = interleavedGradientNoise(coord, frame);
-    float h2 = interleavedGradientNoise(coord + 9.0, frame);
-    float h3 = interleavedGradientNoise(coord + 10.0, frame);
+    float h2 = interleavedGradientNoise(coord + vec2(97.0, 23.0), frame);
+    float h3 = interleavedGradientNoise(coord - vec2(97.0, 23.0), frame);
 
     return vec3(h1, h2, h3);
 }

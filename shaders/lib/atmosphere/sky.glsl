@@ -12,8 +12,11 @@
 #ifndef SKY_INCLUDE
 #define SKY_INCLUDE
 
+#include "/lib/util.glsl"
+
 #include "/lib/atmosphere/eBrunetonAtmosphere.glsl"
 #include "/lib/atmosphere/common.glsl"
+
 
 #ifdef WORLD_THE_END
 #include "/lib/atmosphere/endSky.glsl"

@@ -55,7 +55,7 @@
     float depth = texture(depthtex0, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
-    vec4 fogData = bilateralFilterDepth(colortex8, depthtex0, texcoord, 10, 10, 1.0, 0);
+    vec4 fogData = bilateralFilterDepth(colortex8, depthtex0, texcoord, 5, 10, 1.0, 0);
 
     color = texture(colortex0, texcoord);
 

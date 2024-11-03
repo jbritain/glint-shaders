@@ -193,7 +193,7 @@
     vec2 dy = dFdy(texcoord);
     vec3 parallaxPos;
     if(length(viewPos) < 32.0){
-      vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rg;
+      vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).rg;
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
             parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
@@ -292,7 +292,7 @@
     #ifndef gbuffers_weather
       vec3 sunlightColor; vec3 skyLightColor;
       getLightColors(sunlightColor, skyLightColor);
-      vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, materialIsWater(materialID)) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
+      vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
       color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
       color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
     #endif

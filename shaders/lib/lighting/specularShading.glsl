@@ -86,15 +86,15 @@ vec3 schlick(Material material, float NoV){
   const vec3 f0 = material.f0;
   const vec3 f82 = material.f82;
   if(material.metalID == NO_METAL){ // normal schlick approx.
-  return vec3(f0 + (1.0 - f0) * pow5(1.0 - NoV));
+    return vec3(f0 + (1.0 - f0) * pow5(1.0 - NoV));
   } else { // lazanyi schlick - https://www.shadertoy.com/view/DdlGWM
-  vec3 a = (823543./46656.) * (f0 - f82) + (49./6.) * (1.0 - f0);
+    vec3 a = (823543./46656.) * (f0 - f82) + (49./6.) * (1.0 - f0);
 
-  float p1 = 1.0 - NoV;
-  float p2 = p1*p1;
-  float p4 = p2*p2;
+    float p1 = 1.0 - NoV;
+    float p2 = p1*p1;
+    float p4 = p2*p2;
 
-  return clamp01(f0 + ((1.0 - f0) * p1 - a * NoV * p2) * p4);
+    return clamp01(f0 + ((1.0 - f0) * p1 - a * NoV * p2) * p4);
   }
 }
 
@@ -172,7 +172,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness < 0.01){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = blueNoise(texcoord).x;
+    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter);
     bool hit;
     float fadeFactor;
 
@@ -198,9 +198,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     float skyWeight = 0.0;
 
     for(int i = 0; i < samples; i++){
-      vec3 noise = vec3(
-        blueNoise(texcoord, i).xyz
-      );
+      vec3 noise = interleavedGradientNoise3(floor(gl_FragCoord.xy), i + frameCounter * samples);
 
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);

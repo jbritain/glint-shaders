@@ -196,7 +196,7 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 	return shadowSum;
 }
 
-vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap, bool doFast){
+vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	#ifdef WORLD_THE_END
 	lightmap.y = 1.0;
 	#endif
@@ -223,14 +223,13 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		if(inShadowDistance){
 			float blockerDistance = 0.0;
 			float penumbraWidth = 0.0;
-			if(!doFast){
-				blockerDistance = getBlockerDistance(shadowClipPos, faceNormal, interleavedGradientNoise(floor(gl_FragCoord.xy)));
-				penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
-				scatter = computeSSS(blockerDistance, SSS, faceNormal);
-			}
+			blockerDistance = getBlockerDistance(shadowClipPos, faceNormal, interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
+			penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
+			penumbraWidth *= 1.0 + SSS * 7.0;
+			scatter = computeSSS(blockerDistance, SSS, faceNormal);
+		
 			
-			
-			shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false, interleavedGradientNoise(floor(gl_FragCoord.xy), 1));
+			shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false, interleavedGradientNoise(floor(gl_FragCoord.xy), pow2(frameCounter)));
 		}
 
 		if(distFade > 0.0){
@@ -249,9 +248,5 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	#endif
 
 	return sunlight;
-}
-
-vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
-	return getSunlight(feetPlayerPos, mappedNormal, faceNormal, SSS, lightmap, false);
 }
 #endif

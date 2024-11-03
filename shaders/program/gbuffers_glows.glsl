@@ -22,6 +22,9 @@
   flat out int materialID;
   out vec3 viewPos;
 
+  flat out vec3 sunlightColor;
+  flat out vec3 skyLightColor;
+
   flat out vec2 singleTexSize;
   flat out ivec2 pixelTexSize;
   flat out vec4 textureBounds;
@@ -39,6 +42,11 @@
 
   uniform ivec2 atlasSize;
 
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+  uniform ivec2 eyeBrightnessSmooth;
+  uniform float far;
+
   in vec4 at_tangent;
   in vec2 mc_Entity;
   in vec3 at_midBlock;
@@ -46,8 +54,11 @@
 
   #include "/lib/util.glsl"
   #include "/lib/misc/sway.glsl"
+  #include "/lib/atmosphere/sky.glsl"
 
   void main() {
+    getLightColors(sunlightColor, skyLightColor);
+
     materialID = int(mc_Entity.x + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
@@ -144,6 +155,9 @@
   flat in ivec2 pixelTexSIze;
   flat in vec4 textureBounds;
 
+  flat in vec3 sunlightColor;
+  flat in vec3 skyLightColor;
+
   #include "/lib/util.glsl"
   #include "/lib/post/tonemap.glsl"
   #include "/lib/util/packing.glsl"
@@ -177,7 +191,7 @@
     vec2 dy = dFdy(texcoord);
     vec3 parallaxPos;
     if(length(viewPos) < 32.0){
-      vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rg;
+      vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).rg;
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
             parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
@@ -225,8 +239,7 @@
     color.rgb *= 10.0;
     #endif
 
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
+
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);

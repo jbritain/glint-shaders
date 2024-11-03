@@ -45,6 +45,8 @@
 
   in vec2 texcoord;
 
+  const bool colortex4MipmapEnabled = true;
+
 
   /* RENDERTARGETS: 10 */
   layout(location = 0) out vec4 outGI;
@@ -56,11 +58,11 @@
     #ifdef GLOBAL_ILLUMINATION
     outGI.a = texture(colortex10, texcoord).a;
 
-    if(max2(texcoord) > 0.5){
+    if(max2(texcoord) > GI_RESOLUTION){
       return;
     }
 
-    outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 10, 10, 0.5, 4).rgb;
+    outGI.rgb = bilateralFilterDepth(colortex10, depthtex0, texcoord, 10, 10, GI_RESOLUTION, 4).rgb;
     #endif
   }
 #endif

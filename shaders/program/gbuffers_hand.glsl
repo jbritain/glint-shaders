@@ -22,6 +22,9 @@
   flat out int materialID;
   out vec3 viewPos;
 
+  flat out vec3 sunlightColor;
+  flat out vec3 skyLightColor;
+
   uniform int worldTime;
   uniform int worldDay;
 
@@ -31,14 +34,23 @@
   uniform mat4 gbufferProjection;
 
   uniform vec3 cameraPosition;
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+
+  uniform float far;
+
+  uniform ivec2 eyeBrightnessSmooth;
 
   in vec4 at_tangent;
   in vec2 mc_Entity;
   in vec3 at_midBlock;
 
   #include "/lib/util.glsl"
+  #include "/lib/atmosphere/sky.glsl"
 
   void main() {
+    getLightColors(sunlightColor, skyLightColor);
+
     gl_Position = ftransform();
     materialID = int(mc_Entity.x + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -99,7 +111,7 @@
   uniform float far;
 
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
 
   uniform int frameCounter;
   uniform int worldTime;
@@ -119,6 +131,9 @@ uniform float thunderStrength;
   in mat3 tbnMatrix;
   flat in int materialID;
   in vec3 viewPos;
+
+  flat in vec3 sunlightColor;
+  flat in vec3 skyLightColor;
 
   #include "/lib/util.glsl"
   #include "/lib/post/tonemap.glsl"
@@ -176,8 +191,7 @@ uniform float thunderStrength;
     Material material;
     material = materialFromSpecularMap(color.rgb, specularData);
 
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
+
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
     color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
     color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);

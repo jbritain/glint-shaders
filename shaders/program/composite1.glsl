@@ -17,7 +17,21 @@
 #ifdef vsh
   out vec2 texcoord;
 
+  uniform vec3 cameraPosition;
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+  uniform mat4 gbufferModelViewInverse;
+  uniform ivec2 eyeBrightnessSmooth;
+  uniform float far;
+
+  flat out vec3 sunlightColor;
+  flat out vec3 skyLightColor;
+
+  #include "/lib/atmosphere/sky.glsl"
+
   void main() {
+    getLightColors(sunlightColor, skyLightColor);
+
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }
@@ -80,6 +94,9 @@
 
   in vec2 texcoord;
 
+  flat in vec3 sunlightColor;
+  flat in vec3 skyLightColor;
+
   /* DRAWBUFFERS:8 */
   layout(location = 0) out vec4 fogData;
 
@@ -102,9 +119,6 @@
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
-    
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
 
     vec3 fogTransmittance = vec3(1.0);
 
