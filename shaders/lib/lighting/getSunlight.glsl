@@ -225,12 +225,17 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 			float penumbraWidth = 0.0;
 			blockerDistance = getBlockerDistance(shadowClipPos, faceNormal, interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
 			penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
-			penumbraWidth *= 1.0 + SSS * 7.0;
+
+			if(blockerDistance >= 0.9999){
+				return sampleCloudShadow(shadowClipPos, faceNormal);
+			}
+			
 			scatter = computeSSS(blockerDistance, SSS, faceNormal);
 		
 			
-			shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false, interleavedGradientNoise(floor(gl_FragCoord.xy), pow2(frameCounter)));
+			shadow = computeShadow(shadowClipPos, penumbraWidth, faceNormal, SHADOW_SAMPLES, false, interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
 		}
+
 
 		if(distFade > 0.0){
 			scatter = mix(scatter, lightmapScatter * lightmapShadow, distFade);

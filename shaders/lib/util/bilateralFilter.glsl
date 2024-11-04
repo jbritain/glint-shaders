@@ -60,8 +60,8 @@ vec4 bilateralFilterDepth(sampler2D image, sampler2D depthtex, vec2 coord, float
 
   float depth = linearizeDepth(texture(depthtex, coord / scale).r, near, far) / far;
 
-  for (float x = -halfSize; x <= halfSize; x++) {
-    for (float y = -halfSize;  y <= halfSize; y++){
+  for (float x = -halfSize; x <= halfSize; x += pow(2, mipLevel)) {
+    for (float y = -halfSize;  y <= halfSize; y += pow(2, mipLevel)){
       vec2 offset = vec2(x, y);
 
       float offsetSampleDepth = linearizeDepth(texture(depthtex, coord / scale).r, near, far) / far;

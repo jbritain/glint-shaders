@@ -80,7 +80,11 @@ float calculateSpecularHighlight(vec3 N, vec3 V, vec3 L, float roughness){
 	return alpha / (PI * pow2(distr));
 }
 
-
+mat3 generateTBN(vec3 normal){
+  vec3 tangent = normal.y == 1.0 ? vec3(1.0, 0.0, 0.0) : normalize(cross(vec3(0.0, 1.0, 0.0), normal));
+  vec3 bitangent = normalize(cross(tangent, normal));
+  return mat3(tangent, bitangent, normal);
+}
 
 vec3 schlick(Material material, float NoV){
   const vec3 f0 = material.f0;
@@ -95,20 +99,6 @@ vec3 schlick(Material material, float NoV){
     float p4 = p2*p2;
 
     return clamp01(f0 + ((1.0 - f0) * p1 - a * NoV * p2) * p4);
-  }
-}
-
-// from bliss, which means it's probably by chocapic
-// https://backend.orbit.dtu.dk/ws/portalfiles/portal/126824972/onb_frisvad_jgt2012_v2.pdf
-void computeFrisvadTangent(in vec3 n, out vec3 f, out vec3 r){
-  if(n.z < -0.9) {
-    f = vec3(0.,-1,0);
-    r = vec3(-1, 0, 0);
-  } else {
-  	float a = 1./(1.+n.z);
-  	float b = -n.x*n.y*a;
-  	f = vec3(1. - n.x*n.x*a, b, -n.x) ;
-  	r = vec3(b, 1. - n.y*n.y*a , -n.y);
   }
 }
 
@@ -187,19 +177,14 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   } else { // we must take multiple samples
 
     // we need a TBN to get into tangent space for the VNDF
-    vec3 tangent;
-    vec3 bitangent;
-    computeFrisvadTangent(normal, tangent, bitangent);
+    mat3 tbn = generateTBN(normal);
 
-    mat3 tbn = mat3(tangent, bitangent, normal);
-
-    int samples = SSR_SAMPLES;//int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
+    const int samples = SSR_SAMPLES;//int(mix(float(SSR_SAMPLES), 1.0, 1.0 - max3(fresnel)));
 
     float skyWeight = 0.0;
 
     for(int i = 0; i < samples; i++){
-      vec3 noise = interleavedGradientNoise3(floor(gl_FragCoord.xy), i + frameCounter * samples);
-
+      vec3 noise = blueNoise(texcoord, i + frameCounter * samples).xyz;
       vec3 roughNormal = tbn * (sampleVNDFGGX(normalize(-viewPos * tbn), vec2(material.roughness), noise.xy));
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
       bool hit;

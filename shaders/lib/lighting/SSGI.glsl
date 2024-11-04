@@ -33,7 +33,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal){
 
   for(int i = 0; i < GI_SAMPLES; i++){
     // vec3 noise = interleavedGradientNoise3(floor(gl_FragCoord.xy), i + GI_SAMPLES * frameCounter);
-    vec3 noise = blueNoise(texcoord, i).xyz;
+    vec3 noise = blueNoise(texcoord, i + frameCounter * GI_SAMPLES).xyz;
     float cosTheta = sqrt(noise.x);
     float sinTheta = sqrt(1.0 - pow2(cosTheta));
     float phi = 2 * PI * noise.y;

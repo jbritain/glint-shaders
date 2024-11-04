@@ -9,9 +9,7 @@
     https://jbritain.net
 
     /program/deferred2.glsl
-    - Opaque diffuse shading
-    - Sky
-    - Clear sky buffer for translucents
+    - Opaque specular shading
 */
 
 #include "/lib/settings.glsl"
@@ -39,6 +37,8 @@
   }
 #endif
 
+
+
 #ifdef fsh
   uniform sampler2D colortex0;
   uniform sampler2D colortex1;
@@ -49,6 +49,7 @@
   uniform sampler2D colortex6;
   uniform sampler2D colortex10;
   uniform sampler2D colortex9;
+  uniform sampler2D colortex8;
 
   uniform sampler2D depthtex0;
   uniform sampler2D depthtex2;
@@ -108,10 +109,9 @@
 
 
 
-  /* DRAWBUFFERS:038 */
+  /* DRAWBUFFERS:0 */
   layout(location = 0) out vec4 color;
-  layout(location = 1) out vec4 tex3;
-  layout(location = 2) out vec3 sunlight;
+
   #include "/lib/util.glsl"
   #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
@@ -135,12 +135,9 @@
     
 
 
-    
-    tex3 = vec4(0.0); // clear buffer in preparation for translucents to write to it
+    color = texture(colortex0, texcoord);
 
     if(depth == 1.0){
-      color = texture(colortex3, texcoord);
-      color.rgb = getSky(color, normalize(eyePlayerPos), true);
       return;
     }
 
@@ -151,26 +148,9 @@
       gbufferData.material.sss = 1.0;
     }
 
-
-    float parallaxShadow = texture(colortex10, texcoord).a;
-
-    if(DH_MASK){
-      parallaxShadow = 1.0;
-    }
-    sunlight = SUNLIGHT_STRENGTH * sunlightColor;
-    sunlight *= getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
-    
-
-    color.rgb = gbufferData.material.albedo;
-
-    #ifdef GLOBAL_ILLUMINATION
-    vec3 GI = texture(colortex10, texcoord * GI_RESOLUTION).rgb;
-    #else
-    vec3 GI = vec3(0.0);
-    #endif
+    vec3 sunlight = texture(colortex8, texcoord).rgb;
 
 
-    color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI, skyLightColor);
-    // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
+    color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
   }
 #endif

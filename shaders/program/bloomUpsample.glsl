@@ -57,7 +57,6 @@
     // bloomColor.rgb = vec3(tileCoord.xy, 0.0);
     #else
     vec2 tileCoord = texcoord / 2;
-    show(texture(colortex3, texcoord));
     #endif
     bloomColor.rgb += upSample(colortex3, tileCoord);  
   }

@@ -40,6 +40,12 @@
   uniform float near;
   uniform float far;
 
+  uniform int isEyeInWater;
+  uniform vec3 fogColor;
+  uniform float fogDensity;
+  uniform float fogStart;
+  uniform float fogEnd;
+
   in vec2 texcoord;
 
   /* DRAWBUFFERS:0 */
@@ -60,5 +66,9 @@
     color = texture(colortex0, texcoord);
 
     color.rgb = color.rgb * fogData.a + fogData.rgb;
+
+    // if(isEyeInWater > 1){
+      color.rgb = mix(color.rgb, fogColor, smoothstep(fogStart, fogEnd, length(viewPos)));
+    // }
   }
 #endif

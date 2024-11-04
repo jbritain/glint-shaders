@@ -116,6 +116,7 @@
   #include "/lib/util/noise.glsl"
   #include "/lib/util/dh.glsl"
   #include "/lib/lighting/SSGI.glsl"
+  #include "/lib/util/blur.glsl"
 
   void main() {
     #ifdef GLOBAL_ILLUMINATION
@@ -124,7 +125,7 @@
     if(clamp01(texcoord) != texcoord){
       return;
     }
-    float depth = texture(depthtex2, texcoord).r;
+    float depth = texture(depthtex0, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);
     vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
@@ -141,12 +142,19 @@
     vec3 previousFeetPlayerPos = feetPlayerPos + (cameraPosition - previousCameraPosition);
     vec3 previousViewPos = (gbufferPreviousModelView * vec4(previousFeetPlayerPos, 1.0)).xyz;
     vec3 previousScreenPos = previousViewSpaceToPreviousScreenSpace(previousViewPos);
+    previousScreenPos.z = texture(colortex4, texcoord).a;
+
+    float rejectPreviousFrame = float(abs(length(viewPos) - length(screenSpaceToViewSpace(vec3(previousScreenPos.xy, texture(colortex4, previousScreenPos.xy).a)))) > 0.1);
+    rejectPreviousFrame += float(clamp01(previousScreenPos.xy) != previousScreenPos.xy);
+
     // previousScreenPos.z = texture(colortex4, texcoord).a;
     // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
     // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
 
-    vec3 GI = SSGI(viewPos, gbufferData.faceNormal);
-    outGI.rgb = GI;
+    vec3 previousGI = blur1(colortex10, previousScreenPos.xy, vec2(viewWidth, viewHeight)).rgb;
+
+    outGI.rgb = mix(previousGI, SSGI(viewPos, gbufferData.faceNormal), clamp01(0.1 + rejectPreviousFrame));
+
 
     
     // outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
