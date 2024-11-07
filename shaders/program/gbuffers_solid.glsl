@@ -182,6 +182,7 @@
       color.rgb = mix(color.rgb, vec3(0.0), porosity * rainingFactor);
       specularData.g = specularData.g <= 229.0/255.0 ? mix(specularData.g, 0.02, wetnessFactor) : specularData.g;
       specularData.r = clamp01(specularData.r + wetnessFactor);
+      mappedNormal = tbnMatrix[2];
     }
     #else
     vec4 specularData = vec4(0.0);

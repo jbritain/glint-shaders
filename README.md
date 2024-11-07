@@ -19,7 +19,6 @@ A work in progress shaderpack for Minecraft.
 - iPBR
 - Puddles
 - Ambient Occlusion
-- Complete LabPBR support - porosity & texture AO
 - Motion blur
 - Skyboxes/atmospherics for other dimensions
 - Floodfill
@@ -29,7 +28,6 @@ A work in progress shaderpack for Minecraft.
 ## Known Issues
 - Reflections on hand broken
 - Ghosting on clouds when player moves
-- Volumetric fog has artifacts
 - Occasionally reflections turn completely black until shader reload
 - Obvious repeating pattern in cloud shapes
 - Artifacts in atmospheric fog near the horizon

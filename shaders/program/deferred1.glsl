@@ -164,8 +164,8 @@
     color.rgb = gbufferData.material.albedo;
 
     #ifdef GLOBAL_ILLUMINATION
-    // vec3 GI = bilateralFilterDepth(colortex10, depthtex0, texcoord, 10, 10, GI_RESOLUTION, 0).rgb;
-    vec3 GI = texture(colortex10, texcoord).rgb;
+    vec3 GI = bilateralFilterDepth(colortex10, depthtex0, texcoord, 5, 10, GI_RESOLUTION, 0).rgb;
+    // vec3 GI = texture(colortex10, texcoord).rgb;
     #else
     vec3 GI = vec3(0.0);
     #endif

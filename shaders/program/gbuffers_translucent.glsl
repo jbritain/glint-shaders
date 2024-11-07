@@ -66,9 +66,9 @@
 
     if(materialIsWater(materialID)){
       float waveMultiplier = 1.0 - smoothstep(-32.0, 32.0, at_midBlock.y);
-      if(waveMultiplier > 0.95){
-        waveMultiplier = 0.0;
-      }
+      // if(waveMultiplier > 0.95){
+      //   waveMultiplier = 0.0;
+      // }
       worldPos.y += (getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5) * waveMultiplier;
     }
 

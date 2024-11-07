@@ -98,11 +98,8 @@
 
     for (int i = 0; i < kernelSampleCount; i++){
       vec2 offset = kernel[i] * sampleRadius;
-      if(clamp01(texcoord + offset) != texcoord + offset){
-        offset = vec2(0.0);
-      }
-      vec3 bokehSample = texture(colortex0, texcoord + offset).rgb;
-      float sampleCoC = (texture(colortex1, texcoord + offset).a - 0.5) / 0.5;
+      vec3 bokehSample = texture(colortex0, clamp01(texcoord + offset)).rgb;
+      float sampleCoC = (texture(colortex1, clamp01(texcoord + offset)).a - 0.5) / 0.5;
 
       if(sign(sampleCoC) == sign(CoC)){
         bokeh.rgb += bokehSample;

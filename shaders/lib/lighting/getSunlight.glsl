@@ -132,9 +132,7 @@ float NoLSafe(vec3 n){
   return clamp01(dot(n, normalize(shadowLightPosition)));
 }
 
-float getBlockerDistance(vec4 shadowClipPos, vec3 normal, float jitter){
-	float range = BLOCKER_SEARCH_RADIUS;
-
+float getBlockerDistance(vec4 shadowClipPos, vec3 normal, float jitter, float range){
 	vec3 receiverShadowScreenPos = getShadowScreenPos(shadowClipPos, normal).xyz;
 	float receiverDepth = receiverShadowScreenPos.z;
 
@@ -210,10 +208,13 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	#ifdef SHADOWS
 
 
-		vec3 bias = getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
+		vec3 bias = getShadowBias(feetPlayerPos, mat3(gbufferModelViewInverse) * faceNormal, faceNoL, lightmap.y);
 		vec4 shadowClipPos = getShadowClipPos(feetPlayerPos + bias);
 
-		float distFade = smoothstep(0.5, 1.0, max3(abs(shadowClipPos).xyz));
+		float distFade = max(
+			max2(abs(shadowClipPos.xy)),
+			mix(1.0, 0.55, smoothstep(0.33, 0.8, lightVector.y)) * dot(shadowClipPos.xz, shadowClipPos.xz) * rcp(pow2(shadowDistance))
+		);
 
 		bool inShadowDistance = distFade < 1.0;
 
@@ -223,7 +224,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		if(inShadowDistance){
 			float blockerDistance = 0.0;
 			float penumbraWidth = 0.0;
-			blockerDistance = getBlockerDistance(shadowClipPos, faceNormal, interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
+			blockerDistance = getBlockerDistance(shadowClipPos, faceNormal, interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter + 1), BLOCKER_SEARCH_RADIUS + SSS);
 			penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
 
 			if(blockerDistance >= 0.9999){

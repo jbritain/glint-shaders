@@ -136,13 +136,15 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
 
 
   vec3 reflectedColor = vec3(0.0);
-  hit = rayIntersects(viewOrigin, viewRay, roughness < 0.01 ? 16 : 8, jitter, true, reflectionPos, true);
+  hit = rayIntersects(viewOrigin, viewRay, roughness < 0.01 ? 4 : 8, jitter, true, reflectionPos, true);
 
   if(texelFetch(colortex4, ivec2(reflectionPos.xy * vec2(viewWidth, viewHeight)), 0).a >= 1.0){
     hit = false;
+    fadeFactor = 1.0;
+    return vec3(0.0);
   }
 
-  if(roughness == 0.0 && hit){
+  if(roughness == 0.0){
     reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
   } else {
     reflectedColor = textureLod(colortex4, reflectionPos.xy, mix(2, 8, roughness)).rgb;
@@ -162,7 +164,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness < 0.01){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter);
+    float jitter = blueNoise(texcoord).x;
     bool hit;
     float fadeFactor;
 

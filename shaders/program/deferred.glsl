@@ -151,9 +151,9 @@
     // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
     // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
 
-    vec3 previousGI = blur1(colortex10, previousScreenPos.xy, vec2(viewWidth, viewHeight)).rgb;
+    vec3 previousGI = texture(colortex10, previousScreenPos.xy).rgb;
 
-    outGI.rgb = mix(previousGI, SSGI(viewPos, gbufferData.faceNormal), clamp01(0.1 + rejectPreviousFrame));
+    outGI.rgb = mix(previousGI, SSGI(viewPos, gbufferData.mappedNormal), clamp01(0.1 + rejectPreviousFrame));
 
 
     

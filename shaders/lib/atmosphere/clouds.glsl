@@ -22,16 +22,16 @@
 uniform sampler2D vanillacloudtex;
 
 #define CUMULUS_DENSITY 0.1
-float CUMULUS_COVERAGE = mix(0.08, 0.21, wetness * 0.5 + thunderStrength * 0.5);
+float CUMULUS_COVERAGE = mix(0.08, 0.21, wetness * 0.5 + thunderStrength * 0.25);
 #define CUMULUS_LOWER_HEIGHT 500.0
-#define CUMULUS_UPPER_HEIGHT 700.0
+#define CUMULUS_UPPER_HEIGHT 900.0
 #define CUMULUS_SAMPLES 15
 #define CUMULUS_SUBSAMPLES 6
 
 #define ALTOCUMULUS_LOWER_HEIGHT 1500.0
 #define ALTOCUMULUS_UPPER_HEIGHT 1700.0
 #define ALTOCUMULUS_DENSITY 0.02
-float ALTOCUMULUS_COVERAGE = mix(0.08, 0.17, wetness * 0.5 + thunderStrength * 0.5);
+float ALTOCUMULUS_COVERAGE = mix(0.08, 0.17, wetness * 0.5 + thunderStrength * 0.25);
 #define ALTOCUMULUS_SAMPLES 6
 #define ALTOCUMULUS_SUBSAMPLES 4
 
@@ -49,8 +49,8 @@ float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
 #define VANILLA_CLOUD_SUBSAMPLES 4
 
 #define CLOUD_SHAPE_SCALE 2342
-#define CLOUD_SHAPE_SCALE_2 7573
-#define CLOUD_EROSION_SCALE 234.426
+#define CLOUD_SHAPE_SCALE_2 7573 / 2.0
+#define CLOUD_EROSION_SCALE 234.426 / 1.5
 
 #define CLOUD_DISTANCE 100000.0
 
@@ -138,9 +138,10 @@ float getCloudDensity(vec3 pos){
   float density = clamp01(shapeDensity - (1.0 - coverage));
   density = mix(density, clamp01(shapeDensity2 - (1.0 - coverage) - 0.05), 0.3);
   density *= 10;
+  density *= 1.0 + thunderStrength;
 
-  if(density == 0.0){
-    return density;
+  if(density < 0.01){
+    return 0.0;
   }
 
   float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;

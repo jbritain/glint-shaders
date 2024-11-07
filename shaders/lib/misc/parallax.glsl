@@ -39,13 +39,14 @@ vec2 getParallaxTexcoord(vec2 texcoord, vec3 viewPos, mat3 tbnMatrix, out vec3 p
 
   vec3 rayStep = vec3(viewDir.xy * rcp(-viewDir.z) * POM_HEIGHT, 1.0) * layerDepth;
   vec3 pos = vec3(atlasToLocal(texcoord), 0.0);
-  // pos += rayStep * jitter;
 
   float depth = getDepth(texcoord, dx, dy);
   if(depth < rcp(255.0)){
     previousPos = pos;
     return texcoord;
   }
+
+  // pos += rayStep * jitter;
 
   while(depth - pos.z > rcp(255.0)){
     previousPos = pos;

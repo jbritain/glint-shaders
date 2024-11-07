@@ -45,13 +45,18 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
 
     vec3 transmittance = exp(-density * waterExtinction);
 
-    vec3 bias = getShadowBias(rayPos, lightVector, 1.0);
     vec4 shadowClipPos = getShadowClipPos(rayPos);
+
+    float distFade = max(
+			max2(abs(shadowClipPos.xy)),
+			mix(1.0, 0.55, smoothstep(0.33, 0.8, lightVector.y)) * dot(shadowClipPos.xz, shadowClipPos.xz) * rcp(pow2(shadowDistance))
+		);
 
     float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));
     vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * waterExtinction);
 
     vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1)) * sunlightColor + skyLightColor * skylightTransmittance * EBS.y;
+    radiance = mix(radiance, skylightTransmittance * sunlightColor, distFade);
 
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / waterExtinction;
 

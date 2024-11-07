@@ -12,6 +12,10 @@
 #ifndef SHADOW_BIAS_INCLUDE
 #define SHADOW_BIAS_INCLUDE
 
+float quarticLength(vec2 pos){
+	return sqrt(sqrt(pow4(pos.x) + pow4(pos.y)));
+}
+
 float getShadowDistance(float depth) {
 	depth = depth * 2.0 - 1.0;
 	depth /= 0.5; // for distortion
@@ -19,10 +23,8 @@ float getShadowDistance(float depth) {
 	return shadowHomPos.z / shadowHomPos.w;
 }
 
-// distortion from photon
-// https://github.com/sixthsurge/photon/blob/090b3b5d760087b090d8783e6810585fb6e3e44e/shaders/include/light/distortion.glsl
 vec3 distort(vec3 pos) {
-	float factor = sqrt(sqrt(pow4(pos.x) + pow4(pos.y))) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
+	float factor = quarticLength(pos.xy) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
 	return vec3(pos.xy / factor, pos.z * 0.5);
 }
 
@@ -50,9 +52,10 @@ vec4 getUndistortedShadowScreenPos(vec4 shadowClipPos, vec3 normal){
 }
 
 // bias from complementary
-vec3 getShadowBias(vec3 playerPos, vec3 worldNormal, float NoL){
+vec3 getShadowBias(vec3 playerPos, vec3 worldNormal, float NoL, float skyLightmap){
 	vec3 bias = 0.25 * worldNormal * clamp01(0.12 + 0.01 * length(playerPos) * (2.0 - clamp01(NoL)));
 
-	return bias;
+	vec3 edgeFactor = 0.1 - 0.2 * fract(playerPos + cameraPosition + worldNormal * 0.01);
+	return bias + edgeFactor * clamp01(1.0 - skyLightmap);
 }
 #endif

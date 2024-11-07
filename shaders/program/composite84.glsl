@@ -47,10 +47,10 @@
     // }
 
     vec3 usample = vec3(0.0);
-    usample += texture(sourceTexture, coord + offset * vec2(1.0)).rgb;
-    usample += texture(sourceTexture, coord + offset * vec2(1.0, -1.0)).rgb;
-    usample += texture(sourceTexture, coord + offset * vec2(-1.0)).rgb;
-    usample += texture(sourceTexture, coord + offset * vec2(-1.0, 1.0)).rgb;
+    usample += texture(sourceTexture, clamp01(coord + offset * vec2(1.0))).rgb;
+    usample += texture(sourceTexture, clamp01(coord + offset * vec2(1.0, -1.0))).rgb;
+    usample += texture(sourceTexture, clamp01(coord + offset * vec2(-1.0))).rgb;
+    usample += texture(sourceTexture, clamp01(coord + offset * vec2(-1.0, 1.0))).rgb;
 
     usample /= 4.0;
 
@@ -69,6 +69,6 @@
 
 
     float DoFStrength = smoothstep(0.1, 1.0, abs(CoC));
-    color.rgb = mix(color.rgb, bokeh.rgb, DoFStrength);
+    color.rgb = mix(color.rgb, bokeh.rgb, clamp01(DoFStrength));
   }
 #endif

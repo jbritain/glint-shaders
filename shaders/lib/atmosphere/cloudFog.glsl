@@ -40,7 +40,7 @@ float getFogDensity(vec3 pos){
   }
   fogFactor += 0.2;
   
-  fogFactor += wetness * 0.5;
+  fogFactor += wetness;
   
   
   float heightFactor = 1.0 - pow2(smoothstep(FOG_LOWER_HEIGHT, FOG_UPPER_HEIGHT, pos.y));
