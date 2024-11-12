@@ -39,7 +39,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define SKYLIGHT_STRENGTH 1.0
 #define AMBIENT_STRENGTH 0.001
 #define SUNLIGHT_STRENGTH 1.0
-#define BLOCKLIGHT_STRENGTH 0.1
+#define BLOCKLIGHT_STRENGTH 1.0
 
 #define SSR
 #define SSR_FADE
@@ -47,7 +47,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define ROUGH_REFLECTION_THRESHOLD 0.1 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 // #define BLUR_SPECULAR
 
-#define TORCH_COLOR vec3(0.8, 0.6, 0.5)
+#define BLOCKLIGHT_COLOR pow(vec3(255, 152, 54) / 255.0, vec3(2.2))
 
 #define SHADOWS
 #define TRANSPARENT_SHADOWS
@@ -116,7 +116,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define AUTO_EXPOSURE
 #endif
 
-#define GLOBAL_ILLUMINATION
+// #define GLOBAL_ILLUMINATION
 #define GI_SAMPLES 1 // [1 2 4 8 16 32]
 #define GI_RESOLUTION 1.0 // [0.25 0.5 0.75 1.0]
 
