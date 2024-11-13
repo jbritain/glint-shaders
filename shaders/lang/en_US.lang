@@ -326,6 +326,9 @@ value.TILT_ANGLE.165.0=165°
 value.TILT_ANGLE.170.0=170°
 value.TILT_ANGLE.175.0=175°
 
+option.DIRECTIONAL_LIGHTMAPPING=Directional Lightmapping
+option.DIRECTIONAL_LIGHTMAPPING.comment=Approximates directional lighting from block light sources and the sky.
+
 option.WATERMARK=Show Watermark
 
 option.GLINT_SHADERS=Glint Shaders

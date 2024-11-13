@@ -120,6 +120,7 @@
   #include "/lib/misc/parallax.glsl"
   #include "/lib/util/noise.glsl"
   #include "/lib/water/puddles.glsl"
+  #include "/lib/lighting/directionalLightmap.glsl"
 
   vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -161,13 +162,13 @@
       discard;
     }
 
-    vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
-
     #ifdef NORMAL_MAPS
       vec3 mappedNormal = getMappedNormal(texcoord);
     #else
       vec3 mappedNormal = tbnMatrix[2];
     #endif
+
+    vec2 lightmap = (lmcoord - 1.0/32.0) * 16.0/15.0;
 
     #ifdef SPECULAR_MAPS
     vec4 specularData = texture(specular, texcoord);
@@ -186,6 +187,10 @@
     }
     #else
     vec4 specularData = vec4(0.0);
+    #endif
+
+    #ifdef DIRECTIONAL_LIGHTMAPPING
+    applyDirectionalLightmap(lightmap, viewPos, mappedNormal, tbnMatrix, specularData.b > 0.25 ? (specularData.b - 0.25) * 4.0/3.0 : 0.0);
     #endif
 
 

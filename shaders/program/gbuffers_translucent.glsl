@@ -171,6 +171,7 @@
   #include "/lib/atmosphere/common.glsl"
   #include "/lib/misc/parallax.glsl"
   #include "/lib/water/waveNormals.glsl"
+  #include "/lib/lighting/directionalLightmap.glsl"
 
   vec3 getMappedNormal(vec2 texcoord){
     vec3 mappedNormal = texture(normals, texcoord).rgb;
@@ -256,12 +257,6 @@
       #endif
     }
 
-    // encode gbuffer data
-    outData1.x = pack2x8F(color.r, color.g);
-    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
-    outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
-    outData1.w = pack2x8F(lightmap);
-
     #ifdef SPECULAR_MAPS
     vec4 specularData = texture(specular, texcoord);
     #else
@@ -284,6 +279,17 @@
     #ifdef gbuffers_spidereyes
     material.emission = 1.0;
     #endif
+
+    #ifdef DIRECTIONAL_LIGHTMAPPING
+    applyDirectionalLightmap(lightmap, viewPos, mappedNormal, tbnMatrix, material.sss);
+    #endif
+
+
+    // encode gbuffer data
+    outData1.x = pack2x8F(color.r, color.g);
+    outData1.y = pack2x8F(color.b, clamp01(float(materialID - 10000) * rcp(255.0)));
+    outData1.z = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * faceNormal));
+    outData1.w = pack2x8F(lightmap);
 
     outData2.x = pack2x8F(encodeNormal(mat3(gbufferModelViewInverse) * mappedNormal));
     outData2.y = pack2x8F(specularData.rg);
