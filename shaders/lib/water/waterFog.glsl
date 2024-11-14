@@ -5,6 +5,7 @@
 #include "/lib/util/noise.glsl"
 #include "/lib/lighting/getSunlight.glsl"
 #include "/lib/atmosphere/common.glsl"
+#include "/lib/water/waveNormals.glsl"
 
 #ifndef VOLUMETRIC_WATER
 vec3 getWaterFog(vec3 color, vec3 frontPos, vec3 backPos, vec3 sunlightColor, vec3 skyLightColor){
@@ -46,6 +47,33 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     vec3 transmittance = exp(-density * waterExtinction);
 
     vec4 shadowClipPos = getShadowClipPos(rayPos);
+    vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos).xyz;
+
+    float sunlight = step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r);
+
+    int blockerID = getBlockerID(shadowScreenPos);
+
+    vec3 radiance;
+
+    if(materialIsWater(blockerID) && sunlight == 1.0){
+      float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
+		  float blockerDistance = blockerDistanceRaw * 255 * 2;
+      vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);
+      radiance = extinction * sunlightColor;
+
+      // vec3 blockerPosition = rayPos + cameraPosition + lightVector * blockerDistance;
+      // vec3 waveNormal = waveNormal(blockerPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
+
+      // vec3 refractedLightVector = refract(lightVector, waveNormal, 1.0/1.33);
+      
+      // float oldArea = length(dFdx(blockerPosition)) * length(dFdy(blockerPosition));
+      // vec3 newPos = blockerPosition + refractedLightVector * blockerDistance;
+      // float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
+
+      // radiance *= (1.0 - oldArea / newArea);
+    } else {
+      radiance = vec3(0.0);
+    }
 
     float distFade = max(
 			max2(abs(shadowClipPos.xy)),
@@ -55,8 +83,10 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));
     vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * waterExtinction);
 
-    vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1)) * sunlightColor + skyLightColor * skylightTransmittance * EBS.y;
+    //vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1)) * sunlightColor;
+    
     radiance = mix(radiance, skylightTransmittance * sunlightColor, distFade);
+    radiance += skyLightColor * skylightTransmittance * EBS.y;
 
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / waterExtinction;
 

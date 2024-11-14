@@ -55,13 +55,13 @@ bool rayIntersects(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bo
 
   rayPos = viewSpaceToScreenSpace(viewOrigin);
   if(previousFrame){
-    rayPos = reproject(rayPos);
+    rayPos = reprojectScreen(rayPos);
   }
 
   vec3 rayDir;
   rayDir = viewSpaceToScreenSpace(viewOrigin + viewDir);
   if(previousFrame){
-    rayDir = reproject(rayDir);
+    rayDir = reprojectScreen(rayDir);
   }
   
   rayDir -= rayPos;

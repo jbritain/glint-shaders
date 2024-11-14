@@ -52,6 +52,7 @@
   uniform sampler2D colortex9;
 
   uniform sampler2D shadowtex0;
+  uniform sampler2D shadowtex1;
   uniform sampler2DShadow shadowtex0HW;
   uniform sampler2DShadow shadowtex1HW;
   uniform sampler2D shadowcolor0;
@@ -97,6 +98,8 @@
 
   uniform bool hasSkylight;
   uniform vec3 fogColor;
+
+  uniform float frameTimeCounter;
 
   in vec2 texcoord;
 

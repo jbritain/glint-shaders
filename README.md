@@ -17,7 +17,6 @@ A work in progress shaderpack for Minecraft.
 - Cloud shape overhaul
 - Biome based weather
 - iPBR
-- Puddles
 - Ambient Occlusion
 - Motion blur
 - Skyboxes/atmospherics for other dimensions
@@ -33,6 +32,8 @@ A work in progress shaderpack for Minecraft.
 - Artifacts in atmospheric fog near the horizon
 - Water waves broken on AMD
 - Artifacts around edge of screen with DoF enabled
+- GI noisy and bad
+- Weird noise in caustics
 - Runs terribly
 
 ## Acknowledgements

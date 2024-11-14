@@ -37,8 +37,7 @@ vec3 previousScreenSpaceToPreviousViewSpace(vec3 screenPosition){
 	return viewPosition;
 }
 
-vec3 reproject(vec3 screenPos){
-
+vec3 reprojectScreen(vec3 screenPos){
   vec3 viewPos = screenSpaceToViewSpace(screenPos);
   vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
   feetPlayerPos += cameraPosition;
@@ -47,6 +46,14 @@ vec3 reproject(vec3 screenPos){
   vec3 previousScreenPos = previousViewSpaceToPreviousScreenSpace(previousViewPos);
 
   return previousScreenPos;
+}
+
+vec3 reprojectView(vec3 viewPos){
+  vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
+  feetPlayerPos += cameraPosition;
+  feetPlayerPos -= previousCameraPosition;
+  vec3 previousViewPos = (gbufferPreviousModelView * vec4(feetPlayerPos, 1.0)).xyz;
+  return viewPos;
 }
 
 #endif

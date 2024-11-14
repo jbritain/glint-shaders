@@ -118,7 +118,7 @@
     vec3 cloudScatter = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor, cloudTransmittance);
 
     vec3 screenPos = vec3(texcoord, depth);
-    vec3 previousScreenPos = reproject(screenPos);
+    vec3 previousScreenPos = reprojectScreen(screenPos);
     previousScreenPos.z = texture(colortex4, previousScreenPos.xy).a;
 
     if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && depth == previousScreenPos.z && lightningBoltPosition == vec4(0.0)){

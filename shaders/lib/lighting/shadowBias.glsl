@@ -34,7 +34,7 @@ vec4 getShadowClipPos(vec3 playerPos){
 	return shadowClipPos;
 }
 
-vec3 getShadowScreenPos(vec4 shadowClipPos, vec3 normal){
+vec3 getShadowScreenPos(vec4 shadowClipPos){
 	vec3 shadowScreenPos = distort(shadowClipPos.xyz); //apply shadow distortion
   shadowScreenPos.xyz = shadowScreenPos.xyz * 0.5 + 0.5; //convert from -1 ~ +1 to 0 ~ 1
 
@@ -42,7 +42,7 @@ vec3 getShadowScreenPos(vec4 shadowClipPos, vec3 normal){
 	return shadowScreenPos;
 }
 
-vec4 getUndistortedShadowScreenPos(vec4 shadowClipPos, vec3 normal){
+vec4 getUndistortedShadowScreenPos(vec4 shadowClipPos){
 
 	vec4 shadowScreenPos = shadowClipPos; //convert to shadow ndc space.
   shadowScreenPos.xyz = shadowScreenPos.xyz * 0.5 + 0.5; //convert from -1 ~ +1 to 0 ~ 1

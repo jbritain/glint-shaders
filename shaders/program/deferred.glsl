@@ -139,12 +139,15 @@
     GbufferData gbufferData;
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
 
-    vec3 previousFeetPlayerPos = feetPlayerPos + (cameraPosition - previousCameraPosition);
-    vec3 previousViewPos = (gbufferPreviousModelView * vec4(previousFeetPlayerPos, 1.0)).xyz;
-    vec3 previousScreenPos = previousViewSpaceToPreviousScreenSpace(previousViewPos);
-    previousScreenPos.z = texture(colortex4, texcoord).a;
+    vec3 reprojectedScreenPos = reprojectScreen(vec3(texcoord, depth));
+    vec3 previousScreenPos = vec3(reprojectedScreenPos.xy, texture(colortex4, texcoord).a);
 
-    float rejectPreviousFrame = float(abs(length(viewPos) - length(screenSpaceToViewSpace(vec3(previousScreenPos.xy, texture(colortex4, previousScreenPos.xy).a)))) > 0.1);
+    vec3 reprojectedViewPos = previousScreenSpaceToPreviousViewSpace(reprojectedScreenPos);
+    vec3 previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
+
+    show(distance(reprojectedViewPos, previousViewPos) > 0.5);
+
+    float rejectPreviousFrame = float(distance(reprojectedViewPos, previousViewPos) > 0.1);
     rejectPreviousFrame += float(clamp01(previousScreenPos.xy) != previousScreenPos.xy);
 
     // previousScreenPos.z = texture(colortex4, texcoord).a;

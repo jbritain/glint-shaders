@@ -55,6 +55,7 @@ vec3 fullSway(vec3 pos){ // leaves, mainly
 }
 
 vec3 getSway(int materialID, vec3 pos, vec3 midblock){
+  return pos;
   switch(materialSwayType(materialID).value){
     case 1:
       return upperSway(pos, midblock);

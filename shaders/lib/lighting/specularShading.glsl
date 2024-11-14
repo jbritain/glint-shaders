@@ -195,18 +195,12 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
       if(hit){
         reflectedColor.rgb += reflection;
       } else {
-        skyWeight += fadeFactor;
-        reflectedColor.rgb += reflection * (1.0 - fadeFactor);
+        vec3 worldDir = mat3(gbufferModelViewInverse) * reflectedRay;
+        vec2 environmentUV = mapSphere(worldDir);
+
+        reflectedColor.rgb += texture(colortex9, environmentUV).rgb;
       }
     }
-
-    if(skyWeight > 0){
-      vec3 worldDir = mat3(gbufferModelViewInverse) * reflect(normalize(viewPos), normal);
-      vec2 environmentUV = mapSphere(worldDir);
-
-      reflectedColor.rgb += textureLod(colortex9, environmentUV, log2(material.roughness * 256 * 2)).rgb * lightmap.y * skyWeight;
-    }
-
     reflectedColor /= SSR_SAMPLES;
   }
 

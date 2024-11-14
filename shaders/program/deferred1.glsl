@@ -132,9 +132,7 @@
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
-    
-
-
+    vec3 feetPlayerPos = eyePlayerPos + gbufferModelViewInverse[3].xyz;
     
     tex3 = vec4(0.0); // clear buffer in preparation for translucents to write to it
 
@@ -158,14 +156,19 @@
       parallaxShadow = 1.0;
     }
     sunlight = SUNLIGHT_STRENGTH * sunlightColor;
-    sunlight *= getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
+
+    #ifdef CUSTOM_WATER
+    sunlight *= getCaustics(feetPlayerPos);
+    #endif
+
+    sunlight *= getSunlight(feetPlayerPos, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
     
 
     color.rgb = gbufferData.material.albedo;
 
     #ifdef GLOBAL_ILLUMINATION
-    vec3 GI = bilateralFilterDepth(colortex10, depthtex0, texcoord, 5, 10, GI_RESOLUTION, 0).rgb;
-    // vec3 GI = texture(colortex10, texcoord).rgb;
+    // vec3 GI = bilateralFilterDepth(colortex10, depthtex0, texcoord, 5, 10, GI_RESOLUTION, 0).rgb;
+    vec3 GI = texture(colortex10, texcoord).rgb;
     #else
     vec3 GI = vec3(0.0);
     #endif

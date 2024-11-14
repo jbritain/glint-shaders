@@ -63,7 +63,8 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
   vec3 b = rayPos;
 
   vec4 shadowClipPos = getShadowClipPos(rayPos - cameraPosition);
-  vec3 sunlight = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, jitter);
+  vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
+  float sunlight = step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r);
 
   if(sunlight == vec3(0.0)){
     return vec3(0.0);

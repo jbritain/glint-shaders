@@ -22,6 +22,8 @@ const int colortex11Format = RGBA16F;|| SMAA
 
 */
 
+const bool generateShadowMipmap = true;
+
 const float wetnessHalflife = 50.0;
 const float centerDepthHalflife = 5.0;
 
@@ -57,7 +59,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define TRANSPARENT_SHADOWS
 #define SHADOW_DISTORTION 0.85
 #define MAX_PENUMBRA_WIDTH 4.0
-#define MIN_PENUMBRA_WIDTH 0.1
+#define MIN_PENUMBRA_WIDTH 0.0
 #define BLOCKER_SEARCH_SAMPLES 8
 #define BLOCKER_SEARCH_RADIUS 0.5
 #define SHADOW_SAMPLES 8 // [1 2 4 8 16 32 64]
