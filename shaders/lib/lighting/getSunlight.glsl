@@ -218,7 +218,7 @@ float getCaustics(vec3 feetPlayerPos){
 		return 1.0;
 	}
 
-	return oldArea / newArea;
+	return clamp01(oldArea / newArea);
 }
 
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
