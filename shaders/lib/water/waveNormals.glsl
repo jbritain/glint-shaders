@@ -22,7 +22,7 @@ vec2 wavedx(vec2 position, vec2 direction, float frequency, float timeshift) {
 }
 
 // Calculates waves by summing octaves of various waves with various parameters
-float getwaves(vec2 position, int iterations) {
+float waveHeight(vec2 position) {
   float wavePhaseShift = length(position) * 0.1; // this is to avoid every octave having exactly the same phase everywhere
   float iter = 0.0; // this will help generating well distributed wave directions
   float frequency = 1.0; // frequency of the wave, this will change every iteration
@@ -30,7 +30,7 @@ float getwaves(vec2 position, int iterations) {
   float weight = 1.0;// weight in final sum for the wave, this will change every iteration
   float sumOfValues = 0.0; // will store final sum of values
   float sumOfWeights = 0.0; // will store final sum of weights
-  for(int i=0; i < iterations; i++) {
+  for(int i=0; i < 16; i++) {
     // generate some wave direction that looks kind of random
     vec2 p = vec2(sin(iter), cos(iter));
     
@@ -58,14 +58,14 @@ float getwaves(vec2 position, int iterations) {
 
 // Calculate normal at point by calculating the height at the pos and 2 additional points very close to pos
 // returned value is in world space
-vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float e, float depth) {
-  vec2 ex = vec2(e, 0);
-  float H = getwaves(pos.xy, ITERATIONS_NORMAL) * depth;
+vec3 waveNormal(vec2 pos, vec3 worldFaceNormal) {
+  vec2 ex = vec2(WAVE_E, 0);
+  float H = waveHeight(pos.xy) * WAVE_DEPTH;
   vec3 a = vec3(pos.x, H, pos.y);
   vec3 waveNormal = normalize(
     cross(
-      a - vec3(pos.x - e, getwaves(pos.xy - ex.xy, ITERATIONS_NORMAL) * depth, pos.y), 
-      a - vec3(pos.x, getwaves(pos.xy + ex.yx, ITERATIONS_NORMAL) * depth, pos.y + e)
+      a - vec3(pos.x - WAVE_E, waveHeight(pos.xy - ex.xy) * WAVE_DEPTH, pos.y), 
+      a - vec3(pos.x, waveHeight(pos.xy + ex.yx) * WAVE_DEPTH, pos.y + WAVE_E)
     )
   );
 

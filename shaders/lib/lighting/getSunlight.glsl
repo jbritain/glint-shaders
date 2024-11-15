@@ -196,9 +196,22 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 }
 
 float getCaustics(vec3 feetPlayerPos){
+	// lil dithered fadeout on caustics near edges where they disappear
+
+	float randomAngle = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) * 2.0 * PI;
+	vec4 blockerIDOffset = vec4(vec2(sin(randomAngle), cos(randomAngle)) * 0.2 * shadowProjection[0][0], 0.0, 0.0);
+
+
 	vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
-	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
+	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos + blockerIDOffset);
+
 	int blockerID = getBlockerID(shadowScreenPos);
+
+	if (!materialIsWater(blockerID)){
+		return 1.0;
+	}
+
+	shadowScreenPos = getShadowScreenPos(shadowClipPos);
 
 	float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 	float blockerDistance = blockerDistanceRaw * 255 * 2;
@@ -206,17 +219,14 @@ float getCaustics(vec3 feetPlayerPos){
 	// float blockerDistance = max0(63 - (feetPlayerPos.y + cameraPosition.y));
 
 	vec3 blockerPos = feetPlayerPos + lightVector * blockerDistance;
-	vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
+	vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
 	vec3 refracted = refract(lightVector, waveNormal, rcp(1.33));
 
 	vec3 oldPos = blockerPos;
 	vec3 newPos = blockerPos + refracted * blockerDistance;
+
 	float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
 	float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
-
-	if (!materialIsWater(blockerID)){
-		return 1.0;
-	}
 
 	return clamp01(oldArea / newArea);
 }

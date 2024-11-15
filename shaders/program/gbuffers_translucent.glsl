@@ -30,6 +30,7 @@
   uniform int worldTime;
   uniform int worldDay;
   uniform float frameTimeCounter;
+  uniform sampler2D noisetex;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -69,7 +70,7 @@
       // if(waveMultiplier > 0.95){
       //   waveMultiplier = 0.0;
       // }
-      worldPos.y += (getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5) * waveMultiplier;
+      worldPos.y += waveHeight(worldPos.xz) * waveMultiplier - 0.5;
     }
 
     feetPlayerPos = worldPos - cameraPosition;
@@ -91,6 +92,7 @@
   uniform sampler2D gtexture;
   uniform sampler2D normals;
   uniform sampler2D specular;
+  uniform sampler2D noisetex;
 
   uniform vec4 entityColor;
 
@@ -253,7 +255,7 @@
       color.a = smoothstep(0.8 * far, far, length(viewPos));
       #endif
 
-      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal, WAVE_E, WAVE_DEPTH);
+      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
       #endif
     }
 

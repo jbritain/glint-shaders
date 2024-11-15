@@ -16,7 +16,7 @@ float quarticLength(vec2 pos){
 	return sqrt(sqrt(pow4(pos.x) + pow4(pos.y)));
 }
 
-float getShadowDistance(float depth) {
+float getShadowDistanceZ(float depth) {
 	depth = depth * 2.0 - 1.0;
 	depth /= 0.5; // for distortion
 	vec4 shadowHomPos = shadowProjectionInverse * vec4(0.0, 0.0, depth, 1.0);

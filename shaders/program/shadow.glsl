@@ -31,6 +31,7 @@
   uniform vec3 cameraPosition;
   uniform float frameTimeCounter;
   uniform bool hasSkylight;
+  uniform sampler2D noisetex;
 
   out vec2 lmcoord;
   out vec2 texcoord;
@@ -65,7 +66,7 @@
     worldPos = getSway(materialID, worldPos, at_midBlock);
 
     if(materialIsWater(materialID)){
-      worldPos.y += getwaves(worldPos.xz, ITERATIONS_NORMAL) - 0.5;
+      worldPos.y += waveHeight(worldPos.xz) - 0.5;
     }
 
     feetPlayerPos = worldPos - cameraPosition;
@@ -91,6 +92,7 @@
 
   uniform vec3 cameraPosition;
   uniform vec3 shadowLightPosition;
+  uniform sampler2D noisetex;
 
   uniform mat4 gbufferModelViewInverse;
   uniform mat4 shadowProjectionInverse;
@@ -126,11 +128,12 @@
     
 
     if(materialIsWater(materialID)){
-      // #ifdef CUSTOM_WATER
+      #ifdef CUSTOM_WATER
+      color.a = 0.0;
       // vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
       // vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
 
-      // float opaqueDepth = getShadowDistance(texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r); // how far away from the sun is the opaque fragment shadowed by the water?
+      // float opaqueDepth = getShadowDistanceZ(texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r); // how far away from the sun is the opaque fragment shadowed by the water?
 
       // float waterDepth = shadowViewPos.z - opaqueDepth;
 
@@ -145,10 +148,9 @@
       // float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
       // color.a = 1.0 - oldArea / newArea;
-      // #else
-      // color.a = color.g;
-      // #endif
+      #else
       color.a = color.g;
+      #endif
     }
 
     

@@ -21,7 +21,7 @@
 
 uniform sampler2D vanillacloudtex;
 
-#define CUMULUS_DENSITY 0.1
+#define CUMULUS_DENSITY 0.05
 float CUMULUS_COVERAGE = mix(0.08, 0.21, wetness * 0.5 + thunderStrength * 0.25);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 900.0
@@ -134,6 +134,7 @@ float getCloudDensity(vec3 pos){
   
   
   // erosionDensity = mix(1.0 - erosionDensity, erosionDensity, heightInPlane * 0.5 + 0.5);
+  coverage = mix(coverage * 0.5, coverage * 2.0, texture(noisetex, mod(pos.xz / 100000.0, 1.0)).r);
 
   float density = clamp01(shapeDensity - (1.0 - coverage));
   density = mix(density, clamp01(shapeDensity2 - (1.0 - coverage) - 0.05), 0.3);
@@ -150,9 +151,9 @@ float getCloudDensity(vec3 pos){
 
   density -= clamp01(erosionDensity - 0.6);
 
-  density = mix(density, 0.0, sin(PI * (1.0 - heightDenseFactor) / 2));
+  density = mix(density, 0.0, pow4(sin(PI * (1.0 - heightDenseFactor) / 2)));
 
-  return clamp01(density * densityFactor);
+  return max0(density * densityFactor);
 }
 
 
@@ -278,7 +279,8 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
   for(int i = 0; i < samples; i++, rayPos += increment){
 
-    float density = getCloudDensity(rayPos) * length(increment);
+    float pointDensity = getCloudDensity(rayPos);
+    float density = pointDensity * length(increment);
     // density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.8, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
 
     if(density < 1e-6){
@@ -304,8 +306,8 @@ vec3 marchCloudLayer(vec3 playerPos, float depth, vec3 sunlightColor, vec3 skyLi
 
       float lightningDistance = distance(rayPos, worldLightningPos);
       float potentialEnergy = pow(1.0 - clamp01(lightningDistance / 1000.0), 12.0);
-      float pseudoAttenuation = (1.0 - clamp01(density * 5.0));
-      radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0) * 10.0;
+      float pseudoAttenuation = (1.0 - clamp01(pointDensity * 5.0));
+      radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0);
     }
 
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / CLOUD_EXTINCTION_COLOR;

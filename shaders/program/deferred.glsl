@@ -145,8 +145,6 @@
     vec3 reprojectedViewPos = previousScreenSpaceToPreviousViewSpace(reprojectedScreenPos);
     vec3 previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
 
-    show(distance(reprojectedViewPos, previousViewPos) > 0.5);
-
     float rejectPreviousFrame = float(distance(reprojectedViewPos, previousViewPos) > 0.1);
     rejectPreviousFrame += float(clamp01(previousScreenPos.xy) != previousScreenPos.xy);
 

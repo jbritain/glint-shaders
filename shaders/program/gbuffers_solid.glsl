@@ -30,6 +30,7 @@
   uniform int worldTime;
   uniform int worldDay;
   uniform float frameTimeCounter;
+  uniform sampler2D noisetex;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -81,6 +82,7 @@
   uniform sampler2D gtexture;
   uniform sampler2D normals;
   uniform sampler2D specular;
+  uniform sampler2D noisetex;
 
   uniform sampler2D colortex10;
 

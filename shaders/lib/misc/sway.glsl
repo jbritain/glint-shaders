@@ -47,7 +47,7 @@ vec3 hangingSway(vec3 pos, vec3 midblock){ // stuff hanging from a block
 }
 
 vec3 floatingSway(vec3 pos){ // stuff on the water
-  return pos + vec3(0.0, getwaves(pos.xz, ITERATIONS_NORMAL) - 0.5, 0.0);
+  return pos + vec3(0.0, waveHeight(pos.xz) - 0.5, 0.0);
 }
 
 vec3 fullSway(vec3 pos){ // leaves, mainly

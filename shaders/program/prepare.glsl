@@ -49,7 +49,7 @@
 
   uniform float far;
   uniform float wetness;
-uniform float thunderStrength;
+  uniform float thunderStrength;
   uniform int isEyeInWater;
 
   uniform float viewWidth;
@@ -60,6 +60,8 @@ uniform float thunderStrength;
   uniform ivec2 eyeBrightnessSmooth;
 
   uniform bool hasSkylight;
+
+  uniform sampler2D noisetex;
 
   in vec2 texcoord;
 

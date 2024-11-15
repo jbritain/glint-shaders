@@ -40,7 +40,7 @@ float getFogDensity(vec3 pos){
   }
   fogFactor += 0.2;
   
-  fogFactor += wetness;
+  fogFactor += wetness * 2.0;
   
   
   float heightFactor = 1.0 - pow2(smoothstep(FOG_LOWER_HEIGHT, FOG_UPPER_HEIGHT, pos.y));
@@ -64,7 +64,12 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
 
   vec4 shadowClipPos = getShadowClipPos(rayPos - cameraPosition);
   vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
-  float sunlight = step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r);
+  vec3 sunlight = vec3(step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r));
+
+  vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
+  vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
+  cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
+  sunlight *= cloudShadow;
 
   if(sunlight == vec3(0.0)){
     return vec3(0.0);
@@ -140,7 +145,8 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
   vec3 scatter = vec3(0.0);
 
   for(int i = 0; i < samples; i++, rayPos += increment){
-    float density = length(increment) * getFogDensity(rayPos);
+    float pointDensity = getFogDensity(rayPos);
+    float density = length(increment) * pointDensity;
 
     vec3 transmittance = exp(-density * FOG_EXTINCTION);
 
@@ -159,7 +165,7 @@ vec3 getCloudFog(vec3 a, vec3 b, float depth, vec3 sunlightColor, vec3 skyLightC
 
       float lightningDistance = distance(rayPos, worldLightningPos);
       float potentialEnergy = pow(1.0 - clamp01(lightningDistance / 100.0), 12.0);
-      float pseudoAttenuation = (1.0 - clamp01(density * 5.0));
+      float pseudoAttenuation = (1.0 - clamp01(pointDensity * 5.0));
       radiance += pseudoAttenuation * potentialEnergy * vec3(1.0, 1.0, 2.0);
     }
 

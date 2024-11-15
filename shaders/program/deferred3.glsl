@@ -84,6 +84,8 @@
 
   uniform ivec2 eyeBrightnessSmooth;
 
+  uniform sampler2D noisetex;
+
   in vec2 texcoord;
 
   flat in vec3 sunlightColor;
