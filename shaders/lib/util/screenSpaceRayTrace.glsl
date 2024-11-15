@@ -110,6 +110,8 @@ bool rayIntersects(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bo
     }
   }
 
+  if(clamp01(rayPos) != rayPos) return false; // we went offscreen
+
   if(refine && intersect){
     binarySearch(rayPos, rayDir, previousFrame);
   }

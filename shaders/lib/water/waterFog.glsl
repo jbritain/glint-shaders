@@ -61,8 +61,13 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
       vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);
       radiance = extinction * sunlightColor;
 
+      vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
+      vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
+      cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
+      radiance *= cloudShadow;
+
       // vec3 blockerPosition = rayPos + cameraPosition + lightVector * blockerDistance;
-      // vec3 waveNormal = waveNormal(blockerPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
+      // vec3 waveNormal = waveNormal(blockerPosition.xz, vec3(0.0, 1.0, 0.0));
 
       // vec3 refractedLightVector = refract(lightVector, waveNormal, 1.0/1.33);
       

@@ -216,6 +216,10 @@ float getCaustics(vec3 feetPlayerPos){
 	float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 	float blockerDistance = blockerDistanceRaw * 255 * 2;
 
+	if(blockerDistance == 0.0){
+		return 1.0;
+	}
+
 	// float blockerDistance = max0(63 - (feetPlayerPos.y + cameraPosition.y));
 
 	vec3 blockerPos = feetPlayerPos + lightVector * blockerDistance;
