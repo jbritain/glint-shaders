@@ -162,7 +162,7 @@
       encodedMaterialID = 1.0;
     }
 
-    shadowData = vec4(encodedMaterialID, encodedNormal, 1.0);
+    shadowData = vec4(materialIsWater(materialID));
   }
   
 #endif

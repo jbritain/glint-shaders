@@ -147,7 +147,7 @@ float getCloudDensity(vec3 pos){
 
   float erosionDensity = cloudErosionNoiseSample(pos / CLOUD_EROSION_SCALE  + vec3(CLOUD_EROSION_SPEED * worldTimeCounter, 0.0, 0.0)).r;
 
-  erosionDensity = mix(erosionDensity, erosionDensity, smoothstep(0.4, 0.6, 1.0 - heightInPlane));
+  // erosionDensity = mix(1.0 - erosionDensity, erosionDensity, smoothstep(0.4, 0.6, 1.0 - heightInPlane));
 
   density -= clamp01(erosionDensity - 0.6);
 

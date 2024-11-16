@@ -14,14 +14,17 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex1` gbuffer data - albedo, material ID, face normal, lightmap
 `colortex2` gbuffer data - mapped normal, specular map data
 `colortex3` stars [gbuffers > deferred] translucents [gbuffers translucent>composite89] bloom [composite90>]
-`colortex4` previous frame data - color rgb, depth a (non-clearing)
+`colortex4` previous frame data - color RGB, depth A (non-clearing)
 `colortex5` hand
 `colortex6` cloud shadow map (256x256)
-`colortex7` cloud scattering (transmittance in alpha) (non-clearing)
+`colortex7` cloud scattering RGB, cloud transmittance A (non-clearing)
 `colortex8` volumetric stuff, opaque specular
 `colortex9` sky environment map (256x256)
-`colortex10` global illumination rgb, opaque parallax shadowing a
+`colortex10` global illumination RGB, opaque parallax shadowing A
 `colortex11` SMAA
+
+`shadowcolor0` shadow colour
+`shadowcolor1` water mask R
 
 # Passes
 `prepare` cloud shadow map
@@ -29,9 +32,10 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 
 `deferred`  global illumination
 `deferred1` global illumination filtering
-`deferred2` opaques shading, sky
-`deferred3` opaques specular shading
-`deferred4` clouds
+`deferred2` global illumination filtering
+`deferred3` opaques shading, sky
+`deferred4` opaques specular shading
+`deferred5` clouds
 
 `composite` atmospheric and water fog, translucency blending
 `composite1` cloud fog

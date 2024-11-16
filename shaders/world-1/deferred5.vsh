@@ -2,4 +2,4 @@
 #define vsh
 #define WORLD_THE_NETHER
 
-#include "/program/giDenoise.glsl"
+#include "/program/deferred4.glsl"

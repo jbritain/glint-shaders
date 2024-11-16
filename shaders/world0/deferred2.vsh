@@ -2,4 +2,4 @@
 #define vsh
 #define WORLD_OVERWORLD
 
-#include "/program/deferred2.glsl"
+#include "/program/giDenoise.glsl"

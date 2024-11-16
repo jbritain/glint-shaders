@@ -129,6 +129,6 @@ vec3 agx(vec3 color) {
   color = AgXOutsetMatrix * color;
   return color;
 }
-#define tonemap uncharted2_filmic
+#define tonemap jodieReinhardTonemap
 
 #endif

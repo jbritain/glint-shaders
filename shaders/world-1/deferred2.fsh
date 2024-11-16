@@ -2,4 +2,4 @@
 #define fsh
 #define WORLD_THE_NETHER
 
-#include "/program/deferred2.glsl"
+#include "/program/giDenoise.glsl"

@@ -2,4 +2,4 @@
 #define fsh
 #define WORLD_THE_END
 
-#include "/program/giDenoise.glsl"
+#include "/program/deferred4.glsl"

@@ -51,11 +51,11 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
 
     float sunlight = step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r);
 
-    int blockerID = getBlockerID(shadowScreenPos);
+    bool isWater = texture(shadowcolor1, shadowScreenPos.xy).r > 0.5;
 
     vec3 radiance;
 
-    if(materialIsWater(blockerID) && sunlight == 1.0){
+    if(isWater && sunlight == 1.0){
       float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 		  float blockerDistance = blockerDistanceRaw * 255 * 2;
       vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);

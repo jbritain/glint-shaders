@@ -1,5 +1,5 @@
 #version 450 compatibility
-#define fsh
+#define vsh
 #define WORLD_THE_END
 
-#include "/program/giDenoise.glsl"
+#include "/program/deferred4.glsl"

@@ -52,12 +52,6 @@ vec2 vogelDiscSample(int stepIndex, int stepCount, float rotation) {
   return r * vec2(cos(theta), sin(theta));
 }
 
-int getBlockerID(vec3 shadowScreenPos){
-	vec4 blockerData = texture(shadowcolor1, shadowScreenPos.xy);
-	int materialID = int(blockerData.x * 255 + 0.5) + 10000;
-	return materialID;
-}
-
 // ask tech, idk
 float computeSSS(float blockerDistance, float SSS, vec3 normal){
 	#ifndef SUBSURFACE_SCATTERING
@@ -76,7 +70,6 @@ float computeSSS(float blockerDistance, float SSS, vec3 normal){
 
 	float s = 1.0 / (SSS * 0.2);
 	float z = blockerDistance * 255 * 2; // multiply by 2 to account for distortion halving z
-
 
 	if(isnan(z)){
 		z = 0.0;
@@ -103,9 +96,9 @@ vec3 sampleShadow(vec4 shadowClipPos, vec3 normal){
 
   vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
 
-	int blockerID = getBlockerID(shadowScreenPos);
+	bool isWater = texture(shadowcolor1, shadowScreenPos.xy).r > 0.5;
 
-	if(materialIsWater(blockerID)){
+	if(isWater){
 		float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 		float blockerDistance = blockerDistanceRaw * 255 * 2;
 
@@ -162,9 +155,6 @@ float getBlockerDistance(vec4 shadowClipPos, vec3 normal, float jitter, float ra
 // 'direct' is for whether we're coming via the `getSunlight` function.
 // this is so that we don't compute the cloud shadows twice if not necessary
 vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int samples, bool direct, float jitter){
-	if(penumbraWidth == 0.0){
-		return(sampleShadow(shadowClipPos, normal));
-	}
 
 	vec3 shadowSum = vec3(0.0);
 
@@ -180,10 +170,14 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 			continue;
 		}
 
-		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth * shadowProjection[0][0], 0.0, 0.0), normal);
+		shadowSum += sampleShadow(shadowClipPos + vec4(offset * max(penumbraWidth, 0.1) * shadowProjection[0][0], 0.0, 0.0), normal);
 		sampleCount++;
 	}
 	shadowSum /= float(sampleCount);
+
+	if(penumbraWidth < 0.1){
+		shadowSum = mix(shadowSum, step(0.5, shadowSum), 1.0 - smoothstep(0.0, 0.1, penumbraWidth));
+	}
 
 	if(direct){
 		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
@@ -196,27 +190,19 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 }
 
 float getCaustics(vec3 feetPlayerPos){
-	// lil dithered fadeout on caustics near edges where they disappear
-
-	float randomAngle = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) * 2.0 * PI;
-	vec4 blockerIDOffset = vec4(vec2(sin(randomAngle), cos(randomAngle)) * 0.2 * shadowProjection[0][0], 0.0, 0.0);
-
-
 	vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
-	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos + blockerIDOffset);
+	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
 
-	int blockerID = getBlockerID(shadowScreenPos);
+	bool isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 4).r > 0.1;
 
-	if (!materialIsWater(blockerID)){
+	if (!isWater){
 		return 1.0;
 	}
-
-	shadowScreenPos = getShadowScreenPos(shadowClipPos);
 
 	float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
 	float blockerDistance = blockerDistanceRaw * 255 * 2;
 
-	if(blockerDistance == 0.0){
+	if(blockerDistance < 0.1){
 		return 1.0;
 	}
 
@@ -278,8 +264,8 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 
 		if(distFade > 0.0){
-			scatter = mix(scatter, lightmapScatter * lightmapShadow, distFade);
-			shadow = mix(shadow, vec3(lightmapShadow), distFade);
+			scatter = mix(scatter, lightmapScatter * lightmapShadow, smoothstep(0.8, 1.0, distFade));
+			shadow = mix(shadow, vec3(lightmapShadow), smoothstep(0.8, 1.0, distFade));
 		}
 	#else
 		vec3 shadow = vec3(lightmapShadow);

@@ -2,4 +2,4 @@
 #define vsh
 #define WORLD_THE_END
 
-#include "/program/deferred1.glsl"
+#include "/program/giDenoise.glsl"

@@ -145,9 +145,9 @@
     vec3 reprojectedViewPos = previousScreenSpaceToPreviousViewSpace(reprojectedScreenPos);
     vec3 previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
 
-    float rejectPreviousFrame = float(distance(reprojectedViewPos, previousViewPos) > 0.1);
+    float rejectPreviousFrame = float(distance(reprojectedViewPos, previousViewPos) > 1.0);
     rejectPreviousFrame += float(clamp01(previousScreenPos.xy) != previousScreenPos.xy);
-
+    
     // previousScreenPos.z = texture(colortex4, texcoord).a;
     // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
     // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
@@ -156,8 +156,6 @@
 
     outGI.rgb = mix(previousGI, SSGI(viewPos, gbufferData.mappedNormal), clamp01(0.1 + rejectPreviousFrame));
 
-
-    
     // outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
     #endif
 

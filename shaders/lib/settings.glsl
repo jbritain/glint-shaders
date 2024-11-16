@@ -22,7 +22,9 @@ const int colortex11Format = RGBA16F;|| SMAA
 
 */
 
-const bool generateShadowMipmap = true;
+const bool shadowtex0Mipmap = true;
+const bool shadowtex1Mipmap = true;
+const bool shadowColor1Mipmap = true;
 
 const float wetnessHalflife = 50.0;
 const float centerDepthHalflife = 5.0;

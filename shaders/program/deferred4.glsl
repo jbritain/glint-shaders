@@ -8,7 +8,7 @@
     By jbritain
     https://jbritain.net
 
-    /program/deferred2.glsl
+    /program/deferred4.glsl
     - Opaque specular shading
 */
 
