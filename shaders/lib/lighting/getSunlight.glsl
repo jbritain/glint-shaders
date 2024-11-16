@@ -170,14 +170,10 @@ vec3 computeShadow(vec4 shadowClipPos, float penumbraWidth, vec3 normal, int sam
 			continue;
 		}
 
-		shadowSum += sampleShadow(shadowClipPos + vec4(offset * max(penumbraWidth, 0.1) * shadowProjection[0][0], 0.0, 0.0), normal);
+		shadowSum += sampleShadow(shadowClipPos + vec4(offset * penumbraWidth * shadowProjection[0][0], 0.0, 0.0), normal);
 		sampleCount++;
 	}
 	shadowSum /= float(sampleCount);
-
-	if(penumbraWidth < 0.1){
-		shadowSum = mix(shadowSum, step(0.5, shadowSum), 1.0 - smoothstep(0.0, 0.1, penumbraWidth));
-	}
 
 	if(direct){
 		vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
