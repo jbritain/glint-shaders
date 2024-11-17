@@ -157,10 +157,6 @@
     }
     sunlight = SUNLIGHT_STRENGTH * sunlightColor;
 
-    #ifdef CUSTOM_WATER
-    sunlight *= getCaustics(feetPlayerPos);
-    #endif
-
     sunlight *= getSunlight(feetPlayerPos, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
     
 

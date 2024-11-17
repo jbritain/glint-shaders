@@ -16,15 +16,8 @@ float quarticLength(vec2 pos){
 	return sqrt(sqrt(pow4(pos.x) + pow4(pos.y)));
 }
 
-float getShadowDistanceZ(float depth) {
-	depth = depth * 2.0 - 1.0;
-	depth /= 0.5; // for distortion
-	vec4 shadowHomPos = shadowProjectionInverse * vec4(0.0, 0.0, depth, 1.0);
-	return shadowHomPos.z / shadowHomPos.w;
-}
-
 vec3 distort(vec3 pos) {
-	float factor = quarticLength(pos.xy) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
+	float factor = length(pos.xy) + SHADOW_DISTORTION;
 	return vec3(pos.xy / factor, pos.z * 0.5);
 }
 
@@ -51,11 +44,12 @@ vec4 getUndistortedShadowScreenPos(vec4 shadowClipPos){
 	return shadowScreenPos;
 }
 
-// bias from complementary
-vec3 getShadowBias(vec3 playerPos, vec3 worldNormal, float NoL, float skyLightmap){
-	vec3 bias = 0.25 * worldNormal * clamp01(0.12 + 0.01 * length(playerPos) * (2.0 - clamp01(NoL)));
+vec3 getShadowBias(vec3 pos, vec3 worldNormal){
+	vec4 shadowNormal = shadowProjection * vec4(mat3(shadowModelView) * worldNormal, 1.0);
 
-	vec3 edgeFactor = 0.1 - 0.2 * fract(playerPos + cameraPosition + worldNormal * 0.01);
-	return bias + edgeFactor * clamp01(1.0 - skyLightmap);
+	float numerator = pow2(length(pos.xy) + SHADOW_DISTORTION);
+	float bias =  SHADOW_BIAS / shadowMapResolution * numerator / SHADOW_DISTORTION;
+
+	return shadowNormal.xyz / shadowNormal.w * bias;
 }
 #endif

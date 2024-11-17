@@ -59,7 +59,8 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define SHADOWS
 #define TRANSPARENT_SHADOWS
-#define SHADOW_DISTORTION 0.85
+#define SHADOW_DISTORTION 0.1
+#define SHADOW_BIAS 2.0
 #define MAX_PENUMBRA_WIDTH 4.0
 #define MIN_PENUMBRA_WIDTH 0.1
 #define BLOCKER_SEARCH_SAMPLES 8
