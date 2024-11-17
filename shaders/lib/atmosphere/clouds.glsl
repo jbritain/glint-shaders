@@ -22,7 +22,7 @@
 uniform sampler2D vanillacloudtex;
 
 #define CUMULUS_DENSITY 0.05
-float CUMULUS_COVERAGE = mix(0.08, 0.21, wetness * 0.5 + thunderStrength * 0.25);
+float CUMULUS_COVERAGE = mix(0.07, 0.21, wetness * 0.5 + thunderStrength * 0.25);
 #define CUMULUS_LOWER_HEIGHT 500.0
 #define CUMULUS_UPPER_HEIGHT 900.0
 #define CUMULUS_SAMPLES 15
@@ -36,7 +36,7 @@ float ALTOCUMULUS_COVERAGE = mix(0.08, 0.17, wetness * 0.5 + thunderStrength * 0
 #define ALTOCUMULUS_SUBSAMPLES 4
 
 #define CIRRUS_DENSITY 0.001
-#define CIRRUS_COVERAGE 0.2
+#define CIRRUS_COVERAGE 0.1
 #define CIRRUS_LOWER_HEIGHT 1900.0
 #define CIRRUS_UPPER_HEIGHT 2000.0
 #define CIRRUS_SAMPLES 1
@@ -49,8 +49,8 @@ float VANILLA_CLOUD_DENSITY = mix(0.5, 2.0, wetness);
 #define VANILLA_CLOUD_SUBSAMPLES 4
 
 #define CLOUD_SHAPE_SCALE 2342
-#define CLOUD_SHAPE_SCALE_2 7573 / 2.0
-#define CLOUD_EROSION_SCALE 234.426 / 1.5
+#define CLOUD_SHAPE_SCALE_2 7573
+#define CLOUD_EROSION_SCALE 234.426
 
 #define CLOUD_DISTANCE 100000.0
 
