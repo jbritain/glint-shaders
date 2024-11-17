@@ -57,10 +57,8 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 
 #define BLOCKLIGHT_COLOR pow(vec3(255, 152, 54) / 255.0, vec3(2.2))
 
-#define SHADOWS
-#define TRANSPARENT_SHADOWS
-#define SHADOW_DISTORTION 0.1
-#define SHADOW_BIAS 2.0
+#define SHADOW_DISTORTION 0.85
+#define SHADOW_BIAS 1.0
 #define MAX_PENUMBRA_WIDTH 4.0
 #define MIN_PENUMBRA_WIDTH 0.1
 #define BLOCKER_SEARCH_SAMPLES 8
@@ -107,7 +105,7 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10 // [5 10 15 20 25 30 35 40 45 50]
 #define WATER_ABSORPTION vec3(0.3, 0.09, 0.04)
-#define WATER_SCATTERING vec3(0.01, 0.06, 0.05)
+#define WATER_SCATTERING vec3(0.01, 0.06, 0.05) * 0.2
 #define WATER_G 0.6
 
 #define CLOUD_FOG

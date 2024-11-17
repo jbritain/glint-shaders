@@ -12,13 +12,18 @@
 #ifndef SHADOW_BIAS_INCLUDE
 #define SHADOW_BIAS_INCLUDE
 
-float quarticLength(vec2 pos){
-	return sqrt(sqrt(pow4(pos.x) + pow4(pos.y)));
+// shadow bias and distortion as conceived by emin, gri, and belmu
+
+float cubeLength(vec2 v) {
+    vec2 t = abs(pow3(v));
+    return pow(t.x + t.y, 1.0/3.0);
 }
 
 vec3 distort(vec3 pos) {
-	float factor = length(pos.xy) + SHADOW_DISTORTION;
-	return vec3(pos.xy / factor, pos.z * 0.5);
+	float factor = cubeLength(pos.xy) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
+	pos.xy /= factor;
+	pos.z /= 2.0;
+	return pos;
 }
 
 vec4 getShadowClipPos(vec3 playerPos){
@@ -44,12 +49,11 @@ vec4 getUndistortedShadowScreenPos(vec4 shadowClipPos){
 	return shadowScreenPos;
 }
 
-vec3 getShadowBias(vec3 pos, vec3 worldNormal){
-	vec4 shadowNormal = shadowProjection * vec4(mat3(shadowModelView) * worldNormal, 1.0);
+vec3 getShadowBias(vec3 pos, vec3 worldNormal, float faceNoL){
+	float biasAdjust = log2(max(4.0, shadowDistance - shadowMapResolution * 0.125)) * 0.5;
 
-	float numerator = pow2(length(pos.xy) + SHADOW_DISTORTION);
-	float bias =  SHADOW_BIAS / shadowMapResolution * numerator / SHADOW_DISTORTION;
+	float factor = cubeLength(pos.xy) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
 
-	return shadowNormal.xyz / shadowNormal.w * bias;
+	return mat3(shadowProjection) * (mat3(shadowModelView) * worldNormal) * factor * biasAdjust;
 }
 #endif

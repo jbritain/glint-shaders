@@ -17,6 +17,47 @@
 #include "/lib/util/materialIDs.glsl"
 #include "/lib/util/dh.glsl"
 #include "/lib/water/waveNormals.glsl"
+#include "/lib/atmosphere/common.glsl"
+
+vec2 vogelDiscSample(int stepIndex, int stepCount, float rotation) {
+  const float goldenAngle = 2.4;
+
+  float r = sqrt(stepIndex + 0.5) / sqrt(float(stepCount));
+  float theta = stepIndex * goldenAngle + rotation;
+
+  return r * vec2(cos(theta), sin(theta));
+}
+
+// subsurface scattering help from tech
+vec3 computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPlayerPos){
+	#ifndef SUBSURFACE_SCATTERING
+	return 0.0;
+	#endif
+
+	float NoL = dot(faceNormal, normalize(shadowLightPosition));
+
+	if(SSS < 0.0001){
+		return vec3(0.0);
+	}
+
+	if(NoL > -0.00001){
+		return vec3(0.0);
+	}
+
+	float s = 1.0 / (SSS * 2.0);
+	float z = blockerDistance;
+
+	if(isnan(z)){
+		return vec3(0.0);
+	}
+
+	vec3 scatter = vec3(0.25 * (exp(-s * z) + 3*exp(-s * z / 3)));
+
+	float cosTheta = clamp01(dot(normalize(feetPlayerPos), lightVector));
+	scatter *= henyeyGreenstein(0.4, cosTheta);
+
+	return clamp01(scatter);
+}
 
 vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 	vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos * vec4(vec2(shadowDistance / far), vec2(1.0))).xyz;
@@ -44,6 +85,10 @@ vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 }
 
 float getCaustics(vec3 shadowScreenPos, vec3 feetPlayerPos, float blockerDistance){
+	if(blockerDistance <= 1.0){
+		return 1.0;
+	}
+
 	vec3 blockerPos = feetPlayerPos + lightVector * blockerDistance;
 	vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
 	vec3 refracted = refract(lightVector, waveNormal, rcp(1.33));
@@ -62,7 +107,7 @@ vec3 waterShadow(float blockerDistance){
 	return extinction;
 }
 
-vec3 sampleShadow(vec3 shadowScreenPos, vec3 feetPlayerPos){
+vec3 sampleShadow(vec3 shadowScreenPos, out bool isWater){
 	float transparentShadow = shadow2D(shadowtex0HW, shadowScreenPos).r;
 
 	if(transparentShadow >= 1.0 - 1e-6){
@@ -75,17 +120,60 @@ vec3 sampleShadow(vec3 shadowScreenPos, vec3 feetPlayerPos){
 		return vec3(opaqueShadow);
 	}
 
-	bool isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 2).r > 0.5;
 
-	if(isWater){
-		float blockerDistance = clamp01(texture(shadowtex0, shadowScreenPos.xy).r - shadowScreenPos.z) * 255 / 0.5;
-		return waterShadow(blockerDistance) * getCaustics(shadowScreenPos, feetPlayerPos, blockerDistance);
-	}
+	isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 1).r > 0.5;
 
 	vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
 	vec3 shadowColor = shadowColorData.rgb * (1.0 - shadowColorData.a);
 	return mix(shadowColor * opaqueShadow, vec3(1.0), transparentShadow);
 }
+
+vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, vec3 feetPlayerPos){
+	float clipPenumbraWidth = penumbraWidth * shadowProjection[0].x * 0.5;
+
+	vec3 shadowSum = vec3(0.0);
+	float waterWeight = 0.0;
+
+	for(int i = 0; i < SHADOW_SAMPLES; i++){
+		vec2 offset = clipPenumbraWidth * vogelDiscSample(i, SHADOW_SAMPLES, interleavedGradientNoise(floor(gl_FragCoord.xy), i + frameCounter * SHADOW_SAMPLES));
+		bool isWater;
+		vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset, 0.0, 0.0));
+		shadowSum += sampleShadow(shadowScreenPos, isWater);
+
+		waterWeight += float(isWater);
+	}
+
+	waterWeight /= SHADOW_SAMPLES;
+	shadowSum /= SHADOW_SAMPLES;
+
+	if(waterWeight > 1e-6){
+		vec3 waterShadow = waterShadow(blockerDistance) * getCaustics(getShadowScreenPos(shadowClipPos), feetPlayerPos, blockerDistance);
+		shadowSum *= mix(vec3(1.0), waterShadow, waterWeight);
+	}
+
+	return shadowSum;
+}
+
+float blockerSearch(vec4 shadowClipPos){
+	float clipBlockerSearchRadius = BLOCKER_SEARCH_RADIUS * shadowProjection[0].x * 0.5;
+
+	float blockerDistanceSum = 0.0;
+
+	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
+
+	for(int i = 0; i < BLOCKER_SEARCH_SAMPLES; i++){
+		vec2 offset = clipBlockerSearchRadius * vogelDiscSample(i, BLOCKER_SEARCH_SAMPLES, interleavedGradientNoise(floor(gl_FragCoord.xy), i + frameCounter * BLOCKER_SEARCH_SAMPLES));
+		bool isWater;
+		vec3 sampleShadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset, 0.0, 0.0));
+		
+		float sampleDepth = texture(shadowtex0, sampleShadowScreenPos.xy).r;
+
+		blockerDistanceSum += clamp01(shadowScreenPos.z - sampleDepth);
+	}
+
+	return blockerDistanceSum / BLOCKER_SEARCH_SAMPLES;
+}
+
 
 vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
 	#ifdef WORLD_THE_END
@@ -103,15 +191,14 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	}
 
 	vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
-	vec3 bias = getShadowBias(shadowClipPos.xyz, mat3(gbufferModelViewInverse) * faceNormal);
-	vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
-	shadowScreenPos += bias;
+	vec3 bias = getShadowBias(shadowClipPos.xyz, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
+	shadowClipPos.xyz += bias;
 
 	vec3 shadow = vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y));
 
 	float distFade = pow5(
 		max(
-			max2(abs(shadowScreenPos.xy * 2.0 - 1.0)),
+			clamp01(max2(abs(shadowClipPos.xy))),
 			mix(
 				1.0, 0.55, 
 				smoothstep(0.33, 0.8, lightVector.y)
@@ -119,9 +206,20 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 		)
 	);
 
-	shadow = mix(sampleShadow(shadowScreenPos, feetPlayerPos), shadow, clamp01(distFade));
+	float blockerDistance = blockerSearch(shadowClipPos);
 
-	sunlight = shadow;
+	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
+	// penumbraWidth *= 1.0 + 7.0 * SSS * (1.0 - faceNoL);
+
+	blockerDistance *= 2.0;
+	blockerDistance *= 255.0;
+
+	shadow = mix(getShadows(shadowClipPos, blockerDistance, penumbraWidth, feetPlayerPos), shadow, distFade);
+
+	sunlight *= shadow;
+
+	vec3 scatter = computeSSS(blockerDistance, SSS, faceNormal, feetPlayerPos);
+	sunlight += scatter;
 
 
 	return sunlight;
