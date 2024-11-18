@@ -63,7 +63,7 @@ vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 	vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos * vec4(vec2(shadowDistance / far), vec2(1.0))).xyz;
 
 	if(clamp01(undistortedShadowScreenPos.xy) != undistortedShadowScreenPos.xy){
-		return vec3(0.0);
+		return vec3(1.0);
 	}
 
 	const vec2 offsets[4] =  vec2[](
@@ -220,6 +220,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 	vec3 scatter = computeSSS(blockerDistance, SSS, faceNormal, feetPlayerPos);
 	sunlight += scatter;
+	sunlight *= sampleCloudShadow(shadowClipPos, faceNormal);
 
 
 	return sunlight;

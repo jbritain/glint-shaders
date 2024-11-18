@@ -61,6 +61,7 @@ float waveHeight(vec2 position) {
 vec3 waveNormal(vec2 pos, vec3 worldFaceNormal) {
   vec2 ex = vec2(WAVE_E, 0);
   float H = waveHeight(pos.xy) * WAVE_DEPTH;
+  show(H);
   vec3 a = vec3(pos.x, H, pos.y);
   vec3 waveNormal = normalize(
     cross(

@@ -1,9 +1,7 @@
 // #define DEBUG_ENABLE
 // #define POST_PROCESS_DEBUG
 
-#ifdef fsh
 #include "/lib/debug.glsl"
-#endif
 
 /*
 
@@ -112,8 +110,9 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define CLOUD_FOG_SAMPLES 20 // [5 10 15 20 25 30 35 40 45 50]
 #define CLOUD_FOG_SUBSAMPLES 4 // [4 5 6 7 8 9 10]
 
-#define WAVE_DEPTH 0.2
+#define WAVE_DEPTH 0.4
 #define WAVE_E 0.01
+#define WATER_PARALLAX
 
 #define SATURATION 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
 

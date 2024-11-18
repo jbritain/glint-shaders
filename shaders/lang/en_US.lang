@@ -25,8 +25,6 @@ option.SSR_SAMPLES.comment=How many samples to take when calculating reflections
 option.ROUGH_REFLECTION_THRESHOLD=Rough Reflection Threshold
 option.ROUGH_REFLECTION_THRESHOLD.comment=Materials rougher than this will not reflect.
 
-option.SHADOWS=Shadows
-
 option.SHADOW_SAMPLES=Shadow Samples
 
 option.shadowDistance=Shadow Distance
@@ -231,6 +229,9 @@ option.SATURATION=Saturation
 option.GLOBAL_ILLUMINATION=Global Illumination
 option.GI_RADIUS=Radius
 option.GI_SAMPLES=Samples
+
+option.WATER_PARALLAX=Water Parallax
+option.WATER_PARALLAX.comment=Creates the illusion of depth on the surface of water.
 
 option.POM=Parallax Occlusion Mapping
 option.POM.comment=Creates the illusion of depth using the heightmap from the resource pack.

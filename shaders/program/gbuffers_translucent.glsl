@@ -164,6 +164,7 @@
   #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/common.glsl"
   #include "/lib/misc/parallax.glsl"
+  #include "/lib/water/waterParallax.glsl"
   #include "/lib/water/waveNormals.glsl"
   #include "/lib/lighting/directionalLightmap.glsl"
 
@@ -247,7 +248,8 @@
       color.a = smoothstep(0.8 * far, far, length(viewPos));
       #endif
 
-      mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
+      //mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
+      mappedNormal = mat3(gbufferModelView) * getWaterParallaxNormal(viewPos, faceNormal, blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).r);
       #endif
     }
 

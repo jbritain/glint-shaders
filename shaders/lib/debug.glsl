@@ -4,6 +4,9 @@
 #define DEBUG_INCLUDE
 
 #ifdef DEBUG_ENABLE
+#endif
+
+#if defined DEBUG_ENABLE && defined fsh
 layout (rgba8) uniform image2D debug;
 
 void show(vec4 x){
