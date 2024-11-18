@@ -65,14 +65,6 @@
     vec3 worldPos = feetPlayerPos + cameraPosition;
     worldPos = getSway(materialID, worldPos, at_midBlock);
 
-    if(materialIsWater(materialID)){
-      float waveMultiplier = 1.0 - smoothstep(-32.0, 32.0, at_midBlock.y);
-      // if(waveMultiplier > 0.95){
-      //   waveMultiplier = 0.0;
-      // }
-      worldPos.y += waveHeight(worldPos.xz) * waveMultiplier - 0.5;
-    }
-
     feetPlayerPos = worldPos - cameraPosition;
     viewPos = (gbufferModelView * vec4(feetPlayerPos, 1.0)).xyz;
 
@@ -305,7 +297,9 @@
       color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
     #endif
 
-    color = getAtmosphericFog(color, eyePlayerPos);
-    color = getBorderFog(color, eyePlayerPos);
+    if(isEyeInWater == 0){
+      color = getAtmosphericFog(color, eyePlayerPos);
+      color = getBorderFog(color, eyePlayerPos);
+    }
   }
 #endif

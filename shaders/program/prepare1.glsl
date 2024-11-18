@@ -108,7 +108,7 @@
     color.rgb += cloudScatter;
 
     if(isEyeInWater == 1){
-      float distanceBelowSeaLevel = max0(-1 * (cameraPosition.y - 63));
+      float distanceBelowSeaLevel = mix(128, max0(-1 * (cameraPosition.y - 63)), clamp01(dir.y));
 
       color.rgb *= exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * distanceBelowSeaLevel);
     }

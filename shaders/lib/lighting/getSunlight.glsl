@@ -40,9 +40,9 @@ vec3 computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPlay
 		return vec3(0.0);
 	}
 
-	if(NoL > -0.00001){
-		return vec3(0.0);
-	}
+	// if(NoL > -0.00001){
+	// 	return vec3(0.0);
+	// }
 
 	float s = 1.0 / (SSS * 2.0);
 	float z = blockerDistance;
@@ -85,9 +85,9 @@ vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 }
 
 float getCaustics(vec3 shadowScreenPos, vec3 feetPlayerPos, float blockerDistance){
-	if(blockerDistance <= 1.0){
-		return 1.0;
-	}
+	// if(blockerDistance <= 1.0){
+	// 	return 1.0;
+	// }
 
 	vec3 blockerPos = feetPlayerPos + lightVector * blockerDistance;
 	vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
@@ -132,7 +132,7 @@ vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, 
 	float clipPenumbraWidth = penumbraWidth * shadowProjection[0].x * 0.5;
 
 	vec3 shadowSum = vec3(0.0);
-	float waterWeight = 0.0;
+	bool doWaterShadow;
 
 	for(int i = 0; i < SHADOW_SAMPLES; i++){
 		vec2 offset = clipPenumbraWidth * vogelDiscSample(i, SHADOW_SAMPLES, interleavedGradientNoise(floor(gl_FragCoord.xy), i + frameCounter * SHADOW_SAMPLES));
@@ -140,15 +140,14 @@ vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, 
 		vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset, 0.0, 0.0));
 		shadowSum += sampleShadow(shadowScreenPos, isWater);
 
-		waterWeight += float(isWater);
+		doWaterShadow = doWaterShadow || isWater;
 	}
 
-	waterWeight /= SHADOW_SAMPLES;
 	shadowSum /= SHADOW_SAMPLES;
 
-	if(waterWeight > 1e-6){
+	if(doWaterShadow){
 		vec3 waterShadow = waterShadow(blockerDistance) * getCaustics(getShadowScreenPos(shadowClipPos), feetPlayerPos, blockerDistance);
-		shadowSum *= mix(vec3(1.0), waterShadow, waterWeight);
+		shadowSum *= waterShadow;
 	}
 
 	return shadowSum;
@@ -207,6 +206,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	);
 
 	float blockerDistance = blockerSearch(shadowClipPos);
+
 
 	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
 	// penumbraWidth *= 1.0 + 7.0 * SSS * (1.0 - faceNoL);
