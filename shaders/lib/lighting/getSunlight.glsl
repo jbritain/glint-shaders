@@ -129,7 +129,8 @@ vec3 sampleShadow(vec3 shadowScreenPos, out bool isWater){
 }
 
 vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, vec3 feetPlayerPos){
-	float clipPenumbraWidth = penumbraWidth * shadowProjection[0].x * 0.5;
+
+	float clipPenumbraWidth = max(MIN_PENUMBRA_WIDTH, penumbraWidth) * shadowProjection[0].x * 0.5;
 
 	vec3 shadowSum = vec3(0.0);
 	bool doWaterShadow;
@@ -144,6 +145,14 @@ vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, 
 	}
 
 	shadowSum /= SHADOW_SAMPLES;
+
+	// reduce aliasing on small penumbra width shadows without softening them
+	// this messes up transparent shadows so we don't do it in that case
+	if(penumbraWidth < MIN_PENUMBRA_WIDTH && shadowSum.r == shadowSum.g && shadowSum.g == shadowSum.b){
+		float sharpen = 0.4 * max0((MIN_PENUMBRA_WIDTH - penumbraWidth) / MIN_PENUMBRA_WIDTH);
+		shadowSum = smoothstep(sharpen, 1.0 - sharpen, vec3(sum3(shadowSum) / 3.0));
+	}
+
 
 	if(doWaterShadow){
 		vec3 waterShadow = waterShadow(blockerDistance) * getCaustics(getShadowScreenPos(shadowClipPos), feetPlayerPos, blockerDistance);
@@ -193,7 +202,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	vec3 bias = getShadowBias(shadowClipPos.xyz, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
 	shadowClipPos.xyz += bias;
 
-	vec3 shadow = vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y));
+	vec3 fakeShadow = vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y)) * mix(faceNoL, pow2(faceNoL * 0.5 + 0.5), SSS);
 
 	float distFade = pow5(
 		max(
@@ -208,19 +217,19 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	float blockerDistance = blockerSearch(shadowClipPos);
 
 
-	float penumbraWidth = mix(MIN_PENUMBRA_WIDTH, MAX_PENUMBRA_WIDTH, blockerDistance);
+	float penumbraWidth = blockerDistance * MAX_PENUMBRA_WIDTH;
 	// penumbraWidth *= 1.0 + 7.0 * SSS * (1.0 - faceNoL);
 
 	blockerDistance *= 2.0;
 	blockerDistance *= 255.0;
 
-	shadow = mix(getShadows(shadowClipPos, blockerDistance, penumbraWidth, feetPlayerPos), shadow, distFade);
-
-	sunlight *= shadow;
+	sunlight *= getShadows(shadowClipPos, blockerDistance, penumbraWidth, feetPlayerPos);
 
 	vec3 scatter = computeSSS(blockerDistance, SSS, faceNormal, feetPlayerPos);
 	sunlight += scatter;
 	sunlight *= sampleCloudShadow(shadowClipPos, faceNormal);
+
+	sunlight = mix(sunlight, fakeShadow, distFade);
 
 
 	return sunlight;

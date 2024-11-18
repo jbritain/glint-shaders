@@ -248,8 +248,13 @@
       color.a = smoothstep(0.8 * far, far, length(viewPos));
       #endif
 
-      //mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
-      mappedNormal = mat3(gbufferModelView) * getWaterParallaxNormal(viewPos, faceNormal, blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).r);
+      //
+      if(abs(faceNormal.y) > 0.9){
+        mappedNormal = mat3(gbufferModelView) * getWaterParallaxNormal(viewPos, faceNormal, blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).r);
+      } else {
+        mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
+      }
+      
       #endif
     }
 

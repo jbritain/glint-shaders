@@ -88,12 +88,12 @@ float getCloudDensity(vec3 pos){
     coverage = mix(CUMULUS_COVERAGE, 1.0, smoothstep(0.0, 50000.0, 0.0));
     densityFactor = CUMULUS_DENSITY;
 
-    float cumulusCentreHeight = mix(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, 0.3); // widest part of our cumulus clouds
+    float cumulusCentreHeight = mix(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, 0.1); // widest part of our cumulus clouds
 
     if(pos.y <= cumulusCentreHeight){
-      heightDenseFactor = smoothstep(CUMULUS_LOWER_HEIGHT, cumulusCentreHeight, pos.y);
+      heightDenseFactor = sqrt(smoothstep(CUMULUS_LOWER_HEIGHT, cumulusCentreHeight, pos.y));
     } else {
-      heightDenseFactor = 1.0 - smoothstep(cumulusCentreHeight, CUMULUS_UPPER_HEIGHT, pos.y);
+      heightDenseFactor = 1.0 - pow2(smoothstep(cumulusCentreHeight, CUMULUS_UPPER_HEIGHT, pos.y));
     }
 
     heightInPlane = smoothstep(CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, pos.y);
