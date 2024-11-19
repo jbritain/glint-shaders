@@ -27,14 +27,11 @@ A work in progress shaderpack for Minecraft.
 ## Known Issues
 - Reflections on hand broken
 - Ghosting on clouds when player moves
-- Occasionally reflections turn completely black until shader reload
-- Obvious repeating pattern in cloud shapes
 - Artifacts in atmospheric fog near the horizon
 - Water waves broken on AMD
 - Artifacts around edge of screen with DoF enabled
 - GI noisy and bad
 - Weird noise in caustics
-- Runs terribly
 
 ## Acknowledgements
 - Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/) (combined texture from [Revelation](https://github.com/HaringProGit/Revelation))

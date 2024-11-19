@@ -155,8 +155,8 @@ vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, 
 
 
 	if(doWaterShadow){
-		vec3 waterShadow = waterShadow(blockerDistance) * getCaustics(getShadowScreenPos(shadowClipPos), feetPlayerPos, blockerDistance);
-		shadowSum *= waterShadow;
+		shadowSum += getCaustics(getShadowScreenPos(shadowClipPos), feetPlayerPos, blockerDistance);
+		shadowSum *= waterShadow(blockerDistance);
 	}
 
 	return shadowSum;
@@ -202,7 +202,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	vec3 bias = getShadowBias(shadowClipPos.xyz, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
 	shadowClipPos.xyz += bias;
 
-	vec3 fakeShadow = vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y)) * mix(faceNoL, pow2(faceNoL * 0.5 + 0.5), SSS);
+	vec3 fakeShadow = clamp01(vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y)) * mix(faceNoL, pow2(faceNoL * 0.5 + 0.5), SSS));
 
 	float distFade = pow5(
 		max(
@@ -218,7 +218,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 
 
 	float penumbraWidth = blockerDistance * MAX_PENUMBRA_WIDTH;
-	// penumbraWidth *= 1.0 + 7.0 * SSS * (1.0 - faceNoL);
+	penumbraWidth = mix(penumbraWidth, MAX_PENUMBRA_WIDTH, distFade);
 
 	blockerDistance *= 2.0;
 	blockerDistance *= 255.0;
@@ -229,7 +229,7 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	sunlight += scatter;
 	sunlight *= sampleCloudShadow(shadowClipPos, faceNormal);
 
-	sunlight = mix(sunlight, fakeShadow, distFade);
+	sunlight = mix(sunlight, fakeShadow, clamp01(distFade));
 
 
 	return sunlight;

@@ -147,7 +147,7 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   if(roughness == 0.0){
     reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
   } else {
-    reflectedColor = textureLod(colortex4, reflectionPos.xy, mix(2, 8, roughness)).rgb;
+    reflectedColor = textureLod(colortex4, reflectionPos.xy, mix(2, 8, smoothstep(roughness, 0.0, ROUGH_REFLECTION_THRESHOLD))).rgb;
   }
 
   #ifdef SSR_FADE

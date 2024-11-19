@@ -50,9 +50,9 @@
   void main() {
     #ifdef SMAA
     edges = vec4(0.0);
-    // edges.rg = SMAADepthEdgeDetection(depthtex0, texcoord, vec2(viewWidth, viewHeight));
+    edges.rg = max(SMAADepthEdgeDetection(depthtex0, texcoord, vec2(viewWidth, viewHeight)), edges.rg);
 
-    edges.rg = SMAAColorEdgeDetection(colortex0, texcoord, vec2(viewWidth, viewHeight));
+    edges.rg = max(SMAAColorEdgeDetection(colortex0, texcoord, vec2(viewWidth, viewHeight)), edges.rg);
     #endif
   }
 #endif
