@@ -84,7 +84,7 @@
   uniform sampler2D specular;
   uniform sampler2D noisetex;
 
-  uniform sampler2D colortex10;
+  uniform sampler2D colortex3;
 
   uniform vec4 entityColor;
 
@@ -132,7 +132,7 @@
     return tbnMatrix * mappedNormal;
   }
 
-  /* RENDERTARGETS: 1,2,10 */
+  /* RENDERTARGETS: 1,2,3 */
   layout(location = 0) out vec4 outData1; // albedo, material ID, face normal, lightmap
   layout(location = 1) out vec4 outData2; // mapped normal, specular map data
   layout(location = 2) out vec4 outData3; // nothing in the rgb but parallax shadow in the a
@@ -152,7 +152,7 @@
       #endif
     }
     #endif
-    outData3.rgb = texture(colortex10, gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rgb;
+    outData3.rgb = texture(colortex3, gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rgb;
     outData3.a = parallaxSunlight;
 
     vec4 color;

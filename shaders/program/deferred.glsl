@@ -120,7 +120,6 @@
 
   void main() {
     #ifdef GLOBAL_ILLUMINATION
-    outGI = texture(colortex10, texcoord);
     vec2 texcoord = texcoord * rcp(GI_RESOLUTION);
     if(clamp01(texcoord) != texcoord){
       return;
@@ -134,8 +133,6 @@
       return;
     }
 
-
-
     GbufferData gbufferData;
     decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
 
@@ -145,18 +142,16 @@
     vec3 reprojectedViewPos = previousScreenSpaceToPreviousViewSpace(reprojectedScreenPos);
     vec3 previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
 
-    float rejectPreviousFrame = float(distance(reprojectedViewPos, previousViewPos) > 1.0);
-    rejectPreviousFrame += float(clamp01(previousScreenPos.xy) != previousScreenPos.xy);
-    
-    // previousScreenPos.z = texture(colortex4, texcoord).a;
-    // previousViewPos = previousScreenSpaceToPreviousViewSpace(previousScreenPos);
-    // previousFeetPlayerPos = (gbufferPreviousModelViewInverse * vec4(previousViewPos, 1.0)).xyz;
+    float acceptPreviousFrame = float(distance(reprojectedViewPos, previousViewPos) <= 1.0);
+    acceptPreviousFrame -= float(clamp01(previousScreenPos.xy) != previousScreenPos.xy);
+    acceptPreviousFrame = clamp01(acceptPreviousFrame);
 
-    vec3 previousGI = texture(colortex10, previousScreenPos.xy).rgb;
+    outGI = texture(colortex10, previousScreenPos.xy) * acceptPreviousFrame;
+    outGI.rgb = mix(outGI.rgb, SSGI(viewPos, gbufferData.mappedNormal), 1.0 / (outGI.a + 1.0));
+    outGI.a += 1.0;
 
-    outGI.rgb = mix(previousGI, SSGI(viewPos, gbufferData.mappedNormal), clamp01(0.1 + rejectPreviousFrame));
+    outGI.a = min(outGI.a, 60.0);
 
-    // outGI.rgb = reflectShadowMap(faceNormal, feetPlayerPos, sunlightColor);
     #endif
 
   }

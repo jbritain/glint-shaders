@@ -8,14 +8,14 @@
 const int colortex0Format = RGBA16F; || scene colour
 const int colortex1Format = RGBA16;  || albedo, face normal, lightmap
 const int colortex2Format = RGBA16;  || mapped normal, specular map data
-const int colortex3Format = RGBA16F; || stars [gbuffers > deferred] translucents [gbuffers translucent>]
+const int colortex3Format = RGBA16F; || stars (parallax shadow in alpha) [gbuffers > deferred] translucents [gbuffers translucent>]
 const int colortex4Format = RGBA32F; || previous frame data - color rgb, depth a
 const int colortex5Format = RGBA16F; || hand
 const int colortex6Format = RGB8;    || cloud shadow map
 const int colortex7Format = RGBA16F; || cloud scattering (transmittance in alpha)
 const int colortex8Format = RGBA16F;   || opaque specular, volumetrics
 const int colortex9Format = RGB16F;  || sky environment map
-const int colortex10Format = RGB10_A2;  || global illumination, parallax shadow
+const int colortex10Format = RGBA16F;  || global illumination
 const int colortex11Format = RGBA16F;|| SMAA
 
 */
@@ -103,14 +103,14 @@ const float sunPathRotation = -40.0; // [-90.0 -85.0 -80.0 -75.0 -70.0 -65.0 -60
 #define VOLUMETRIC_WATER
 #define VOLUMETRIC_WATER_SAMPLES 10 // [5 10 15 20 25 30 35 40 45 50]
 #define WATER_ABSORPTION vec3(0.3, 0.09, 0.04)
-#define WATER_SCATTERING vec3(0.01, 0.06, 0.05) * 0.2
+#define WATER_SCATTERING vec3(0.01, 0.06, 0.05)
 #define WATER_G 0.6
 
 #define CLOUD_FOG
 #define CLOUD_FOG_SAMPLES 20 // [5 10 15 20 25 30 35 40 45 50]
 #define CLOUD_FOG_SUBSAMPLES 4 // [4 5 6 7 8 9 10]
 
-#define WAVE_DEPTH 0.4
+#define WAVE_DEPTH 0.3
 #define WAVE_E 0.01
 #define WATER_PARALLAX
 

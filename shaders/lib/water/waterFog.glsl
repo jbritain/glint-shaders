@@ -58,46 +58,47 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     vec3 transmittance = exp(-density * waterExtinction);
 
     vec4 shadowClipPos = getShadowClipPos(rayPos);
+
+    float distFade = pow5(
+      max(
+        clamp01(max2(abs(shadowClipPos.xy))),
+        mix(
+          1.0, 0.55, 
+          smoothstep(0.33, 0.8, lightVector.y)
+        ) * (dot(rayPos.xz, rayPos.xz) * rcp(pow2(shadowDistance)))
+      )
+    );
+
     vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos).xyz;
 
     float sunlight = step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r);
 
-    bool isWater = texture(shadowcolor1, shadowScreenPos.xy).r > 0.5;
+    float isWater = step(0.5, texture(shadowcolor1, shadowScreenPos.xy).r);
+
+    float doWaterShadow = (sunlight + isWater) / 2.0;
+    doWaterShadow = mix(doWaterShadow, 1.0, clamp01(distFade));
 
     vec3 radiance;
 
-    if(isWater && sunlight == 1.0){
+    float distanceBelowSeaLevel = max0(63.0 - rayPos.y);
+    vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * waterExtinction);
+
+    if(doWaterShadow > 0.99){
       float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
-		  float blockerDistance = blockerDistanceRaw * 255 * 2;
+		  float blockerDistance = mix(blockerDistanceRaw * 255 * 2, distanceBelowSeaLevel / clamp01(dot(lightVector, vec3(0.0, 1.0, 0.0))), clamp01(distFade));
       vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);
       radiance = extinction * sunlightColor;
 
       vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
       vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
       cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));
+      cloudShadow = mix(cloudShadow, vec3(1.0), clamp01(distFade));
       radiance *= cloudShadow;
-
-      // vec3 blockerPosition = rayPos + cameraPosition + lightVector * blockerDistance;
-      // vec3 waveNormal = waveNormal(blockerPosition.xz, vec3(0.0, 1.0, 0.0));
-
-      // vec3 refractedLightVector = refract(lightVector, waveNormal, 1.0/1.33);
-      
-      // float oldArea = length(dFdx(blockerPosition)) * length(dFdy(blockerPosition));
-      // vec3 newPos = blockerPosition + refractedLightVector * blockerDistance;
-      // float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
-
-      // radiance *= (1.0 - oldArea / newArea);
     } else {
       radiance = vec3(0.0);
     }
 
-    float distFade = max(
-			max2(abs(shadowClipPos.xy)),
-			mix(1.0, 0.55, smoothstep(0.33, 0.8, lightVector.y)) * dot(shadowClipPos.xz, shadowClipPos.xz) * rcp(pow2(shadowDistance))
-		);
 
-    float distanceBelowSeaLevel = max0(-1 * (rayPos.y - 63));
-    vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * waterExtinction);
 
     //vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1)) * sunlightColor;
     

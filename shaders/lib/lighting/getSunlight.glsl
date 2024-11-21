@@ -99,7 +99,7 @@ float getCaustics(vec3 shadowScreenPos, vec3 feetPlayerPos, float blockerDistanc
 	float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
 	float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-	return clamp01(oldArea / newArea);
+	return pow3(clamp01(oldArea / newArea));
 }
 
 vec3 waterShadow(float blockerDistance){

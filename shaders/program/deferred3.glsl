@@ -150,7 +150,7 @@
     }
 
 
-    float parallaxShadow = texture(colortex10, texcoord).a;
+    float parallaxShadow = texture(colortex3, texcoord).a;
 
     if(DH_MASK){
       parallaxShadow = 1.0;
@@ -164,11 +164,11 @@
 
     #ifdef GLOBAL_ILLUMINATION
     // vec3 GI = bilateralFilterDepth(colortex10, depthtex0, texcoord, 5, 10, GI_RESOLUTION, 0).rgb;
-    vec3 GI = texture(colortex10, texcoord).rgb;
+    vec4 GI = texture(colortex10, texcoord);
     #else
-    vec3 GI = vec3(0.0);
+    vec4 GI = vec4(vec3(0.0), 1.0);
     #endif
-    color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI, skyLightColor);
+    color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI.rgb, skyLightColor);
     // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
   }
 #endif
