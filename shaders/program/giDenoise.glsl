@@ -67,6 +67,9 @@
   layout(location = 0) out vec4 outGI;
 
   void main(){
+    // outGI = texture(colortex10, texcoord);
+    // return;
+
     outGI.a = texture(colortex10, texcoord).a;
 
     if(max3(textureLod(colortex10, texcoord, 4).rgb) < 1e-6){

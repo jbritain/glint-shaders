@@ -191,6 +191,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
       vec3 reflectedRay = reflect(normalize(viewPos), roughNormal);
       bool hit;
       float fadeFactor;
+      vec3 originalColor = reflectedColor.rgb;
       vec3 reflection = SSRSample(viewPos, reflectedRay, lightmap.y, noise.z, material.roughness, hit, fadeFactor);
       if(hit){
         reflectedColor.rgb += reflection;
@@ -198,7 +199,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
         vec3 worldDir = mat3(gbufferModelViewInverse) * reflectedRay;
         vec2 environmentUV = mapSphere(worldDir);
 
-        reflectedColor.rgb += texture(colortex9, environmentUV).rgb;
+        reflectedColor.rgb += mix(originalColor.rgb, texture(colortex9, environmentUV).rgb * lightmap.y, fadeFactor);
       }
     }
     reflectedColor /= SSR_SAMPLES;

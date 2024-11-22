@@ -17,7 +17,7 @@
 
 vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material, vec3 GI, vec3 skyLightColor){
   vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * pow2(lightmap.y);
-  vec3 blockLight = max0(exp(-(1.0 - lightmap.x) * 10.0)) * BLOCKLIGHT_COLOR * BLOCKLIGHT_STRENGTH;
+  vec3 blockLight = max0(exp(-(1.0 - max0(lightmap.x - max3(GI))) * 10.0)) * BLOCKLIGHT_COLOR * BLOCKLIGHT_STRENGTH;
   
 
   vec3 ambient = vec3(AMBIENT_STRENGTH);
@@ -29,7 +29,9 @@ vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material, v
   return color * (
     (
     skyLight +
+    #ifndef DISABLE_BLOCKLIGHT
     blockLight +
+    #endif
     sunlight +
     GI
     ) / PI +
