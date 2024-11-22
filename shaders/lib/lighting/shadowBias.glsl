@@ -19,6 +19,13 @@ float cubeLength(vec2 v) {
     return pow(t.x + t.y, 1.0/3.0);
 }
 
+float getShadowDistanceZ(float depth) {
+	depth = depth * 2.0 - 1.0;
+	depth /= 0.5; // for distortion
+	vec4 shadowHomPos = shadowProjectionInverse * vec4(0.0, 0.0, depth, 1.0);
+	return shadowHomPos.z / shadowHomPos.w;
+}
+
 vec3 distort(vec3 pos) {
 	float factor = cubeLength(pos.xy) * SHADOW_DISTORTION + (1.0 - SHADOW_DISTORTION);
 	pos.xy /= factor;

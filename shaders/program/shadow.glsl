@@ -127,29 +127,29 @@
     }
     
 
+    float caustics = 1.0;
+
     if(materialIsWater(materialID)){
       #ifdef CUSTOM_WATER
       color.a = 0.0;
-      // vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0), WAVE_E, WAVE_DEPTH);
-      // vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
+      vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
+      vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
 
-      // float opaqueDepth = getShadowDistanceZ(texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r); // how far away from the sun is the opaque fragment shadowed by the water?
+      float opaqueDepth = getShadowDistanceZ(texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r); // how far away from the sun is the opaque fragment shadowed by the water?
 
-      // float waterDepth = shadowViewPos.z - opaqueDepth;
+      float waterDepth = shadowViewPos.z - opaqueDepth;
 
-      // vec3 refracted = refract(lightDir, waveNormal, 1.0/1.33);
+      vec3 refracted = refract(lightDir, waveNormal, 1.0/1.33);
 
-      // vec3 oldPos = feetPlayerPos;
-      // vec3 newPos = feetPlayerPos + refracted * waterDepth;
+      vec3 oldPos = feetPlayerPos;
+      vec3 newPos = feetPlayerPos + refracted * waterDepth;
 
-      // // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
-      // // I do not understand entirely what this does but it seems to work
-      // float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
-      // float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
+      // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
+      // I do not understand entirely what this does but it seems to work
+      float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
+      float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-      // color.a = 1.0 - oldArea / newArea;
-      #else
-      color.a = color.g;
+      caustics = oldArea / newArea;
       #endif
     }
 
@@ -162,7 +162,7 @@
       encodedMaterialID = 1.0;
     }
 
-    shadowData = vec4(materialIsWater(materialID));
+    shadowData = vec4(materialIsWater(materialID), caustics, 0.0, 0.0);
   }
   
 #endif

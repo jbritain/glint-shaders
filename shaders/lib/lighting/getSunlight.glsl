@@ -84,24 +84,6 @@ vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 	return cloudShadow;
 }
 
-float getCaustics(vec3 shadowScreenPos, vec3 feetPlayerPos, float blockerDistance){
-	// if(blockerDistance <= 1.0){
-	// 	return 1.0;
-	// }
-
-	vec3 blockerPos = feetPlayerPos + lightVector * blockerDistance;
-	vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
-	vec3 refracted = refract(lightVector, waveNormal, rcp(1.33));
-
-	vec3 oldPos = blockerPos;
-	vec3 newPos = blockerPos + refracted * blockerDistance;
-
-	float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
-	float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
-
-	return pow3(clamp01(oldArea / newArea));
-}
-
 vec3 waterShadow(float blockerDistance){
 	vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);
 	return extinction;
@@ -155,7 +137,7 @@ vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, 
 
 
 	if(doWaterShadow){
-		shadowSum += getCaustics(getShadowScreenPos(shadowClipPos), feetPlayerPos, blockerDistance);
+		shadowSum *= texture(shadowcolor1, getShadowScreenPos(shadowClipPos).xy).g;
 		shadowSum *= waterShadow(blockerDistance);
 	}
 

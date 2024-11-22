@@ -170,5 +170,7 @@
     #endif
     color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI.rgb, skyLightColor);
     // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
+
+    show(texture(shadowcolor1, texcoord).g);
   }
 #endif
