@@ -29,7 +29,7 @@ vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material, v
   return color * (
     (
     skyLight +
-    // blockLight +
+    blockLight +
     sunlight +
     GI
     ) / PI +
