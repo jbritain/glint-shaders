@@ -147,6 +147,8 @@
 
     if(materialIsPlant(gbufferData.materialID)){
       gbufferData.material.sss = 1.0;
+      gbufferData.material.f0 = vec3(0.04);
+      gbufferData.material.roughness = 0.5;
     }
 
 

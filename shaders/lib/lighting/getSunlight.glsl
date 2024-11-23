@@ -106,7 +106,7 @@ vec3 sampleShadow(vec3 shadowScreenPos, out bool isWater){
 	isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 1).r > 0.5;
 
 	vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
-	vec3 shadowColor = shadowColorData.rgb * (1.0 - shadowColorData.a);
+	vec3 shadowColor = pow(shadowColorData.rgb, vec3(2.2)) * (1.0 - shadowColorData.a);
 	return mix(shadowColor * opaqueShadow, vec3(1.0), transparentShadow);
 }
 
