@@ -174,7 +174,7 @@ const AtmosphereParameters ATMOSPHERE = AtmosphereParameters(
     vec3(0.9420, 1.0269, 1.0242),
     // The sun's angular radius. Warning: the implementation uses approximations
     // that are valid only if this angle is smaller than 0.1 radians.
-	  0.004675,
+	  0.004675 * 2.0,
     // The distance between the planet center and the bottom of the atmosphere.
     earthRadius,
     // The distance between the planet center and the top of the atmosphere.

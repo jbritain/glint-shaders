@@ -128,6 +128,7 @@
     
 
     float caustics = 1.0;
+    float opaqueDepth = texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r;
 
     if(materialIsWater(materialID)){
       #ifdef CUSTOM_WATER
@@ -135,9 +136,9 @@
       vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
       vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
 
-      float opaqueDepth = getShadowDistanceZ(texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r); // how far away from the sun is the opaque fragment shadowed by the water?
+      float opaqueDistance = getShadowDistanceZ(opaqueDepth); // how far away from the sun is the opaque fragment shadowed by the water?
 
-      float waterDepth = shadowViewPos.z - opaqueDepth;
+      float waterDepth = shadowViewPos.z - opaqueDistance;
 
       vec3 refracted = refract(lightDir, waveNormal, 1.0/1.33);
 
@@ -153,6 +154,8 @@
       #endif
     }
 
+    float depthToOpaque = gl_FragDepth - opaqueDepth;
+
     
     float encodedMaterialID = clamp01(float(materialID - 10000) * rcp(255.0));
     vec2 encodedNormal = normal.xy * 0.5 + 0.5;
@@ -162,7 +165,7 @@
       encodedMaterialID = 1.0;
     }
 
-    shadowData = vec4(materialIsWater(materialID), caustics, 0.0, 0.0);
+    shadowData = vec4(materialIsWater(materialID), caustics, opaqueDepth, 0.0);
   }
   
 #endif

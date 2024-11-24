@@ -255,6 +255,8 @@
         mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
       }
       
+      #else
+      color.a = color.g;
       #endif
     }
 

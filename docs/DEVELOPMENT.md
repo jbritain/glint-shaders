@@ -24,7 +24,7 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex11` SMAA
 
 `shadowcolor0` shadow colour
-`shadowcolor1` water mask R
+`shadowcolor1` water mask R, caustics G, distance between opaque and translucent B
 
 # Passes
 `prepare` cloud shadow map

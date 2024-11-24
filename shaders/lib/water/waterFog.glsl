@@ -73,7 +73,9 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
 
     float sunlight = step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r);
 
-    float isWater = step(0.5, texture(shadowcolor1, shadowScreenPos.xy).r);
+    vec4 waterShadowData = texture(shadowcolor1, shadowScreenPos.xy);
+
+    float isWater = step(0.5, waterShadowData.r);
 
     float doWaterShadow = (sunlight + isWater) / 2.0;
     doWaterShadow = mix(doWaterShadow, 1.0, clamp01(distFade));
@@ -84,10 +86,16 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     vec3 skylightTransmittance = exp(-distanceBelowSeaLevel * waterExtinction);
 
     if(doWaterShadow > 0.99){
+      float distanceToOpaque = waterShadowData.b;
       float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
+      float percentageIntoWater = blockerDistanceRaw / distanceToOpaque;
+
+      float caustics = textureLod(shadowcolor1, shadowScreenPos.xy, floor(log2(shadowMapResolution) * (1.0 - percentageIntoWater))).g;
+      
+
 		  float blockerDistance = mix(blockerDistanceRaw * 255 * 2, distanceBelowSeaLevel / clamp01(dot(lightVector, vec3(0.0, 1.0, 0.0))), clamp01(distFade));
       vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);
-      radiance = extinction * sunlightColor;
+      radiance = extinction * sunlightColor * caustics;
 
       vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
       vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
@@ -102,7 +110,7 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
 
     //vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1)) * sunlightColor;
     
-    radiance = mix(radiance, skylightTransmittance * sunlightColor, distFade);
+    radiance = mix(radiance, sunlightColor * skylightTransmittance, distFade);
     radiance += skyLightColor * skylightTransmittance * EBS.y;
 
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / waterExtinction;
