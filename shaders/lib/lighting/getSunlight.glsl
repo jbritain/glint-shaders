@@ -103,7 +103,7 @@ vec3 sampleShadow(vec3 shadowScreenPos, out bool isWater){
 	}
 
 
-	isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 1).r > 0.5;
+	isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 0).r > 0.5;
 
 	vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
 	vec3 shadowColor = pow(shadowColorData.rgb, vec3(2.2)) * (1.0 - shadowColorData.a);
@@ -117,8 +117,10 @@ vec3 getShadows(vec4 shadowClipPos, float blockerDistance, float penumbraWidth, 
 	vec3 shadowSum = vec3(0.0);
 	bool doWaterShadow;
 
+	float noise = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter * SHADOW_SAMPLES);
+
 	for(int i = 0; i < SHADOW_SAMPLES; i++){
-		vec2 offset = clipPenumbraWidth * vogelDiscSample(i, SHADOW_SAMPLES, interleavedGradientNoise(floor(gl_FragCoord.xy), i + frameCounter * SHADOW_SAMPLES));
+		vec2 offset = clipPenumbraWidth * vogelDiscSample(i, SHADOW_SAMPLES, noise);
 		bool isWater;
 		vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos + vec4(offset, 0.0, 0.0));
 		shadowSum += sampleShadow(shadowScreenPos, isWater);

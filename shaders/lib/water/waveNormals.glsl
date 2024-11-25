@@ -5,21 +5,18 @@
 // https://www.shadertoy.com/view/MdXyzX
 // https://opensource.org/license/mit
 
-#define ITERATIONS_NORMAL 16 // waves iterations when calculating normals
 #define DRAG_MULT 0.38 // changes how much waves pull on the water
 
 // Calculates wave value and its derivative, 
 // for the wave direction, position in space, wave frequency and time
 vec2 wavedx(vec2 position, vec2 direction, float frequency, float timeshift) {
-  #ifndef CUSTOM_WATER
-    return vec2(0.5, 0.0);
-  #endif
-
   float x = dot(direction, position) * frequency + timeshift;
   float wave = exp(sin(x) - 1.0) * 0.5;
   float dx = wave * cos(x);
   return vec2(wave, -dx);
 }
+
+
 
 // Calculates waves by summing octaves of various waves with various parameters
 float waveHeight(vec2 position) {
