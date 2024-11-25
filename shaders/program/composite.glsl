@@ -122,6 +122,7 @@
   #include "/lib/util/uvmap.glsl"
   #include "/lib/atmosphere/cloudFog.glsl"
   #include "/lib/util/dh.glsl"
+  #include "/lib/atmosphere/sky.glsl"
 
   // Kneemund's Border Attenuation
   float kneemundAttenuation(vec2 pos, float edgeFactor) {
@@ -143,7 +144,7 @@
 
     vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
     dhOverride(opaqueDepth, opaqueViewPos, true);
-    vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+    
 
     vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
     dhOverride(translucentDepth, translucentViewPos, false);
@@ -157,45 +158,31 @@
     #ifdef REFRACTION
 
     if(waterMask){
-      vec3 dir = normalize(opaqueEyePlayerPos);
+      vec3 dir = normalize(translucentViewPos);
 
       // the actual refracted ray direction
-      vec3 refractedDir = normalize(refract(dir, mat3(gbufferModelViewInverse) * gbufferData.mappedNormal, inWater ? 1.33 : (1.0 / 1.33))); // refracted ray in view space
+      vec3 refractedDir = normalize(refract(dir, gbufferData.mappedNormal, inWater ? 1.33 : rcp(1.33))); // refracted ray in view space
+      float jitter = blueNoise(texcoord).r;
+      
 
-      float waterDepth = distance(opaqueEyePlayerPos, translucentEyePlayerPos);
+      vec3 refractedPos;
+      bool intersect = rayIntersects(translucentViewPos, refractedDir, 8, jitter, true, refractedPos, false);
+      if(intersect && texture(depthtex2, refractedPos.xy).r > translucentDepth + 1e-6){
+        color = texture(colortex0, refractedPos.xy);
+        opaqueViewPos = screenSpaceToViewSpace(refractedPos);
+      } else if(inWater) {
+        vec3 worldRefractedDir = normalize(mat3(gbufferModelViewInverse) * refractedDir);
+        vec2 environmentUV = mapSphere(worldRefractedDir);
 
-      // the refracted offset we use for terrain
-      // method from BSL
-      vec2 refractDir = gbufferData.mappedNormal.xy - gbufferData.faceNormal.xy;
-      refractDir *= vec2(1.0 / aspectRatio, 1.0) * (gbufferProjection[1][1] / 1.37) / (opaqueDepth == 1.0 ? 16.0 : max(length(opaqueEyePlayerPos), 8.0)); // sorcery
-      refractDir *= 4.0;
-      vec3 refractedCoord = vec3(texcoord + refractDir, 0.0);
-      refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
-
-      bool refract = clamp01(refractedCoord.xy) == refractedCoord.xy; // don't refract offscreen
-
-      refract = refract && (
-        refractedCoord.z > translucentDepth
-      );
-
-      if(refract){ // don't refract stuff that's not underwater
-        vec2 refractedDecode1y = unpack2x8F(texture(colortex1, refractedCoord.xy).y);
-        int refractedMaterialID = int(refractedDecode1y.y * 255 + 0.5) + 10000;
-        refract = materialIsWater(refractedMaterialID);
-      }
-
-      // refract = refract && (refractedCoord.z >= translucentDepth); // another check for it being underwater
-
-
-      if(refract){
-        // refractedCoord.xy = mix(texcoord, refractedCoord.xy, kneemundAttenuation(refractedCoord.xy, 0.03));
-        color = texture(colortex0, refractedCoord.xy);
-        refractedCoord.z = texture(depthtex2, refractedCoord.xy).r;
-        opaqueViewPos = screenSpaceToViewSpace(refractedCoord);
-        opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+        color.a = 1.0;
+        color.rgb = texture(colortex9, environmentUV).rgb;
+      } else {
+        color.rgb = vec3(0.0);
       }
     }
     #endif
+
+    vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
 
     if(waterMask == inWater && opaqueDepth != 1.0){
       color = getAtmosphericFog(color, opaqueEyePlayerPos);

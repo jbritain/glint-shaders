@@ -90,12 +90,12 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
       float blockerDistanceRaw = max0(shadowScreenPos.z - texture(shadowtex0, shadowScreenPos.xy).r);
       float percentageIntoWater = blockerDistanceRaw / distanceToOpaque;
 
-      float caustics = textureLod(shadowcolor1, shadowScreenPos.xy, floor(log2(shadowMapResolution) * (1.0 - percentageIntoWater))).g;
+      // float caustics = textureLod(shadowcolor1, shadowScreenPos.xy, floor(log2(shadowMapResolution) * (1.0 - percentageIntoWater))).g;
       
 
 		  float blockerDistance = mix(blockerDistanceRaw * 255 * 2, distanceBelowSeaLevel / clamp01(dot(lightVector, vec3(0.0, 1.0, 0.0))), clamp01(distFade));
       vec3 extinction = exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * blockerDistance);
-      radiance = extinction * sunlightColor * caustics;
+      radiance = extinction * sunlightColor;
 
       vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
       vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
@@ -111,7 +111,7 @@ vec3 getWaterFog(vec3 color, vec3 a, vec3 b, vec3 sunlightColor, vec3 skyLightCo
     //vec3 radiance = computeShadow(shadowClipPos, 0.1, lightVector, 2, true, interleavedGradientNoise(floor(gl_FragCoord.xy), i + 1)) * sunlightColor;
     
     radiance = mix(radiance, sunlightColor * skylightTransmittance, distFade);
-    radiance += skyLightColor * skylightTransmittance * EBS.y;
+    radiance += skyLightColor * skylightTransmittance;
 
     vec3 integScatter = (radiance - radiance * clamp01(transmittance)) / waterExtinction;
 

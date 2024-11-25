@@ -173,7 +173,13 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
     if(!hit || fadeFactor > 0.0){
       vec3 worldDir = mat3(gbufferModelViewInverse) * reflectedRay;
       vec2 environmentUV = mapSphere(normalize(worldDir));
-      reflectedColor.rgb = mix(reflectedColor.rgb, texture(colortex9, environmentUV).rgb * lightmap.y, fadeFactor);
+      vec3 skyReflection = texture(colortex9, environmentUV).rgb;
+      if(isEyeInWater == 1){
+        skyReflection *= mix(exp(-WATER_ABSORPTION * max0(63 - cameraPosition.y)), exp(-WATER_ABSORPTION * 1024), 1.0 - clamp01(worldDir.y));
+      } else {
+        skyReflection *= lightmap.y;
+      }
+      reflectedColor.rgb = mix(reflectedColor.rgb, skyReflection, fadeFactor);
     }
 
   } else { // we must take multiple samples
@@ -198,8 +204,14 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
       } else {
         vec3 worldDir = mat3(gbufferModelViewInverse) * reflectedRay;
         vec2 environmentUV = mapSphere(worldDir);
+        vec3 skyReflection = texture(colortex9, environmentUV).rgb;
+        if(isEyeInWater == 1){
+          skyReflection *= mix(exp(-WATER_ABSORPTION * max0(63 - cameraPosition.y)), exp(-WATER_ABSORPTION * 1024), 1.0 - clamp01(worldDir.y));
+        } else {
+          skyReflection *= lightmap.y;
+        }
 
-        reflectedColor.rgb += mix(originalColor.rgb, texture(colortex9, environmentUV).rgb * lightmap.y, fadeFactor);
+        reflectedColor.rgb += mix(originalColor.rgb, skyReflection, fadeFactor);
       }
     }
     reflectedColor /= SSR_SAMPLES;
@@ -234,8 +246,14 @@ vec4 getSpecularShading(vec4 color, vec2 lightmap, vec3 normal, vec3 viewPos, Ma
   if(material.roughness < 0.01){
     vec3 reflectedDir = mat3(gbufferModelViewInverse) * reflect(normalize(viewPos), normal);
     vec2 environmentUV = mapSphere(reflectedDir);
+    vec3 skyReflection = texture(colortex9, environmentUV).rgb;
+    if(isEyeInWater == 1){
+      skyReflection *= mix(exp(-WATER_ABSORPTION * max0(63 - cameraPosition.y)), exp(-WATER_ABSORPTION * 1024), 1.0 - clamp01(worldDir.y));
+    } else {
+      skyReflection *= lightmap.y;
+    }
 
-    reflectedColor.rgb = texture(colortex9, environmentUV).rgb * lightmap.y;
+    reflectedColor.rgb = skyReflection;
   } else {
     reflectedColor = color;
   }

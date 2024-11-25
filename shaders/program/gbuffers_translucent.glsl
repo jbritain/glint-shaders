@@ -243,6 +243,7 @@
     if(materialIsWater(materialID)){
       #ifdef CUSTOM_WATER
       color = vec4(0.0);
+      color.a = 0.0;
 
       #ifdef DISTANT_HORIZONS
       color.a = smoothstep(0.8 * far, far, length(viewPos));
