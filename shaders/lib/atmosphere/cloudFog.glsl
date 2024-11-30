@@ -66,6 +66,10 @@ vec3 calculateFogLightEnergy(vec3 rayPos, float jitter, float costh){
   vec3 shadowScreenPos = getShadowScreenPos(shadowClipPos);
   vec3 sunlight = vec3(step(shadowScreenPos.z, textureLod(shadowtex1, shadowScreenPos.xy, 2).r));
 
+  // float distFade = smoothstep(0.8, 1.0, length(shadowClipPos));
+
+  // sunlight = mix(sunlight, vec3(1.0), clamp01(distFade));
+
   vec3 undistortedShadowScreenPos = getUndistortedShadowScreenPos(shadowClipPos).xyz;
   vec3 cloudShadow = texture(colortex6, undistortedShadowScreenPos.xy).rgb;
   cloudShadow = mix(vec3(1.0), cloudShadow, smoothstep(0.1, 0.2, lightVector.y));

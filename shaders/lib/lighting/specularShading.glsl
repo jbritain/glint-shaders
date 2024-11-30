@@ -164,7 +164,7 @@ vec4 screenSpaceReflections(in vec4 reflectedColor, vec2 lightmap, vec3 normal, 
   vec2 screenPos = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
   if(material.roughness < 0.01){ // we only need to make one reflection sample for perfectly smooth surfaces
     vec3 reflectedRay = reflect(normalize(viewPos), normal);
-    float jitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight)).x;
+    float jitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).x;
     bool hit;
     float fadeFactor;
 

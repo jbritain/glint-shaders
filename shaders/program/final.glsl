@@ -81,6 +81,7 @@
     color.rgb = invGammaCorrect(color.rgb);
 
     #if defined DEBUG_ENABLE && !defined POST_PROCESS_DEBUG
+    // if(texcoord.x > 0.5)
     color = texture(debugtex, texcoord);
     #endif
 

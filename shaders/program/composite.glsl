@@ -161,30 +161,43 @@
       vec3 dir = normalize(translucentViewPos);
 
       // the actual refracted ray direction
-      vec3 refractedDir = normalize(refract(dir, gbufferData.mappedNormal, inWater ? 1.33 : rcp(1.33))); // refracted ray in view space
-      float jitter = blueNoise(texcoord).r;
+      vec3 refractionNormal = !inWater ? gbufferData.faceNormal - gbufferData.mappedNormal :  gbufferData.mappedNormal;
+
+      vec3 refractedDir = normalize(refract(dir, refractionNormal, inWater ? 1.33 : rcp(1.33))); // refracted ray in view space
+      float jitter = blueNoise(texcoord, frameCounter).r;
+
       
 
+      // vec3 refractedPos = viewSpaceToScreenSpace(translucentViewPos + refractedDir * distance(translucentViewPos, opaqueViewPos));
       vec3 refractedPos;
       bool intersect = rayIntersects(translucentViewPos, refractedDir, 8, jitter, true, refractedPos, false);
-      if(intersect && texture(depthtex2, refractedPos.xy).r > translucentDepth + 1e-6){
+      
+      float refractedDepth = texture(depthtex2, refractedPos.xy).r;
+      intersect = intersect && refractedDepth > translucentDepth + 1e-6 && refractedDepth != 1.0; 
+      // intersect = intersect && distance(refractedPos.xy, texcoord) > 5e-3;
+      if(intersect){
         color = texture(colortex0, refractedPos.xy);
         opaqueViewPos = screenSpaceToViewSpace(refractedPos);
+        opaqueDepth = refractedPos.z;
       } else if(inWater) {
-        vec3 worldRefractedDir = normalize(mat3(gbufferModelViewInverse) * refractedDir);
-        vec2 environmentUV = mapSphere(worldRefractedDir);
 
-        color.a = 1.0;
-        color.rgb = texture(colortex9, environmentUV).rgb;
-      } else {
-        color.rgb = vec3(0.0);
+        if((mat3(gbufferModelViewInverse) * refractedDir).y > 0.0){
+          vec3 worldRefractedDir = normalize(mat3(gbufferModelViewInverse) * refractedDir);
+          vec2 environmentUV = mapSphere(worldRefractedDir);
+
+          color.a = 1.0;
+          color.rgb = texture(colortex9, environmentUV).rgb;
+        } else {
+          color.rgb = skyLightColor * EBS.y;
+        }
       }
+
     }
     #endif
 
     vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
 
-    if(waterMask == inWater && opaqueDepth != 1.0){
+    if(!inWater && !waterMask && opaqueDepth != 1.0){
       color = getAtmosphericFog(color, opaqueEyePlayerPos);
       color = getBorderFog(color, opaqueEyePlayerPos);
     }

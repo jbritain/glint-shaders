@@ -93,16 +93,21 @@ bool rayIntersects(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bo
       intersect = true;
       break;
     }
+    if(clamp01(rayPos2) != rayPos2) return false; // we went offscreen
     if(depth2 < rayPos2.z && abs(depthLenience - (rayPos2.z - depth2)) < depthLenience && rayPos2.z > handDepth){
+      
       intersect = true;
       rayPos = rayPos2;
       break;
     }
+    if(clamp01(rayPos3) != rayPos3) return false; // we went offscreen
     if(depth3 < rayPos3.z && abs(depthLenience - (rayPos3.z - depth3)) < depthLenience && rayPos3.z > handDepth){
+      
       intersect = true;
       rayPos = rayPos3;
       break;
     }
+    if(clamp01(rayPos4) != rayPos4) return false; // we went offscreen
     if(depth4 < rayPos4.z && abs(depthLenience - (rayPos4.z - depth4)) < depthLenience && rayPos4.z > handDepth){
       intersect = true;
       rayPos = rayPos4;
@@ -113,7 +118,7 @@ bool rayIntersects(vec3 viewOrigin, vec3 viewDir, int maxSteps, float jitter, bo
   if(clamp01(rayPos) != rayPos) return false; // we went offscreen
 
   if(refine && intersect){
-    binarySearch(rayPos, rayDir, previousFrame);
+    binarySearch(rayPos, rayStep, previousFrame);
   }
 
   return intersect;

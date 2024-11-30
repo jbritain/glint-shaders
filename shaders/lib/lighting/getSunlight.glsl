@@ -19,7 +19,8 @@
 #include "/lib/water/waveNormals.glsl"
 #include "/lib/atmosphere/common.glsl"
 
-vec2 vogelDiscSample(int stepIndex, int stepCount, float rotation) {
+vec2 vogelDiscSample(int stepIndex, int stepCount, float noise) {
+	float rotation = noise * 2 * PI;
   const float goldenAngle = 2.4;
 
   float r = sqrt(stepIndex + 0.5) / sqrt(float(stepCount));
@@ -104,6 +105,10 @@ vec3 sampleShadow(vec3 shadowScreenPos, out bool isWater){
 
 
 	isWater = textureLod(shadowcolor1, shadowScreenPos.xy, 0).r > 0.5;
+
+	if(isWater){
+		return vec3(opaqueShadow);
+	}
 
 	vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
 	vec3 shadowColor = pow(shadowColorData.rgb, vec3(2.2)) * (1.0 - shadowColorData.a);

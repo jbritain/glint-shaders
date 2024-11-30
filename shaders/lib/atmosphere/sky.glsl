@@ -115,7 +115,7 @@ vec4 getBorderFog(vec4 color, vec3 playerPos){
   return color;
   #endif
   
-  float distFactor = smoothstep(0.8 * far, far, length(playerPos));
+  float distFactor = smoothstep(0.8 * far, far, length(playerPos.xz));
   distFactor = pow2(distFactor);
 
   vec3 fog = getSky(normalize(playerPos), false);

@@ -48,13 +48,28 @@ vec2 getParallaxTexcoord(vec2 texcoord, vec3 viewPos, mat3 tbnMatrix, out vec3 p
 
   // pos += rayStep * jitter;
 
+  depth = getDepth(localToAtlas(pos.xy), dx, dy);
+
   while(depth - pos.z > rcp(255.0)){
     previousPos = pos;
     depth = getDepth(localToAtlas(pos.xy), dx, dy);
     pos += rayStep;
   }
 
-  return localToAtlas(pos.xy);
+  depth = getDepth(localToAtlas(pos.xy), dx, dy);
+  // binary refinement
+  for(int i = 0; i < 6; i++){
+    rayStep /= 2.0;
+
+    pos += rayStep * float(depth - pos.z > rcp(255.0));
+    depth = getDepth(localToAtlas(pos.xy), dx, dy);
+
+    if (depth - pos.z > rcp(255.0)){
+      previousPos = pos;
+    }
+  }
+
+  return localToAtlas(previousPos.xy);
 }
 
 bool getParallaxShadow(vec3 pos, mat3 tbnMatrix, vec2 dx, vec2 dy, float jitter){
@@ -66,11 +81,13 @@ bool getParallaxShadow(vec3 pos, mat3 tbnMatrix, vec2 dx, vec2 dy, float jitter)
   vec3 lightDir = normalize(shadowLightPosition) * tbnMatrix;
   vec3 rayStep = vec3(lightDir.xy * rcp(lightDir.z) * POM_HEIGHT, -1.0) * pos.z * rcp(PARALLAX_SHADOW_SAMPLES);
 
+  if(getDepth(localToAtlas(pos.xy), dx, dy) < pos.z) return true;
+
   pos += rayStep * jitter;
 
-  for(int i = 0; i < PARALLAX_SHADOW_SAMPLES; ++i){
-    pos += rayStep;
+  for(int i = 0; i < PARALLAX_SHADOW_SAMPLES; i++){
     if(getDepth(localToAtlas(pos.xy), dx, dy) < pos.z) return true;
+    pos += rayStep;
   }
 
   return false;

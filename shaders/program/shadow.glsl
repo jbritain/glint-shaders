@@ -134,7 +134,7 @@
       #ifdef CUSTOM_WATER
       color.a = 0.0;
 
-      vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
+      vec3 lightDir = mat3(gbufferModelViewInverse) * normalize(-shadowLightPosition);
       float opaqueDistance = getShadowDistanceZ(opaqueDepth); // how far away from the sun is the opaque fragment shadowed by the water?
       float waterDepth = shadowViewPos.z - opaqueDistance;
 
@@ -142,7 +142,7 @@
       vec3 waveNormal = waveNormal(feetPlayerPos.xz + cameraPosition.xz, vec3(0.0, 1.0, 0.0));
       vec3 refracted = refract(lightDir, waveNormal, 1.0/1.33);
 
-      vec3 oldPos = feetPlayerPos;
+      vec3 oldPos = feetPlayerPos + lightDir * waterDepth;
       vec3 newPos = feetPlayerPos + refracted * waterDepth;
 
       // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
