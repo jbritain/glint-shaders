@@ -67,8 +67,8 @@
 
     color.rgb = color.rgb * fogData.a + fogData.rgb;
 
-    // if(isEyeInWater > 1){
+    if(isEyeInWater > 1){
       color.rgb = mix(color.rgb, fogColor, smoothstep(fogStart, fogEnd, length(viewPos)));
-    // }
+    }
   }
 #endif
