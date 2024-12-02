@@ -126,6 +126,7 @@
   #include "/lib/util/blur.glsl"
   #include "/lib/util/dh.glsl"
   #include "/lib/util/bilateralFilter.glsl"
+  #include "/lib/lighting/brdf.glsl"
 
   void main() {
     float depth = texture(depthtex2, texcoord).r;
@@ -157,10 +158,9 @@
     if(DH_MASK){
       parallaxShadow = 1.0;
     }
-    sunlight = SUNLIGHT_STRENGTH * sunlightColor;
 
-    sunlight *= getSunlight(feetPlayerPos, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap) * parallaxShadow;
-    
+    float scatter;
+    vec3 sunlight = getSunlight(feetPlayerPos, gbufferData.mappedNormal, gbufferData.faceNormal, gbufferData.material.sss, gbufferData.lightmap, scatter) * parallaxShadow;
 
     color.rgb = gbufferData.material.albedo;
 
@@ -170,7 +170,12 @@
     #else
     vec4 GI = vec4(vec3(0.0), 1.0);
     #endif
-    color.rgb = shadeDiffuse(color.rgb, gbufferData.lightmap, sunlight, gbufferData.material, GI.rgb, skyLightColor);
-    // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
+
+    vec3 diffuse = getDiffuseColor(gbufferData.lightmap, gbufferData.material, skyLightColor) * gbufferData.material.albedo;
+    vec3 fresnel;
+    vec3 specular = getSpecularColor(color.rgb, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, fresnel);
+
+    color.rgb *= (brdf(gbufferData.material, gbufferData.mappedNormal, gbufferData.faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor;
+    color.rgb += mix(diffuse, specular, fresnel);
   }
 #endif

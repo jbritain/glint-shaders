@@ -138,7 +138,7 @@
   layout(location = 2) out vec4 outData3; // nothing in the rgb but parallax shadow in the a
 
   void main() {
-    float parallaxSunlight = 1.0;
+    float parallaxShadow = 1.0;
     #if defined POM && !defined gbuffers_spidereyes
     vec2 texcoord = texcoord;
     vec2 dx = dFdx(texcoord);
@@ -148,12 +148,12 @@
       vec2 pomJitter = vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
-      parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
+      parallaxShadow = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
       #endif
     }
     #endif
     outData3.rgb = texture(colortex3, gl_FragCoord.xy / vec2(viewWidth, viewHeight)).rgb;
-    outData3.a = parallaxSunlight;
+    outData3.a = parallaxShadow;
 
     vec4 color;
     color = texture(gtexture, texcoord) * glcolor;

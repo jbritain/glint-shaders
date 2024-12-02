@@ -193,8 +193,19 @@
     material = materialFromSpecularMap(color.rgb, specularData);
 
 
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor;
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
-    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    float scatter;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, scatter);
+
+
+    vec3 diffuse = getDiffuseColor(lightmap, material, skyLightColor);
+    vec3 fresnel;
+    vec3 specular = getSpecularColor(color.rgb, lightmap, mappedNormal, viewPos, material, fresnel);
+
+
+    color.rgb *= (
+      (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor + 
+      mix(diffuse, specular, fresnel)
+    );
+    color.a = mix(color.a, 1.0, max3(fresnel));
   }
 #endif

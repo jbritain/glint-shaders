@@ -13,45 +13,31 @@
 vec2 SMAAColorEdgeDetection(sampler2D colorTex, vec2 uv, vec2 bufferSize) {
     ivec2 texelCoord = ivec2(uv * bufferSize);
     vec4 delta;
-    vec3 currentColor;
+    vec3 d;
 
     vec2 edges = vec2(0.0);
 
     vec3 colorCenter = texelFetch(colorTex, texelCoord, 0).rgb;
 
-    currentColor = texelFetchOffset(colorTex, texelCoord, 0, ivec2(-1,  0)).rgb;
-    delta.x      = distance(colorCenter, currentColor);                          // Perceptual color space euclidian distance. Probably not scientific but looks good. 
-
-    currentColor = texelFetchOffset(colorTex, texelCoord, 0, ivec2( 0, -1)).rgb;
-    delta.y      = distance(colorCenter, currentColor);
+    delta.x = distance(colorCenter, texelFetchOffset(colorTex, texelCoord, 0, ivec2(-1, 0)).xyz);
+    delta.y = distance(colorCenter, texelFetchOffset(colorTex, texelCoord, 0, ivec2(0, -1)).xyz);
 
     edges = step(0.0625, delta.xy);
 
-    float temp1 = length(delta.xy);
+    d.x = length(delta.xy);
 
-    if (edges.x + edges.y > 0.0) {
-        currentColor = texelFetchOffset(colorTex, texelCoord, 0, ivec2( 1,  0)).rgb;
-        delta.z      = distance(colorCenter, currentColor);
-        
-        currentColor = texelFetchOffset(colorTex, texelCoord, 0, ivec2( 0,  1)).rgb;
-        delta.w      = distance(colorCenter, currentColor);
+    if(edges.x + edges.y > 0.0){
+        delta.z = distance(colorCenter, texelFetchOffset(colorTex, texelCoord, 0, ivec2(1, 0)).xyz);
+        delta.w = distance(colorCenter, texelFetchOffset(colorTex, texelCoord, 0, ivec2(0, 1)).xyz);
 
-        float temp2 = length(delta.zw);
+        d.y = length(delta.zw);
 
-        vec2 maxDelta = max(delta.xy, delta.zw);
+        delta.z = distance(colorCenter, texelFetchOffset(colorTex, texelCoord, 0, ivec2(-2, 0)).xyz);
+        delta.w = distance(colorCenter, texelFetchOffset(colorTex, texelCoord, 0, ivec2(0, -2)).xyz);
 
-        currentColor = texelFetchOffset(colorTex, texelCoord, 0, ivec2(-2,  0)).rgb;
-        delta.z      = distance(colorCenter, currentColor);
+        d.z = length(delta.zw);
 
-        currentColor = texelFetchOffset(colorTex, texelCoord, 0, ivec2( 0, -2)).rgb;
-        delta.w      = distance(colorCenter, currentColor);
-
-        float temp3 = length(delta.zw);
-
-        maxDelta         = max(maxDelta.xy, delta.zw);
-        float finalDelta = max(max(temp1, temp2), temp3); // Better method, using maximum of local difference vector lengths rather than maximum of local x's and y's.
-
-        edges = step(finalDelta, SMAA_CONTRAST_ADAPTION_COEFFICIENT * delta.xy);
+        edges = step(max(max(d.x, d.y), d.z), 2.0 * delta.xy);
     }
 
     return edges;

@@ -18,9 +18,9 @@
 vec3 getWave(vec3 pos){
   float magnitude = 0.1;
 
-  float d0 = sin(frameTimeCounter);
-  float d1 = sin(frameTimeCounter * 0.5);
-  float d2 = sin(frameTimeCounter * 0.25);
+  float d0 = sin(worldTimeCounter);
+  float d1 = sin(worldTimeCounter * 0.5);
+  float d2 = sin(worldTimeCounter * 0.25);
 
   vec3 wave;
   wave.x = sin(0.2 + d0 + d1 - pos.x + pos.y + pos.z) * magnitude;

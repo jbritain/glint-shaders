@@ -182,7 +182,7 @@
   layout(location = 2) out vec4 outData2; // mapped normal, specular map data
 
   void main() {
-    float parallaxSunlight = 1.0;
+    float parallaxShadow = 1.0;
     #ifdef POM
     vec2 texcoord = texcoord;
     vec2 dx = dFdx(texcoord);
@@ -192,7 +192,7 @@
       vec2 pomJitter = vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter));
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
-            parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
+            parallaxShadow = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
       #endif
     }
     #endif
@@ -242,22 +242,11 @@
 
     if(materialIsWater(materialID)){
       #ifdef CUSTOM_WATER
-      color = vec4(0.0);
-      color.a = 0.0;
-
-      #ifdef DISTANT_HORIZONS
-      color.a = smoothstep(0.8 * far, far, length(viewPos));
-      #endif
-
-      //
       if(abs(faceNormal.y) > 0.9){
         mappedNormal = mat3(gbufferModelView) * getWaterParallaxNormal(viewPos, faceNormal, blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).r);
       } else {
         mappedNormal = mat3(gbufferModelView) * waveNormal(eyePlayerPos.xz + cameraPosition.xz, mat3(gbufferModelViewInverse) * faceNormal);
       }
-      
-      #else
-      color.a = color.g;
       #endif
     }
 
@@ -300,11 +289,41 @@
     outData2.z = pack2x8F(specularData.ba);
 
     #ifndef gbuffers_weather
-      vec3 sunlightColor; vec3 skyLightColor;
-      getLightColors(sunlightColor, skyLightColor);
-      vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
-      color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
-      color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    vec3 sunlightColor; vec3 skyLightColor;
+    getLightColors(sunlightColor, skyLightColor);
+    float scatter;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, scatter) * parallaxShadow;
+
+    vec3 diffuse = getDiffuseColor(lightmap, material, skyLightColor) * material.albedo;
+    vec3 fresnel;
+    vec3 specular = getSpecularColor(color.rgb, lightmap, mappedNormal, viewPos, material, fresnel);
+
+    if(materialIsWater(materialID)){
+      color.rgb = specular;
+
+      float alpha = 1e-6;
+
+      vec3 L = normalize(shadowLightPosition);
+      vec3 V = normalize(-viewPos);
+      vec3 N = mappedNormal;
+      vec3 H = normalize(L + V);
+
+      float dotNHSquared = getNoHSquared(dot(N, L), dot(N, V), dot(V, L), ATMOSPHERE.sun_angular_radius);
+      float distr = dotNHSquared * (alpha - 1.0) + 1.0;
+      color.rgb += alpha / (PI * pow2(distr)) * sunlightColor * sunlight;
+
+
+      color.a = max3(fresnel);
+    } else {
+      color.rgb *= (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor;
+      color.rgb += mix(diffuse, specular, fresnel);
+      color.a *= (1.0 - max3(fresnel));
+    }
+    
+
+
+
+    
     #endif
 
     if(isEyeInWater == 0){

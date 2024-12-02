@@ -30,7 +30,7 @@ vec2 vogelDiscSample(int stepIndex, int stepCount, float noise) {
 }
 
 // subsurface scattering help from tech
-vec3 computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPlayerPos){
+float computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPlayerPos){
 	#ifndef SUBSURFACE_SCATTERING
 	return 0.0;
 	#endif
@@ -38,26 +38,26 @@ vec3 computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPlay
 	float NoL = dot(faceNormal, normalize(shadowLightPosition));
 
 	if(SSS < 0.0001){
-		return vec3(0.0);
+		return 0.0;
 	}
 
-	// if(NoL > -0.00001){
-	// 	return vec3(0.0);
-	// }
+	if(NoL > -0.00001){
+		return 0.0;
+	}
 
 	float s = 1.0 / (SSS * 2.0);
 	float z = blockerDistance;
 
 	if(isnan(z)){
-		return vec3(0.0);
+		return 0.0;
 	}
 
-	vec3 scatter = vec3(0.25 * (exp(-s * z) + 3*exp(-s * z / 3)));
+	float scatter = 0.25 * (exp(-s * z) + 3*exp(-s * z / 3));
 
 	float cosTheta = clamp01(dot(normalize(feetPlayerPos), lightVector));
 	scatter *= henyeyGreenstein(0.4, cosTheta);
 
-	return clamp01(scatter);
+	return scatter;
 }
 
 vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
@@ -172,7 +172,7 @@ float blockerSearch(vec4 shadowClipPos){
 }
 
 
-vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap){
+vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float SSS, vec2 lightmap, out float scatter){
 	#ifdef WORLD_THE_END
 	lightmap.y = 1.0;
 	#endif
@@ -181,17 +181,15 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	float faceNoL = clamp01(dot(faceNormal, viewLightVector));
 	float mappedNoL = clamp01(dot(mappedNormal, viewLightVector));
 
-	vec3 sunlight = vec3(mappedNoL * step(1e-6, faceNoL));
-
-	if (max3(sunlight) < 1e-6 && SSS < 1e-6){
-		return sunlight;
+	if (faceNoL < 1e-6 && SSS < 1e-6){
+		return vec3(0.0);
 	}
 
 	vec4 shadowClipPos = getShadowClipPos(feetPlayerPos);
 	vec3 bias = getShadowBias(shadowClipPos.xyz, mat3(gbufferModelViewInverse) * faceNormal, faceNoL);
 	shadowClipPos.xyz += bias;
 
-	vec3 fakeShadow = clamp01(vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y)) * mix(faceNoL, pow2(faceNoL * 0.5 + 0.5), SSS));
+	vec3 fakeShadow = clamp01(vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y)));
 
 	float distFade = pow5(
 		max(
@@ -212,15 +210,12 @@ vec3 getSunlight(vec3 feetPlayerPos, vec3 mappedNormal, vec3 faceNormal, float S
 	blockerDistance *= 2.0;
 	blockerDistance *= 255.0;
 
-	sunlight *= getShadows(shadowClipPos, blockerDistance, penumbraWidth, feetPlayerPos);
+	vec3 sunlight = getShadows(shadowClipPos, blockerDistance, penumbraWidth, feetPlayerPos);
 
-	vec3 scatter = computeSSS(blockerDistance, SSS, faceNormal, feetPlayerPos);
-	sunlight += scatter;
+	scatter = computeSSS(blockerDistance, SSS, faceNormal, feetPlayerPos);
 	sunlight *= sampleCloudShadow(shadowClipPos, faceNormal);
 
 	sunlight = mix(sunlight, fakeShadow, clamp01(distFade));
-
-
 	return sunlight;
 }
 #endif

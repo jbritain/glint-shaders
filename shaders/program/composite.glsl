@@ -160,8 +160,13 @@
     if(waterMask){
       vec3 dir = normalize(translucentViewPos);
 
+      bool doSnellsWindow = false;
+      #ifdef SNELLS_WINDOW
+      doSnellsWindow = inWater;
+      #endif
+
       // the actual refracted ray direction
-      vec3 refractionNormal = !inWater ? gbufferData.faceNormal - gbufferData.mappedNormal :  gbufferData.mappedNormal;
+      vec3 refractionNormal = !doSnellsWindow ? gbufferData.faceNormal - gbufferData.mappedNormal :  gbufferData.mappedNormal;
 
       vec3 refractedDir = normalize(refract(dir, refractionNormal, inWater ? 1.33 : rcp(1.33))); // refracted ray in view space
       float jitter = blueNoise(texcoord, frameCounter).r;
@@ -177,16 +182,15 @@
       // intersect = intersect && distance(refractedPos.xy, texcoord) > 5e-3;
       if(intersect){
         color = texture(colortex0, refractedPos.xy);
-        opaqueViewPos = screenSpaceToViewSpace(refractedPos);
-        opaqueDepth = refractedPos.z;
-      } else if(inWater) {
-
+        // opaqueViewPos = screenSpaceToViewSpace(refractedPos);
+        // opaqueDepth = refractedPos.z;
+      } else if(doSnellsWindow) {
         if((mat3(gbufferModelViewInverse) * refractedDir).y > 0.0){
           vec3 worldRefractedDir = normalize(mat3(gbufferModelViewInverse) * refractedDir);
           vec2 environmentUV = mapSphere(worldRefractedDir);
 
           color.a = 1.0;
-          color.rgb = texture(colortex9, environmentUV).rgb;
+          color.rgb = texture(colortex9, environmentUV).rgb * float(opaqueDepth == 1.0 || refractedDepth > 0.99);
         } else {
           color.rgb = skyLightColor * EBS.y;
         }

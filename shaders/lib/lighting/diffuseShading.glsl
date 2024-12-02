@@ -15,9 +15,9 @@
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/material.glsl"
 
-vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material, vec3 GI, vec3 skyLightColor){
+vec3 getDiffuseColor(vec2 lightmap, Material material, vec3 skyLightColor){
   vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * pow2(lightmap.y);
-  vec3 blockLight = max0(exp(-(1.0 - max0(lightmap.x - max3(GI))) * 10.0)) * BLOCKLIGHT_COLOR * BLOCKLIGHT_STRENGTH;
+  vec3 blockLight = max0(exp(-(1.0 - lightmap.x * 10.0))) * BLOCKLIGHT_COLOR * 0.0001;
   
 
   vec3 ambient = vec3(AMBIENT_STRENGTH);
@@ -26,18 +26,10 @@ vec3 shadeDiffuse(vec3 color, vec2 lightmap, vec3 sunlight, Material material, v
   ambient *= 3.0;
   #endif
 
-  return color * (
-    (
-    skyLight +
-    #ifndef DISABLE_BLOCKLIGHT
-    blockLight +
-    #endif
-    sunlight +
-    GI
-    ) / PI +
-    ambient +
-    material.emission * 2
-  );
+  return skyLight +
+  blockLight +
+  ambient +
+  material.emission * 2;
 }
 
 #endif

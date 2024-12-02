@@ -186,7 +186,7 @@
   layout(location = 0) out vec4 color; // shaded colour
 
   void main() {
-    float parallaxSunlight = 1.0;
+    float parallaxShadow = 1.0;
     #ifdef POM
     vec2 texcoord = texcoord;
     vec2 dx = dFdx(texcoord);
@@ -196,7 +196,7 @@
       vec2 pomJitter = blueNoise(gl_FragCoord.xy / vec2(viewWidth, viewHeight), frameCounter).rg;
       texcoord = getParallaxTexcoord(texcoord, viewPos, tbnMatrix, parallaxPos, dx, dy, pomJitter.x);
       #ifdef POM_SHADOW
-            parallaxSunlight = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
+            parallaxShadow = getParallaxShadow(parallaxPos, tbnMatrix, dx, dy, pomJitter.y) ? smoothstep(0.0, 32.0, length(viewPos)) : 1.0;
       #endif
     }
     #endif
@@ -242,9 +242,19 @@
     #endif
 
 
-    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap) * SUNLIGHT_STRENGTH * sunlightColor * parallaxSunlight;
-    color.rgb = shadeDiffuse(color.rgb, lightmap, sunlight, material, vec3(0.0), skyLightColor);
-    color = shadeSpecular(color, lightmap, mappedNormal, viewPos, material, sunlight, skyLightColor);
+    float scatter;
+    vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, scatter) * parallaxShadow;
+
+
+    vec3 diffuse = getDiffuseColor(lightmap, material, skyLightColor);
+    vec3 fresnel;
+    vec3 specular = getSpecularColor(color.rgb, lightmap, mappedNormal, viewPos, material, fresnel);
+
+
+    color.rgb *= (
+      (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor + 
+      mix(diffuse, specular, fresnel)
+    );
 
     color = getAtmosphericFog(color, eyePlayerPos);
   }

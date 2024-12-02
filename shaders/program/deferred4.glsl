@@ -150,8 +150,7 @@
 
     vec3 sunlight = texture(colortex8, texcoord).rgb;
 
-    show(texture(shadowcolor1, texcoord).g);
 
-    color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
+    // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
   }
 #endif
