@@ -881,6 +881,15 @@ RadianceSpectrum GetSkyRadianceToPoint(
   Number nu = dot(view_ray, sun_direction);
   Length d = length(point - camera);
   bool ray_r_mu_intersects_ground = RayIntersectsGround(atmosphere, r, mu);
+
+  // Hack to avoid rendering artifacts near the horizon, due to finite
+  // atmosphere texture resolution and finite floating point precision.
+  if (!ray_r_mu_intersects_ground) {
+    Number mu_horiz = -SafeSqrt(
+    1.0 - (atmosphere.bottom_radius / r) * (atmosphere.bottom_radius / r));
+    mu = max(mu, mu_horiz + 0.004);
+  }
+
   transmittance = GetTransmittance(atmosphere, transmittance_texture,
       r, mu, d, ray_r_mu_intersects_ground);
   IrradianceSpectrum single_mie_scattering;
