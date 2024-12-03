@@ -289,8 +289,9 @@
     outData2.z = pack2x8F(specularData.ba);
 
     #ifndef gbuffers_weather
-    vec3 sunlightColor; vec3 skyLightColor;
-    getLightColors(sunlightColor, skyLightColor);
+        vec3 skyLightColor;
+    vec3 sunlightColor;
+    getLightColors(sunlightColor, skyLightColor, eyePlayerPos, faceNormal);
     float scatter;
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, scatter) * parallaxShadow;
 

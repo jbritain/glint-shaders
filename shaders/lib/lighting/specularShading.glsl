@@ -112,7 +112,7 @@ vec3 screenSpaceReflections(vec2 lightmap, vec3 normal, vec3 viewPos, Material m
       if(isEyeInWater == 1){
         skyReflection *= mix(exp(-WATER_ABSORPTION * max0(63 - cameraPosition.y)), exp(-WATER_ABSORPTION * 1024), 1.0 - clamp01(worldDir.y));
       } else {
-        skyReflection *= lightmap.y;
+        skyReflection *= smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
       }
 
       reflectedColor = mix(reflection, skyReflection, fadeFactor);
@@ -147,7 +147,7 @@ vec3 screenSpaceReflections(vec2 lightmap, vec3 normal, vec3 viewPos, Material m
         if(isEyeInWater == 1){
           skyReflection *= mix(exp(-WATER_ABSORPTION * max0(63 - cameraPosition.y)), exp(-WATER_ABSORPTION * 1024), 1.0 - clamp01(worldDir.y));
         } else {
-          skyReflection *= lightmap.y;
+          skyReflection *= smoothstep(13.5 / 15.0, 14.5 / 15.0, lightmap.y);
         }
 
         reflectedColor += mix(reflection, skyReflection, fadeFactor);

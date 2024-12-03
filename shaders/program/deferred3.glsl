@@ -26,14 +26,9 @@
   uniform ivec2 eyeBrightnessSmooth;
   uniform float far;
 
-  flat out vec3 sunlightColor;
-  flat out vec3 skyLightColor;
 
-  #include "/lib/atmosphere/sky.glsl"
 
   void main() {
-    getLightColors(sunlightColor, skyLightColor);
-
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }
@@ -103,8 +98,7 @@
 
   in vec2 texcoord;
 
-  flat in vec3 sunlightColor;
-  flat in vec3 skyLightColor;
+
 
 
 
@@ -152,6 +146,10 @@
       gbufferData.material.roughness = 0.5;
     }
 
+    vec3 skyLightColor;
+    vec3 sunlightColor;
+    getLightColors(sunlightColor, skyLightColor, eyePlayerPos, mat3(gbufferModelViewInverse) * gbufferData.faceNormal);
+
 
     float parallaxShadow = texture(colortex3, texcoord).a;
 
@@ -177,5 +175,7 @@
 
     color.rgb *= (brdf(gbufferData.material, gbufferData.mappedNormal, gbufferData.faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor;
     color.rgb += mix(diffuse, specular, fresnel);
+
+    show(texture(irradiance_texture, texcoord));
   }
 #endif

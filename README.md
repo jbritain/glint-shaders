@@ -34,7 +34,7 @@ A work in progress shaderpack for Minecraft.
 - Weird noise in caustics
 
 ## Acknowledgements
-- Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/) (combined texture from [Revelation](https://github.com/HaringProGit/Revelation))
+- Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/)
 - [Capt. Tatsu](https://bitslablab.com/) - FXAA from [BSL Shaders](https://bitslablab.com/bslshaders/)
 - [Ary](https://github.com/TinyAry123) - SMAA Implementation
 - [Jessie-LC](https://github.com/Jessie-LC) - [various utility functions](https://github.com/Jessie-LC/open-source-utility-code)

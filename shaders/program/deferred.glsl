@@ -25,14 +25,9 @@
   uniform ivec2 eyeBrightnessSmooth;
   uniform float far;
 
-  flat out vec3 sunlightColor;
-  flat out vec3 skyLightColor;
 
-  #include "/lib/atmosphere/sky.glsl"
 
   void main() {
-    getLightColors(sunlightColor, skyLightColor);
-
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }

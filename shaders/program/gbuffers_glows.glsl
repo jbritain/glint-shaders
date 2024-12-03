@@ -58,8 +58,6 @@
   #include "/lib/atmosphere/sky.glsl"
 
   void main() {
-    getLightColors(sunlightColor, skyLightColor);
-
     materialID = int(mc_Entity.x + 0.5);
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
@@ -157,8 +155,7 @@
   flat in ivec2 pixelTexSIze;
   flat in vec4 textureBounds;
 
-  flat in vec3 sunlightColor;
-  flat in vec3 skyLightColor;
+
 
   #include "/lib/util.glsl"
   #include "/lib/post/tonemap.glsl"
@@ -245,6 +242,10 @@
     float scatter;
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, scatter) * parallaxShadow;
 
+        
+    vec3 skyLightColor;
+    vec3 sunlightColor;
+    getLightColors(sunlightColor, skyLightColor, eyePlayerPos, faceNormal);
 
     vec3 diffuse = getDiffuseColor(lightmap, material, skyLightColor);
     vec3 fresnel;

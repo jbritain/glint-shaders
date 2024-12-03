@@ -69,7 +69,7 @@ bool rayPlaneIntersection(vec3 O, vec3 D, float height, inout vec3 point){
   return true;
 }
 
-const float earthRadius = 6371e3 - 1000;
+const float earthRadius = 6360e3;
 const vec3 earthCentre = vec3(cameraPosition.x, -earthRadius, cameraPosition.z);
 vec3 kCamera = vec3(0.0, 128 + cameraPosition.y + earthRadius, 0.0);
 

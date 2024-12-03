@@ -27,14 +27,9 @@
   uniform ivec2 eyeBrightnessSmooth;
   uniform float far;
 
-  flat out vec3 sunlightColor;
-  flat out vec3 skyLightColor;
 
-  #include "/lib/atmosphere/sky.glsl"
 
   void main() {
-    getLightColors(sunlightColor, skyLightColor);
-
     gl_Position = ftransform();
     texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   }
@@ -105,8 +100,7 @@
 
   in vec2 texcoord;
 
-  flat in vec3 sunlightColor;
-  flat in vec3 skyLightColor;
+
 
 
 
@@ -155,6 +149,9 @@
     bool inWater = isEyeInWater == 1;
     bool waterMask = materialIsWater(gbufferData.materialID) && translucent.a < 1.0;
 
+    vec3 skyLightColor;
+    vec3 sunlightColor;
+
     #ifdef REFRACTION
 
     if(waterMask){
@@ -200,6 +197,7 @@
     #endif
 
     vec3 opaqueEyePlayerPos = mat3(gbufferModelViewInverse) * opaqueViewPos;
+    getLightColors(sunlightColor, skyLightColor, opaqueEyePlayerPos, gbufferData.faceNormal);
 
     if(!inWater && !waterMask && opaqueDepth != 1.0){
       color = getAtmosphericFog(color, opaqueEyePlayerPos);
