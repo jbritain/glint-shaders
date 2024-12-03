@@ -926,8 +926,7 @@ IrradianceSpectrum GetSunAndSkyIrradiance(
       (1.0 + dot(normal, point) / r) * 0.5;
   return atmosphere.solar_irradiance *
       GetTransmittanceToSun(
-          atmosphere, transmittance_texture, r, mu_s) *
-      max(dot(normal, sun_direction), 0.0);
+          atmosphere, transmittance_texture, r, mu_s);
 }
 #define RADIANCE_API_ENABLED
 

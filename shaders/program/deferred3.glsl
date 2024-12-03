@@ -175,7 +175,5 @@
 
     color.rgb *= (brdf(gbufferData.material, gbufferData.mappedNormal, gbufferData.faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor;
     color.rgb += mix(diffuse, specular, fresnel);
-
-    show(texture(irradiance_texture, texcoord));
   }
 #endif
