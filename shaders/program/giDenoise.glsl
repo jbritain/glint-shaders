@@ -106,7 +106,7 @@
       float pW = max0(min(1.0 - pt / A_TROUS_P_PHI, 1.0));
       float weight = cW * pW * nW * kernel[i];
 
-      sum += ctmp.rgb * weight;
+      sum += max0(ctmp.rgb) * weight;
       cumW += weight;
     }
     outGI.rgb = sum / cumW;

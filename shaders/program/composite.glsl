@@ -147,7 +147,7 @@
     vec4 translucent = texture(colortex3, texcoord);
 
     bool inWater = isEyeInWater == 1;
-    bool waterMask = materialIsWater(gbufferData.materialID) && translucent.a < 1.0;
+    bool waterMask = (materialIsWater(gbufferData.materialID) || materialIsIce(gbufferData.materialID)) && translucent.a < 1.0;
 
     vec3 skyLightColor;
     vec3 sunlightColor;

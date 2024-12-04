@@ -74,17 +74,15 @@ vec3 brdf(Material material, vec3 mappedNormal, vec3 faceNormal, vec3 viewPos){
   float faceNoL = clamp01(dot(faceNormal, L));
   float mappedNoL = clamp01(dot(mappedNormal, L));
 
-  float NoL = mappedNoL * step(0.0, faceNoL);
+  float NoL = clamp01(mappedNoL * smoothstep(0.0, 0.1, faceNoL));
 
   if(NoL < 1e-6){
-    return vec3(NoL);
+    return vec3(0.0);
   }
 
   vec3 V = normalize(-viewPos);
   vec3 N = mappedNormal;
   vec3 H = normalize(L + V);
-
-
 
   float NoV = dot(N, V);
   float VoL = dot(V, L);
@@ -96,12 +94,19 @@ vec3 brdf(Material material, vec3 mappedNormal, vec3 faceNormal, vec3 viewPos){
   vec3 F = clamp01(schlick(material, HoV));
 
   // trowbridge-reitz ggx
-  float D = pow2(alpha) / (PI * pow2(NoHSquared * (pow2(alpha) - 1.0) + 1.0));
+  float denominator = NoHSquared * (pow2(alpha) - 1.0) + 1.0;
+  float D = pow2(alpha) / (PI * pow2(denominator));
   float G = geometrySmith(N, V, L, material.roughness);
 
-  vec3 Rs = (F * D * G) / (PI * NoL * NoV);
+  vec3 Rs = (F * D * G) / (4.0 * NoL * NoV + 1e-6);
 
-  return NoL + Rs;
+  if(material.metalID != NO_METAL){
+    Rs *= material.albedo;
+  }
+
+  vec3 Rd = material.albedo * (1.0 - F);
+
+  return NoL * (Rs + Rd);
 }
 
 #endif

@@ -27,6 +27,8 @@ def main():
 
 	mapping = BlockMapping.solve({
 		'water': Bool(blocks('minecraft:water')),
+		'ice': Bool(blocks('minecraft:ice')),
+		'lava': Bool(blocks('minecraft:lava')),
 		'plant': Bool(tags['plant']),
 		'sway': Enum({
 			'upper': tags['sway/upper'],
@@ -43,9 +45,9 @@ def main():
 
   )
 
-	with shaderpack_root.joinpath('shaders/block.properties').open('w') as f:
+	with shaderpack_root.joinpath('../shaders/block.properties').open('w') as f:
 		f.write(mapping.render_encoder())
-	with shaderpack_root.joinpath('shaders/lib/util/materialIDs.glsl').open('w') as f:
+	with shaderpack_root.joinpath('../shaders/lib/util/materialIDs.glsl').open('w') as f:
 		f.write(mapping.render_decoder())
 
 if __name__ == '__main__':

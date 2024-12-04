@@ -302,22 +302,33 @@
     if(materialIsWater(materialID)){
       color.rgb = specular;
 
-      float alpha = 1e-6;
+      float alpha = 0.01;
 
       vec3 L = normalize(shadowLightPosition);
+      float NoL = clamp01(dot(mappedNormal, L));
+
       vec3 V = normalize(-viewPos);
       vec3 N = mappedNormal;
       vec3 H = normalize(L + V);
 
-      float dotNHSquared = getNoHSquared(dot(N, L), dot(N, V), dot(V, L), ATMOSPHERE.sun_angular_radius);
-      float distr = dotNHSquared * (alpha - 1.0) + 1.0;
-      color.rgb += alpha / (PI * pow2(distr)) * sunlightColor * sunlight;
+      float NoV = dot(N, V);
+      float VoL = dot(V, L);
+      float HoV = dot(H, V);
 
+      float NoHSquared = getNoHSquared(NoL, NoV, VoL, ATMOSPHERE.sun_angular_radius);
 
-      color.a = max3(fresnel);
+      // trowbridge-reitz ggx
+      float denominator = NoHSquared * (pow2(alpha) - 1.0) + 1.0;
+      float D = max(1e-6, pow2(alpha) / (PI * pow2(denominator)));
+      float G = max(1e-6, geometrySmith(N, V, L, material.roughness));
+
+      color.rgb += ((D * G) / (4.0 * NoV)) * sunlightColor * sunlight;
+      // color.a = 1.0;
+      color.a = max3(fresnel); // this is Not Good (tm) because this is the average fresnel for the SSR, it doesnn't include the fresnel for the specular
     } else {
-      color.rgb *= (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor;
+      color.rgb = (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter) * material.albedo) * sunlightColor;
       color.rgb += mix(diffuse, specular, fresnel);
+      color.rgb += material.emission * 2.0 * material.albedo;
       color.a *= (1.0 - max3(fresnel));
     }
     

@@ -142,7 +142,7 @@
     acceptPreviousFrame = clamp01(acceptPreviousFrame);
 
     outGI = texture(colortex10, previousScreenPos.xy) * acceptPreviousFrame;
-    outGI.rgb = mix(outGI.rgb, SSGI(viewPos, gbufferData.mappedNormal), 1.0 / (outGI.a + 1.0));
+    outGI.rgb = mix(outGI.rgb, SSGI(viewPos, gbufferData.mappedNormal, gbufferData.lightmap), 1.0 / (outGI.a + 1.0));
     outGI.a += 1.0;
 
     outGI.a = min(outGI.a, 60.0);

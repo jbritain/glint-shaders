@@ -20,7 +20,7 @@ void computeFrisvadTangent(in vec3 n, out vec3 f, out vec3 r){
   }
 }
 
-vec3 SSGI(vec3 viewPos, vec3 faceNormal){
+vec3 SSGI(vec3 viewPos, vec3 faceNormal, vec2 lightmap){
   
 
   vec3 GI = vec3(0.0);
@@ -50,6 +50,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal){
 
     vec3 GIPos;
     if(!rayIntersects(viewPos + faceNormal * 0.1, rayDir, 2, noise.z, true, GIPos, true)){
+      GI += getSky(rayDir, false) * lightmap.y;
       continue;
     }
 

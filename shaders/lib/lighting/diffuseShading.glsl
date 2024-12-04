@@ -27,9 +27,7 @@ vec3 getDiffuseColor(vec2 lightmap, Material material, vec3 skyLightColor){
   #endif
 
   return skyLight +
-  blockLight +
-  // ambient +
-  material.emission * 2;
+  blockLight;
 }
 
 #endif

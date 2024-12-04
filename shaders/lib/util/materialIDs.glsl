@@ -4,6 +4,16 @@
 
 
 bool materialIsWater(int id) {
+	return id == 10010;
+}
+
+
+bool materialIsIce(int id) {
+	return id == 10009;
+}
+
+
+bool materialIsLava(int id) {
 	return id == 10008;
 }
 

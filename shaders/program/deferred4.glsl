@@ -9,7 +9,7 @@
     https://jbritain.net
 
     /program/deferred4.glsl
-    - Opaque specular shading
+    - Clouds
 */
 
 #include "/lib/settings.glsl"
@@ -32,30 +32,14 @@
   }
 #endif
 
-
-
 #ifdef fsh
   uniform sampler2D colortex0;
-  uniform sampler2D colortex1;
-  uniform sampler2D colortex2;
-  uniform sampler2D colortex3;
   uniform sampler2D colortex4;
-  uniform sampler2D colortex5;
-  uniform sampler2D colortex6;
-  uniform sampler2D colortex10;
-  uniform sampler2D colortex9;
+  uniform sampler2D colortex7;
   uniform sampler2D colortex8;
+  uniform sampler2D colortex9;
 
-  uniform sampler2D depthtex0;
   uniform sampler2D depthtex2;
-
-  uniform sampler2D shadowtex0;
-  uniform sampler2DShadow shadowtex0HW;
-  uniform sampler2DShadow shadowtex1HW;
-  uniform sampler2D shadowcolor0;
-  uniform sampler2D shadowcolor1;
-
-  uniform sampler2D noisetex;
 
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
@@ -77,8 +61,6 @@
   uniform int worldTime;
   uniform int worldDay;
 
-  uniform int biome_precipitation;
-
   uniform float viewWidth;
   uniform float viewHeight;
 
@@ -97,54 +79,64 @@
 
   uniform ivec2 eyeBrightnessSmooth;
 
+  uniform sampler2D noisetex;
+
   in vec2 texcoord;
 
 
 
-
-
-  /* DRAWBUFFERS:0 */
-  layout(location = 0) out vec4 color;
+  /* DRAWBUFFERS:70 */
+  layout(location = 0) out vec4 cloudData;
+  layout(location = 1) out vec4 color;
 
   #include "/lib/util.glsl"
-  #include "/lib/util/gbufferData.glsl"
   #include "/lib/util/spaceConversions.glsl"
   #include "/lib/util/noise.glsl"
-  #include "/lib/util/material.glsl"
-  #include "/lib/util/materialIDs.glsl"
-  #include "/lib/lighting/diffuseShading.glsl"
-  #include "/lib/lighting/getSunlight.glsl"
-  #include "/lib/lighting/specularShading.glsl"
   #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/clouds.glsl"
-  #include "/lib/util/blur.glsl"
   #include "/lib/util/dh.glsl"
+  #include "/lib/atmosphere/aurora.glsl"
 
 
   void main() {
+
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);
     vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos;
-    
-
 
     color = texture(colortex0, texcoord);
+    
+    vec3 skyLightColor;
+    vec3 sunlightColor;
+    getLightColors(sunlightColor, skyLightColor, eyePlayerPos, vec3(0.0, 1.0, 0.0));
 
-    if(depth == 1.0){
-      return;
+
+    vec3 cloudTransmittance = vec3(1.0);
+
+    vec3 cloudScatter = getClouds(eyePlayerPos, depth, sunlightColor, skyLightColor, cloudTransmittance);
+
+    vec3 screenPos = vec3(texcoord, depth);
+    vec3 previousScreenPos = reprojectScreen(screenPos);
+    previousScreenPos.z = texture(colortex4, previousScreenPos.xy).a;
+
+    if(clamp01(previousScreenPos.xy) == previousScreenPos.xy && depth == previousScreenPos.z && lightningBoltPosition == vec4(0.0)){
+      vec4 previousCloudData = texture(colortex7, previousScreenPos.xy);
+
+      cloudScatter.rgb = mix(previousCloudData.rgb, cloudScatter.rgb, CLOUD_BLEND);
+      cloudTransmittance.rgb = mix(vec3(previousCloudData.a), cloudTransmittance, CLOUD_BLEND);
     }
 
-    GbufferData gbufferData;
-    decodeGbufferData(texture(colortex1, texcoord), texture(colortex2, texcoord), gbufferData);
-
-    if(materialIsPlant(gbufferData.materialID)){
-      gbufferData.material.sss = 1.0;
-    }
-
-    vec3 sunlight = texture(colortex8, texcoord).rgb;
+    // if(depth == 1.0){
+    //   color.rgb += getAurora(normalize(eyePlayerPos));
+    // }
 
 
-    // color = shadeSpecular(color, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, sunlight, skyLightColor);
+    color.rgb = color.rgb * cloudTransmittance.rgb + cloudScatter.rgb;
+
+    cloudData.rgb = cloudScatter;
+    cloudData.a = mean(cloudTransmittance);
+
+    vec3 p;
   }
 #endif

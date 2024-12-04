@@ -45,7 +45,7 @@ float computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPla
 		return 0.0;
 	}
 
-	float s = 1.0 / (SSS * 2.0);
+	float s = 1.0 / (SSS);
 	float z = blockerDistance;
 
 	if(isnan(z)){
@@ -67,11 +67,12 @@ vec3 sampleCloudShadow(vec4 shadowClipPos, vec3 faceNormal){
 		return vec3(1.0);
 	}
 
-	const vec2 offsets[4] =  vec2[](
-		vec2(0.5, 0.5),
-		vec2(0.5, -0.5),
-		vec2(-0.5, 0.5),
-		vec2(-0.5, -0.5)
+	const vec2 offsets[5] =  vec2[](
+		vec2(0.0),
+		vec2(1.0, 1.0),
+		vec2(1.0, -1.0),
+		vec2(-1.0, 1.0),
+		vec2(-1.0, -1.0)
 	);
 
 	vec3 cloudShadow = vec3(0.0);

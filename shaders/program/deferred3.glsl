@@ -164,16 +164,17 @@
 
     #ifdef GLOBAL_ILLUMINATION
     // vec3 GI = bilateralFilterDepth(colortex10, depthtex0, texcoord, 5, 10, GI_RESOLUTION, 0).rgb;
-    vec4 GI = texture(colortex10, texcoord);
+    vec3 diffuse = max0(texture(colortex10, texcoord).rgb);
     #else
-    vec4 GI = vec4(vec3(0.0), 1.0);
+    vec3 diffuse = getDiffuseColor(gbufferData.lightmap, gbufferData.material, skyLightColor);
     #endif
 
-    vec3 diffuse = getDiffuseColor(gbufferData.lightmap, gbufferData.material, skyLightColor) * gbufferData.material.albedo;
+    diffuse *= gbufferData.material.albedo;
     vec3 fresnel;
     vec3 specular = getSpecularColor(color.rgb, gbufferData.lightmap, gbufferData.mappedNormal, viewPos, gbufferData.material, fresnel);
 
-    color.rgb *= (brdf(gbufferData.material, gbufferData.mappedNormal, gbufferData.faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor;
+    color.rgb = (brdf(gbufferData.material, gbufferData.mappedNormal, gbufferData.faceNormal, viewPos) * sunlight + vec3(scatter) * gbufferData.material.albedo) * sunlightColor;
     color.rgb += mix(diffuse, specular, fresnel);
+    color.rgb += gbufferData.material.emission * 2.0 * gbufferData.material.albedo;
   }
 #endif

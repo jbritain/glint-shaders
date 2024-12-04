@@ -232,8 +232,10 @@
     #endif
 
     Material material;
+    material = materialFromSpecularMap(color.rgb, specularData);
 
     material.emission = 1.0;
+    lightmap = vec2(0.0);
     #ifdef gbuffers_lightning
     color.rgb *= 10.0;
     #endif
@@ -252,11 +254,10 @@
     vec3 specular = getSpecularColor(color.rgb, lightmap, mappedNormal, viewPos, material, fresnel);
 
 
-    color.rgb *= (
-      (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor + 
-      mix(diffuse, specular, fresnel)
-    );
-
+    color.rgb = (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter) * material.albedo) * sunlightColor;
+    color.rgb += mix(diffuse, specular, fresnel);
+    color.rgb += material.emission * 2.0 * material.albedo;
+    color.a *= (1.0 - max3(fresnel));
     color = getAtmosphericFog(color, eyePlayerPos);
   }
 #endif

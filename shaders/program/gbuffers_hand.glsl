@@ -195,7 +195,7 @@
     vec3 sunlight = getSunlight(eyePlayerPos + gbufferModelViewInverse[3].xyz, mappedNormal, faceNormal, material.sss, lightmap, scatter);
 
 
-        vec3 skyLightColor;
+    vec3 skyLightColor;
     vec3 sunlightColor;
     getLightColors(sunlightColor, skyLightColor, eyePlayerPos, faceNormal);
 
@@ -204,10 +204,9 @@
     vec3 specular = getSpecularColor(color.rgb, lightmap, mappedNormal, viewPos, material, fresnel);
 
 
-    color.rgb *= (
-      (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter)) * sunlightColor + 
-      mix(diffuse, specular, fresnel)
-    );
-    color.a = mix(color.a, 1.0, max3(fresnel));
+    color.rgb = (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter) * material.albedo) * sunlightColor;
+    color.rgb += mix(diffuse, specular, fresnel);
+    color.rgb += material.emission * 2.0 * material.albedo;
+    color.a *= (1.0 - max3(fresnel));
   }
 #endif

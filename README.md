@@ -25,13 +25,14 @@ A work in progress shaderpack for Minecraft.
 - ~~TAA~~
 
 ## Known Issues
+- Banners don't render well
+- Colours are ghastly
 - Reflections on hand broken
 - Ghosting on clouds when player moves
 - Artifacts in atmospheric fog near the horizon
 - Water waves broken on AMD
 - Artifacts around edge of screen with DoF enabled
 - GI noisy and bad
-- Weird noise in caustics
 
 ## Acknowledgements
 - Eric Bruneton - [Precomputed Atmospheric Scattering](https://ebruneton.github.io/precomputed_atmospheric_scattering/)
