@@ -36,6 +36,15 @@ vec3 uncharted2_filmic(vec3 v)
     vec3 white_scale = vec3(1.0f) / uncharted2_tonemap_partial(W);
     return curr * white_scale;
 }
+	
+vec3 ACESFilm(vec3 x){
+  float a = 2.51f;
+  float b = 0.03f;
+  float c = 2.43f;
+  float d = 0.59f;
+  float e = 0.14f;
+  return clamp01((x*(a*x+b))/(x*(c*x+d)+e));
+}
 
 // Missing Deadlines (Benjamin Wrensch): https://iolite-engine.com/blog_posts/minimal_agx_implementation
 // Filament: https://github.com/google/filament/blob/main/filament/src/ToneMapper.cpp#L263
@@ -129,6 +138,6 @@ vec3 agx(vec3 color) {
   color = AgXOutsetMatrix * color;
   return color;
 }
-#define tonemap uncharted2_filmic
+#define tonemap ACESFilm
 
 #endif

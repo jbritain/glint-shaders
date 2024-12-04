@@ -206,7 +206,7 @@
 
     color.rgb = (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter) * material.albedo) * sunlightColor;
     color.rgb += mix(diffuse, specular, fresnel);
-    color.rgb += material.emission * 2.0 * material.albedo;
+    color.rgb += material.emission * 10.0 * material.albedo;
     color.a *= (1.0 - max3(fresnel));
   }
 #endif

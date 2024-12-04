@@ -918,8 +918,7 @@ RadianceSpectrum GetSkyRadianceToPoint(
   single_mie_scattering = GetExtrapolatedSingleMieScattering(
       atmosphere, vec4(scattering, single_mie_scattering.r));
 #endif
-  single_mie_scattering = single_mie_scattering *
-      smoothstep(Number(0.0), Number(0.01), mu_s);
+single_mie_scattering = single_mie_scattering * 0.01;   //    smoothstep(Number(0.0), Number(0.01), mu_s);
   return scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
       MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
 }
