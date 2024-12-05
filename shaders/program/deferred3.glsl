@@ -123,6 +123,8 @@
   #include "/lib/lighting/brdf.glsl"
 
   void main() {
+
+
     float depth = texture(depthtex2, texcoord).r;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     dhOverride(depth, viewPos, false);
@@ -177,4 +179,6 @@
     color.rgb += mix(diffuse, specular, fresnel);
     color.rgb += gbufferData.material.emission * 10.0 * gbufferData.material.albedo;
   }
+
+
 #endif

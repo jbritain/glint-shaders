@@ -58,7 +58,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal, vec2 lightmap){
     vec3 hitFaceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);
 
     if(dot(rayDir, hitFaceNormal) < 0.0){
-      GI += textureLod(colortex4, GIPos.xy, 4).rgb;
+      GI += textureLod(colortex4, GIPos.xy, 6).rgb;
     }
   }
   

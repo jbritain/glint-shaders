@@ -77,7 +77,7 @@
     averageLuminanceSmooth = mix(averageLuminance, averageLuminanceSmooth, clamp01(exp2(frameTime * -0.001)));
     averageLuminanceSmooth = max(averageLuminanceSmooth, 0.0001);
 
-    float exposure = rcp(9.6 * averageLuminanceSmooth);
+    float exposure = rcp(20.0 * averageLuminanceSmooth);
 
     exposure = clamp(exposure, 0.001, 100.0);
 
