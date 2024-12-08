@@ -45,9 +45,10 @@
 
   in vec2 texcoord;
 
-  #ifdef AUTO_EXPOSURE
+
   const bool colortex0MipmapEnabled = true;
 
+  #ifdef AUTO_EXPOSURE
   layout(std430, binding = 0) buffer frameData {
     float averageLuminanceSmooth;
   };
@@ -68,11 +69,18 @@
     vec4 hand = texture(colortex5, texcoord);
     color.rgb = mix(color.rgb, hand.rgb, hand.a);
 
-    #ifdef AUTO_EXPOSURE
     int maxMipLevel = int(floor(log2(max(viewWidth, viewHeight))));
 
     float averageLuminance = textureLod(colortex0, vec2(0.5), maxMipLevel).a;
     averageLuminance = exp2(averageLuminance);
+
+      // purkinje shift
+    color.r = mix(color.r, color.r * 0.6, 1.0 - smoothstep(0.0, 0.05, averageLuminance));
+
+    #ifdef AUTO_EXPOSURE
+
+
+
 
     averageLuminanceSmooth = mix(averageLuminance, averageLuminanceSmooth, clamp01(exp2(frameTime * -0.1)));
     averageLuminanceSmooth = max(averageLuminanceSmooth, 0.0001);
