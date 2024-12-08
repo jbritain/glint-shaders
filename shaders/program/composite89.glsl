@@ -74,10 +74,10 @@
     float averageLuminance = textureLod(colortex0, vec2(0.5), maxMipLevel).a;
     averageLuminance = exp2(averageLuminance);
 
-    averageLuminanceSmooth = mix(averageLuminance, averageLuminanceSmooth, clamp01(exp2(frameTime * -0.001)));
+    averageLuminanceSmooth = mix(averageLuminance, averageLuminanceSmooth, clamp01(exp2(frameTime * -0.1)));
     averageLuminanceSmooth = max(averageLuminanceSmooth, 0.0001);
 
-    float exposure = rcp(20.0 * averageLuminanceSmooth);
+    float exposure = rcp(9.8 * averageLuminanceSmooth);
 
     exposure = clamp(exposure, 0.001, 100.0);
 

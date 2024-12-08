@@ -22,10 +22,6 @@
 #include "/lib/atmosphere/endSky.glsl"
 #endif
 
-layout(std430, binding = 1) buffer frameData {
-  vec3 averageSkyColor;
-};
-
 vec3 getSky(vec4 color, vec3 dir, bool includeSun){
   #ifdef WORLD_THE_END
     return endSky(dir, includeSun);
@@ -52,7 +48,8 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
   // }
   // #endif
 
-  if(includeSun && dot(dir, sunVector) > cos(ATMOSPHERE.sun_angular_radius)){
+  vec3 p;
+  if(includeSun && dot(dir, sunVector) > cos(ATMOSPHERE.sun_angular_radius) && !raySphereIntersectionPlanet(cameraPosition, dir, 0.0, p)){
     radiance += transmit * GetSolarRadiance();
   }
 
@@ -70,10 +67,11 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor, vec3 feetPla
 
   #ifdef WORLD_OVERWORLD
   sunlightColor = GetSunAndSkyIrradiance(
-		kCamera + feetPlayerPos, worldFaceNormal, sunVector, skyLightColor
+		kCamera, sunVector, skyLightColor
   );
+
   vec3 transmit;
-  skyLightColor = averageSkyColor * PI;
+  skyLightColor = GetSkyRadiance(kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit) * PI;
 
   if(sunVector != lightVector) {
     vec3 moonColor = vec3(0.62, 0.65, 0.74) * vec3(0.5, 0.5, 1.0);

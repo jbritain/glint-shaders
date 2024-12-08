@@ -120,9 +120,7 @@
   layout(location = 0) out vec4 color;
 
   void main() {
-    if(max2(gl_FragCoord.xy) < 1.0)
-    averageSkyColor = textureLod(colortex9, vec2(0.0, 0.5), 8).rgb;
-    show(texture(colortex9, texcoord).rgb);
+
 
 
     color = vec4(1.0);

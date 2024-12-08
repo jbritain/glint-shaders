@@ -36,7 +36,7 @@
 
   void main() {
     color.rgb = max0(texture(colortex0, texcoord).rgb);
-    float luminance = dot(tonemap(color.rgb), vec3(0.2125, 0.7154, 0.0721));
+    float luminance = dot(color.rgb, vec3(0.2125, 0.7154, 0.0721));
     color.a = log2(luminance + 1e-6);
   }
 #endif

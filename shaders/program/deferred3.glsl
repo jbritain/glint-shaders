@@ -40,6 +40,9 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
+
+  const bool colortex4MipmapEnabled = true;
+
   uniform sampler2D colortex5;
   uniform sampler2D colortex6;
   uniform sampler2D colortex10;

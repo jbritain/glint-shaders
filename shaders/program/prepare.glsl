@@ -96,13 +96,6 @@
     vec3 skyLightColor;
     vec3 sunlightColor;
     getLightColors(sunlightColor, skyLightColor, vec3(0.0), vec3(0.0, 1.0, 0.0));
-    vec3 transmit;
-
-    
-
-    skyLightColor = GetSkyRadiance(
-      kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit
-    ) * PI;
 
 
     vec3 cloudTransmittance;

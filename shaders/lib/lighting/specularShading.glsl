@@ -74,7 +74,8 @@ vec3 SSRSample(vec3 viewOrigin, vec3 viewRay, float skyLightmap, float jitter, f
   if(roughness == 0.0){
     reflectedColor = texture(colortex4, reflectionPos.xy).rgb;
   } else {
-    reflectedColor = textureLod(colortex4, reflectionPos.xy, mix(2, 8, smoothstep(roughness, 0.0, ROUGH_REFLECTION_THRESHOLD))).rgb;
+    float LOD = clamp(pow(distance(viewSpaceToScreenSpace(viewOrigin) * 2.0 - 1.0, reflectionPos * 2.0 - 1.0), pow(1.0-sqrt(roughness),5.0) * 3.0) * 6.0, 0.0, 6.0); // LOD curve by x0nk
+    reflectedColor = textureLod(colortex4, reflectionPos.xy, LOD).rgb;
   }
 
   #ifdef SSR_FADE

@@ -91,6 +91,11 @@
       ivec2 uv = tx + offsets[i];
 
       float ptmp = texelFetch(depthtex0, uv, 0).r;
+
+      if(ptmp == 1.0){
+        continue;
+      }
+
       vec3 ntmp = getNormal(uv);
 
       float nW = dot(nval, ntmp);
