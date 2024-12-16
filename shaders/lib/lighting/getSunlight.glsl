@@ -55,7 +55,7 @@ float computeSSS(float blockerDistance, float SSS, vec3 faceNormal, vec3 feetPla
 	float scatter = 0.25 * (exp(-s * z) + 3*exp(-s * z / 3));
 
 	float cosTheta = clamp01(dot(normalize(feetPlayerPos), lightVector));
-	scatter *= henyeyGreenstein(0.4, cosTheta);
+	scatter *= henyeyGreenstein(0.5, cosTheta);
 
 	return scatter;
 }

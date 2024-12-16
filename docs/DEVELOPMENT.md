@@ -22,13 +22,15 @@ GBuffer data (albedo, PBR, normals) is packed into two buffers.
 `colortex9` sky environment map (256x256)
 `colortex10` global illumination RGB, opaque parallax shadowing A
 `colortex11` SMAA
+`colortex12` sky irradiance map (256x256)
 
 `shadowcolor0` shadow colour
 `shadowcolor1` water mask R, caustics G, distance between opaque and translucent B
 
 # Passes
-`prepare` cloud shadow map
-`prepare1` sky environment map
+`prepare` sky environment map
+`prepare1` cloud shadow map
+`prepare2` sky irradiance map
 
 `deferred`  global illumination
 `deferred1` global illumination filtering

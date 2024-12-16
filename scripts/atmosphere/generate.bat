@@ -1,0 +1,2 @@
+lualut --script "sun_transmission.lua" --out "../../shaders/lib/textures/" --img "RAW" --format "RGB" --type HALF_FLOAT -w 256 -h 64 -d 5
+lualut --script "multiple_scattering.lua" --out "../../shaders/lib/textures/" --img RAW --format RGB --type HALF_FLOAT -w 32 -h 32 -d 5 -s "../../shaders/lib/textures/sun_transmission.dat 256 64 5 RGB HALF_FLOAT"

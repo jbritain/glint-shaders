@@ -40,6 +40,7 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
+  uniform sampler2D colortex12;
 
   const bool colortex4MipmapEnabled = true;
 
@@ -154,7 +155,7 @@
     vec3 skyLightColor;
     vec3 sunlightColor;
     getLightColors(sunlightColor, skyLightColor, eyePlayerPos, mat3(gbufferModelViewInverse) * gbufferData.faceNormal);
-
+    skyLightColor = texture(colortex12, mapSphere(mat3(gbufferModelViewInverse) * gbufferData.faceNormal)).rgb;
 
     float parallaxShadow = texture(colortex3, texcoord).a;
 

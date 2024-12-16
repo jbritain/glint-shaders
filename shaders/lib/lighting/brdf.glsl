@@ -89,7 +89,7 @@ vec3 brdf(Material material, vec3 mappedNormal, vec3 faceNormal, vec3 viewPos){
   float HoV = dot(H, V);
 
   float alpha = max(1e-3, material.roughness);
-	float NoHSquared = getNoHSquared(NoL, NoV, VoL, ATMOSPHERE.sun_angular_radius);
+	float NoHSquared = getNoHSquared(NoL, NoV, VoL, sunAngularRadius);
 
   vec3 F = clamp01(schlick(material, HoV));
 

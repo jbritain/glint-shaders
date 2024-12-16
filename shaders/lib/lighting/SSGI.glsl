@@ -50,7 +50,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal, vec2 lightmap){
 
     vec3 GIPos;
     if(!rayIntersects(viewPos + faceNormal * 0.1, rayDir, 2, noise.z, true, GIPos, true)){
-      GI += getSky(rayDir, false) * lightmap.y;
+      GI += getSky(rayDir, false) * lightmap.y / (cosTheta / PI);
       continue;
     }
 
@@ -58,7 +58,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal, vec2 lightmap){
     vec3 hitFaceNormal = mat3(gbufferModelView) * decodeNormal(decode1z);
 
     if(dot(rayDir, hitFaceNormal) < 0.0){
-      GI += textureLod(colortex4, GIPos.xy, 6).rgb;
+      GI += textureLod(colortex4, GIPos.xy, 6).rgb / (cosTheta / PI);
     }
   }
   

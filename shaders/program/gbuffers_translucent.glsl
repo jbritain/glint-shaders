@@ -315,7 +315,7 @@
       float VoL = dot(V, L);
       float HoV = dot(H, V);
 
-      float NoHSquared = getNoHSquared(NoL, NoV, VoL, ATMOSPHERE.sun_angular_radius);
+      float NoHSquared = getNoHSquared(NoL, NoV, VoL, sunAngularRadius);
 
       // trowbridge-reitz ggx
       float denominator = NoHSquared * (pow2(alpha) - 1.0) + 1.0;

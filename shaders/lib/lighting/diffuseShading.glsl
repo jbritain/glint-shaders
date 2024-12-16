@@ -17,7 +17,7 @@
 
 vec3 getDiffuseColor(vec2 lightmap, Material material, vec3 skyLightColor){
   vec3 skyLight = skyLightColor * SKYLIGHT_STRENGTH * pow2(lightmap.y);
-  vec3 blockLight = max0(exp(-(1.0 - lightmap.x * 10.0))) * BLOCKLIGHT_COLOR * 0.0001;
+  vec3 blockLight = max0(exp(-(1.0 - lightmap.x * 10.0))) * BLOCKLIGHT_COLOR * 0.0004;
   
 
   vec3 ambient = vec3(AMBIENT_STRENGTH);
@@ -26,8 +26,7 @@ vec3 getDiffuseColor(vec2 lightmap, Material material, vec3 skyLightColor){
   ambient *= 3.0;
   #endif
 
-  return skyLight +
-  blockLight;
+  return skyLight + (blockLight + ambient) / PI;
 }
 
 #endif

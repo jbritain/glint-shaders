@@ -14,7 +14,6 @@
 
 #include "/lib/util.glsl"
 
-#include "/lib/atmosphere/eBrunetonAtmosphere.glsl"
 #include "/lib/atmosphere/common.glsl"
 
 
@@ -49,7 +48,7 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
   // #endif
 
   vec3 p;
-  if(includeSun && dot(dir, sunVector) > cos(ATMOSPHERE.sun_angular_radius) && !raySphereIntersectionPlanet(cameraPosition, dir, 0.0, p)){
+  if(includeSun && dot(dir, sunVector) > cos(sunAngularRadius) && !raySphereIntersectionPlanet(cameraPosition, dir, 0.0, p)){
     radiance += transmit * GetSolarRadiance();
   }
 
