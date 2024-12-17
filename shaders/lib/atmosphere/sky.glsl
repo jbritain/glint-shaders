@@ -32,9 +32,7 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
 
   // return vec3(0.0);
   vec3 transmit = vec3(1.0);
-  vec3 radiance = GetSkyRadiance(
-    kCamera, dir, 0.0, sunVector, transmit
-  );
+  vec3 radiance = vec3(0.0);
 
   // #ifdef BORDER_FOG
   // // override sky color below horizon
@@ -49,7 +47,7 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
 
   vec3 p;
   if(includeSun && dot(dir, sunVector) > cos(sunAngularRadius) && !raySphereIntersectionPlanet(cameraPosition, dir, 0.0, p)){
-    radiance += transmit * GetSolarRadiance();
+    radiance += transmit * vec3(0.0);
   }
 
   return color.rgb * transmit + radiance;
@@ -64,21 +62,21 @@ void getLightColors(out vec3 sunlightColor, out vec3 skyLightColor, vec3 feetPla
   sunlightColor = vec3(0.0);
   skyLightColor = vec3(0.0);
 
-  #ifdef WORLD_OVERWORLD
-  sunlightColor = GetSunAndSkyIrradiance(
-		kCamera, sunVector, skyLightColor
-  );
+  // #ifdef WORLD_OVERWORLD
+  // sunlightColor = GetSunAndSkyIrradiance(
+	// 	kCamera, sunVector, skyLightColor
+  // );
 
-  vec3 transmit;
-  skyLightColor = GetSkyRadiance(kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit) * PI;
+  // vec3 transmit;
+  // skyLightColor = GetSkyRadiance(kCamera, vec3(0.0, 1.0, 0.0), 0.0, sunVector, transmit) * PI;
 
-  if(sunVector != lightVector) {
-    vec3 moonColor = vec3(0.62, 0.65, 0.74) * vec3(0.5, 0.5, 1.0);
-    sunlightColor += getSky(vec4(moonColor * 0.05, 1.0), -sunVector, false);
-  }
-  #elif defined WORLD_THE_END
-  sunlightColor = vec3(0.8, 0.7, 1.0);
-  #endif
+  // if(sunVector != lightVector) {
+  //   vec3 moonColor = vec3(0.62, 0.65, 0.74) * vec3(0.5, 0.5, 1.0);
+  //   sunlightColor += getSky(vec4(moonColor * 0.05, 1.0), -sunVector, false);
+  // }
+  // #elif defined WORLD_THE_END
+  // sunlightColor = vec3(0.8, 0.7, 1.0);
+  // #endif
 }
 
 vec4 getAtmosphericFog(vec4 color, vec3 playerPos, vec3 transmit){
@@ -86,17 +84,17 @@ vec4 getAtmosphericFog(vec4 color, vec3 playerPos, vec3 transmit){
   return color;
   #endif
 
-  #ifndef WORLD_OVERWORLD
+  // #ifndef WORLD_OVERWORLD
   return color;
-  #endif
+  // #endif
 
-  vec3 dir = normalize(playerPos);
+  // vec3 dir = normalize(playerPos);
 
-  // playerPos = mix(playerPos, playerPos * vec3(10000.0, 1.0, 10000.0), smoothstep(0.8 * far, far, length(playerPos)));
+  // // playerPos = mix(playerPos, playerPos * vec3(10000.0, 1.0, 10000.0), smoothstep(0.8 * far, far, length(playerPos)));
 
-  vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit) * EBS.y;
+  // vec3 fog = GetSkyRadianceToPoint(kCamera, kCamera + playerPos, 0.0, normalize(mat3(gbufferModelViewInverse) * sunPosition), transmit) * EBS.y;
 
-  return vec4(color.rgb * transmit + fog, color.a);
+  // return vec4(color.rgb * transmit + fog, color.a);
 }
 
 vec4 getAtmosphericFog(vec4 color, vec3 playerPos){
