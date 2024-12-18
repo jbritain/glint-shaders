@@ -75,7 +75,7 @@
     averageLuminance = exp2(averageLuminance);
 
       // purkinje shift
-    color.r = mix(color.r, color.r * 0.6, 1.0 - smoothstep(0.0, 0.05, averageLuminance));
+    // color.r = mix(color.r, color.r * 0.6, 1.0 - smoothstep(0.0, 0.05, averageLuminance));
 
     #ifdef AUTO_EXPOSURE
 

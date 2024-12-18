@@ -15,6 +15,7 @@
 #include "/lib/util.glsl"
 
 #include "/lib/atmosphere/common.glsl"
+#include "/lib/atmosphere/hillaireAtmosphere.glsl"
 
 
 #ifdef WORLD_THE_END
@@ -30,27 +31,9 @@ vec3 getSky(vec4 color, vec3 dir, bool includeSun){
     return vec3(0.0);
   #endif
 
-  // return vec3(0.0);
-  vec3 transmit = vec3(1.0);
-  vec3 radiance = vec3(0.0);
+  vec3 skyColor = getValFromSkyLUT(dir);
 
-  // #ifdef BORDER_FOG
-  // // override sky color below horizon
-  // if(dir.y < 0.0){
-  //   vec3 tempDir = dir;
-  //   tempDir.y = clamp01(tempDir.y);
-  //   tempDir = normalize(tempDir);
-  //   vec3 tempTransmit;
-  //   radiance = GetSkyRadiance(kCamera, tempDir, 0.0, sunVector, tempTransmit);
-  // }
-  // #endif
-
-  vec3 p;
-  if(includeSun && dot(dir, sunVector) > cos(sunAngularRadius) && !raySphereIntersectionPlanet(cameraPosition, dir, 0.0, p)){
-    radiance += transmit * vec3(0.0);
-  }
-
-  return color.rgb * transmit + radiance;
+  return skyColor;
 }
 
 vec3 getSky(vec3 dir, bool includeSun){

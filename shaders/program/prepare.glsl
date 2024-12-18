@@ -8,24 +8,14 @@
     By jbritain
     https://jbritain.net
 
-    /program/prepare.glsl
-    - Sky environment map
+    /program/prepare2.glsl
+    - Sky irradiance map
 */
 
 #include "/lib/settings.glsl"
-#define HIGH_CLOUD_SAMPLES
 
 #ifdef vsh
   out vec2 texcoord;
-
-  uniform vec3 cameraPosition;
-  uniform vec3 sunPosition;
-  uniform vec3 shadowLightPosition;
-  uniform mat4 gbufferModelViewInverse;
-  uniform ivec2 eyeBrightnessSmooth;
-  uniform float far;
-
-
 
   void main() {
     gl_Position = ftransform();
@@ -35,7 +25,7 @@
 
 #ifdef fsh
   uniform sampler2D colortex9;
-  uniform sampler2D colortex6;
+  
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -74,40 +64,87 @@
 
   uniform sampler2D noisetex;
 
+
   in vec2 texcoord;
 
-
+  /* RENDERTARGETS: 12 */
+  layout(location = 0) out vec3 color;
 
   #include "/lib/util.glsl"
-  #include "/lib/atmosphere/sky.glsl"
-  #include "/lib/atmosphere/common.glsl"
-  #include "/lib/atmosphere/clouds.glsl"
-  #include "/lib/util/uvmap.glsl"
+  #include "/lib/atmosphere/hillaireAtmosphere.glsl"
 
-  /* DRAWBUFFERS:9 */
-  layout(location = 0) out vec4 color;
+  const int numScatteringSteps = 40;
+
+vec3 raymarchScattering(const in vec3 pos, const in vec3 rayDir, const in vec3 sunDir, const in float tMax) {
+  const int numScatteringSteps = 32;
+
+  float cosTheta = dot(rayDir, sunDir);
+  float miePhaseValue = getMiePhase(cosTheta);
+  float rayleighPhaseValue = getRayleighPhase(-cosTheta);
+  
+  float t = 0.0;
+  vec3 lum = vec3(0.0);
+  vec3 transmittance = vec3(1.0);
+
+  for (float i = 0.0; i < numScatteringSteps; i += 1.0) {
+    float newT = ((i + 0.3) / numScatteringSteps) * tMax;
+    float dt = newT - t;
+    t = newT;
+        
+    vec3 newPos = pos + t*rayDir;
+        
+    vec3 rayleighScattering, extinction;
+    float mieScattering;
+    getScatteringValues(newPos, rayleighScattering, mieScattering, extinction);
+        
+    vec3 sampleTransmittance = exp(-dt*extinction);
+
+    vec3 sunTransmittance = getValFromTLUT(newPos, sunDir);
+    vec3 psiMS = getValFromMultiScattLUT(newPos, sunDir);
+        
+    vec3 rayleighInScattering = rayleighScattering * (rayleighPhaseValue*sunTransmittance + psiMS);
+    vec3 mieInScattering = mieScattering * (miePhaseValue*sunTransmittance + psiMS);
+    vec3 inScattering = (rayleighInScattering + mieInScattering);
+
+    // Integrated scattering within path segment.
+    vec3 scatteringIntegral = (inScattering - inScattering * sampleTransmittance) / extinction;
+
+    lum += scatteringIntegral * transmittance;
+    
+    transmittance *= sampleTransmittance;
+  }
+
+  return lum;
+}
 
   void main() {
+    float u = texcoord.x;
+    float v = texcoord.y;
 
-    vec3 dir = unmapSphere(texcoord);
-
-    color.rgb = getSky(color, dir, false);
-
-    vec3 skyLightColor;
-    vec3 sunlightColor;
-    getLightColors(sunlightColor, skyLightColor, vec3(0.0), vec3(0.0, 1.0, 0.0));
-
-
-    vec3 cloudTransmittance;
-    vec3 cloudScatter = getClouds(dir * far, 1.0, sunlightColor, skyLightColor, cloudTransmittance.rgb);
-
-    color.rgb *= cloudTransmittance;
-    color.rgb += cloudScatter;
-
-    // if(isEyeInWater == 1){
-    //   float distanceBelowSeaLevel = mix(128, max0(-1 * (cameraPosition.y - 63)), clamp01(dir.y));
-
-    //   color.rgb *= exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * distanceBelowSeaLevel);
-    // }
+    float azimuthAngle = (u - 0.5)*2.0*PI;
+    // Non-linear mapping of altitude. See Section 5.3 of the paper.
+    float adjV;
+    if (v < 0.5) {
+      float coord = 1.0 - 2.0*v;
+      adjV = -coord*coord;
+    } else {
+      float coord = v*2.0 - 1.0;
+      adjV = coord*coord;
+    }
+    
+    float height = length(kCamera);
+    vec3 up = kCamera / height;
+    float horizonAngle = safeacos(sqrt(height * height - groundRadiusMM * groundRadiusMM) / height) - 0.5*PI;
+    float altitudeAngle = adjV*0.5*PI - horizonAngle;
+    
+    float cosAltitude = cos(altitudeAngle);
+    vec3 rayDir = vec3(cosAltitude*sin(azimuthAngle), sin(altitudeAngle), -cosAltitude*cos(azimuthAngle));
+    
+    float atmoDist = rayIntersectSphere(kCamera / 1e6, rayDir, atmosphereRadiusMM);
+    float groundDist = rayIntersectSphere(kCamera / 1e6, rayDir, groundRadiusMM);
+    float tMax = (groundDist < 0.0) ? atmoDist : groundDist;
+    vec3 lum = raymarchScattering(kCamera / 1e6, rayDir, sunVector, tMax);
+    color = lum;
+    show(color);
   }
 #endif

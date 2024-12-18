@@ -34,8 +34,6 @@ const bool colortex10Clear = false;
 
 const bool colortex7Clear = false;
 
-const bool colortex12Clear = false;
-
 const bool shadowHardwareFiltering = true;
 const float shadowDistance = 192.0; // [16.0 32.0 48.0 64.0 80.0 96.0 112.0 128.0 144.0 160.0 176.0 192.0 208.0 224.0 240.0 256.0 272.0 288.0 304.0 320.0 336.0 352.0 368.0 384.0 400.0 416.0 432.0 448.0 464.0 480.0 496.0 512.0]
 const int shadowMapResolution = 2048; // [128 256 512 1024 2048 4096 8192]

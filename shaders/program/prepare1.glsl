@@ -8,16 +8,24 @@
     By jbritain
     https://jbritain.net
 
-    /program/prepare1.glsl
-    - Cloud shadow map
+    /program/prepare.glsl
+    - Sky environment map
 */
 
 #include "/lib/settings.glsl"
 #define HIGH_CLOUD_SAMPLES
-#define GENERATE_SKY_LUT
 
 #ifdef vsh
   out vec2 texcoord;
+
+  uniform vec3 cameraPosition;
+  uniform vec3 sunPosition;
+  uniform vec3 shadowLightPosition;
+  uniform mat4 gbufferModelViewInverse;
+  uniform ivec2 eyeBrightnessSmooth;
+  uniform float far;
+
+
 
   void main() {
     gl_Position = ftransform();
@@ -27,7 +35,7 @@
 
 #ifdef fsh
   uniform sampler2D colortex9;
-  const bool colortex9MipmapEnabled = true;
+  uniform sampler2D colortex6;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -68,92 +76,38 @@
 
   in vec2 texcoord;
 
+
+
   #include "/lib/util.glsl"
+  #include "/lib/atmosphere/sky.glsl"
   #include "/lib/atmosphere/common.glsl"
   #include "/lib/atmosphere/clouds.glsl"
-  #include "/lib/atmosphere/sky.glsl"
+  #include "/lib/util/uvmap.glsl"
 
-  void marchCloudLayerShadow(inout vec3 totalTransmittance, vec3 playerOrigin, float lowerHeight, float upperHeight, int samples){
-    vec3 worldDir = lightVector;
-
-    samples = int(ceil(mix(samples * 0.75, float(samples), worldDir.y)));
-
-    // we trace from a to b
-    vec3 a;
-    vec3 b;
-
-    vec3 worldOrigin = playerOrigin + cameraPosition;
-
-    if(!raySphereIntersectionPlanet(worldOrigin, worldOrigin.y <= lowerHeight ? worldDir : -worldDir, lowerHeight, a)){
-      totalTransmittance = vec3(1.0);
-      return;
-    }
-    if(!raySphereIntersectionPlanet(worldOrigin, worldOrigin.y <= upperHeight ? worldDir : -worldDir, upperHeight, b)){
-      totalTransmittance = vec3(1.0);
-    }
-    
-    vec3 rayPos = a;
-    vec3 increment = (b - a) / samples;
-
-    float jitter = blueNoise(texcoord).r;
-    rayPos += increment * jitter;
-
-    for(int i = 0; i < samples; i++, rayPos += increment){
-
-      float density = getCloudDensity(rayPos) * length(increment);
-      // density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.8, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
-
-      if(density < 1e-6){
-        continue;
-      }
-
-      vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
-      totalTransmittance *= transmittance;
-
-      if(max3(totalTransmittance) < 0.01){
-        break;
-      }
-  }
-}
-
-  /* DRAWBUFFERS:6 */
+  /* DRAWBUFFERS:9 */
   layout(location = 0) out vec4 color;
 
   void main() {
 
+    vec3 dir = unmapSphere(texcoord);
+
+    color.rgb = getSky(color, dir, false);
+
+    vec3 skyLightColor;
+    vec3 sunlightColor;
+    getLightColors(sunlightColor, skyLightColor, vec3(0.0), vec3(0.0, 1.0, 0.0));
 
 
-    color = vec4(1.0);
+    vec3 cloudTransmittance;
+    vec3 cloudScatter = getClouds(dir * far, 1.0, sunlightColor, skyLightColor, cloudTransmittance.rgb);
 
-    #if !defined WORLD_OVERWORLD || !defined CLOUD_SHADOWS
-    return;
-    #endif
+    color.rgb *= cloudTransmittance;
+    color.rgb += cloudScatter;
 
-    vec3 shadowScreenPos = vec3(texcoord, 1.0);
-    vec3 shadowNDCPos = shadowScreenPos * 2.0 - 1.0;
-    vec4 shadowHomPos = shadowProjectionInverse * vec4(shadowNDCPos, 1.0);
-    shadowHomPos.xy /= (shadowDistance / far);
-    vec3 shadowViewPos = shadowHomPos.xyz / shadowHomPos.w;
+    // if(isEyeInWater == 1){
+    //   float distanceBelowSeaLevel = mix(128, max0(-1 * (cameraPosition.y - 63)), clamp01(dir.y));
 
-    vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
-    vec3 rayPos;
-
-    vec3 totalTransmittance = vec3(1.0);
-
-    #ifdef VANILLA_CLOUDS
-    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, VANILLA_CLOUD_SAMPLES);
-    #endif
-    #ifdef CUMULUS_CLOUDS
-    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SAMPLES);
-    #endif
-    #ifdef ALTOCUMULUS_CLOUDS
-    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, ALTOCUMULUS_SAMPLES);
-    #endif
-    #ifdef CIRRUS_CLOUDS
-    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SAMPLES);
-    #endif
-
-    color.rgb = totalTransmittance;
-    color.a = 1.0;
+    //   color.rgb *= exp(-clamp01(WATER_ABSORPTION + WATER_SCATTERING) * distanceBelowSeaLevel);
+    // }
   }
 #endif

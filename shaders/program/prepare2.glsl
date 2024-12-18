@@ -8,11 +8,13 @@
     By jbritain
     https://jbritain.net
 
-    /program/prepare2.glsl
-    - Sky irradiance map
+    /program/prepare1.glsl
+    - Cloud shadow map
 */
 
 #include "/lib/settings.glsl"
+#define HIGH_CLOUD_SAMPLES
+#define GENERATE_SKY_LUT
 
 #ifdef vsh
   out vec2 texcoord;
@@ -25,7 +27,7 @@
 
 #ifdef fsh
   uniform sampler2D colortex9;
-  uniform sampler2D colortex12;
+  const bool colortex9MipmapEnabled = true;
 
   uniform mat4 gbufferModelView;
   uniform mat4 gbufferModelViewInverse;
@@ -66,66 +68,92 @@
 
   in vec2 texcoord;
 
-  /* RENDERTARGETS: 12 */
-  layout(location = 0) out vec3 color;
-
   #include "/lib/util.glsl"
-  #include "/lib/util/uvmap.glsl"
-  #include "/lib/textures/blueNoise.glsl"
+  #include "/lib/atmosphere/common.glsl"
+  #include "/lib/atmosphere/clouds.glsl"
+  #include "/lib/atmosphere/sky.glsl"
 
-  // from bliss, which means it's probably by chocapic
-  // https://backend.orbit.dtu.dk/ws/portalfiles/portal/126824972/onb_frisvad_jgt2012_v2.pdf
-  void computeFrisvadTangent(in vec3 n, out vec3 f, out vec3 r){
-    if(n.z < -0.9) {
-      f = vec3(0.,-1,0);
-      r = vec3(-1, 0, 0);
-    } else {
-      float a = 1./(1.+n.z);
-      float b = -n.x*n.y*a;
-      f = vec3(1. - n.x*n.x*a, b, -n.x) ;
-      r = vec3(b, 1. - n.y*n.y*a , -n.y);
+  void marchCloudLayerShadow(inout vec3 totalTransmittance, vec3 playerOrigin, float lowerHeight, float upperHeight, int samples){
+    vec3 worldDir = lightVector;
+
+    samples = int(ceil(mix(samples * 0.75, float(samples), worldDir.y)));
+
+    // we trace from a to b
+    vec3 a;
+    vec3 b;
+
+    vec3 worldOrigin = playerOrigin + cameraPosition;
+
+    if(!raySphereIntersectionPlanet(worldOrigin, worldOrigin.y <= lowerHeight ? worldDir : -worldDir, lowerHeight, a)){
+      totalTransmittance = vec3(1.0);
+      return;
     }
+    if(!raySphereIntersectionPlanet(worldOrigin, worldOrigin.y <= upperHeight ? worldDir : -worldDir, upperHeight, b)){
+      totalTransmittance = vec3(1.0);
+    }
+    
+    vec3 rayPos = a;
+    vec3 increment = (b - a) / samples;
+
+    float jitter = blueNoise(texcoord).r;
+    rayPos += increment * jitter;
+
+    for(int i = 0; i < samples; i++, rayPos += increment){
+
+      float density = getCloudDensity(rayPos) * length(increment);
+      // density = mix(density, 0.0, smoothstep(CLOUD_DISTANCE * 0.8, CLOUD_DISTANCE, length(rayPos.xz - cameraPosition.xz)));
+
+      if(density < 1e-6){
+        continue;
+      }
+
+      vec3 transmittance = exp(-density * CLOUD_EXTINCTION_COLOR);
+      totalTransmittance *= transmittance;
+
+      if(max3(totalTransmittance) < 0.01){
+        break;
+      }
   }
+}
+
+  /* DRAWBUFFERS:6 */
+  layout(location = 0) out vec4 color;
 
   void main() {
-    vec3 oldColor = texture(colortex12, texcoord).rgb;
-
-    const int samples = 8;
-
-    vec3 dir = unmapSphere(texcoord);
-    vec3 tangent;
-    vec3 bitangent;
-    computeFrisvadTangent(dir, tangent, bitangent);
-
-    mat3 tbd = mat3(tangent, bitangent, dir);
-
-    for(int i = 0; i < samples; i++){
-      vec2 noise = i % 2 == 1 ? blueNoise(texcoord, i % 2 + frameCounter * samples).xy : blueNoise(texcoord, i % 2 + frameCounter * samples).yz;
-
-      float cosTheta = sqrt(noise.x);
-      float sinTheta = sqrt(1.0 - noise.x); // thanks veka
-      float phi = 2 * PI * noise.y;
-
-      vec3 hemisphereDir = vec3(
-        cos(phi) * sinTheta,
-        sin(phi) * sinTheta,
-        cosTheta
-      );
-
-      vec3 sampleDir = tbd * hemisphereDir;
-
-      vec2 sampleCoord = mapSphere(sampleDir);
-
-      vec3 skySample = texture(colortex9, sampleCoord).rgb / (cosTheta / PI);
-    }
-
-    color.rgb /= samples;
-
-    if(frameCounter > 1){
-      color.rgb = mix(oldColor, color.rgb, 0.1);
-    }
 
 
-    show(color.rgb);
+
+    color = vec4(1.0);
+
+    #if !defined WORLD_OVERWORLD || !defined CLOUD_SHADOWS
+    return;
+    #endif
+
+    vec3 shadowScreenPos = vec3(texcoord, 1.0);
+    vec3 shadowNDCPos = shadowScreenPos * 2.0 - 1.0;
+    vec4 shadowHomPos = shadowProjectionInverse * vec4(shadowNDCPos, 1.0);
+    shadowHomPos.xy /= (shadowDistance / far);
+    vec3 shadowViewPos = shadowHomPos.xyz / shadowHomPos.w;
+
+    vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
+    vec3 rayPos;
+
+    vec3 totalTransmittance = vec3(1.0);
+
+    #ifdef VANILLA_CLOUDS
+    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, VANILLA_CLOUD_LOWER_HEIGHT, VANILLA_CLOUD_UPPER_HEIGHT, VANILLA_CLOUD_SAMPLES);
+    #endif
+    #ifdef CUMULUS_CLOUDS
+    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, CUMULUS_LOWER_HEIGHT, CUMULUS_UPPER_HEIGHT, CUMULUS_SAMPLES);
+    #endif
+    #ifdef ALTOCUMULUS_CLOUDS
+    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, ALTOCUMULUS_LOWER_HEIGHT, ALTOCUMULUS_UPPER_HEIGHT, ALTOCUMULUS_SAMPLES);
+    #endif
+    #ifdef CIRRUS_CLOUDS
+    marchCloudLayerShadow(totalTransmittance, feetPlayerPos, CIRRUS_LOWER_HEIGHT, CIRRUS_UPPER_HEIGHT, CIRRUS_SAMPLES);
+    #endif
+
+    color.rgb = totalTransmittance;
+    color.a = 1.0;
   }
 #endif
