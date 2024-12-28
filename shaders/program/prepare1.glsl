@@ -8,12 +8,13 @@
     By jbritain
     https://jbritain.net
 
-    /program/prepare.glsl
+    /program/prepare1.glsl
     - Sky environment map
 */
 
 #include "/lib/settings.glsl"
 #define HIGH_CLOUD_SAMPLES
+#define GENERATE_SKY_LUT
 
 #ifdef vsh
   out vec2 texcoord;

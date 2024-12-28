@@ -50,7 +50,7 @@ vec3 SSGI(vec3 viewPos, vec3 faceNormal, vec2 lightmap){
 
     vec3 GIPos;
     if(!rayIntersects(viewPos + faceNormal * 0.1, rayDir, 2, noise.z, true, GIPos, true)){
-      GI += getSky(rayDir, false) * lightmap.y / (cosTheta / PI);
+      GI += getSky(rayDir, false) * lightmap.y / (cosTheta * PI);
       continue;
     }
 

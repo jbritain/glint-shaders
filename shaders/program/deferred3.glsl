@@ -40,6 +40,7 @@
   uniform sampler2D colortex2;
   uniform sampler2D colortex3;
   uniform sampler2D colortex4;
+  uniform sampler2D colortex12;
 
   const bool colortex4MipmapEnabled = true;
 
@@ -179,7 +180,7 @@
 
     color.rgb = (brdf(gbufferData.material, gbufferData.mappedNormal, gbufferData.faceNormal, viewPos) * sunlight + vec3(scatter) * gbufferData.material.albedo) * sunlightColor;
     color.rgb += mix(diffuse, specular, fresnel);
-    color.rgb += gbufferData.material.emission * 4.0 * gbufferData.material.albedo;
+    color.rgb += gbufferData.material.emission * 40.0 * gbufferData.material.albedo;
   }
 
 

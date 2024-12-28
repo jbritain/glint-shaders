@@ -46,7 +46,6 @@
   in vec3 at_midBlock;
 
   #include "/lib/util.glsl"
-  #include "/lib/atmosphere/sky.glsl"
 
   void main() {
 
@@ -84,6 +83,7 @@
   uniform sampler2D colortex4;
   uniform sampler2D colortex6;
   uniform sampler2D colortex9;
+  uniform sampler2D colortex12;
 
   uniform float alphaTestRef;
   uniform float frameTimeCounter;
@@ -206,7 +206,7 @@
 
     color.rgb = (brdf(material, mappedNormal, faceNormal, viewPos) * sunlight + vec3(scatter) * material.albedo) * sunlightColor;
     // color.rgb += mix(diffuse, specular, fresnel);
-    color.rgb += material.emission * 4.0 * material.albedo;
+    color.rgb += material.emission * 40.0 * material.albedo;
     // color.a *= (1.0 - max3(fresnel));
   }
 #endif

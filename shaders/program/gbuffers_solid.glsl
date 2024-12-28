@@ -85,6 +85,7 @@
   uniform sampler2D noisetex;
 
   uniform sampler2D colortex3;
+  uniform sampler2D colortex12;
 
   uniform vec4 entityColor;
 

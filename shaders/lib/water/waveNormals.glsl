@@ -11,6 +11,7 @@
 // for the wave direction, position in space, wave frequency and time
 vec2 wavedx(vec2 position, vec2 direction, float frequency, float timeshift) {
   float x = dot(direction, position) * frequency + timeshift;
+  x = mod(x, 2 * PI);
   float wave = exp(sin(x) - 1.0) * 0.5;
   float dx = wave * cos(x);
   return vec2(wave, -dx);
@@ -28,6 +29,7 @@ float waveHeight(vec2 position) {
   float sumOfValues = 0.0; // will store final sum of values
   float sumOfWeights = 0.0; // will store final sum of weights
   for(int i=0; i < 16; i++) {
+    iter = mod(iter, 2 * PI);
     // generate some wave direction that looks kind of random
     vec2 p = vec2(sin(iter), cos(iter));
     
