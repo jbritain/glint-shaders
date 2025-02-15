@@ -1,3 +1,6 @@
+# ⚠️THIS VERSION OF GLINT IS NO LONGER DEVELOPED⚠️
+Glint is now being developed for the Aperture pipeline. The new version is available [here](https://github.com/jbritain/glint-aperture).
+
 # Glint
 A work in progress shaderpack for Minecraft.
 
