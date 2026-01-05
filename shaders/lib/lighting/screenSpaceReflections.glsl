@@ -53,6 +53,7 @@ vec3 getSSR(
   Material material,
   out float averageHitLength
 ) {
+  averageHitLength = 0.0;
   vec3 SSRColor = vec3(0.0);
   vec3 viewNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
   vec3 viewDir = normalize(viewPos);
@@ -61,7 +62,6 @@ vec3 getSSR(
     material.roughness < 0.01 ||
     ROUGH_SSR_THRESHOLD == 1.0 && material.metalID != NO_METAL
   ) {
-    float h;
     SSRColor = SSRSample(
       viewPos,
       viewDir,
@@ -70,7 +70,7 @@ vec3 getSSR(
       interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
       SMOOTH_SSR_STEPS,
       true,
-      h
+      averageHitLength
     );
   } else {
     mat3 tbn = generateTBN(viewNormal);
@@ -81,7 +81,6 @@ vec3 getSSR(
     );
 
     if (maxVec3(f) > ROUGH_SSR_THRESHOLD) {
-      averageHitLength = 0.0;
 
       for (int i = 0; i < ROUGH_SSR_SAMPLES; i++) {
         vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter, i);

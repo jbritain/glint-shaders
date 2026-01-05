@@ -15,7 +15,7 @@ const int shadowcolor1Format = RG8;
 
 const int shadowMapResolution = 2048;
 const bool shadowHardwareFiltering = true;
-const float sunPathRotation = -40.0;
+const float sunPathRotation = 40.0;
 const float shadowDistance = 192.0;
 const float shadowDistanceRenderMul = 1.0;
 

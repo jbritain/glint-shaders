@@ -22,6 +22,7 @@ out vec2 lightmap;
 out vec2 texcoord;
 out vec4 glcolor;
 out mat3 tbn;
+out vec3 viewPos;
 
 void main() {
   gl_Position = ftransform();
@@ -37,6 +38,8 @@ void main() {
   tbn[0] = normalize(gl_NormalMatrix * at_tangent.xyz);
   tbn[2] = normalize(gl_NormalMatrix * gl_Normal);
   tbn[1] = normalize(cross(tbn[0], tbn[2]) * at_tangent.w);
+
+  viewPos = (gbufferProjectionInverse * gl_Position).xyz;
 
   glcolor = gl_Color;
 }
@@ -54,6 +57,7 @@ in vec2 lightmap;
 in vec2 texcoord;
 in vec4 glcolor;
 in mat3 tbn;
+in vec3 viewPos;
 
 #ifdef SSAO
 /* RENDERTARGETS: 1,2 */
@@ -75,9 +79,10 @@ void main() {
   Gbuffer gbuffer;
 
   gbuffer.geometryNormal = mat3(gbufferModelViewInverse) * tbn[2];
+  vec3 surfaceNormal = getSurfaceNormal(texcoord, tbn);
   gbuffer.surfaceNormal =
-    mat3(gbufferModelViewInverse) * getSurfaceNormal(texcoord, tbn);
-  gbuffer.lightmap = applyLightmapFalloff(lightmap);
+    mat3(gbufferModelViewInverse) * surfaceNormal;
+  gbuffer.lightmap = lightmap;
 
   vec4 color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
@@ -89,6 +94,9 @@ void main() {
     pow(color.rgb, vec3(2.2)),
     texture(specular, texcoord)
   );
+
+  gbuffer.lightmap = applyDirectionalLightmap(gbuffer.lightmap, viewPos, surfaceNormal, tbn, material.subsurface);
+  gbuffer.lightmap *= applyLightmapFalloff(lightmap);
 
   gbufferData = packGbuffer(gbuffer);
   materialData = packMaterial(material);

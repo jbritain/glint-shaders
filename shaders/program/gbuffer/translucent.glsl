@@ -97,10 +97,13 @@ void main() {
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
   float shadow = getShadowFast(feetPlayerPos, gbuffer.surfaceNormal);
 
+  color.rgb = vec3(0.0);
+  #ifndef WORLD_THE_NETHER
   color.rgb =
     diffuseBRDF(material, surfaceNormal, tbn[2], viewPos) *
     sunlightColor *
     shadow;
+  #endif
 
   color.rgb += lightmap.y * skylightColor * material.albedo;
   color.rgb += lightmap.x * blocklightColor * material.albedo;

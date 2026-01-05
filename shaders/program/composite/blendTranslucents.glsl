@@ -82,18 +82,10 @@ void main() {
   // TRANSLUCENT BLENDING
   color.rgb = mix(color.rgb, translucents.rgb, translucents.a);
 
+
   // TRANSLUCENT SHADING
-  float shadow = getShadowFast(translucentFeetPlayerPos, gbuffer.surfaceNormal);
-
-  vec3 specularHighlight = specularBRDF(
-    material,
-    viewSurfaceNormal,
-    viewGeometryNormal,
-    translucentViewPos
-  ) * shadow;
-
-  float h;
-  vec3 indirectSpecular = getSSR(translucentViewPos, gbuffer, material, h);
+  float hitLength;
+  vec3 indirectSpecular = getSSR(translucentViewPos, gbuffer, material, hitLength);
 
   vec3 f = fresnelRoughness(material, dot(-viewDir, viewSurfaceNormal));
   if(refractedDir == vec3(0.0)){
@@ -107,7 +99,19 @@ void main() {
   // on the surface
   // however, it looks fine, and translucents like this aren't physically accurate anyway
   color.rgb = mix(color.rgb, indirectSpecular, f);
+  #ifndef WORLD_THE_NETHER
+
+  float shadow = getShadowFast(translucentFeetPlayerPos, gbuffer.surfaceNormal);
+  shadow *= 1.0 - step(0.01, hitLength);
+
+  vec3 specularHighlight = specularBRDF(
+    material,
+    viewSurfaceNormal,
+    viewGeometryNormal,
+    translucentViewPos
+  ) * shadow;
   color.rgb += specularHighlight;
+  #endif
 
 }
 

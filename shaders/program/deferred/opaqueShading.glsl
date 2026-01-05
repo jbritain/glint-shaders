@@ -57,16 +57,19 @@ void main() {
 
   // show(material.subsurface);
 
-  float blockerDistance;
-  vec3 shadow = getShadow(feetPlayerPos, gbuffer.geometryNormal, material.subsurface, blockerDistance);
-  color.rgb =
-    brdf(
-      material,
-      mat3(gbufferModelView) * gbuffer.surfaceNormal,
-      mat3(gbufferModelView) * gbuffer.geometryNormal,
-      viewPos
-    ) *
-    sunlightColor * shadow;
+  color.rgb = vec3(0.0);
+  #ifndef WORLD_THE_NETHER
+    float blockerDistance;
+    vec3 shadow = getShadow(feetPlayerPos, gbuffer.geometryNormal, material.subsurface, blockerDistance);
+    color.rgb =
+      brdf(
+        material,
+        mat3(gbufferModelView) * gbuffer.surfaceNormal,
+        mat3(gbufferModelView) * gbuffer.geometryNormal,
+        viewPos
+      ) *
+      sunlightColor * shadow;
+  #endif
 
   float occlusion = texture(colortex3, texcoord).r;
 
@@ -75,25 +78,31 @@ void main() {
 
   // TODO: SSS should probably not be multiplied by AO
   vec3 diffuse = vec3(0.0);
+  
   if(material.metalID == NO_METAL){
+    #ifndef WORLD_THE_NETHER
     vec3 subsurfaceScattering = getSubsurfaceScattering(material.albedo, material.subsurface, blockerDistance, length(shadow), normalize(feetPlayerPos), gbuffer.geometryNormal) * sunlightColor;
-    diffuse = gbuffer.lightmap.y * skylightColor * material.albedo * occlusion;
     diffuse += subsurfaceScattering * occlusion;
-    #ifdef RSM
-    diffuse += texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
+
+      #ifdef RSM
+      diffuse += texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
+      #endif
     #endif
+
+    diffuse += gbuffer.lightmap.y * skylightColor * material.albedo * occlusion;
+    diffuse += gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+
     if(material.roughness != 0.0){
       f *= smoothstep(ROUGH_SSR_THRESHOLD, ROUGH_SSR_THRESHOLD * 1.2, maxVec3(f));
     }
-
   }
+  // show(specularc);
 
   color.rgb += mix(diffuse, specularc, f);
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
 
-  color.rgb += material.albedo * gbuffer.lightmap.x * blocklightColor * EMISSIVE_STRENGTH;
-  show(gbuffer.lightmap);
+  
 
 }
 

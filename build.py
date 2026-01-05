@@ -2,6 +2,7 @@ import json
 import time
 import os
 import shutil
+
 # from watchdog.events import FileSystemEvent, FileSystemEventHandler
 # from watchdog.observers import Observer
 
@@ -10,27 +11,30 @@ shaders_path = "shaders"
 material_id_path = "lib/material/materialIDs.glsl"
 version = "460 compatibility"
 
-OVERWORLD = ("OVERWORLD", "world0")
-NETHER = ("THE_NETHER", "world1")
-END = ("THE_END", "world-1")
-all_dimensions = OVERWORLD, NETHER, END
+all_dimensions = {"OVERWORLD": "world0", "THE_NETHER": "world-1", "THE_END": "world1"}
 
 
-def create_linked_shader_program(program_path, file_path, program_types=["vsh", "fsh"], dimensions=[OVERWORLD, NETHER, END], defines={}):
+def create_linked_shader_program(
+    program_path,
+    file_path,
+    program_types=["vsh", "fsh"],
+    dimensions=all_dimensions.items(),
+    defines={},
+):
     for dim in dimensions:
         for program_type in program_types:
             if not os.path.exists(f"{shaders_path}/{dim[1]}/"):
                 os.makedirs(f"{shaders_path}/{dim[1]}/")
-            with open(f"{shaders_path}/{dim[1]}/{program_path}.{program_type}", "w") as p:
+            with open(
+                f"{shaders_path}/{dim[1]}/{program_path}.{program_type}", "w"
+            ) as p:
                 program_string = []
                 program_string.append(f"#version {version}")
                 program_string.append(f"#define WORLD_{dim[0]}")
                 program_string.append(f"#define {program_type}")
                 for macro, value in defines.items():
                     program_string.append(f"#define {macro} {value}")
-                program_string.append(f"#include \"/{file_path}\"")
-
-
+                program_string.append(f'#include "/{file_path}"')
 
                 p.writelines([l + "\n" for l in program_string])
 
@@ -38,11 +42,11 @@ def create_linked_shader_program(program_path, file_path, program_types=["vsh", 
 def generate_gbuffers(pack):
     for program, file in pack["programs"]["gbuffers"].items():
         create_linked_shader_program(
-            f"gbuffers_{program}", f"program/gbuffer/{file}.glsl")
+            f"gbuffers_{program}", f"program/gbuffer/{file}.glsl"
+        )
 
     if os.path.exists(f"{shaders_path}/program/shadow.glsl"):
-        create_linked_shader_program(
-            f"shadow", f"program/shadow.glsl")
+        create_linked_shader_program(f"shadow", f"program/shadow.glsl")
 
 
 def generate_post_processing(pack):
@@ -52,30 +56,39 @@ def generate_post_processing(pack):
                 program_name = f"{stage}{i if i else ''}"
 
                 create_linked_shader_program(
-                    program_name, f"program/{stage}/{program['path']}.glsl", program["programs"], defines=(program["defines"] if "defines" in program.keys() else {}))
+                    program_name,
+                    f"program/{stage}/{program['path']}.glsl",
+                    program["programs"],
+                    defines=(program["defines"] if "defines" in program.keys() else {}),
+                    dimensions=(
+                        {
+                            dim: all_dimensions[dim] for dim in program["dimensions"]
+                        }.items()
+                        if "dimensions" in program.keys()
+                        else all_dimensions.items()
+                    ),
+                )
 
-
-                if 'blend' in program.keys():
+                if "blend" in program.keys():
                     pack["properties"].append(
-                        f"blend.{program_name} = {program['blend']}")
+                        f"blend.{program_name} = {program['blend']}"
+                    )
 
-                if 'enabledBy' in program.keys():
-                    for dim in all_dimensions:
-                        pack['properties'].append(
+                if "enabledBy" in program.keys():
+                    for dim in all_dimensions.items():
+                        pack["properties"].append(
                             f"program.{dim[1]}/{program_name}.enabled = {program['enabledBy']}"
                         )
 
-
     if os.path.exists(f"{shaders_path}/program/final.glsl"):
-        create_linked_shader_program(
-            f"final", f"program/final.glsl")
+        create_linked_shader_program(f"final", f"program/final.glsl")
 
 
 def generate_properties(pack):
     with open(f"{shaders_path}/shaders.properties", "r+") as f:
         lines = f.readlines()
         if "# !AUTOGENERATE\n" in lines:
-            lines = lines[0:lines.index("# !AUTOGENERATE\n") + 1]
+            lines = lines[0 : lines.index("# !AUTOGENERATE\n") + 1]
 
         lines = lines + [l + "\n" for l in pack["properties"]]
         f.seek(0)
@@ -89,12 +102,14 @@ def generate_material_ids(pack):
     for i, (group_name, blocks) in enumerate(pack["blockMappings"].items()):
         block_properties.append(f"block.{i + 1000} = {blocks}")
         mappings.append(
-            f"bool materialIs{group_name.title()}(uint id){{return id == {i + 1000};}}")
+            f"bool materialIs{group_name.title()}(uint id){{return id == {i + 1000};}}"
+        )
 
     with open(f"{shaders_path}/block.properties", "w") as f:
         f.writelines(block_properties)
     with open(f"{shaders_path}/{material_id_path}", "w") as f:
         f.writelines(mappings)
+
 
 def generate_pack():
     with open(json_path) as j:
@@ -102,9 +117,9 @@ def generate_pack():
 
     pack["properties"] = []
 
-    for dim in all_dimensions:
-        if os.path.exists(f"{shaders_path}/{dim[1]}"):
-            shutil.rmtree(f"{shaders_path}/{dim[1]}")
+    for dim in all_dimensions.values():
+        if os.path.exists(f"{shaders_path}/{dim}"):
+            shutil.rmtree(f"{shaders_path}/{dim}")
     generate_gbuffers(pack)
     generate_post_processing(pack)
     generate_properties(pack)

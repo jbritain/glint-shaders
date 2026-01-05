@@ -52,37 +52,43 @@
       {
         "path": "getClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS"
+        "enabledBy": "CLOUDS",
+        "dimensions": ["OVERWORLD"]
       },
       {
         "path": "blendClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS"
+        "enabledBy": "CLOUDS",
+        "dimensions": ["OVERWORLD"]
       },
       {
         "path": "blendTranslucents",
-        "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS"
-      },
-      {
-        "path": "RTWForwardAnalysis",
-        "programs": ["csh"]
-      },
-      {
-        "path": "RTWBackwardAnalysis",
-        "programs": ["csh"]
-      },
-      {
-        "path": "RTWCalculateMaxWeights",
-        "programs": ["csh"]
-      },
-      {
-        "path": "RTWBlurMaxWeights",
         "programs": ["vsh", "fsh"]
       },
       {
+        "path": "RTWForwardAnalysis",
+        "programs": ["csh"],
+        "dimensions": ["OVERWORLD"]
+      },
+      {
+        "path": "RTWBackwardAnalysis",
+        "programs": ["csh"],
+        "dimensions": ["OVERWORLD"]
+      },
+      {
+        "path": "RTWCalculateMaxWeights",
+        "programs": ["csh"],
+        "dimensions": ["OVERWORLD"]
+      },
+      {
+        "path": "RTWBlurMaxWeights",
+        "programs": ["vsh", "fsh"],
+        "dimensions": ["OVERWORLD"]
+      },
+      {
         "path": "RTWComputeWarpFactorFastish",
-        "programs": ["csh"]
+        "programs": ["csh"],
+        "dimensions": ["OVERWORLD"]
       },
       {
         "path": "temporalFilter",

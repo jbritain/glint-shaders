@@ -33,7 +33,7 @@ float interleavedGradientNoise(vec2 coord, int frame) {
 }
 
 vec3 blueNoise(vec2 coord, int frame) {
-  return texelFetch(blueNoiseTex, ivec3(ivec2(coord) % 128, frame % 64), 0).rgb;
+  return texelFetch(bluenoisetex, ivec3(ivec2(coord) % 128, frame % 64), 0).rgb;
 }
 
 vec3 blueNoise(vec2 texcoord, int frame, int i) {

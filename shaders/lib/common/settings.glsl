@@ -1,4 +1,5 @@
-#define DEBUG_ENABLE
+// #define DEBUG_ENABLE
+// #define DEBUG_RECTILINEAR
 
 #define BLOOM_RADIUS 1.0
 
@@ -8,16 +9,16 @@
 #define PCSS_MIN_RADIUS 0.0
 #define SHADOW_PCF_SAMPLES 8
 
-// #define SSAO
+#define SSAO
 #define SSAO_SAMPLES 64
 #define SSAO_RADIUS 2.0
 
 #define SMOOTH_SSR_STEPS 16
 #define ROUGH_SSR_STEPS 8
 #define ROUGH_SSR_SAMPLES 4
-#define ROUGH_SSR_THRESHOLD 1.0
+#define ROUGH_SSR_THRESHOLD 0.5 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
-// #define RSM
+#define RSM
 #define RSM_SAMPLES 4
 #define RSM_RADIUS 2.0
 
@@ -26,11 +27,11 @@
 #define BLOCKLIGHT_COLOR_R 255
 #define BLOCKLIGHT_COLOR_G 128
 #define BLOCKLIGHT_COLOR_B 32
-const vec3 blocklightColor = pow(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0, vec3(1.0 / 2.2));
+const vec3 blocklightColor = pow(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0, vec3(1.0 / 2.2)) * EMISSIVE_STRENGTH;
 
 #define MULTIPLICATIVE_TRANSLUCENTS
 
 
-// #define CLOUDS
+#define CLOUDS
 #ifdef CLOUDS
 #endif
