@@ -18,7 +18,7 @@
 #define ROUGH_SSR_THRESHOLD 1.0
 
 // #define RSM
-#define RSM_SAMPLES 16
+#define RSM_SAMPLES 4
 #define RSM_RADIUS 2.0
 
 #define EMISSIVE_STRENGTH 100.0

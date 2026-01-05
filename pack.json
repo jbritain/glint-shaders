@@ -5,6 +5,7 @@
       "entities": "opaque",
       "entities_translucent": "translucent",
       "hand": "opaque",
+      "hand_water": "translucent",
       "water": "translucent"
     },
     "setup": [

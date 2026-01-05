@@ -2,10 +2,9 @@
     Copyright (c) 2025 Josh Britain (jbritain)
     Licensed under the MIT license
 
-      _____   __   _
-     / ___/  / /  (_)  __ _   __ _  ___   ____
-    / (_ /  / /  / /  /  ' \ /  ' \/ -_) / __/
-    \___/  /_/  /_/  /_/_/_//_/_/_/\__/ /_/
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
 
     By jbritain
     https://jbritain.net
@@ -37,7 +36,7 @@ layout(location = 0) out vec3 globalIllumination;
 
 void main() {
   globalIllumination = vec3(0.0);
-  float depth = texture(depthtex0, texcoord).r;
+  float depth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
@@ -47,6 +46,8 @@ void main() {
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
   globalIllumination = getReflectiveShadowMap(feetPlayerPos, gbuffer.geometryNormal);
+
+  // globalIllumination *= 1.0 - smoothstep(0.5, 1.0, length(feetPlayerPos) / shadowDistance);
 
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);

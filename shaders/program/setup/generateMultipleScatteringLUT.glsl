@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2025 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+
+    By jbritain
+    https://jbritain.net
+
+*/
+
 layout(local_size_x = 8, local_size_y = 8) in;
 const ivec3 workGroups = ivec3(4, 4, 1);
 

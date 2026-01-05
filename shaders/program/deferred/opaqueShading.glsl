@@ -2,10 +2,9 @@
     Copyright (c) 2025 Josh Britain (jbritain)
     Licensed under the MIT license
 
-      _____   __   _
-     / ___/  / /  (_)  __ _   __ _  ___   ____
-    / (_ /  / /  / /  /  ' \ /  ' \/ -_) / __/
-    \___/  /_/  /_/  /_/_/_//_/_/_/\__/ /_/
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
 
     By jbritain
     https://jbritain.net
@@ -40,7 +39,7 @@ in vec2 texcoord;
 layout(location = 0) out vec4 color;
 
 void main() {
-  float depth = texture(depthtex0, texcoord).r;
+  float depth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
   if (depth == 1.0) {
@@ -84,7 +83,7 @@ void main() {
     diffuse += texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
     #endif
     if(material.roughness != 0.0){
-      f *= step(ROUGH_SSR_THRESHOLD, maxVec3(f));
+      f *= smoothstep(ROUGH_SSR_THRESHOLD, ROUGH_SSR_THRESHOLD * 1.2, maxVec3(f));
     }
 
   }

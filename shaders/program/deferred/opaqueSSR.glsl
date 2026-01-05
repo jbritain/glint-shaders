@@ -2,10 +2,9 @@
     Copyright (c) 2025 Josh Britain (jbritain)
     Licensed under the MIT license
 
-      _____   __   _
-     / ___/  / /  (_)  __ _   __ _  ___   ____
-    / (_ /  / /  / /  /  ' \ /  ' \/ -_) / __/
-    \___/  /_/  /_/  /_/_/_//_/_/_/\__/ /_/
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
 
     By jbritain
     https://jbritain.net
@@ -36,7 +35,7 @@ layout(location = 0) out vec3 SSRColor;
 
 void main() {
   SSRColor = vec3(0.0);
-  float depth = texture(depthtex0, texcoord).r;
+  float depth = texture(depthtex1, texcoord).r;
   if (depth == 1.0) {
     return;
   }

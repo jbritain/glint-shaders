@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2025 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+
+    By jbritain
+    https://jbritain.net
+
+*/
+
 #ifndef MATERIAL_GLSL
 #define MATERIAL_GLSL
 

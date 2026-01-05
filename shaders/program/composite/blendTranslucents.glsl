@@ -2,10 +2,9 @@
     Copyright (c) 2025 Josh Britain (jbritain)
     Licensed under the MIT license
 
-      _____   __   _
-     / ___/  / /  (_)  __ _   __ _  ___   ____
-    / (_ /  / /  / /  /  ' \ /  ' \/ -_) / __/
-    \___/  /_/  /_/  /_/_/_//_/_/_/\__/ /_/
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
 
     By jbritain
     https://jbritain.net
@@ -101,7 +100,7 @@ void main() {
     f = vec3(1.0);
   }
   if(material.roughness != 0.0){
-    f *= step(ROUGH_SSR_THRESHOLD, maxVec3(f));
+    f *= smoothstep(ROUGH_SSR_THRESHOLD, ROUGH_SSR_THRESHOLD * 1.2, maxVec3(f));
   }
 
   // the blend here is incorrectly applying fresnel to the direct diffuse

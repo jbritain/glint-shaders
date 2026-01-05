@@ -88,7 +88,7 @@ vec3 getShadow(
 
   vec3 shadowViewNormal = mat3(shadowModelView) * playerNormal;
   shadowViewPos +=
-    shadowViewNormal * 0.1 * sqrt(1.0 - pow2(dot(playerNormal, worldLightDir)));
+    shadowViewNormal * (0.1 + step(0.5, length(playerPos) / shadowDistance) * 0.2) * sqrt(1.0 - pow2(dot(playerNormal, worldLightDir)));
 
   vec3 shadowScreenPos = viewSpaceToScreenSpaceOrtho(
     shadowViewPos,

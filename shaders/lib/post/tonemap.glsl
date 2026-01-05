@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2025 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+
+    By jbritain
+    https://jbritain.net
+
+*/
+
 #ifndef TONEMAP_GLSL
 #define TONEMAP_GLSL
 

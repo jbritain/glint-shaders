@@ -2,10 +2,9 @@
     Copyright (c) 2025 Josh Britain (jbritain)
     Licensed under the MIT license
 
-      _____   __   _
-     / ___/  / /  (_)  __ _   __ _  ___   ____
-    / (_ /  / /  / /  /  ' \ /  ' \/ -_) / __/
-    \___/  /_/  /_/  /_/_/_//_/_/_/\__/ /_/
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
 
     By jbritain
     https://jbritain.net
@@ -38,7 +37,7 @@ void main() {
   vec3 viewPos = transformView(playerPos, gbufferModelView);
   vec3 screenPos = viewSpaceToScreenSpace(viewPos);
 
-  uint weight = uint((1.0 - clamp01(-viewPos.z / far)) * 0);
+  uint weight = 0;//uint((clamp01(-viewPos.z / far)) * 1000);
 
-  imageAtomicAdd(shadowImportanceMap, texelCoord, weight);
+  // imageAtomicAdd(shadowImportanceMap, texelCoord, weight);
 }

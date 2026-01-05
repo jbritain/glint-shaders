@@ -2,10 +2,9 @@
     Copyright (c) 2025 Josh Britain (jbritain)
     Licensed under the MIT license
 
-      _____   __   _
-     / ___/  / /  (_)  __ _   __ _  ___   ____
-    / (_ /  / /  / /  /  ' \ /  ' \/ -_) / __/
-    \___/  /_/  /_/  /_/_/_//_/_/_/\__/ /_/
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
 
     By jbritain
     https://jbritain.net
@@ -51,17 +50,17 @@ void main() {
   }
   #endif
 
-  // if(gl_FragCoord.x < 256 && gl_FragCoord.y < 256){
-  //   color = vec3(
-  //     texelFetch(shadowImportanceMapTex, ivec2(gl_FragCoord.xy), 0).r,
-  //     texelFetch(shadowtex0, ivec2(gl_FragCoord.xy * shadowMapResolution / 256), 0).r,
-  //     0.0
-  //     );
-  // } else if(gl_FragCoord.x < 266 && gl_FragCoord.y < 256) {
-  //   color = texelFetch(colortex4, ivec2(gl_FragCoord.y, 1), 0).rgb;
-  // } else if(gl_FragCoord.y < 266 && gl_FragCoord.x < 256){
-  //   color = texelFetch(colortex4, ivec2(gl_FragCoord.x, 0), 0).rgb;
-  // }
+  if(gl_FragCoord.x < 256 && gl_FragCoord.y < 256){
+    color = vec3(
+      texelFetch(shadowImportanceMapTex, ivec2(gl_FragCoord.xy), 0).r,
+      texelFetch(shadowtex0, ivec2(gl_FragCoord.xy * shadowMapResolution / 256), 0).r,
+      0.0
+      );
+  } else if(gl_FragCoord.x < 266 && gl_FragCoord.y < 256) {
+    color = texelFetch(colortex4, ivec2(gl_FragCoord.y, 1), 0).rgb;
+  } else if(gl_FragCoord.y < 266 && gl_FragCoord.x < 256){
+    color = texelFetch(colortex4, ivec2(gl_FragCoord.x, 0), 0).rgb;
+  }
 }
 
 #endif
