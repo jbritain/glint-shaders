@@ -30,6 +30,8 @@ void main() {
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/lighting/screenSpaceReflections.glsl"
 #include "/lib/lighting/shadows.glsl"
+#include "/lib/water/waterFog.glsl"
+#include "/lib/water/waveNormals.glsl"
 
 in vec2 texcoord;
 
@@ -40,19 +42,37 @@ layout(location = 0) out vec4 color;
 void main() {
   vec4 translucents = texture(colortex6, texcoord);
   color = texture(colortex0, texcoord);
-  if (translucents.a == 0.0) {
-    return;
-  }
 
-  Material material = unpackMaterial(texture(colortex2, texcoord).rg);
-  Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
-  vec3 viewGeometryNormal = mat3(gbufferModelView) * gbuffer.geometryNormal;
-  vec3 viewSurfaceNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
+  bool inWater = isEyeInWater == 1;
 
   float translucentDepth = texture(depthtex0, texcoord).r;
   vec3 translucentViewPos = screenSpaceToViewSpace(vec3(texcoord, translucentDepth));
   vec3 viewDir = normalize(translucentViewPos);
   vec3 translucentFeetPlayerPos = transformView(translucentViewPos, gbufferModelViewInverse);
+
+  if (translucents.a == 0.0) {
+    if(inWater) {
+      color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentViewPos);
+    }
+    return;
+  }
+
+
+  Material material = unpackMaterial(texture(colortex2, texcoord).rg);
+  Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+
+  bool isWater = materialIsWater(material.id);
+  if(isWater){
+    gbuffer.surfaceNormal = waveNormal(translucentFeetPlayerPos.xz + cameraPosition.xz, gbuffer.surfaceNormal, 1.0);
+  }
+
+  vec3 viewGeometryNormal = mat3(gbufferModelView) * gbuffer.geometryNormal;
+  vec3 viewSurfaceNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
+
+
+
+
+
 
   float opaqueDepth = texture(depthtex2, texcoord).r;
   vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
@@ -62,7 +82,7 @@ void main() {
   float refractedRayLength = distance(translucentViewPos, opaqueViewPos);
   float sqrf0 = sqrt(material.f0.r);
   float ior = (1.0 + sqrf0) / (1.0 - sqrf0);
-  if(isEyeInWater != 1){
+  if(!inWater){
     ior = 1.0 / ior;
   }
   vec3 refractedDir = refract(viewDir, ior < 1.0 ? viewGeometryNormal - viewSurfaceNormal : viewSurfaceNormal, ior);
@@ -75,13 +95,18 @@ void main() {
   }
 
   #ifdef MULTIPLICATIVE_TRANSLUCENTS
-  color.rgb *= material.albedo;
+  if(!isWater){
+    color.rgb *= material.albedo;
+  }
   #endif
-  
 
   // TRANSLUCENT BLENDING
   color.rgb = mix(color.rgb, translucents.rgb, translucents.a);
 
+  if(isWater && !inWater){
+    color.rgb = getWaterFog(color.rgb, translucentViewPos, opaqueViewPos);
+  }
+  // }
 
   // TRANSLUCENT SHADING
   float hitLength;
@@ -112,6 +137,10 @@ void main() {
   ) * shadow;
   color.rgb += specularHighlight;
   #endif
+
+  if(isWater && inWater){
+    color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentViewPos);
+  }
 
 }
 

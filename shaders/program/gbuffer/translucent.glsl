@@ -84,7 +84,8 @@ void main() {
 
   Material material = materialFromSpecularMap(
     pow(color.rgb, vec3(2.2)),
-    texture(specular, texcoord)
+    texture(specular, texcoord),
+    materialID
   );
 
   if(materialIsWater(materialID)){
@@ -105,8 +106,8 @@ void main() {
     shadow;
   #endif
 
-  color.rgb += lightmap.y * skylightColor * material.albedo;
-  color.rgb += lightmap.x * blocklightColor * material.albedo;
+  color.rgb += gbuffer.lightmap.y * skylightColor * material.albedo;
+  color.rgb += gbuffer.lightmap.x * blocklightColor * material.albedo;
   color.rgb += material.albedo * material.emission * EMISSIVE_STRENGTH;
 
   gbufferData = packGbuffer(gbuffer);

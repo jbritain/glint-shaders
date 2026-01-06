@@ -60,8 +60,8 @@ void main() {
   actualPreviousPos.z = texture(colortex5, previousPos.xy).a;
 
   if (
-    clamp01(previousPos) == previousPos &&
-    distance(actualPreviousPos, previousViewPos) < 0.1
+    (clamp01(previousPos) == previousPos &&
+    distance(actualPreviousPos, previousViewPos) < 0.1) || distance(cameraPosition, previousCameraPosition) < 0.1
   ) {
     vec3 previousglobalIllumination = texture(colortex9, previousPos.xy).rgb;
     globalIllumination = mix(globalIllumination, previousglobalIllumination, 0.9);

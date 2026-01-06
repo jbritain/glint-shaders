@@ -20,8 +20,8 @@ uniform sampler2D cloudcoveragetex;
 uniform sampler2D vanillacloudtex;
 
 
-#define CLOUDS_BASE_ALTITUDE 400
-#define CLOUDS_TOP_ALTITUDE 500
+#define CLOUDS_BASE_ALTITUDE 200
+#define CLOUDS_TOP_ALTITUDE 350
 #define CLOUD_PRIMARY_SAMPLES 16
 #define CLOUD_SECONDARY_SAMPLES 4
 #define CLOUDS_DENSITY 0.085
@@ -105,7 +105,7 @@ float getCloudDensity(vec3 rayPos, bool highQuality){
         // Based loosely upon "Real Time Volumetric Cloudscapes" by Andrew Schneider in GPU Pro 7
         // Coverage texture generated with 'Strepitus' by luna5ama (https://github.com/luna5ama/strepitus)
         // Shape and detail textures generated with jaekmichie97's noise generator (https://github.com/jcm2606/volume-noise-generator)
-        float coverage = smoothstep(0.7, 1.0, texture(cloudcoveragetex, fract(rayPos.xz / 7500.0)).r);
+        float coverage = smoothstep(0.7, 1.0, texture(cloudcoveragetex, fract(rayPos.xz / 10000.0)).r);
         coverage *= heightInPlane * 0.3 + 0.7;
 
         // coverage = sqrt(coverage);

@@ -16,9 +16,13 @@
 
 layout(r32ui) uniform uimage2D undistortedShadowMap;
 
+in vec2 mc_Entity;
+
 out vec2 texcoord;
 out vec4 glcolor;
 out vec3 normal;
+
+flat out uint materialID;
 
 void main() {
   gl_Position = ftransform();
@@ -41,6 +45,8 @@ void main() {
 
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   glcolor = gl_Color;
+
+  materialID = uint(mc_Entity.x);
 }
 #endif
 
@@ -52,6 +58,8 @@ in vec2 texcoord;
 in vec4 glcolor;
 in vec3 normal;
 
+flat in uint materialID;
+
 /* RENDERTARGETS: 0,1 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec2 encodedNormal;
@@ -60,6 +68,9 @@ void main() {
   color = texture(gtexture, texcoord) * glcolor;
   if (color.a < alphaTestRef) {
     discard;
+  }
+  if(materialIsWater(materialID)){
+    color = vec4(0.0);
   }
   encodedNormal = normal.xy * 0.5 + 0.5;
 }

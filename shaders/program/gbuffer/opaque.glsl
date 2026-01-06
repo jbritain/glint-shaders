@@ -24,6 +24,8 @@ out vec4 glcolor;
 out mat3 tbn;
 out vec3 viewPos;
 
+flat out uint materialID;
+
 void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -42,6 +44,8 @@ void main() {
   viewPos = (gbufferProjectionInverse * gl_Position).xyz;
 
   glcolor = gl_Color;
+
+  materialID = uint(mc_Entity.x);
 }
 #endif
 
@@ -58,6 +62,8 @@ in vec2 texcoord;
 in vec4 glcolor;
 in mat3 tbn;
 in vec3 viewPos;
+
+flat in uint materialID;
 
 #ifdef SSAO
 /* RENDERTARGETS: 1,2 */
@@ -92,11 +98,12 @@ void main() {
 
   Material material = materialFromSpecularMap(
     pow(color.rgb, vec3(2.2)),
-    texture(specular, texcoord)
+    texture(specular, texcoord),
+    materialID
   );
 
-  gbuffer.lightmap = applyDirectionalLightmap(gbuffer.lightmap, viewPos, surfaceNormal, tbn, material.subsurface);
-  gbuffer.lightmap *= applyLightmapFalloff(lightmap);
+  gbuffer.lightmap = applyLightmapFalloff(lightmap);
+  // gbuffer.lightmap *= applyDirectionalLightmap(lightmap, viewPos, surfaceNormal, tbn, material.subsurface);
 
   gbufferData = packGbuffer(gbuffer);
   materialData = packMaterial(material);

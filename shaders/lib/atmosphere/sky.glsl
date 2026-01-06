@@ -39,7 +39,7 @@ vec3 getMoon(vec3 dir){
   float lat = atan(normal.x, normal.z) / TAU + 0.5;
   float lon = asin(normal.y) / PI + 0.5;
 
-  return dot(normal, worldSunDir) * texture(moontex, vec2(lat, lon)).rgb * moonRadiance;
+  return dot(normal, worldSunDir) * texture(moontex, vec2(lat, lon)).rgb * moonRadiance / PI;
 }
 
 vec3 getSky(vec3 dir, bool includeSun){

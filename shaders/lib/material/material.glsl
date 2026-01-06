@@ -84,9 +84,10 @@ struct Material {
 	float subsurface;
 	float porosity;
 	float ao;
+  uint id;
 };
 
-Material materialFromSpecularMap(vec3 albedo, vec4 specularData){
+Material materialFromSpecularMap(vec3 albedo, vec4 specularData, uint materialID){
   Material material;
 
   material.albedo = albedo;
@@ -108,6 +109,7 @@ Material materialFromSpecularMap(vec3 albedo, vec4 specularData){
   }
 
   material.emission = specularData.a < 1.0 ? specularData.a : 0.0;
+  material.id = materialID;
 
   return material;
 }
@@ -128,8 +130,13 @@ uvec2 packMaterial(Material material) {
       : (material.metalID + 229) / 255.0;
   data.g = bitfieldInsert(data.g, uint(packedF0 * 255), 8, 8);
   data.g = bitfieldInsert(data.g, uint(material.subsurface * 255), 16, 8);
-  data.g = bitfieldInsert(data.g, uint(material.ao * 255), 24, 8);
+  data.g = bitfieldInsert(data.g, uint(material.ao * 15), 24, 4);
 
+  // only the first 15 material IDs get stored, so anything that needs a deferred effect must have an ID < 16
+  if(material.id < 1016){
+    data.g = bitfieldInsert(data.g, uint(material.id - 999), 28, 4);
+  }
+  
   return data;
 }
 
@@ -155,7 +162,8 @@ Material unpackMaterial(uvec2 data){
     material.metalID = int(specularG * 255 + 0.5) - 229;
   }
   material.subsurface = bitfieldExtract(data.g, 16, 8) / 255.0;
-  material.ao = bitfieldExtract(data.g, 24, 8) / 255.0;
+  material.ao = bitfieldExtract(data.g, 24, 4) / 15.0;
+  material.id = bitfieldExtract(data.g, 28, 4) + 999;
 
   return material;
 }
