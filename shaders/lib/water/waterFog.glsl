@@ -16,20 +16,23 @@
 
 #include "/lib/util/phaseFunctions.glsl"
 
-#define WATER_ABSORPTION vec3(0.3, 0.06, 0.04)
-#define WATER_SCATTERING (vec3(0.01, 0.05, 0.03) * 0.1)
+const vec3 waterAbsorption = WATER_ABSORPTION_MOD * vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) / 255;
+const vec3 waterScattering = WATER_SCATTERING_MOD * vec3(WATER_SCATTERING_R, WATER_SCATTERING_G, WATER_SCATTERING_B) / 255;
 #define WATER_DENSITY 1.0
 
 const vec3 waterExtinction =
-  vec3(WATER_ABSORPTION + WATER_SCATTERING) * WATER_DENSITY;
+  vec3(waterAbsorption + waterScattering);
 
 vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
+  if(waterExtinction == vec3(0.0)){
+    return color;
+  }
   float dist = distance(start, end);
   vec3 dir = normalize(end - start);
 
   vec3 transmittance = exp(-dist * waterExtinction);
   vec3 scattering =
-    (1.0 - transmittance) * (WATER_SCATTERING / waterExtinction);
+    (1.0 - transmittance) * (waterScattering / waterExtinction);
   scattering *=
     (sunlightColor * henyeyGreenstein(0.4, dot(dir, lightDir)) +
       skylightColor * isotropicPhase) *

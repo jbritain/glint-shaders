@@ -26,6 +26,10 @@
       {
         "path": "sampleSkylightColour",
         "programs": ["csh"]
+      },
+      {
+        "path": "generateSkyCloudMap",
+        "programs": ["csh"]
       }
     ],
     "deferred": [
@@ -86,7 +90,7 @@
         "dimensions": ["OVERWORLD"]
       },
       {
-        "path": "RTWComputeWarpFactorFastish",
+        "path": "RTWComputeWarpFactor",
         "programs": ["csh"],
         "dimensions": ["OVERWORLD"]
       },
@@ -160,6 +164,22 @@
           "TILE_INDEX": "0"
         },
         "blend": "ONE ONE ZERO ZERO"
+      },
+      {
+        "path": "tonemap",
+        "programs": ["vsh", "fsh"]
+      },
+      {
+        "path": "SMAAEdgeWeights",
+        "programs": ["csh"]
+      },
+      {
+        "path": "SMAABlendWeights",
+        "programs": ["csh"]
+      },
+      {
+        "path": "SMAA",
+        "programs": ["csh"]
       }
     ]
   },

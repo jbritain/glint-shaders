@@ -1,5 +1,5 @@
 /*
-const int colortex0Format = RGB16F;
+const int colortex0Format = RGBA16F;
 const int colortex1Format = RGB16UI;
 const int colortex2Format = RG32UI;
 const int colortex3Format = R16;
@@ -13,12 +13,8 @@ const int colortex9Format = R11F_G11F_B10F;
 const int shadowcolor1Format = RG8;
 */
 
-const int shadowMapResolution = 2048;
 const bool shadowHardwareFiltering = true;
-const float sunPathRotation = 40.0;
-const float shadowDistance = 192.0;
 const float shadowDistanceRenderMul = 1.0;
-
 const bool colortex3Clear = false;
 const bool colortex4Clear = false;
 const bool colortex5Clear = false;

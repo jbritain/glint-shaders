@@ -36,7 +36,7 @@ vec3 uncharted2FilmicTonemap(vec3 v) {
 
   vec3 W = vec3(11.2f);
   vec3 white_scale = vec3(1.0f) / uncharted2TonemapPartial(W);
-  return pow(curr * white_scale, vec3(rcp(2.2)));
+  return curr * white_scale;
 }
 
 vec3 hejlBurgessTonemap(vec3 v) {
@@ -51,7 +51,7 @@ vec3 ACESTonemap(vec3 v) {
   float c = 2.43;
   float d = 0.59;
   float e = 0.14;
-  return pow(clamp01(v * (a * v + b) / (v * (c * v + d) + e)), vec3(rcp(2.2)));
+  return clamp01(v * (a * v + b) / (v * (c * v + d) + e));
 }
 
 // 0: Default, 1: Golden, 2: Punchy
@@ -108,7 +108,7 @@ vec3 agxEotf(vec3 val) {
   val = agx_mat_inv * val;
 
   // sRGB IEC 61966-2-1 2.2 Exponent Reference EOTF Display
-  //val = pow(val, vec3(2.2));
+  val = pow(val, vec3(2.2));
 
   return val;
 }
@@ -165,7 +165,7 @@ vec3 lottesTonemap(vec3 x) {
       pow(hdrMax, a) * pow(midIn, a * d) * midOut) /
     ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
 
-  return pow(pow(x, a) / (pow(x, a * d) * b + c), vec3(rcp(2.2)));
+  return pow(x, a) / (pow(x, a * d) * b + c);
 }
 
 // uniform sampler3D tonyMcMapfaceTex;

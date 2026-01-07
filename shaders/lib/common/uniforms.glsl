@@ -60,6 +60,7 @@ uniform float screenBrightness;
 uniform float viewHeight;
 uniform float viewWidth;
 uniform vec2 resolution;
+uniform vec2 pixelSize;
 uniform float wetness;
 uniform float sunAngle;
 uniform float playerMood;
@@ -138,6 +139,8 @@ uniform sampler2D sunTransmittanceLUTTex;
 uniform sampler2D multipleScatteringLUTTex;
 uniform sampler2D skyViewLUTTex;
 uniform sampler3D aerialPerspectiveLUTTex;
+
+uniform sampler2D skyCloudMapTex;
 
 uniform usampler2D undistortedShadowMapTex;
 uniform usampler2D shadowImportanceMapTex;

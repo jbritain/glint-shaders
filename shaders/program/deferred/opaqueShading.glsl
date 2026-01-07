@@ -80,7 +80,7 @@ void main() {
   if(material.metalID == NO_METAL){
     #ifndef WORLD_THE_NETHER
     vec3 subsurfaceScattering = getSubsurfaceScattering(material.albedo, material.subsurface, blockerDistance, length(shadow), normalize(feetPlayerPos), gbuffer.geometryNormal) * sunlightColor;
-    diffuse += subsurfaceScattering * occlusion;
+    diffuse += material.albedo * subsurfaceScattering;
 
       #ifdef RSM
       diffuse += texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
@@ -98,8 +98,6 @@ void main() {
   color.rgb += mix(diffuse, specularc, f);
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
-
-  
 
 }
 

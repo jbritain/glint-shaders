@@ -27,9 +27,9 @@ void main() {
   float minDepth = minVec4(neighbouringDepths);
   float maxDepth = maxVec4(neighbouringDepths);
 
-  if(depth == 0 || (maxDepth - minDepth < 1.0)){
-    imageStore(shadowImportanceMap, texelCoord, uvec4(0));
-    return;
+  uint weight = 0;
+  if(depth != 0){
+    weight += 1000;
   }
 
   vec3 shadowViewPos = screenSpaceToViewSpaceOrtho(vec3((texelCoord + 0.5) / 256.0, depth), shadowProjectionInverse);
@@ -37,7 +37,7 @@ void main() {
   vec3 viewPos = transformView(playerPos, gbufferModelView);
   vec3 screenPos = viewSpaceToScreenSpace(viewPos);
 
-  uint weight = 0;//uint((clamp01(-viewPos.z / far)) * 1000);
+  //uint((clamp01(-viewPos.z / far)) * 1000);
 
-  // imageAtomicAdd(shadowImportanceMap, texelCoord, weight);
+  imageAtomicAdd(shadowImportanceMap, texelCoord, weight);
 }

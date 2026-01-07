@@ -104,9 +104,18 @@ void main() {
   vec3 refractedPos = translucentViewPos + refractedDir * refractedRayLength;
   refractedPos = viewSpaceToScreenSpace(refractedPos);
   float refractedDepth = texture(depthtex1, refractedPos.xy).r;
-  if (refractedDepth > translucentDepth) {
-    color.rgb = texture(colortex0, refractedPos.xy).rgb;
+  if(clamp01(refractedPos) == refractedPos && refractedDepth != 1.0){
+    if (refractedDepth > translucentDepth) {
+      color.rgb = texture(colortex0, refractedPos.xy).rgb;
+    }
+  } else if(inWater) {
+    vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
+    vec3 sky = getSky(skyDir, false);
+    vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
+    sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    color.rgb = sky * gbuffer.lightmap.y;
   }
+
 
   #ifdef MULTIPLICATIVE_TRANSLUCENTS
   if (!isWater) {

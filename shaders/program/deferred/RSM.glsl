@@ -63,11 +63,13 @@ void main() {
 
   if (
     clamp01(previousPos) == previousPos &&
-    ((distance(actualPreviousPos, previousViewPos) < 0.1) || distance(cameraPosition, previousCameraPosition) < 0.1)
+    ((distance(actualPreviousPos, previousViewPos) < 0.1) || distance(cameraPosition, previousCameraPosition) < 0.01)
   ) {
     vec3 previousglobalIllumination = texture(colortex9, previousPos.xy).rgb;
     globalIllumination = mix(globalIllumination, previousglobalIllumination, 0.9);
   }
+
+  // show(globalIllumination * 10.0);
 
 }
 

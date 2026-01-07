@@ -8,6 +8,9 @@
 #define PCSS_MAX_RADIUS 2.0
 #define PCSS_MIN_RADIUS 0.0
 #define SHADOW_PCF_SAMPLES 8
+const float shadowDistance = 192.0;
+const float sunPathRotation = 40.0;
+const int shadowMapResolution = 2048;
 
 #define SSAO
 #define SSAO_SAMPLES 8
@@ -20,8 +23,8 @@
 
 #define RSM
 #define RSM_SAMPLES 4
-#define RSM_RADIUS 3.0
-#define RSM_BRIGHTNESS 1.0
+#define RSM_RADIUS 2.0
+#define RSM_BRIGHTNESS 5.0
 #define RSM_LIGHT_LEAK_FIX
 
 #define EMISSIVE_STRENGTH 100.0
@@ -36,6 +39,23 @@ const vec3 blocklightColor = pow(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BL
 #define WATER_PARALLAX
 #define WATER_PARALLAX_SAMPLES 8
 
+#define WATER_ABSORPTION_R 100
+#define WATER_ABSORPTION_G 40
+#define WATER_ABSORPTION_B 24
+#define WATER_ABSORPTION_MOD 1.0
+
+#define WATER_SCATTERING_R 14
+#define WATER_SCATTERING_G 30
+#define WATER_SCATTERING_B 38
+#define WATER_SCATTERING_MOD 0.1
+
+#define SUBSURFACE_SCATTERING_STRENGTH 4.0
+
+#define SMAA
+#define SMAA_THRESHOLD 0.1 // [0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5]
+#define SMAA_SEARCH 112 // [8 16 32 48 64 80 96 112]
+#define SMAA_SEARCH_DIAG 20 // [0 4 8 12 16 20]
+#define SMAA_CORNER 25 // [0 25 50 75 100]
 
 #define CLOUDS
 #ifdef CLOUDS

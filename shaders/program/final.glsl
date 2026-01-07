@@ -35,14 +35,7 @@ uniform sampler2D debugtex;
 #include "/lib/util/dither.glsl"
 
 void main() {
-  color = texture(colortex0, texcoord).rgb;
-
-  vec3 bloom = texture(colortex6, texcoord * 0.5).rgb;
-  color = mix(color, bloom, 0.01);
-
-  color /= 15;
-  color = tonemap(color);
-  color += interleavedGradientNoise(floor(gl_FragCoord.xy), 0) / 255;
+  color = pow(texture(colortex0, texcoord).rgb, vec3(rcp(2.2)));
 
   #ifdef DEBUG_ENABLE
   if (hideGUI) {

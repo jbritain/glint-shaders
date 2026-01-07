@@ -7,6 +7,7 @@
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/util/misc.glsl"
 #include "/lib/lighting/brdf.glsl"
+#include "/lib/util/packing.glsl"
 
 vec3 SSRSample(
   inout vec3 origin,
@@ -42,8 +43,11 @@ vec3 SSRSample(
   } else {
     hitLength = 0.0;
     rayPos = viewSpaceToScreenSpace(origin);
-    return getSky(mat3(gbufferModelViewInverse) * reflectedDir, false) *
-    skyLightmap;
+    vec3 skyDir = mat3(gbufferModelViewInverse) * reflectedDir;
+    vec3 sky = getSky(skyDir, false);
+    vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
+    sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    return sky * skyLightmap;
   }
 }
 

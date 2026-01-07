@@ -36,9 +36,10 @@ void main() {
 
 
   for(int i = 0; i < (depth0 == depth1 ? 1 : 2); i++){
-    uint weight = uint(1000);
     float depth = ((i == 0) ? depth0 : depth1);
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+    uint weight = 1000;
+    weight += uint(10 / (1.0 - depth));
     vec3 shadowViewPos = transformView(
       transformView(viewPos, gbufferModelViewInverse),
       shadowModelView

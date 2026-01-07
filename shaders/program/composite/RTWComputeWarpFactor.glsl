@@ -22,7 +22,7 @@ shared float a[256];
 void main() {
 
   // load values into shared memory
-  a[gl_GlobalInvocationID.x] = max(0.0, texelFetch(colortex4, ivec2(gl_GlobalInvocationID.xy), 0).r) + 1000.0;
+  a[gl_GlobalInvocationID.x] = max(0.0, texelFetch(colortex4, ivec2(gl_GlobalInvocationID.xy), 0).r);
   barrier();
 
   if(gl_GlobalInvocationID.x == 0){

@@ -85,7 +85,7 @@ def generate_post_processing(pack):
 
 
 def generate_properties(pack):
-    with open(f"{shaders_path}/shaders.properties", "r+") as f:
+    with open(f"{shaders_path}/shaders.properties", "r+", encoding="utf-8") as f:
         lines = f.readlines()
         if "# !AUTOGENERATE\n" in lines:
             lines = lines[0 : lines.index("# !AUTOGENERATE\n") + 1]

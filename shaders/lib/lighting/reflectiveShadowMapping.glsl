@@ -46,7 +46,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   }
 
   irradiance /= float(RSM_SAMPLES);
-  irradiance *= PI * pow2(RSM_RADIUS) * RSM_BRIGHTNESS;
+  irradiance *= PI * RSM_RADIUS * RSM_BRIGHTNESS;
 
   return irradiance;
 }

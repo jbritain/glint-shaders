@@ -32,8 +32,8 @@ uvec3 packGbuffer(Gbuffer gbuffer){
   packedGbuffer.r = bitfieldInsert(packedGbuffer.r, uint(packedSurface.r * 255), 0, 8);
   packedGbuffer.r = bitfieldInsert(packedGbuffer.r, uint(packedSurface.g * 255), 8, 8);
 
-  packedGbuffer.g = bitfieldInsert(packedGbuffer.r, uint(packedGeometry.r * 255), 0, 8);
-  packedGbuffer.g = bitfieldInsert(packedGbuffer.r, uint(packedGeometry.g * 255), 8, 8);
+  packedGbuffer.g = bitfieldInsert(packedGbuffer.g, uint(packedGeometry.r * 255), 0, 8);
+  packedGbuffer.g = bitfieldInsert(packedGbuffer.g, uint(packedGeometry.g * 255), 8, 8);
 
   packedGbuffer.b = bitfieldInsert(packedGbuffer.b, uint(gbuffer.lightmap.x * 255), 0, 8);
   packedGbuffer.b = bitfieldInsert(packedGbuffer.b, uint(gbuffer.lightmap.y * 255), 8, 8);
