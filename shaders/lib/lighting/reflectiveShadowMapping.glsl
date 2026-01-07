@@ -5,11 +5,9 @@
 
 vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   vec3 shadowViewPos = transformView(playerPos, shadowModelView);
+  // shadowViewPos.z -= 0.1;
 
   vec3 shadowViewNormal = mat3(shadowModelView) * playerNormal;
-  shadowViewPos +=
-  shadowViewNormal * (0.1 + step(0.5, length(playerPos) / shadowDistance) * 0.2) * sqrt(1.0 - pow2(dot(playerNormal, worldLightDir)));
-
   vec3 shadowScreenPos = viewSpaceToScreenSpaceOrtho(
     shadowViewPos,
     shadowProjection
@@ -22,7 +20,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
 
   for (int i = 0; i < RSM_SAMPLES; i++) {
     float angle = fract(float(i) / RSM_SAMPLES + jitter.x) * 2.0 * PI;
-    float r = float(i + jitter.y) / RSM_SAMPLES;
+    float r = sqrt(float(i + jitter.y) / RSM_SAMPLES);
     vec2 offset = r * radius * vec2(sin(angle), cos(angle));
 
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
@@ -44,11 +42,13 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
 
     vec3 dir = normalize(shadowViewPos - samplePos); // direction from fragment to sample
 
-    irradiance += sampleFlux * max0(dot(dir, sampleNormal)) * max0(dot(-dir, shadowViewNormal)) / pow2(distance(samplePos, shadowViewPos) + 1.0);
+    irradiance += sampleFlux * max0(dot(dir, sampleNormal)) * max0(dot(-dir, shadowViewNormal)) / (pow2(distance(samplePos, shadowViewPos) + 1.0));
   }
 
   irradiance /= float(RSM_SAMPLES);
-  return irradiance * 100.0 / pow2(RSM_RADIUS);
+  irradiance *= PI * pow2(RSM_RADIUS) * RSM_BRIGHTNESS;
+
+  return irradiance;
 }
 
 #endif

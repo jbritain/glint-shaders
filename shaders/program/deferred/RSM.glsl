@@ -47,7 +47,9 @@ void main() {
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
   globalIllumination = getReflectiveShadowMap(feetPlayerPos, gbuffer.geometryNormal);
 
-  // globalIllumination *= 1.0 - smoothstep(0.5, 1.0, length(feetPlayerPos) / shadowDistance);
+  #ifdef RSM_LIGHT_LEAK_FIX
+  globalIllumination *= smoothstep(0.0, 0.2, gbuffer.lightmap.y);
+  #endif
 
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);
@@ -60,14 +62,12 @@ void main() {
   actualPreviousPos.z = texture(colortex5, previousPos.xy).a;
 
   if (
-    (clamp01(previousPos) == previousPos &&
-    distance(actualPreviousPos, previousViewPos) < 0.1) || distance(cameraPosition, previousCameraPosition) < 0.1
+    clamp01(previousPos) == previousPos &&
+    ((distance(actualPreviousPos, previousViewPos) < 0.1) || distance(cameraPosition, previousCameraPosition) < 0.1)
   ) {
     vec3 previousglobalIllumination = texture(colortex9, previousPos.xy).rgb;
     globalIllumination = mix(globalIllumination, previousglobalIllumination, 0.9);
   }
-
-  // show(globalIllumination);
 
 }
 

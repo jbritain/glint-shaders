@@ -52,8 +52,10 @@ void main() {
   occlusion = getSSAO(viewPos, gbuffer.geometryNormal);
   if(clamp01(previousPos) == previousPos){
     float previousOcclusion = texture(colortex3, previousPos.xy).r;
-    occlusion = mix(occlusion, previousOcclusion, 0.9);
+    occlusion = mix(occlusion, previousOcclusion, 0.5);
   }
+
+  show(occlusion);
 
 }
 

@@ -15,11 +15,11 @@
 #define DITHER_GLSL
 
 vec2 r2(int index) {
-    const float g = 1.6180339887498948482;
+  const float g = 1.32471795724474602596;
   float a1 = rcp(g);
   float a2 = rcp(pow2(g));
 
-  return vec2(mod(0.5 + a1 * index, 1.0), mod(0.5 + a2 * index, 1.0));
+  return vec2(fract(0.5 + a1 * index), fract(0.5 + a2 * index));
 }
 
 // https://blog.demofox.org/2022/01/01/interleaved-gradient-noise-a-different-kind-of-low-discrepancy-sequence/
@@ -37,7 +37,7 @@ vec3 blueNoise(vec2 coord, int frame) {
 }
 
 vec3 blueNoise(vec2 texcoord, int frame, int i) {
-  return blueNoise(texcoord + r2(i), frame);
+  return blueNoise(texcoord + r2(i) * 128, frame);
 }
 
 vec2 vogelDisc(int stepIndex, int stepCount, float noise) {

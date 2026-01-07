@@ -55,8 +55,6 @@ void main() {
   Material material = unpackMaterial(texture(colortex2, texcoord).rg);
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
-  // show(material.subsurface);
-
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER
     float blockerDistance;
@@ -96,7 +94,6 @@ void main() {
       f *= smoothstep(ROUGH_SSR_THRESHOLD, ROUGH_SSR_THRESHOLD * 1.2, maxVec3(f));
     }
   }
-  // show(specularc);
 
   color.rgb += mix(diffuse, specularc, f);
 
