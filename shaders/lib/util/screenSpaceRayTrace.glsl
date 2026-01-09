@@ -53,6 +53,8 @@ bool rayIntersects(
     return false;
   }
 
+  vec2 res = textureSize(depthBuffer, 0).xy;
+
   rayPos = viewSpaceToScreenSpace(viewOrigin, projection);
   vec3 rayDir = viewSpaceToScreenSpace(viewOrigin + viewDir, projection);
 
@@ -91,11 +93,11 @@ bool rayIntersects(
 
   }
 
-  if (clamp01(rayPos) != rayPos) return false; // we went offscreen
-
   if (refine && intersect) {
     binarySearch(rayPos, rayStep, depthBuffer);
   }
+
+  rayPos.xy = (floor(rayPos.xy * res) + 0.5) / res;
 
   return intersect;
 }

@@ -45,8 +45,10 @@ vec3 SSRSample(
     rayPos = viewSpaceToScreenSpace(origin);
     vec3 skyDir = mat3(gbufferModelViewInverse) * reflectedDir;
     vec3 sky = getSky(skyDir, false);
+    #ifdef CLOUDS
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    #endif
     return sky * skyLightmap;
   }
 }

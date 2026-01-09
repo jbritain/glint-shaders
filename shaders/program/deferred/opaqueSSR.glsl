@@ -76,7 +76,7 @@ void main() {
       distance(projectedViewPos, actualProjectedPos) < 0.1
     ) {
       vec3 previousSSR = texture(colortex7, projectedPos.xy).rgb;
-      SSRColor = mix(SSRColor, previousSSR, 0.5);
+      SSRColor = mix(SSRColor, previousSSR, 0.9);
     }
   }
 

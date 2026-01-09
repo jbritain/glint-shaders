@@ -49,9 +49,9 @@ void main() {
 
   color = texture(colortex0, texcoord);
 
-  float opaqueDepth = texture(depthtex2, texcoord).r;
+  float opaqueDepth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
-  newHistory.a = viewPos.z;
+  newHistory.a = screenSpaceToViewSpace(opaqueDepth);
 
   if(depth != opaqueDepth){
     return;
@@ -64,11 +64,14 @@ void main() {
       vec4(feetPlayerPos, 1.0)).xyz;
   vec4 previousClipPos = gbufferPreviousProjection * vec4(previousViewPos, 1.0);
   vec3 previousScreenPos = previousClipPos.xyz / previousClipPos.w * 0.5 + 0.5;
-
+  vec3 actualPreviousViewPos = previousViewPos;
+  
 
   bool rejectSample = clamp01(previousScreenPos.xy) != previousScreenPos.xy;
 
   vec4 historyColor = texture(colortex5, previousScreenPos.xy);
+  actualPreviousViewPos.z = screenSpaceToViewSpace(historyColor.a);
+  // rejectSample = rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
 
   // neighbourhood clamping
   vec3 maxCol = vec3(0.0);

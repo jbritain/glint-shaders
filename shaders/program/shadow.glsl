@@ -70,7 +70,7 @@ void main() {
     discard;
   }
   if(materialIsWater(materialID)){
-    color = vec4(0.0);
+    discard;
   }
   encodedNormal = normal.xy * 0.5 + 0.5;
 }

@@ -71,7 +71,7 @@ void main() {
     gbuffer.surfaceNormal = getWaterParallaxNormal(
       translucentFeetPlayerPos,
       gbuffer.surfaceNormal,
-      interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+      interleavedGradientNoise(floor(gl_FragCoord.xy)),
       1.0
     );
   }
@@ -111,8 +111,10 @@ void main() {
   } else if(inWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
     vec3 sky = getSky(skyDir, false);
+    #ifdef CLOUDS
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    #endif
     color.rgb = sky * gbuffer.lightmap.y;
   }
 
@@ -154,7 +156,7 @@ void main() {
   color.rgb = mix(color.rgb, indirectSpecular, f);
   #ifndef WORLD_THE_NETHER
 
-  float shadow = getShadowFast(translucentFeetPlayerPos, gbuffer.surfaceNormal);
+  float shadow = getShadowFast(translucentFeetPlayerPos, gbuffer.surfaceNormal, gbuffer.lightmap.y);
   shadow *= 1.0 - step(0.01, hitLength);
 
   vec3 specularHighlight =

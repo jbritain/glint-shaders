@@ -110,7 +110,7 @@ vec3 getValFromTLUT(sampler2D tex, vec2 bufferRes, vec3 pos, vec3 sunDir) {
                max(0.0, min(1.0, (height - groundRadiusMM) /
                                      (atmosphereRadiusMM - groundRadiusMM))));
   uv /= bufferRes;
-  return texture(tex, uv).rgb;
+  return textureLod(tex, uv, 0).rgb;
 }
 vec3 getValFromMultiScattLUT(sampler2D tex, vec2 bufferRes, vec3 pos,
                              vec3 sunDir) {
@@ -123,7 +123,7 @@ vec3 getValFromMultiScattLUT(sampler2D tex, vec2 bufferRes, vec3 pos,
                max(0.0, min(1.0, (height - groundRadiusMM) /
                                      (atmosphereRadiusMM - groundRadiusMM))));
   uv /= bufferRes;
-  return texture(tex, uv).rgb;
+  return textureLod(tex, uv, 0).rgb;
 }
 
 vec3 getValFromSkyLUT(vec3 rayDir) {
@@ -153,7 +153,7 @@ vec3 getValFromSkyLUT(vec3 rayDir) {
       0.5 + 0.5 * sign(altitudeAngle) * sqrt(abs(altitudeAngle) * 2.0 / PI);
   vec2 uv = vec2(azimuthAngle / (2.0 * PI), v);
 
-  return texture(skyViewLUTTex, uv).rgb;
+  return textureLod(skyViewLUTTex, uv, 0).rgb;
 }
 
 vec3 mapAerialPerspectivePos(vec3 viewPos) {

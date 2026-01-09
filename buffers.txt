@@ -8,3 +8,4 @@ colortex6: translucents, bloom
 colortex7: SSR (ACCUMULATED)
 colortex8: clouds (ACCUMULATED)
 colortex9: global illumination (ACCUMULATED)
+colortex10: opaque shadowing (ACCUMULATED)

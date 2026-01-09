@@ -14,7 +14,7 @@ const int shadowMapResolution = 2048;
 
 #define SSAO
 #define SSAO_SAMPLES 8
-#define SSAO_RADIUS 0.5
+#define SSAO_RADIUS 1.0
 
 #define SMOOTH_SSR_STEPS 16
 #define ROUGH_SSR_STEPS 8

@@ -96,7 +96,7 @@ void main() {
   }
 
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
-  float shadow = getShadowFast(feetPlayerPos, gbuffer.surfaceNormal);
+  float shadow = getShadowFast(feetPlayerPos, gbuffer.surfaceNormal, gbuffer.lightmap.y);
 
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER

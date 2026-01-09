@@ -57,41 +57,59 @@ void main() {
 
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER
-    float blockerDistance;
-    vec3 shadow = getShadow(feetPlayerPos, gbuffer.geometryNormal, material.subsurface, blockerDistance);
-    color.rgb =
-      brdf(
-        material,
-        mat3(gbufferModelView) * gbuffer.surfaceNormal,
-        mat3(gbufferModelView) * gbuffer.geometryNormal,
-        viewPos
-      ) *
-      sunlightColor * shadow;
+  vec4 shadowAndBlockerDistance = texture(colortex10, texcoord);
+  float blockerDistance = shadowAndBlockerDistance.a;
+  vec3 shadow = shadowAndBlockerDistance.rgb;
+  color.rgb =
+    brdf(
+      material,
+      mat3(gbufferModelView) * gbuffer.surfaceNormal,
+      mat3(gbufferModelView) * gbuffer.geometryNormal,
+      viewPos
+    ) *
+    sunlightColor *
+    shadow;
   #endif
 
   float occlusion = texture(colortex3, texcoord).r;
 
   vec3 specularc = texture(colortex7, texcoord).rgb;
-  vec3 f = fresnelRoughness(material, dot(gbuffer.geometryNormal, -normalize(feetPlayerPos)));
+  vec3 f = fresnelRoughness(
+    material,
+    dot(gbuffer.geometryNormal, -normalize(feetPlayerPos))
+  );
 
-  // TODO: SSS should probably not be multiplied by AO
   vec3 diffuse = vec3(0.0);
-  
-  if(material.metalID == NO_METAL){
+  if (material.metalID == NO_METAL) {
     #ifndef WORLD_THE_NETHER
-    vec3 subsurfaceScattering = getSubsurfaceScattering(material.albedo, material.subsurface, blockerDistance, length(shadow), normalize(feetPlayerPos), gbuffer.geometryNormal) * sunlightColor;
+    vec3 subsurfaceScattering =
+      getSubsurfaceScattering(
+        material.albedo,
+        material.subsurface,
+        blockerDistance,
+        length(shadow),
+        normalize(feetPlayerPos),
+        gbuffer.geometryNormal
+      ) *
+      sunlightColor;
     diffuse += material.albedo * subsurfaceScattering;
 
-      #ifdef RSM
-      diffuse += texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
-      #endif
+    #ifdef RSM
+    diffuse +=
+      texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
+    #endif
     #endif
 
     diffuse += gbuffer.lightmap.y * skylightColor * material.albedo * occlusion;
-    diffuse += gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+    diffuse +=
+      gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
 
-    if(material.roughness != 0.0){
-      f *= smoothstep(ROUGH_SSR_THRESHOLD, ROUGH_SSR_THRESHOLD * 1.2, maxVec3(f));
+    if (material.roughness != 0.0) {
+      f *= smoothstep(
+        ROUGH_SSR_THRESHOLD,
+        ROUGH_SSR_THRESHOLD * 1.2,
+        maxVec3(f)
+      );
     }
   }
 

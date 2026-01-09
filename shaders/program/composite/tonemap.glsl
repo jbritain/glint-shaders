@@ -42,7 +42,6 @@ void main() {
 
   color /= 15;
   color = tonemap(color);
-  color += interleavedGradientNoise(floor(gl_FragCoord.xy), 0) / 255;
 }
 
 #endif

@@ -81,9 +81,11 @@ vec3 getShadow(
   vec3 playerPos,
   vec3 playerNormal,
   float subsurface,
-  out float blockerDistance
+  float skyLightmap,
+  out float blockerDistance,
+  out float distFade
 ) {
-  float jitter = interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter);
+  float jitter = blueNoise(gl_FragCoord.xy, frameCounter).r;
   vec3 shadowViewPos = transformView(playerPos, shadowModelView);
 
   vec3 shadowViewNormal = mat3(shadowModelView) * playerNormal;
@@ -110,10 +112,14 @@ vec3 getShadow(
     jitter,
     shadowViewNormal
   );
+
+  distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
+  show(distFade);
+  shadow = mix(shadow, vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, skyLightmap)), distFade);
   return shadow;
 }
 
-float getShadowFast(vec3 playerPos, vec3 playerNormal){
+float getShadowFast(vec3 playerPos, vec3 playerNormal, float skyLightmap){
   vec3 shadowViewPos = transformView(playerPos, shadowModelView);
 
   vec3 shadowViewNormal = mat3(shadowModelView) * playerNormal;
@@ -133,6 +139,10 @@ float getShadowFast(vec3 playerPos, vec3 playerNormal){
   shadowScreenPos.xy += warp;
 
   float shadow = texture(shadowtex0HW, shadowScreenPos).r;
+
+  float distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
+  shadow = mix(shadow, smoothstep(13.5 / 15.0, 14.5 / 15.0, skyLightmap), distFade);
+
   return shadow;
 }
 

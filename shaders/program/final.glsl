@@ -36,6 +36,7 @@ uniform sampler2D debugtex;
 
 void main() {
   color = pow(texture(colortex0, texcoord).rgb, vec3(rcp(2.2)));
+  color += interleavedGradientNoise(floor(gl_FragCoord.xy), 0) / 255;
 
   #ifdef DEBUG_ENABLE
   if (hideGUI) {
