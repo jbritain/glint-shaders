@@ -65,15 +65,14 @@ vec3 getSSR(
   vec3 viewDir = normalize(viewPos);
 
   if (
-    material.roughness < 0.01 ||
-    ROUGH_SSR_THRESHOLD == 1.0 && material.metalID != NO_METAL
+    material.roughness < 0.01
   ) {
     SSRColor = SSRSample(
       viewPos,
       viewDir,
       viewNormal,
       gbuffer.lightmap.y,
-      interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+      interleavedGradientNoise(floor(gl_FragCoord.xy)),
       SMOOTH_SSR_STEPS,
       true,
       averageHitLength
@@ -86,7 +85,7 @@ vec3 getSSR(
       dot(tangentViewDir, vec3(0.0, 1.0, 0.0))
     );
 
-    if (maxVec3(f) > ROUGH_SSR_THRESHOLD) {
+    if (material.roughness >= 0.01 && material.roughness <= ROUGH_SSR_THRESHOLD) {
 
       for (int i = 0; i < ROUGH_SSR_SAMPLES; i++) {
         vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter, i);

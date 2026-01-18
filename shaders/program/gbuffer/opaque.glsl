@@ -30,7 +30,7 @@ void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
-  vec2 lmcoord = (mat2(gl_TextureMatrix[1]) * gl_MultiTexCoord1.xy);
+  vec2 lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
   lightmap = lmcoord / (30.0 / 32.0) - 1.0 / 32.0;
 
   if(at_midBlock.w > 0.0){
@@ -102,6 +102,11 @@ void main() {
     materialID
   );
 
+  if(material.roughness > ROUGH_SSR_THRESHOLD && material.metalID != NO_METAL){
+    material.roughness = ROUGH_SSR_THRESHOLD;
+  }
+
+  gbuffer.lightmap = lightmap;
   gbuffer.lightmap = applyLightmapFalloff(lightmap);
   // gbuffer.lightmap *= applyDirectionalLightmap(lightmap, viewPos, surfaceNormal, tbn, material.subsurface);
 

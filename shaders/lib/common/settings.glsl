@@ -1,5 +1,5 @@
 // #define DEBUG_ENABLE
-// #define DEBUG_RECTILINEAR
+#define DEBUG_RECTILINEAR
 
 #define BLOOM_RADIUS 1.0
 
@@ -8,7 +8,7 @@
 #define PCSS_MAX_RADIUS 2.0
 #define PCSS_MIN_RADIUS 0.0
 #define SHADOW_PCF_SAMPLES 8
-const float shadowDistance = 192.0;
+const float shadowDistance = 256.0;
 const float sunPathRotation = 40.0;
 const int shadowMapResolution = 2048;
 
@@ -19,7 +19,7 @@ const int shadowMapResolution = 2048;
 #define SMOOTH_SSR_STEPS 16
 #define ROUGH_SSR_STEPS 8
 #define ROUGH_SSR_SAMPLES 4
-#define ROUGH_SSR_THRESHOLD 0.5 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define ROUGH_SSR_THRESHOLD 0.2 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
 #define RSM
 #define RSM_SAMPLES 4

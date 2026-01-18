@@ -24,6 +24,8 @@ out vec3 normal;
 
 flat out uint materialID;
 
+#include "/lib/util/rectilinearWarp.glsl"
+
 void main() {
   gl_Position = ftransform();
   normal = normalize(gl_NormalMatrix * gl_Normal);
@@ -34,10 +36,7 @@ void main() {
     floatBitsToUint(1.0 - screenPos.z)
   );
 
-  vec2 warp = vec2(
-    textureLod(colortex4, vec2(screenPos.x, 0.0), 0).r,
-    textureLod(colortex4, vec2(screenPos.y, 1.0), 0).r
-  );
+  vec2 warp = getWarp(screenPos.xy);
 
   screenPos.xy += warp;
   screenPos.z /= 2.0;

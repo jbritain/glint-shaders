@@ -70,7 +70,7 @@ void main() {
   if (isWater) {
     gbuffer.surfaceNormal = getWaterParallaxNormal(
       translucentFeetPlayerPos,
-      gbuffer.surfaceNormal,
+      gbuffer.geometryNormal,
       interleavedGradientNoise(floor(gl_FragCoord.xy)),
       1.0
     );
@@ -146,14 +146,13 @@ void main() {
   if (refractedDir == vec3(0.0)) {
     f = vec3(1.0);
   }
-  if (material.roughness != 0.0) {
-    f *= smoothstep(ROUGH_SSR_THRESHOLD, ROUGH_SSR_THRESHOLD * 1.2, maxVec3(f));
-  }
 
   // the blend here is incorrectly applying fresnel to the direct diffuse
   // on the surface
   // however, it looks fine, and translucents like this aren't physically accurate anyway
-  color.rgb = mix(color.rgb, indirectSpecular, f);
+  if(material.roughness <= ROUGH_SSR_THRESHOLD){
+    color.rgb = mix(color.rgb, indirectSpecular, f);
+  }
   #ifndef WORLD_THE_NETHER
 
   float shadow = getShadowFast(translucentFeetPlayerPos, gbuffer.surfaceNormal, gbuffer.lightmap.y);

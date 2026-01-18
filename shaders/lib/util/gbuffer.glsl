@@ -28,7 +28,7 @@ vec2 applyLightmapFalloff(vec2 lightmap){
   // attempt at an inverse square falloff
   lightmap.x = max0(1.0 / pow2(15 - lightmap.x * 15 + 1)) - 0.004;
   // dithering before gbuffer packing
-  lightmap += vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) / 255.0);
+  // lightmap += vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) / 255.0);
 
   return lightmap;
 }

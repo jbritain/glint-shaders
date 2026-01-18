@@ -13,9 +13,10 @@
 layout(local_size_x = 256, local_size_y = 1) in;
 const ivec3 workGroups = ivec3(1, 2, 1);
 
-layout(r16) uniform image2D colorimg4;
+layout(rg16f) uniform image2D colorimg4;
 
 #include "/lib/common.glsl"
+#include "/lib/util/rectilinearWarp.glsl"
 
 shared float a[256];
 
@@ -34,5 +35,10 @@ void main() {
 
 
   float warp = a[gl_GlobalInvocationID.x] / a[255] - float(gl_GlobalInvocationID.x) / 256.0;
-  imageStore(colorimg4, ivec2(gl_GlobalInvocationID.xy), vec4(warp));
+  imageStore(colorimg4, ivec2(gl_GlobalInvocationID.xy), vec4(warp, 0.0, 0.0, 0.0));
+  if(gl_GlobalInvocationID.y == 0){
+    xWarpMap[gl_GlobalInvocationID.x] = warp;
+  } else {
+    yWarpMap[gl_GlobalInvocationID.x] = warp;
+  }
 }

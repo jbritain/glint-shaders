@@ -103,18 +103,9 @@ void main() {
     diffuse += gbuffer.lightmap.y * skylightColor * material.albedo * occlusion;
     diffuse +=
       gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
-
-    if (material.roughness != 0.0) {
-      f *= smoothstep(
-        ROUGH_SSR_THRESHOLD,
-        ROUGH_SSR_THRESHOLD * 1.2,
-        maxVec3(f)
-      );
-    }
   }
-
-  color.rgb += mix(diffuse, specularc, f);
-
+  color.rgb += mix(diffuse, specularc, f * float(material.roughness <= ROUGH_SSR_THRESHOLD));
+  
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
 
 }

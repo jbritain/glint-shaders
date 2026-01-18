@@ -67,9 +67,8 @@ void main() {
     ((distance(actualPreviousPos, previousViewPos) < 0.1))
   ) {
     vec4 previous = texture(colortex10, previousPos.xy);
-    shadowAndBlockerDistance = mix(shadowAndBlockerDistance, previous, 0.9);
+    shadowAndBlockerDistance.a = mix(shadowAndBlockerDistance.a, previous.a, 0.9);
   }
-  show(shadowAndBlockerDistance.rgb);
 
 }
 

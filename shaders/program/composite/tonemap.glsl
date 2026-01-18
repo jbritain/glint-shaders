@@ -40,7 +40,7 @@ void main() {
   vec3 bloom = texture(colortex6, texcoord * 0.5).rgb;
   color = mix(color, bloom, 0.01);
 
-  color /= 15;
+  color *= 126 / 15;
   color = tonemap(color);
 }
 

@@ -10,7 +10,7 @@ const float sunRadius = 6.9634e8;
 const float sunDistance = 1.496e11;
 const float sunAngularRadius = sunRadius / sunDistance;
 
-const vec3 sunIrradiance = vec3(1.0, 0.949, 0.937) * 126;
+const vec3 sunIrradiance = vec3(1.0, 0.949, 0.937);
 const vec3 sunRadiance = sunIrradiance / sunAngularRadius;
 
 const float moonRadius = 1737e3;

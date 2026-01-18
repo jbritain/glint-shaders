@@ -46,11 +46,11 @@ void main() {
 
   float averageHitLength;
   SSRColor = getSSR(viewPos, gbuffer, material, averageHitLength);
+  averageHitLength *= 1.0 - material.roughness;
 
   if (
     material.roughness >= 0.01 &&
-    SSRColor != vec3(0.0) &&
-    !(ROUGH_SSR_THRESHOLD == 1.0 && material.metalID != NO_METAL)
+    material.roughness < ROUGH_SSR_THRESHOLD
   ) {
     vec3 viewNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
     vec3 viewDir = normalize(viewPos);

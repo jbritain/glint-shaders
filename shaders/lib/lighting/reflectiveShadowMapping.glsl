@@ -2,6 +2,7 @@
 #define RSM_GLSL
 
 #include "/lib/util/dither.glsl"
+#include "/lib/util/rectilinearWarp.glsl"
 
 vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   vec3 shadowViewPos = transformView(playerPos, shadowModelView);
@@ -24,10 +25,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
     vec2 offset = r * radius * vec2(sin(angle), cos(angle));
 
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
-    vec2 warp = vec2(
-      texture(colortex4, vec2(offsetPos.x, 0.0)).r,
-      texture(colortex4, vec2(offsetPos.y, 1.0)).r
-    );
+    vec2 warp = getWarp(offsetPos.xy);
     vec2 warpedPos = offsetPos.xy + warp;
 
     offsetPos.z = texture(shadowtex0, warpedPos).r * 2.0;

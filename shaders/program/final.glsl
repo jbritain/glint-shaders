@@ -33,6 +33,7 @@ uniform sampler2D debugtex;
 
 #include "/lib/post/tonemap.glsl"
 #include "/lib/util/dither.glsl"
+#include "/lib/util/rectilinearWarp.glsl"
 
 void main() {
   color = pow(texture(colortex0, texcoord).rgb, vec3(rcp(2.2)));
@@ -51,10 +52,11 @@ void main() {
       texelFetch(shadowtex0, ivec2(gl_FragCoord.xy * shadowMapResolution / 256), 0).r,
       0.0
       );
+    // color = vec3(getWarp(gl_FragCoord.xy / 255), 0);
   } else if(gl_FragCoord.x < 266 && gl_FragCoord.y < 256) {
-    color = texelFetch(colortex4, ivec2(gl_FragCoord.y, 1), 0).rgb;
+    color = vec3(yWarpMap[int(gl_FragCoord.y)]);
   } else if(gl_FragCoord.y < 266 && gl_FragCoord.x < 256){
-    color = texelFetch(colortex4, ivec2(gl_FragCoord.x, 0), 0).rgb;
+    color = vec3(xWarpMap[int(gl_FragCoord.x)]);
   }
   #endif
 }

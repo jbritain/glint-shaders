@@ -13,7 +13,7 @@
 layout(local_size_x = 128, local_size_y = 1) in;
 const ivec3 workGroups = ivec3(2, 2, 1);
 
-layout(r16) uniform image2D colorimg4;
+layout(rg16f) uniform image2D colorimg4;
 
 #include "/lib/common.glsl"
 
@@ -38,6 +38,6 @@ void main() {
   imageStore(
     colorimg4,
     ivec2(gl_GlobalInvocationID.xy),
-    vec4(maxWeight) / 100
+    vec4(maxWeight, 0.0, 0.0, 0.0) / 100
   );
 }

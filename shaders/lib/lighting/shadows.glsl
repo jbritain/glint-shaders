@@ -2,6 +2,7 @@
 #define SHADOWS_GLSL
 
 #include "/lib/util/dither.glsl"
+#include "/lib/util/rectilinearWarp.glsl"
 
 vec3 sampleShadow(vec3 shadowScreenPos) {
   float transparentShadow = texture(shadowtex0HW, shadowScreenPos).r;
@@ -34,10 +35,7 @@ vec3 sampleShadowPCF(
     vec2 offset = vogelDisc(i, SHADOW_PCF_SAMPLES, jitter) * radius;
 
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
-    vec2 warp = vec2(
-      texture(colortex4, vec2(offsetPos.x, 0.0)).r,
-      texture(colortex4, vec2(offsetPos.y, 1.0)).r
-    );
+    vec2 warp = getWarp(offsetPos.xy);
     offsetPos += vec3(warp, 0.0);
     shadow += sampleShadow(offsetPos);
   }
@@ -55,10 +53,7 @@ float getBlockerDistance(vec3 shadowScreenPos, float jitter, vec3 shadowViewNorm
     
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
     
-    vec2 warp = vec2(
-      texture(colortex4, vec2(offsetPos.x, 0.0)).r,
-      texture(colortex4, vec2(offsetPos.y, 1.0)).r
-    );
+    vec2 warp = getWarp(offsetPos.xy);
     offsetPos.xy += warp;
     float blockerDistance = max(
       0.0,
@@ -114,7 +109,6 @@ vec3 getShadow(
   );
 
   distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
-  show(distFade);
   shadow = mix(shadow, vec3(smoothstep(13.5 / 15.0, 14.5 / 15.0, skyLightmap)), distFade);
   return shadow;
 }
@@ -132,10 +126,7 @@ float getShadowFast(vec3 playerPos, vec3 playerNormal, float skyLightmap){
   );
   shadowScreenPos.z /= 2.0;
 
-  vec2 warp = vec2(
-    texture(colortex4, vec2(shadowScreenPos.x, 0.0)).r,
-    texture(colortex4, vec2(shadowScreenPos.y, 1.0)).r
-  );
+  vec2 warp = getWarp(shadowScreenPos.xy);
   shadowScreenPos.xy += warp;
 
   float shadow = texture(shadowtex0HW, shadowScreenPos).r;
