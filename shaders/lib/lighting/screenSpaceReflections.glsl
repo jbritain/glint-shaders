@@ -77,7 +77,7 @@ vec3 getSSR(
       true,
       averageHitLength
     );
-  } else {
+  } else if (material.roughness <= ROUGH_SSR_THRESHOLD) {
     mat3 tbn = generateTBN(viewNormal);
     vec3 tangentViewDir = normalize(-viewDir * tbn);
     vec3 f = fresnelRoughness(
@@ -85,30 +85,27 @@ vec3 getSSR(
       dot(tangentViewDir, vec3(0.0, 1.0, 0.0))
     );
 
-    if (material.roughness >= 0.01 && material.roughness <= ROUGH_SSR_THRESHOLD) {
+    for (int i = 0; i < ROUGH_SSR_SAMPLES; i++) {
+      vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter, i);
+      vec3 roughNormal =
+        tbn *
+        SampleVNDFGGX(tangentViewDir, vec2(material.roughness), noise.xy);
 
-      for (int i = 0; i < ROUGH_SSR_SAMPLES; i++) {
-        vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter, i);
-        vec3 roughNormal =
-          tbn *
-          SampleVNDFGGX(tangentViewDir, vec2(material.roughness), noise.xy);
-
-        float hitLength;
-        SSRColor += SSRSample(
-          viewPos,
-          viewDir,
-          roughNormal,
-          gbuffer.lightmap.y,
-          noise.z,
-          ROUGH_SSR_STEPS,
-          true,
-          hitLength
-        );
-        averageHitLength += hitLength;
-      }
-      SSRColor /= float(ROUGH_SSR_SAMPLES);
-      averageHitLength /= float(ROUGH_SSR_SAMPLES);
+      float hitLength;
+      SSRColor += SSRSample(
+        viewPos,
+        viewDir,
+        roughNormal,
+        gbuffer.lightmap.y,
+        noise.z,
+        ROUGH_SSR_STEPS,
+        true,
+        hitLength
+      );
+      averageHitLength += hitLength;
     }
+    SSRColor /= float(ROUGH_SSR_SAMPLES);
+    averageHitLength /= float(ROUGH_SSR_SAMPLES);
   }
   return SSRColor;
 }
