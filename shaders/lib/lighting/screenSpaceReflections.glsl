@@ -21,8 +21,8 @@ vec3 SSRSample(
 ) {
   vec3 rayPos;
   vec3 reflectedDir = reflect(dir, normal);
-  if (
-    rayIntersects(
+
+  bool hit = rayIntersects(
       origin,
       reflectedDir,
       samples,
@@ -31,7 +31,24 @@ vec3 SSRSample(
       rayPos,
       depthtex0,
       gbufferProjection
-    )
+    );
+  #ifdef VOXY
+  if(!hit){
+    hit = rayIntersects(
+      origin,
+      reflectedDir,
+      samples,
+      jitter,
+      refine,
+      rayPos,
+      vxDepthTexTrans,
+      vxProj
+    );
+  }
+  #endif
+
+  if (
+    hit
   ) {
     rayPos = screenSpaceToViewSpace(rayPos);
     hitLength = distance(rayPos, origin);
@@ -99,7 +116,7 @@ vec3 getSSR(
         gbuffer.lightmap.y,
         noise.z,
         ROUGH_SSR_STEPS,
-        true,
+        false,
         hitLength
       );
       averageHitLength += hitLength;

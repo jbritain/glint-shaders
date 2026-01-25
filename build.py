@@ -39,6 +39,18 @@ def create_linked_shader_program(
                 p.writelines([l + "\n" for l in program_string])
 
 
+def generate_others(pack):
+    for file in pack["programs"]["other"]:
+        for dim in all_dimensions.items():
+            if not os.path.exists(f"{shaders_path}/{dim[1]}/"):
+                os.makedirs(f"{shaders_path}/{dim[1]}/")
+            with open(f"{shaders_path}/{dim[1]}/{file}", "w") as p:
+                program_string = []
+                program_string.append(f'#include "/program/{file}"')
+
+                p.writelines([l + "\n" for l in program_string])
+
+
 def generate_gbuffers(pack):
     for program, file in pack["programs"]["gbuffers"].items():
         create_linked_shader_program(
@@ -122,6 +134,7 @@ def generate_pack():
             shutil.rmtree(f"{shaders_path}/{dim}")
     generate_gbuffers(pack)
     generate_post_processing(pack)
+    generate_others(pack)
     generate_properties(pack)
     generate_material_ids(pack)
 

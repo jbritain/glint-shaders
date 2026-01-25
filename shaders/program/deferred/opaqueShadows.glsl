@@ -42,6 +42,7 @@ void main() {
   float depth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
+  voxyOverride(depth, viewPos, texcoord, true);
 
   Material material = unpackMaterial(texture(colortex2, texcoord).rg);
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
@@ -50,7 +51,16 @@ void main() {
   float shadowFade;
   vec3 shadow = getShadow(feetPlayerPos, gbuffer.geometryNormal, material.subsurface, gbuffer.lightmap.y, blockerDistance, shadowFade);
 
+  float occlusion = texture(colortex3, texcoord).r;
+  float fakeBlockerDistance = (1.0 - occlusion) * 10.0;
+  // show(vec2(blockerDistance, fakeBlockerDistance));
+  blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
+
   shadowAndBlockerDistance = vec4(shadow, blockerDistance);
+
+  // if(VOXY_MASK){
+  //   shadowAndBlockerDistance.rgb = vec3(getShadowScreenSpace(viewPos, gbuffer.geometryNormal));
+  // }
 
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);

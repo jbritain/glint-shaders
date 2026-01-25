@@ -37,6 +37,7 @@ layout(location = 0) out vec4 clouds;
 void main() {
   float depth = texture(depthtex0, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+  voxyOverride(depth, viewPos, texcoord, true);
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
   clouds = getClouds(feetPlayerPos, depth == 1.0);

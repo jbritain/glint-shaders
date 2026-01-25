@@ -111,6 +111,12 @@ vec3 downSample(sampler2D sourceTexture, vec2 coord, bool doKarisAverage) {
     dsample += (j + k + l + m) * 0.125;
   }
 
+  if(any(isinf(dsample))){
+    dsample = vec3(10000.0, 0.0, 0.0);
+  }
+
+  dsample = max(dsample, 1e-6);
+
   return dsample;
 }
 

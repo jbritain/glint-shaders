@@ -9,3 +9,4 @@ colortex7: SSR (ACCUMULATED)
 colortex8: clouds (ACCUMULATED)
 colortex9: global illumination (ACCUMULATED)
 colortex10: opaque shadowing (ACCUMULATED)
+colortex11: low resolution version of previous frame depth

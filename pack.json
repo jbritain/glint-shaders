@@ -1,5 +1,10 @@
 {
   "programs": {
+    "other": [
+      "voxy.json",
+      "voxy_opaque.glsl",
+      "voxy_translucent.glsl"
+    ],
     "gbuffers": {
       "terrain": "opaque",
       "entities": "opaque",
@@ -101,6 +106,10 @@
       },
       {
         "path": "temporalFilter",
+        "programs": ["vsh", "fsh"]
+      },
+      {
+        "path": "exposure",
         "programs": ["vsh", "fsh"]
       },
       {

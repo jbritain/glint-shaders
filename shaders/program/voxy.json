@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "uniforms": [],
+  "samplers": {},
+  "opaqueDrawBuffers": [1,2],
+  "translucentDrawBuffers": [6,16,17],
+  "ssbos": {
+    "0": "{vec3 sunlightColor;vec3 skylightColor;}"
+  },
+  "blend": {
+    "1": "off",
+    "2": "off"
+  },
+  "excludeLodsFromVanillaDepth": true
+}

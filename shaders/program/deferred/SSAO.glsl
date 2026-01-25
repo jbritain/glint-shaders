@@ -38,6 +38,12 @@ void main() {
   occlusion = 1.0;
   float depth = texture(depthtex0, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+  voxyOverride(depth, viewPos, texcoord, true);
+
+  if (depth == 1.0) {
+    return;
+  }
+
   vec3 playerPos = transformView(viewPos, gbufferModelViewInverse);
   vec3 previousPos = playerPos + cameraPosition - previousCameraPosition;
   previousPos = transformView(previousPos, gbufferPreviousModelView);
@@ -45,9 +51,7 @@ void main() {
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
-  if (depth == 1.0) {
-    return;
-  }
+
 
   occlusion = getSSAO(viewPos, gbuffer.geometryNormal);
   if(clamp01(previousPos) == previousPos){

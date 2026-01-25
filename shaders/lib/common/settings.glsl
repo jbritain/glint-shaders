@@ -1,5 +1,5 @@
 // #define DEBUG_ENABLE
-#define DEBUG_RECTILINEAR
+// #define DEBUG_RECTILINEAR
 
 #define BLOOM_RADIUS 1.0
 
@@ -11,6 +11,7 @@
 const float shadowDistance = 256.0;
 const float sunPathRotation = 40.0;
 const int shadowMapResolution = 2048;
+#define SCREEN_SPACE_SHADOW_STEPS 8
 
 #define SSAO
 #define SSAO_SAMPLES 8
@@ -48,6 +49,11 @@ const vec3 blocklightColor = pow(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BL
 #define WATER_SCATTERING_G 30
 #define WATER_SCATTERING_B 38
 #define WATER_SCATTERING_MOD 0.1
+
+#define VOLUMETRIC_WATER
+#define VOLUMETRIC_WATER_SAMPLES 8
+#define WATER_ANISOTROPY 0.8
+#define VOLUMETRIC_WATER_LIGHT_FALLOFF 10
 
 #define SUBSURFACE_SCATTERING_STRENGTH 4.0
 

@@ -36,10 +36,12 @@ layout(location = 0) out vec3 SSRColor;
 void main() {
   SSRColor = vec3(0.0);
   float depth = texture(depthtex1, texcoord).r;
+  vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+  voxyOverride(depth, viewPos, texcoord, true);
+
   if (depth == 1.0) {
     return;
   }
-  vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
   Material material = unpackMaterial(texture(colortex2, texcoord).rg);

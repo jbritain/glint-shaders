@@ -38,6 +38,7 @@ void main() {
   globalIllumination = vec3(0.0);
   float depth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+  voxyOverride(depth, viewPos, texcoord, true);
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
   if (depth == 1.0) {

@@ -156,26 +156,4 @@ vec3 getValFromSkyLUT(vec3 rayDir) {
   return textureLod(skyViewLUTTex, uv, 0).rgb;
 }
 
-vec3 mapAerialPerspectivePos(vec3 viewPos) {
-  vec3 pos;
-  pos.xy = viewSpaceToScreenSpace(viewPos).xy;
-#if defined DISTANT_HORIZONS || defined VOXY
-  pos.z = clamp01(abs(viewPos.z) / dhRenderDistance);
-#else
-  pos.z = clamp01(abs(viewPos.z) / far);
-#endif
-  return pos;
-}
-
-vec3 unmapAerialPerspectivePos(vec3 pos) {
-  vec3 viewPos;
-  viewPos.xy = screenSpaceToViewSpace(pos).xy;
-#if defined DISTANT_HORIZONS || defined VOXY
-  viewPos.z = -abs(pos.z) * dhRenderDistance;
-#else
-  viewPos.z = -abs(pos.z) * far;
-#endif
-  return viewPos;
-}
-
 #endif // ATMOSPHERE_GLSL

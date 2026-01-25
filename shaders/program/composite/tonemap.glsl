@@ -27,9 +27,9 @@ void main() {
 
 in vec2 texcoord;
 
-layout(location = 0) out vec3 color;
+/* RENDERTARGETS: 0 */
 
-uniform sampler2D debugtex;
+layout(location = 0) out vec3 color;
 
 #include "/lib/post/tonemap.glsl"
 #include "/lib/util/dither.glsl"
@@ -38,10 +38,10 @@ void main() {
   color = texture(colortex0, texcoord).rgb;
 
   vec3 bloom = texture(colortex6, texcoord * 0.5).rgb;
-  color = mix(color, bloom, 0.01);
+  color = mix(color, bloom, 0.001);
 
-  color *= 126 / 15;
   color = tonemap(color);
+
 }
 
 #endif

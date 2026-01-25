@@ -48,7 +48,10 @@ void main() {
       shadowViewPos,
       shadowProjection
     );
-    imageAtomicAdd(shadowImportanceMap, ivec2(shadowScreenPos.xy * 256), weight);
+
+    if(clamp01(shadowScreenPos) == shadowScreenPos){
+      imageAtomicAdd(shadowImportanceMap, ivec2(shadowScreenPos.xy * 256), weight);
+    }
   }
 
   

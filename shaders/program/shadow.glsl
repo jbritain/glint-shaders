@@ -36,9 +36,7 @@ void main() {
     floatBitsToUint(1.0 - screenPos.z)
   );
 
-  vec2 warp = getWarp(screenPos.xy);
-
-  screenPos.xy += warp;
+  screenPos.xy += getWarp(screenPos.xy);
   screenPos.z /= 2.0;
   gl_Position.xyz = screenPos * 2.0 - 1.0;
 
@@ -66,9 +64,6 @@ layout(location = 1) out vec2 encodedNormal;
 void main() {
   color = texture(gtexture, texcoord) * glcolor;
   if (color.a < alphaTestRef) {
-    discard;
-  }
-  if(materialIsWater(materialID)){
     discard;
   }
   encodedNormal = normal.xy * 0.5 + 0.5;

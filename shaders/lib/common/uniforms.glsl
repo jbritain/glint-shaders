@@ -97,6 +97,11 @@ uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowProjectionInverse;
 
+#ifdef VOXY
+uniform mat4 vxProj;
+uniform mat4 vxProjInv;
+#endif
+
 uniform sampler2D colortex0;
 uniform usampler2D colortex1;
 uniform usampler2D colortex2;
@@ -113,6 +118,14 @@ uniform sampler2D colortex12;
 uniform sampler2D colortex13;
 uniform sampler2D colortex14;
 uniform sampler2D colortex15;
+
+#ifdef VOXY
+uniform usampler2D colortex16;
+uniform usampler2D colortex17;
+
+uniform sampler2D vxDepthTexOpaque;
+uniform sampler2D vxDepthTexTrans;
+#endif
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;

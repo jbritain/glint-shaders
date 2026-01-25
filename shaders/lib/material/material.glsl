@@ -87,6 +87,18 @@ struct Material {
   uint id;
 };
 
+Material defaultMaterial = Material(
+  vec3(0.0),
+  0.0,
+  vec3(0.04),
+  NO_METAL,
+  1.0,
+  0.0,
+  0.0,
+  1.0,
+  0
+);
+
 Material materialFromSpecularMap(vec3 albedo, vec4 specularData, uint materialID){
   Material material;
 

@@ -41,6 +41,7 @@ layout(location = 0) out vec4 color;
 void main() {
   float depth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+  voxyOverride(depth, viewPos, texcoord, true);
 
   if (depth == 1.0) {
     color.rgb = getSky(

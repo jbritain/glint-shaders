@@ -230,6 +230,13 @@ vec3 specularBRDF(
 
   // this was causing some weird issues
   Rs *= step(1e-6, NoL);
+
+  // prevent specular highlights blowing out the bloom
+  if(luminance(Rs) > 1000){
+    Rs = hsv(Rs);
+    Rs.b = 1000;
+    Rs = rgb(Rs);
+  }
   return Rs;
 }
 

@@ -50,21 +50,37 @@ void main() {
   vec3 translucentViewPos = screenSpaceToViewSpace(
     vec3(texcoord, translucentDepth)
   );
+  voxyOverride(translucentDepth, translucentViewPos, texcoord, false);
   vec3 viewDir = normalize(translucentViewPos);
   vec3 translucentFeetPlayerPos = transformView(
     translucentViewPos,
     gbufferModelViewInverse
   );
 
+
   if (translucents.a == 0.0) {
     if (inWater) {
-      color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentViewPos);
+      color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
     }
     return;
   }
 
-  Material material = unpackMaterial(texture(colortex2, texcoord).rg);
-  Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  Material material; 
+  Gbuffer gbuffer; 
+
+  #ifdef VOXY
+  if(!VOXY_MASK){
+    material = unpackMaterial(texture(colortex2, texcoord).rg);
+    gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  } else {
+    material = unpackMaterial(texture(colortex17, texcoord).rg);
+    gbuffer = unpackGbuffer(texture(colortex16, texcoord).rgb);
+  }
+  #else
+    material = unpackMaterial(texture(colortex2, texcoord).rg);
+    gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  #endif
+
 
   bool isWater = materialIsWater(material.id);
   if (isWater) {
@@ -81,10 +97,12 @@ void main() {
 
   float opaqueDepth = texture(depthtex2, texcoord).r;
   vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
+  voxyOverride(opaqueDepth, opaqueViewPos, texcoord, true);
   vec3 opaqueFeetPlayerPos = transformView(
     opaqueViewPos,
     gbufferModelViewInverse
   );
+
 
   // REFRACTION
   float refractedRayLength = distance(translucentViewPos, opaqueViewPos);
@@ -110,7 +128,7 @@ void main() {
     }
   } else if(inWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
-    vec3 sky = getSky(skyDir, false);
+    vec3 sky = getSky(skyDir, true);
     #ifdef CLOUDS
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
@@ -129,9 +147,8 @@ void main() {
   color.rgb = mix(color.rgb, translucents.rgb, translucents.a);
 
   if (isWater && !inWater) {
-    color.rgb = getWaterFog(color.rgb, translucentViewPos, opaqueViewPos);
+    color.rgb = getWaterFog(color.rgb, translucentFeetPlayerPos, opaqueFeetPlayerPos);
   }
-  // }
 
   // TRANSLUCENT SHADING
   float hitLength;
@@ -170,7 +187,7 @@ void main() {
   #endif
 
   if (isWater && inWater) {
-    color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentViewPos);
+    color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
   }
 
 }
