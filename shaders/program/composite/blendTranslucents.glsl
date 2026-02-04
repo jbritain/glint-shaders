@@ -33,6 +33,7 @@ void main() {
 #include "/lib/water/waterFog.glsl"
 #include "/lib/water/waveNormals.glsl"
 #include "/lib/util/dither.glsl"
+#include "/lib/atmosphere/atmosphericFog.glsl"
 
 in vec2 texcoord;
 
@@ -189,6 +190,8 @@ void main() {
   if (isWater && inWater) {
     color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
   }
+
+  color.rgb = getAtmosphericFog(color.rgb, translucentViewPos);
 
 }
 

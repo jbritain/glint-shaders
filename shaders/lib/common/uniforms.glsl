@@ -100,6 +100,7 @@ uniform mat4 shadowProjectionInverse;
 #ifdef VOXY
 uniform mat4 vxProj;
 uniform mat4 vxProjInv;
+uniform int vxRenderDistance;
 #endif
 
 uniform sampler2D colortex0;

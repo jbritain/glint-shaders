@@ -31,11 +31,25 @@ in vec2 texcoord;
 
 layout(location = 0) out vec4 color;
 
-void main() {
-  color = texture(colortex0, texcoord);
-  vec4 clouds = texture(colortex8, texcoord);
+#include "/lib/atmosphere/clouds.glsl"
 
-  color.rgb = fma(color.rgb, vec3(clouds.a), clouds.rgb);
+void main() {
+
+  color = texture(colortex0, texcoord);
+
+  bool blend;
+  #ifdef BLEND_BEFORE_TRANSLUCENTS
+  blend = cameraPosition.y < CLOUDS_BASE_ALTITUDE;
+  #else
+  blend = cameraPosition.y >= CLOUDS_BASE_ALTITUDE;
+  #endif
+
+  if(blend){
+    vec4 clouds = texture(colortex8, texcoord);
+
+    color.rgb = fma(color.rgb, vec3(clouds.a), clouds.rgb);
+  }
+
 }
 
 #endif

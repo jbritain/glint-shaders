@@ -29,10 +29,9 @@ void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
-  vec2 lmcoord = mat2(gl_TextureMatrix[1]) * gl_MultiTexCoord1.xy;
-  lightmap = lmcoord / (30.0 / 32.0) - 1.0 / 32.0;
+  lightmap = max0(gl_MultiTexCoord1.xy - 10) / 230.0;
 
-  if(at_midBlock.w > 0.0){
+  if (at_midBlock.w > 0.0) {
     lightmap.x = 0.0;
   }
 
@@ -82,13 +81,17 @@ void main() {
   color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
 
+  if (color.a < alphaTestRef) {
+    discard;
+  }
+
   Material material = materialFromSpecularMap(
     pow(color.rgb, vec3(2.2)),
     texture(specular, texcoord),
     materialID
   );
 
-  if(materialIsWater(materialID)){
+  if (materialIsWater(materialID)) {
     material.roughness = 0.0;
     material.f0 = vec3(0.02);
     material.albedo = vec3(0.0);
@@ -96,7 +99,11 @@ void main() {
   }
 
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
-  float shadow = getShadowFast(feetPlayerPos, gbuffer.surfaceNormal, gbuffer.lightmap.y);
+  float shadow = getShadowFast(
+    feetPlayerPos,
+    gbuffer.surfaceNormal,
+    gbuffer.lightmap.y
+  );
 
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER

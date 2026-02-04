@@ -30,10 +30,9 @@ void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
-  vec2 lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
-  lightmap = lmcoord / (30.0 / 32.0) - 1.0 / 32.0;
+  lightmap = max0(gl_MultiTexCoord1.xy - 10) / 230.0;
 
-  if(at_midBlock.w > 0.0){
+  if (at_midBlock.w > 0.0) {
     lightmap.x = 0.0;
   }
 
@@ -86,13 +85,19 @@ void main() {
 
   gbuffer.geometryNormal = mat3(gbufferModelViewInverse) * tbn[2];
   vec3 surfaceNormal = getSurfaceNormal(texcoord, tbn);
-  gbuffer.surfaceNormal =
-    mat3(gbufferModelViewInverse) * surfaceNormal;
+  gbuffer.surfaceNormal = mat3(gbufferModelViewInverse) * surfaceNormal;
   gbuffer.lightmap = lightmap;
 
   vec4 color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
-  if (color.a < max(alphaTestRef, blueNoise(gl_FragCoord.xy, frameCounter).r * float(renderStage == MC_RENDER_STAGE_ENTITIES))) {
+  if (
+    color.a <
+    max(
+      alphaTestRef,
+      blueNoise(gl_FragCoord.xy, frameCounter).r *
+        float(renderStage == MC_RENDER_STAGE_ENTITIES)
+    )
+  ) {
     discard;
   }
 
@@ -102,7 +107,10 @@ void main() {
     materialID
   );
 
-  if(material.roughness > ROUGH_SSR_THRESHOLD && material.metalID != NO_METAL){
+  if (
+    material.roughness > ROUGH_SSR_THRESHOLD &&
+    material.metalID != NO_METAL
+  ) {
     material.roughness = ROUGH_SSR_THRESHOLD;
   }
 

@@ -13,7 +13,7 @@
 layout(local_size_x = 128, local_size_y = 1) in;
 const ivec3 workGroups = ivec3(2, 2, 1);
 
-layout(rg16f) uniform image2D colorimg4;
+layout(r16f) uniform image2D colorimg4;
 
 #include "/lib/common.glsl"
 
@@ -27,8 +27,12 @@ void main() {
       texelFetch(
         shadowImportanceMapTex,
         ivec2(
-          vertical ? x : gl_GlobalInvocationID.x,
-          vertical ? gl_GlobalInvocationID.x : x
+          vertical
+            ? x
+            : gl_GlobalInvocationID.x,
+          vertical
+            ? gl_GlobalInvocationID.x
+            : x
         ),
         0
       ).r

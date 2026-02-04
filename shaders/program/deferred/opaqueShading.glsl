@@ -31,6 +31,7 @@ void main() {
 #include "/lib/util/dither.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/subsurfaceScattering.glsl"
+#include "/lib/atmosphere/atmosphericFog.glsl"
 
 in vec2 texcoord;
 
@@ -98,6 +99,7 @@ void main() {
     #ifdef RSM
     diffuse +=
       texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
+    // show(texture(colortex9, texcoord).rgb);
     #endif
     #endif
 
@@ -105,9 +107,15 @@ void main() {
     diffuse +=
       gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
   }
-  color.rgb += mix(diffuse, specularc, f * float(material.roughness <= ROUGH_SSR_THRESHOLD));
-  
+  color.rgb += mix(
+    diffuse,
+    specularc,
+    f * float(material.roughness <= ROUGH_SSR_THRESHOLD)
+  );
+
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
+
+  color.rgb = getAtmosphericFog(color.rgb, viewPos);
 
 }
 

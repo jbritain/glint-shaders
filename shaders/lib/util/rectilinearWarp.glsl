@@ -13,25 +13,12 @@
 #ifndef RTW_GLSL
 #define RTW_GLSL
 
-layout(std430, binding = 1) buffer rtwMapBuffer {
-  float xWarpMap[256];
-  float yWarpMap[256];
-};
+layout(r16f) writeonly uniform image2D rectilinearWarpMap;
 
 vec2 getWarp(vec2 pos){
-  ivec2 floorPos = ivec2(floor(pos * 255));
-  ivec2 ceilPos = ivec2(ceil(pos * 255));
-
-  return mix(
-    vec2(
-      xWarpMap[floorPos.x],
-      yWarpMap[floorPos.y]
-    ),
-    vec2(
-      xWarpMap[ceilPos.x],
-      yWarpMap[ceilPos.y]
-    ),
-    fract(pos * 255)
+  return vec2(
+    texture(colortex4, vec2(pos.x, 0.0)).r,
+    texture(colortex4, vec2(pos.y, 1.0)).r
   );
 }
 

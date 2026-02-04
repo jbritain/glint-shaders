@@ -16,7 +16,7 @@
 
 #include "/lib/util/dither.glsl"
 
-vec3 getSurfaceNormal(vec2 texcoord, mat3 tbn){
+vec3 getSurfaceNormal(vec2 texcoord, mat3 tbn) {
   vec3 surfaceNormal = texture(normals, texcoord).rgb;
   surfaceNormal = surfaceNormal * 2.0 - 1.0;
   surfaceNormal.z = sqrt(1.0 - dot(surfaceNormal.xy, surfaceNormal.xy)); // reconstruct z due to labPBR encoding
@@ -24,11 +24,13 @@ vec3 getSurfaceNormal(vec2 texcoord, mat3 tbn){
   return tbn * surfaceNormal;
 }
 
-vec2 applyLightmapFalloff(vec2 lightmap){
+vec2 applyLightmapFalloff(vec2 lightmap) {
   // attempt at an inverse square falloff
-  lightmap.x = max0(1.0 / pow2(15 - lightmap.x * 15 + 1)) - 0.004;
+  // lightmap.x = max0(1.0 / pow2(15 - lightmap.x * 15 + 1)) - 0.004;
   // dithering before gbuffer packing
-  // lightmap += vec2(interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) / 255.0);
+  lightmap += vec2(
+    interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) / 255.0
+  );
 
   return lightmap;
 }
@@ -62,7 +64,8 @@ vec2 applyDirectionalLightmap(
     float NoL = dot(torchDir, surfaceNormal);
     float NGoL = dot(torchDir, tbnMatrix[2]);
 
-    lightmap.x += clamp01((NoL - NGoL) * lightmap.x * (1.0 - subsurface * 0.5)) * 0.25;
+    lightmap.x +=
+      clamp01((NoL - NGoL) * lightmap.x * (1.0 - subsurface * 0.5)) * 0.25;
   } else {
     float NoL = 0.9 - dot(tbnMatrix[2], surfaceNormal);
     lightmap.x -= clamp01(NoL * lightmap.x * (1.0 - subsurface * 0.5)) * 0.25;

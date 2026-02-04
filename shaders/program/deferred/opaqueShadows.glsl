@@ -49,18 +49,41 @@ void main() {
 
   float blockerDistance;
   float shadowFade;
-  vec3 shadow = getShadow(feetPlayerPos, gbuffer.geometryNormal, material.subsurface, gbuffer.lightmap.y, blockerDistance, shadowFade);
+  vec3 shadow = getShadow(
+    feetPlayerPos,
+    gbuffer.geometryNormal,
+    material.subsurface,
+    gbuffer.lightmap.y,
+    blockerDistance,
+    shadowFade
+  );
 
   float occlusion = texture(colortex3, texcoord).r;
   float fakeBlockerDistance = (1.0 - occlusion) * 10.0;
-  // show(vec2(blockerDistance, fakeBlockerDistance));
   blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
+
+  #ifdef VOXY
+  vec3 p;
+  if (VOXY_MASK) {
+    shadow = 
+      rayIntersects(
+        viewPos,
+        lightDir,
+        SCREEN_SPACE_SHADOW_STEPS,
+        blueNoise(gl_FragCoord.xy, frameCounter).r,
+        false,
+        p,
+        vxDepthTexTrans,
+        vxProj
+      )
+        ? vec3(0.0)
+        : vec3(1.0)
+    ;
+  }
+  #endif
 
   shadowAndBlockerDistance = vec4(shadow, blockerDistance);
 
-  // if(VOXY_MASK){
-  //   shadowAndBlockerDistance.rgb = vec3(getShadowScreenSpace(viewPos, gbuffer.geometryNormal));
-  // }
 
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);
@@ -74,10 +97,14 @@ void main() {
 
   if (
     clamp01(previousPos) == previousPos &&
-    ((distance(actualPreviousPos, previousViewPos) < 0.1))
+    distance(actualPreviousPos, previousViewPos) < 0.1
   ) {
     vec4 previous = texture(colortex10, previousPos.xy);
-    shadowAndBlockerDistance.a = mix(shadowAndBlockerDistance.a, previous.a, 0.9);
+    shadowAndBlockerDistance.a = mix(
+      shadowAndBlockerDistance.a,
+      previous.a,
+      0.9
+    );
   }
 
 }

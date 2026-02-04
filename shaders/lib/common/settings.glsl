@@ -26,14 +26,20 @@ const int shadowMapResolution = 2048;
 #define RSM_SAMPLES 4
 #define RSM_RADIUS 2.0
 #define RSM_BRIGHTNESS 5.0
-#define RSM_LIGHT_LEAK_FIX
+// #define RSM_LIGHT_LEAK_FIX
 
-#define EMISSIVE_STRENGTH 100.0
+#define EMISSIVE_STRENGTH 10.0
 
 #define BLOCKLIGHT_COLOR_R 255
 #define BLOCKLIGHT_COLOR_G 128
 #define BLOCKLIGHT_COLOR_B 32
-const vec3 blocklightColor = pow(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0, vec3(1.0 / 2.2)) * EMISSIVE_STRENGTH;
+const vec3 blocklightColor =
+  pow(
+    vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0,
+    vec3(1.0 / 2.2)
+  ) *
+  EMISSIVE_STRENGTH /
+  100.0;
 
 #define MULTIPLICATIVE_TRANSLUCENTS
 

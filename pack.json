@@ -11,7 +11,11 @@
       "entities_translucent": "translucent",
       "hand": "opaque",
       "hand_water": "translucent",
-      "water": "translucent"
+      "water": "translucent",
+      "textured": "translucent",
+      "clouds": "discard",
+      "skytextured": "discard",
+      "skybasic": "discard"
     },
     "setup": [
       {
@@ -26,6 +30,10 @@
     "prepare": [
       {
         "path": "generateSkyViewLUT",
+        "programs": ["csh"]
+      },
+      {
+        "path": "generateAerialPerspectiveLUT",
         "programs": ["csh"]
       },
       {
@@ -73,11 +81,19 @@
         "path": "blendClouds",
         "programs": ["vsh", "fsh"],
         "enabledBy": "CLOUDS",
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD"],
+        "defines": {"BLEND_BEFORE_TRANSLUCENTS": ""}
       },
       {
         "path": "blendTranslucents",
         "programs": ["vsh", "fsh"]
+      },
+      {
+        "path": "blendClouds",
+        "programs": ["vsh", "fsh"],
+        "enabledBy": "CLOUDS",
+        "dimensions": ["OVERWORLD"],
+        "defines": {"BLEND_AFTER_TRANSLUCENTS": ""}
       },
       {
         "path": "RTWForwardAnalysis",
