@@ -27,7 +27,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
     vec2 warpedPos = offsetPos.xy + getWarp(offsetPos.xy);
 
-    offsetPos.z = texture(shadowtex0, warpedPos).r * 2.0;
+    offsetPos.z = texture(shadowtex0, warpedPos).r * SHADOW_Z_STRETCH;
     vec3 samplePos = screenSpaceToViewSpaceOrtho(
       offsetPos,
       shadowProjectionInverse
@@ -39,7 +39,11 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
 
     vec3 dir = normalize(shadowViewPos - samplePos); // direction from fragment to sample
 
-    irradiance += sampleFlux * max0(dot(dir, sampleNormal)) * max0(dot(-dir, shadowViewNormal)) / (pow2(distance(samplePos, shadowViewPos) + 1.0));
+    irradiance +=
+      sampleFlux *
+      max0(dot(dir, sampleNormal)) *
+      max0(dot(-dir, shadowViewNormal)) /
+      pow2(distance(samplePos, shadowViewPos) + 1.0);
   }
 
   irradiance /= float(RSM_SAMPLES);

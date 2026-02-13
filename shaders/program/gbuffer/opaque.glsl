@@ -30,11 +30,8 @@ void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
-  lightmap = max0(gl_MultiTexCoord1.xy - 10) / 230.0;
-
-  if (at_midBlock.w > 0.0) {
-    lightmap.x = 0.0;
-  }
+  vec2 lmcoord = gl_MultiTexCoord1.xy / 255.0;
+  lightmap = lmcoord / (30.0 / 32.0) - 1.0 / 32.0;
 
   tbn[0] = normalize(gl_NormalMatrix * at_tangent.xyz);
   tbn[2] = normalize(gl_NormalMatrix * gl_Normal);

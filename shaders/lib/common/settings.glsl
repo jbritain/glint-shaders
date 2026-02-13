@@ -12,6 +12,7 @@ const float shadowDistance = 256.0;
 const float sunPathRotation = 40.0;
 const int shadowMapResolution = 2048;
 #define SCREEN_SPACE_SHADOW_STEPS 8
+#define SHADOW_Z_STRETCH 1.0
 
 #define SSAO
 #define SSAO_SAMPLES 8
@@ -38,8 +39,7 @@ const vec3 blocklightColor =
     vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0,
     vec3(1.0 / 2.2)
   ) *
-  EMISSIVE_STRENGTH /
-  100.0;
+  EMISSIVE_STRENGTH;
 
 #define MULTIPLICATIVE_TRANSLUCENTS
 

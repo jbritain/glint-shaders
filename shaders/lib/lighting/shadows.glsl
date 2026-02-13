@@ -113,7 +113,7 @@ vec3 getShadow(
     shadowViewPos,
     shadowProjection
   );
-  shadowScreenPos.z /= 2.0;
+  shadowScreenPos.z /= SHADOW_Z_STRETCH;
   distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
 
   // vec3 screenSpaceShadow = vec3(1.0);
@@ -140,15 +140,14 @@ vec3 getShadow(
       blockerDistance
     );
 
-    shadow = sampleShadowPCF(
-      shadowScreenPos,
-      radius,
-      jitter,
-      shadowViewNormal
-    );
+    shadow = sampleShadowPCF(shadowScreenPos, radius, jitter, shadowViewNormal);
   }
 
-  shadow = mix(shadow, vec3(smoothstep(13.5/15, 14.5/15, skyLightmap)), distFade);
+  shadow = mix(
+    shadow,
+    vec3(smoothstep(13.5 / 15, 14.5 / 15, skyLightmap)),
+    distFade
+  );
 
   return shadow;
 }
@@ -164,7 +163,7 @@ float getShadowFast(vec3 playerPos, vec3 playerNormal, float skyLightmap) {
     shadowViewPos,
     shadowProjection
   );
-  shadowScreenPos.z /= 2.0;
+  shadowScreenPos.z /= SHADOW_Z_STRETCH;
 
   shadowScreenPos.xy += getWarp(shadowScreenPos.xy);
 

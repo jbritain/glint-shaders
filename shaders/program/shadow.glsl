@@ -37,7 +37,7 @@ void main() {
   );
 
   screenPos.xy += getWarp(screenPos.xy);
-  screenPos.z /= 2.0;
+  screenPos.z /= SHADOW_Z_STRETCH;
   gl_Position.xyz = screenPos * 2.0 - 1.0;
 
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;

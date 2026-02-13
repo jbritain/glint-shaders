@@ -54,13 +54,13 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     transformView(start, shadowModelView),
     shadowProjection
   );
-  shadowStart.z /= 2.0;
+  shadowStart.z /= SHADOW_Z_STRETCH;
 
   vec3 shadowEnd = viewSpaceToScreenSpaceOrtho(
     transformView(end, shadowModelView),
     shadowProjection
   );
-  shadowEnd.z /= 2.0;
+  shadowEnd.z /= SHADOW_Z_STRETCH;
 
   for (int i = 0; i < VOLUMETRIC_WATER_SAMPLES; i++) {
     float progress = float(i + jitter) / float(VOLUMETRIC_WATER_SAMPLES);
@@ -76,10 +76,7 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     float t = frameTimeCounter * 0.005;
     float caustics = max(
       texture(noisetex, causticsPos + vec2(t, 0.0)).r,
-      texture(
-        noisetex,
-        causticsPos + vec2(-t, t)
-      ).r
+      texture(noisetex, causticsPos + vec2(-t, t)).r
     );
 
     caustics = pow3(caustics);
