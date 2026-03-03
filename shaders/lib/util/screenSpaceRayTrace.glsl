@@ -65,7 +65,7 @@ bool rayIntersects(
 
   vec3 r = abs(sign(rayDir) - rayPos) / max(abs(rayDir), 0.00001);
   float rayLength = minVec3(r);
-  float stepLength = rayLength * rcp(float(maxSteps * 4));
+  float stepLength = rayLength * rcp(float(maxSteps));
 
   vec3 rayStep = rayDir * stepLength;
   rayPos +=
@@ -75,21 +75,61 @@ bool rayIntersects(
 
   bool intersect = false;
 
-  for (int i = 0; i < maxSteps * 4; ++i, rayPos += rayStep) {
+  for (int i = 0; i < maxSteps; ++i) {
     if (clamp01(rayPos) != rayPos) return false; // we went offscreen
-    float depth = getDepth(rayPos.xy, depthBuffer); // sample depth at ray position
 
-    if (abs(depth - startZ) < 1e-5) continue;
+    float depth0 = getDepth(rayPos.xy, depthBuffer);
+    float depth1 = getDepth(rayPos.xy + rayStep.xy * 0.25, depthBuffer);
+    float depth2 = getDepth(rayPos.xy + rayStep.xy * 0.5, depthBuffer);
+    float depth3 = getDepth(rayPos.xy + rayStep.xy * 0.75, depthBuffer);
 
     intersect =
-      depth < rayPos.z &&
-      abs(depthLenience - (rayPos.z - depth)) < depthLenience &&
+      depth0 < rayPos.z &&
+      abs(depthLenience - (rayPos.z - depth0)) < depthLenience &&
       rayPos.z > handDepth &&
-      depth < 1.0;
+      depth0 < 1.0;
 
     if (intersect) {
       break;
     }
+
+    rayPos += rayStep * 0.25;
+
+    intersect =
+      depth1 < rayPos.z &&
+      abs(depthLenience - (rayPos.z - depth1)) < depthLenience &&
+      rayPos.z > handDepth &&
+      depth1 < 1.0;
+
+    if (intersect) {
+      break;
+    }
+
+    rayPos += rayStep * 0.25;
+
+    intersect =
+      depth2 < rayPos.z &&
+      abs(depthLenience - (rayPos.z - depth2)) < depthLenience &&
+      rayPos.z > handDepth &&
+      depth2 < 1.0;
+
+    if (intersect) {
+      break;
+    }
+
+    rayPos += rayStep * 0.25;
+
+    intersect =
+      depth3 < rayPos.z &&
+      abs(depthLenience - (rayPos.z - depth3)) < depthLenience &&
+      rayPos.z > handDepth &&
+      depth3 < 1.0;
+
+    if (intersect) {
+      break;
+    }
+
+    rayPos += rayStep * 0.25;
 
   }
 

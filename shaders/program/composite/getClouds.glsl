@@ -41,19 +41,25 @@ void main() {
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
   clouds = getClouds(feetPlayerPos, depth == 1.0);
-  if(depth == 1.0 || distance(cameraPosition, previousCameraPosition) < 0.01){
+  if (depth == 1.0 || distance(cameraPosition, previousCameraPosition) < 0.01) {
     vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
     previousPos = transformView(previousPos, gbufferPreviousModelView);
-    previousPos = viewSpaceToScreenSpace(previousPos, gbufferPreviousProjection);
+    previousPos = viewSpaceToScreenSpace(
+      previousPos,
+      gbufferPreviousProjection
+    );
 
     vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
     float previousZ = texture(colortex5, previousPos.xy).a;
-    float previousDepth = viewSpaceToScreenSpace(previousZ, gbufferPreviousProjection);
+    float previousDepth = viewSpaceToScreenSpace(
+      previousZ,
+      gbufferPreviousProjection
+    );
 
-    if(saturate(previousPos.xy) == previousPos.xy && previousDepth == 1.0){
+    if (saturate(previousPos.xy) == previousPos.xy && previousDepth == 1.0) {
       clouds = mix(previousClouds, clouds, 0.05);
     }
-}
+  }
 }
 
 #endif

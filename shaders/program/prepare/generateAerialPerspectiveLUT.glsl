@@ -18,8 +18,6 @@
 layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 const ivec3 workGroups = ivec3(8, 8, 8);
 
-#include "/lib/common.glsl"
-
 layout(rgba16f) uniform image3D aerialPerspectiveLUT;
 
 #include "/lib/atmosphere/atmosphere.glsl"
@@ -78,11 +76,11 @@ vec3 raymarchScattering(
     vec3 mieInScattering =
       mieScattering * (miePhaseValue * sunTransmittance + psiMS);
 
-    rayleighScattering *= 20.0;
-    mieScattering *= 20.0;
-    rayleighInScattering *= 20.0;
-    mieInScattering *= 20.0;
-    // extinction *= 20.0;
+    rayleighScattering *= ATMOSPHERIC_FOG_STRENGTH;
+    mieScattering *= ATMOSPHERIC_FOG_STRENGTH;
+    rayleighInScattering *= ATMOSPHERIC_FOG_STRENGTH;
+    mieInScattering *= ATMOSPHERIC_FOG_STRENGTH;
+    // extinction *= ATMOSPHERIC_FOG_STRENGTH;
 
     vec3 inScattering = rayleighInScattering + mieInScattering;
 

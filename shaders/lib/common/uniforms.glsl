@@ -171,4 +171,10 @@ uniform vec3 worldSunDir;
 uniform vec3 worldMoonDir;
 uniform vec3 worldLightDir;
 
+uniform sampler2D indirectRadiosityTex;
+#ifndef GBUFFERS_VOXELS
+uniform sampler2D radiosity_direct;
+uniform sampler2D radiosity_direct_soft;
+#endif
+
 #endif // UNIFORMS_GLSL

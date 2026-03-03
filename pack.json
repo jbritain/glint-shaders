@@ -3,7 +3,7 @@
     "other": [
       "voxy.json",
       "voxy_opaque.glsl",
-      "voxy_translucent.glsl"
+      "voxy_translucent.glsl",
     ],
     "gbuffers": {
       "terrain": "opaque",
@@ -15,7 +15,8 @@
       "textured": "translucent",
       "clouds": "discard",
       "skytextured": "discard",
-      "skybasic": "discard"
+      "skybasic": "discard",
+      "voxels": "voxels"
     },
     "setup": [
       {

@@ -12,7 +12,7 @@ const float shadowDistance = 256.0;
 const float sunPathRotation = 40.0;
 const int shadowMapResolution = 2048;
 #define SCREEN_SPACE_SHADOW_STEPS 8
-#define SHADOW_Z_STRETCH 1.0
+#define SHADOW_Z_STRETCH 2.0
 
 #define SSAO
 #define SSAO_SAMPLES 8
@@ -62,6 +62,8 @@ const vec3 blocklightColor =
 #define VOLUMETRIC_WATER_LIGHT_FALLOFF 10
 
 #define SUBSURFACE_SCATTERING_STRENGTH 4.0
+
+#define ATMOSPHERIC_FOG_STRENGTH 100.0
 
 #define SMAA
 #define SMAA_THRESHOLD 0.1 // [0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5]

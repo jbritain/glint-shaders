@@ -54,11 +54,16 @@ def generate_others(pack):
 def generate_gbuffers(pack):
     for program, file in pack["programs"]["gbuffers"].items():
         create_linked_shader_program(
-            f"gbuffers_{program}", f"program/gbuffer/{file}.glsl"
+            f"gbuffers_{program}",
+            f"program/gbuffer/{file}.glsl",
+            defines={f"GBUFFERS_{program.upper()}": ""},
         )
 
     if os.path.exists(f"{shaders_path}/program/shadow.glsl"):
         create_linked_shader_program(f"shadow", f"program/shadow.glsl")
+
+    if os.path.exists(f"{shaders_path}/program/shadow_voxels.glsl"):
+        create_linked_shader_program(f"shadow_voxels", f"program/shadow_voxels.glsl")
 
 
 def generate_post_processing(pack):

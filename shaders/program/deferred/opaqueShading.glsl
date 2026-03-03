@@ -96,16 +96,27 @@ void main() {
       sunlightColor;
     diffuse += material.albedo * subsurfaceScattering;
 
+    #ifdef PHOTONICS
+    diffuse +=
+      texture(indirectRadiosityTex, texcoord).rgb * material.albedo * occlusion;
+    #else
     #ifdef RSM
     diffuse +=
       texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
     // show(texture(colortex9, texcoord).rgb);
     #endif
     #endif
+    #endif
 
+    #ifdef PHOTONICS
+    vec4 radiosity = texture(radiosity_direct_soft, texcoord);
+    diffuse += radiosity.rgb / max(1.0, radiosity.a) * material.albedo;
+    diffuse += texture(radiosity_direct, texcoord).rgb * material.albedo;
+    #else
     diffuse += gbuffer.lightmap.y * skylightColor * material.albedo * occlusion;
     diffuse +=
       gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+    #endif
   }
   color.rgb += mix(
     diffuse,
@@ -116,6 +127,8 @@ void main() {
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
 
   color.rgb = getAtmosphericFog(color.rgb, viewPos);
+
+  show(texture(indirectRadiosityTex, texcoord));
 
 }
 

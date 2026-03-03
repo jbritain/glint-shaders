@@ -65,25 +65,22 @@ void main() {
   #ifdef VOXY
   vec3 p;
   if (VOXY_MASK) {
-    shadow = 
-      rayIntersects(
-        viewPos,
-        lightDir,
-        SCREEN_SPACE_SHADOW_STEPS,
-        blueNoise(gl_FragCoord.xy, frameCounter).r,
-        false,
-        p,
-        vxDepthTexTrans,
-        vxProj
-      )
-        ? vec3(0.0)
-        : vec3(1.0)
-    ;
+    shadow = rayIntersects(
+      viewPos,
+      lightDir,
+      SCREEN_SPACE_SHADOW_STEPS,
+      blueNoise(gl_FragCoord.xy, frameCounter).r,
+      false,
+      p,
+      vxDepthTexTrans,
+      vxProj
+    )
+      ? vec3(0.0)
+      : vec3(1.0);
   }
   #endif
 
   shadowAndBlockerDistance = vec4(shadow, blockerDistance);
-
 
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);
@@ -106,6 +103,8 @@ void main() {
       0.9
     );
   }
+
+  // show(texture(shadowtex0, texcoord));
 
 }
 
