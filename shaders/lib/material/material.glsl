@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -23,25 +23,55 @@ struct Gbuffer {
   vec2 lightmap;
 };
 
-uvec3 packGbuffer(Gbuffer gbuffer){
+uvec3 packGbuffer(Gbuffer gbuffer) {
   uvec3 packedGbuffer = uvec3(0);
 
   vec2 packedSurface = encodeUnitVector(gbuffer.surfaceNormal);
   vec2 packedGeometry = encodeUnitVector(gbuffer.geometryNormal);
 
-  packedGbuffer.r = bitfieldInsert(packedGbuffer.r, uint(packedSurface.r * 255), 0, 8);
-  packedGbuffer.r = bitfieldInsert(packedGbuffer.r, uint(packedSurface.g * 255), 8, 8);
+  packedGbuffer.r = bitfieldInsert(
+    packedGbuffer.r,
+    uint(packedSurface.r * 255),
+    0,
+    8
+  );
+  packedGbuffer.r = bitfieldInsert(
+    packedGbuffer.r,
+    uint(packedSurface.g * 255),
+    8,
+    8
+  );
 
-  packedGbuffer.g = bitfieldInsert(packedGbuffer.g, uint(packedGeometry.r * 255), 0, 8);
-  packedGbuffer.g = bitfieldInsert(packedGbuffer.g, uint(packedGeometry.g * 255), 8, 8);
+  packedGbuffer.g = bitfieldInsert(
+    packedGbuffer.g,
+    uint(packedGeometry.r * 255),
+    0,
+    8
+  );
+  packedGbuffer.g = bitfieldInsert(
+    packedGbuffer.g,
+    uint(packedGeometry.g * 255),
+    8,
+    8
+  );
 
-  packedGbuffer.b = bitfieldInsert(packedGbuffer.b, uint(gbuffer.lightmap.x * 255), 0, 8);
-  packedGbuffer.b = bitfieldInsert(packedGbuffer.b, uint(gbuffer.lightmap.y * 255), 8, 8);
+  packedGbuffer.b = bitfieldInsert(
+    packedGbuffer.b,
+    uint(gbuffer.lightmap.x * 255),
+    0,
+    8
+  );
+  packedGbuffer.b = bitfieldInsert(
+    packedGbuffer.b,
+    uint(gbuffer.lightmap.y * 255),
+    8,
+    8
+  );
 
   return packedGbuffer;
 }
 
-Gbuffer unpackGbuffer(uvec3 packedGbuffer){
+Gbuffer unpackGbuffer(uvec3 packedGbuffer) {
   Gbuffer gbuffer;
 
   vec2 packedSurface;
@@ -80,10 +110,10 @@ struct Material {
   float emission;
   vec3 f0;
   uint metalID;
-	float roughness;
-	float subsurface;
-	float porosity;
-	float ao;
+  float roughness;
+  float subsurface;
+  float porosity;
+  float ao;
   uint id;
 };
 
@@ -99,7 +129,11 @@ Material defaultMaterial = Material(
   0
 );
 
-Material materialFromSpecularMap(vec3 albedo, vec4 specularData, uint materialID){
+Material materialFromSpecularMap(
+  vec3 albedo,
+  vec4 specularData,
+  uint materialID
+) {
   Material material;
 
   material.albedo = albedo;
@@ -145,14 +179,14 @@ uvec2 packMaterial(Material material) {
   data.g = bitfieldInsert(data.g, uint(material.ao * 15), 24, 4);
 
   // only the first 15 material IDs get stored, so anything that needs a deferred effect must have an ID < 16
-  if(material.id < 1016){
+  if (material.id < 1016) {
     data.g = bitfieldInsert(data.g, uint(material.id - 999), 28, 4);
   }
-  
+
   return data;
 }
 
-Material unpackMaterial(uvec2 data){
+Material unpackMaterial(uvec2 data) {
   Material material;
   material.albedo.r = bitfieldExtract(data.r, 0, 8) / 255.0;
   material.albedo.g = bitfieldExtract(data.r, 8, 8) / 255.0;
@@ -165,7 +199,7 @@ Material unpackMaterial(uvec2 data){
   float specularG = bitfieldExtract(data.g, 8, 8) / 255.0;
   if (specularG <= 229.0 / 255.0) {
     material.f0 = vec3(specularG);
-    if(material.f0 == vec3(0.0)){
+    if (material.f0 == vec3(0.0)) {
       material.f0 = vec3(0.04);
     }
     material.metalID = NO_METAL;

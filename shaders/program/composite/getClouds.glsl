@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -25,7 +25,8 @@ void main() {
 
 #ifdef fsh
 
-#include "/lib/atmosphere/clouds.glsl"
+#include "/lib/atmosphere/volumetricClouds.glsl"
+#include "/lib/atmosphere/planarClouds.glsl"
 #include "/lib/util/misc.glsl"
 
 in vec2 texcoord;
@@ -35,12 +36,22 @@ in vec2 texcoord;
 layout(location = 0) out vec4 clouds;
 
 void main() {
+  clouds = vec4(0.0, 0.0, 0.0, 1.0);
   float depth = texture(depthtex0, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   voxyOverride(depth, viewPos, texcoord, true);
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
-  clouds = getClouds(feetPlayerPos, depth == 1.0);
+  vec4 planarClouds = getPlanarClouds(normalize(feetPlayerPos));
+  vec4 volClouds = getVolumetricClouds(feetPlayerPos, depth == 1.0);
+
+  if (depth == 1.0) {
+    clouds = planarClouds;
+  }
+
+  clouds.rgb = fma(clouds.rgb, vec3(volClouds.a), volClouds.rgb);
+  clouds.a *= volClouds.a;
+
   if (depth == 1.0 || distance(cameraPosition, previousCameraPosition) < 0.01) {
     vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
     previousPos = transformView(previousPos, gbufferPreviousModelView);

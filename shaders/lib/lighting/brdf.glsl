@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -167,7 +167,7 @@ vec3 diffuseBRDF(
   vec3 geometryNormal,
   vec3 viewPos
 ) {
-  if(material.metalID != NO_METAL){
+  if (material.metalID != NO_METAL) {
     return vec3(0.0);
   }
 
@@ -179,7 +179,8 @@ vec3 diffuseBRDF(
   vec3 H = normalize(L + V);
   float HoV = dot(H, V);
 
-  return material.albedo / PI *
+  return material.albedo /
+  PI *
   clamp01(mappedNoL * smoothstep(0.0, 0.1, faceNoL));
 }
 
@@ -219,7 +220,7 @@ vec3 specularBRDF(
   // trowbridge-reitz ggx
   float denominator = NoHSquared * (pow2(alpha) - 1.0) + 1.0;
   float D = max0(pow2(alpha) / (PI * pow2(denominator)));
-  
+
   float G = max0(geometrySmith(N, V, L, material.roughness));
 
   if (material.metalID != NO_METAL) {
@@ -232,7 +233,7 @@ vec3 specularBRDF(
   Rs *= step(1e-6, NoL);
 
   // prevent specular highlights blowing out the bloom
-  if(luminance(Rs) > 1000){
+  if (luminance(Rs) > 1000) {
     Rs = hsv(Rs);
     Rs.b = 1000;
     Rs = rgb(Rs);

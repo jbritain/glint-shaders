@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -51,10 +51,8 @@ void main() {
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
-
-
   occlusion = getSSAO(viewPos, gbuffer.geometryNormal);
-  if(clamp01(previousPos) == previousPos){
+  if (clamp01(previousPos) == previousPos) {
     float previousOcclusion = texture(colortex3, previousPos.xy).r;
     occlusion = mix(occlusion, previousOcclusion, 0.5);
   }

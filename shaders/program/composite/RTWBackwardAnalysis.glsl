@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -20,7 +20,7 @@ layout(r32ui) uniform uimage2D shadowImportanceMap;
 void main() {
   ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
   vec2 texcoord = vec2(texelCoord + 0.5) / 256;
-  
+
   vec4 neighbouringDepths = textureGather(undistortedShadowMapTex, texcoord);
   float depth = texelFetch(undistortedShadowMapTex, texelCoord, 0).r;
 
@@ -28,11 +28,14 @@ void main() {
   float maxDepth = maxVec4(neighbouringDepths);
 
   uint weight = 0;
-  if(depth != 0){
+  if (depth != 0) {
     weight += 1000;
   }
 
-  vec3 shadowViewPos = screenSpaceToViewSpaceOrtho(vec3((texelCoord + 0.5) / 256.0, depth), shadowProjectionInverse);
+  vec3 shadowViewPos = screenSpaceToViewSpaceOrtho(
+    vec3((texelCoord + 0.5) / 256.0, depth),
+    shadowProjectionInverse
+  );
   vec3 playerPos = transformView(shadowViewPos, shadowModelViewInverse);
   vec3 viewPos = transformView(playerPos, gbufferModelView);
   vec3 screenPos = viewSpaceToScreenSpace(viewPos);

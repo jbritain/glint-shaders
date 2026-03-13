@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -10,7 +10,6 @@
     https://jbritain.net
 
 */
-
 
 #ifndef ATMOSPHERIC_FOG_GLSL
 #define ATMOSPHERIC_FOG_GLSL

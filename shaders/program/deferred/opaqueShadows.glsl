@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -31,6 +31,7 @@ void main() {
 #include "/lib/util/dither.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/subsurfaceScattering.glsl"
+#include "/lib/lighting/cloudShadows.glsl"
 
 in vec2 texcoord;
 
@@ -40,6 +41,9 @@ layout(location = 0) out vec4 shadowAndBlockerDistance;
 
 void main() {
   float depth = texture(depthtex1, texcoord).r;
+  if (depth == 1.0) {
+    return;
+  }
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
   voxyOverride(depth, viewPos, texcoord, true);

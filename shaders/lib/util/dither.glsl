@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -41,7 +41,7 @@ vec3 blueNoise(vec2 texcoord, int frame, int i) {
 }
 
 vec2 vogelDisc(int stepIndex, int stepCount, float noise) {
-	float rotation = noise * 2 * PI;
+  float rotation = noise * 2 * PI;
   const float goldenAngle = 2.4;
 
   float r = sqrt(stepIndex + 0.5) / sqrt(float(stepCount));

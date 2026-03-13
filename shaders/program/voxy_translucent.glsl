@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -24,7 +24,6 @@ layout(location = 1) out uvec3 gbufferData;
 layout(location = 2) out uvec2 materialData;
 
 void voxy_emitFragment(VoxyFragmentParameters params) {
-
   Gbuffer gbuffer;
 
   gbuffer.geometryNormal =
@@ -52,7 +51,7 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
   gbuffer.lightmap = params.lightMap;
   gbuffer.lightmap = applyLightmapFalloff(gbuffer.lightmap);
 
-  if(materialIsWater(material.id)){
+  if (materialIsWater(material.id)) {
     material.roughness = 0.0;
     material.f0 = vec3(0.02);
     material.albedo = vec3(0.0);
@@ -63,12 +62,21 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
     gl_FragCoord.xyz / vec3(viewWidth, viewHeight, 1.0)
   );
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
-  float shadow = getShadowFast(feetPlayerPos, gbuffer.surfaceNormal, gbuffer.lightmap.y);
+  float shadow = getShadowFast(
+    feetPlayerPos,
+    gbuffer.surfaceNormal,
+    gbuffer.lightmap.y
+  );
 
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER
   color.rgb =
-    diffuseBRDF(material, gbuffer.geometryNormal, gbuffer.geometryNormal, viewPos) *
+    diffuseBRDF(
+      material,
+      gbuffer.geometryNormal,
+      gbuffer.geometryNormal,
+      viewPos
+    ) *
     sunlightColor *
     shadow;
   #endif

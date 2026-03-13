@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -35,5 +35,7 @@ void main() {
 
 
   float warp = a[gl_GlobalInvocationID.x] / a[255] - float(gl_GlobalInvocationID.x) / 256.0;
+  float previousWarp = texelFetch(colortex4, ivec2(gl_GlobalInvocationID.xy), 0).r;
+  // warp = mix(warp, previousWarp, 0.1);
   imageStore(colorimg4, ivec2(gl_GlobalInvocationID.xy), vec4(warp, 0.0, 0.0, 0.0));
 }

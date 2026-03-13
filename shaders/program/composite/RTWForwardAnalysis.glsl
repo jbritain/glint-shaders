@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -29,14 +29,12 @@ void main() {
   float depth1 = textureLod(depthtex2, texcoord, 0).r;
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
-
-  if(depth0 == 1.0){
+  if (depth0 == 1.0) {
     return;
   }
 
-
-  for(int i = 0; i < (depth0 == depth1 ? 1 : 2); i++){
-    float depth = ((i == 0) ? depth0 : depth1);
+  for (int i = 0; i < (depth0 == depth1 ? 1 : 2); i++) {
+    float depth = i == 0 ? depth0 : depth1;
     vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
     uint weight = 1000;
     weight += uint(10 / (1.0 - depth));
@@ -49,16 +47,13 @@ void main() {
       shadowProjection
     );
 
-    if(clamp01(shadowScreenPos) == shadowScreenPos){
-      imageAtomicAdd(shadowImportanceMap, ivec2(shadowScreenPos.xy * 256), weight);
+    if (clamp01(shadowScreenPos) == shadowScreenPos) {
+      imageAtomicAdd(
+        shadowImportanceMap,
+        ivec2(shadowScreenPos.xy * 256),
+        weight
+      );
     }
   }
 
-  
-
-
-
-
-
-  
 }

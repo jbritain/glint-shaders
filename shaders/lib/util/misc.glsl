@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -98,16 +98,54 @@ float raySphereIntersect(vec3 r0, vec3 rd, vec3 s0, float sr) {
   // - rd: normalized ray direction
   // - s0: sphere center
   // - sr: sphere radius
-  // - Returns distance from r0 to first intersecion with sphere,
+  // - Returns distance from r0 to first intersection with sphere,
   //   or -1.0 if no intersection.
   float a = dot(rd, rd);
   vec3 s0_r0 = r0 - s0;
   float b = 2.0 * dot(rd, s0_r0);
-  float c = dot(s0_r0, s0_r0) - (sr * sr);
-  if (b*b - 4.0*a*c < 0.0) {
-      return -1.0;
+  float c = dot(s0_r0, s0_r0) - sr * sr;
+  if (b * b - 4.0 * a * c < 0.0) {
+    return -1.0;
   }
-  return (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+  return (-b - sqrt(b * b - 4.0 * a * c)) / (2.0 * a);
+}
+
+float remap(float val, float oMin, float oMax, float nMin, float nMax) {
+  return mix(nMin, nMax, linearstep(oMin, oMax, val));
+}
+
+bool rayPlaneIntersection(
+  vec3 cameraPosition,
+  vec3 direction,
+  float height,
+  inout vec3 point
+) {
+  vec3 normal = vec3(0.0, sign(cameraPosition.y - height), 0.0); // plane normal vector
+  vec3 planePoint = vec3(0.0, height, 0.0); // point on the plane
+
+  float NdotD = dot(normal, direction);
+  if (NdotD == 0.0) {
+    return false;
+  }
+
+  float t = dot(normal, planePoint - cameraPosition) / NdotD;
+
+  point = cameraPosition + t * direction;
+
+  return t >= 0;
+}
+
+// TODO: move this somewhere more sensible
+vec3 unmapSphere(vec2 uv) {
+  float phi = (uv.x - 0.5) * 2.0 * 3.14;
+  float theta = (uv.y - 0.5) * 3.14;
+
+  float y = sin(theta);
+  float cosPhi = cos(phi);
+  float sinPhi = sin(phi);
+  float cosTheta = cos(theta);
+
+  return vec3(cosTheta * cosPhi, y, cosTheta * sinPhi);
 }
 
 #endif // MISC_GLSL

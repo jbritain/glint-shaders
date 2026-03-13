@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2026 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    
+    By jbritain
+    https://jbritain.net
+                                            
+*/
+
 #ifndef RSM_GLSL
 #define RSM_GLSL
 
@@ -27,12 +40,13 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
     vec2 warpedPos = offsetPos.xy + getWarp(offsetPos.xy);
 
-    offsetPos.z = texture(shadowtex0, warpedPos).r * SHADOW_Z_STRETCH;
+    offsetPos.z = texture(shadowtex0, warpedPos).r;
     vec3 samplePos = screenSpaceToViewSpaceOrtho(
       offsetPos,
       shadowProjectionInverse
     );
-    vec3 sampleFlux = texture(shadowcolor0, warpedPos).rgb;
+    vec4 sampleColor = texture(shadowcolor0, warpedPos);
+    vec3 sampleFlux = sampleColor.rgb * sampleColor.a;
     sampleFlux = pow(sampleFlux, vec3(2.2));
     vec3 sampleNormal = texture(shadowcolor1, warpedPos).rgb * 2.0 - 1.0;
     sampleNormal.z = sqrt(1.0 - dot(sampleNormal.xy, sampleNormal.xy));

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -31,23 +31,37 @@ in vec2 texcoord;
 
 layout(location = 0) out vec4 color;
 
-#include "/lib/atmosphere/clouds.glsl"
+#include "/lib/atmosphere/volumetricClouds.glsl"
 
 void main() {
-
   color = texture(colortex0, texcoord);
+
+  // EXPLANATION:
+  // fog should always be blended after translucents (no fog behind glass, cry about it)
+  // which means that it should only be blended in the program where blend_before_translucents
+  // we then hijack the check for if the player is in the clouds
+  // because that decides whether we blend fog or the clouds first
+
+  vec4 fog = texture(colortex12, texcoord);
 
   bool blend;
   #ifdef BLEND_BEFORE_TRANSLUCENTS
-  blend = cameraPosition.y < CLOUDS_BASE_ALTITUDE;
+  blend = cameraPosition.y < VOLUMETRIC_CLOUDS_BASE_ALTITUDE;
   #else
-  blend = cameraPosition.y >= CLOUDS_BASE_ALTITUDE;
+  blend = cameraPosition.y >= VOLUMETRIC_CLOUDS_BASE_ALTITUDE;
+
+  if (!blend) {
+    color.rgb = fma(color.rgb, vec3(fog.a), fog.rgb);
+  }
   #endif
 
-  if(blend){
+  if (blend) {
     vec4 clouds = texture(colortex8, texcoord);
 
     color.rgb = fma(color.rgb, vec3(clouds.a), clouds.rgb);
+    #ifndef BLEND_BEFORE_TRANSLUCENTS
+    color.rgb = fma(color.rgb, vec3(fog.a), fog.rgb);
+    #endif
   }
 
 }

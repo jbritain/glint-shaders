@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -32,6 +32,7 @@ void main() {
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/subsurfaceScattering.glsl"
 #include "/lib/atmosphere/atmosphericFog.glsl"
+#include "/lib/lighting/cloudShadows.glsl"
 
 in vec2 texcoord;
 
@@ -62,6 +63,12 @@ void main() {
   vec4 shadowAndBlockerDistance = texture(colortex10, texcoord);
   float blockerDistance = shadowAndBlockerDistance.a;
   vec3 shadow = shadowAndBlockerDistance.rgb;
+
+  float cloudShadow = getCloudShadow(feetPlayerPos);
+  gbuffer.lightmap.y *= 1.0 + (1.0 - cloudShadow); // boost skylight in cloud shadow
+  shadow *= cloudShadow;
+  show(cloudShadow);
+
   color.rgb =
     brdf(
       material,
@@ -93,7 +100,8 @@ void main() {
         normalize(feetPlayerPos),
         gbuffer.geometryNormal
       ) *
-      sunlightColor;
+      sunlightColor *
+      cloudShadow;
     diffuse += material.albedo * subsurfaceScattering;
 
     #ifdef PHOTONICS
@@ -102,7 +110,10 @@ void main() {
     #else
     #ifdef RSM
     diffuse +=
-      texture(colortex9, texcoord).rgb * sunlightColor * material.albedo;
+      texture(colortex9, texcoord).rgb *
+      sunlightColor *
+      material.albedo *
+      cloudShadow;
     // show(texture(colortex9, texcoord).rgb);
     #endif
     #endif
@@ -128,7 +139,7 @@ void main() {
 
   color.rgb = getAtmosphericFog(color.rgb, viewPos);
 
-  show(texture(indirectRadiosityTex, texcoord));
+  // show(texture(indirectRadiosityTex, texcoord));
 
 }
 

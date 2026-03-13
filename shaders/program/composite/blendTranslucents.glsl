@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -34,6 +34,8 @@ void main() {
 #include "/lib/water/waveNormals.glsl"
 #include "/lib/util/dither.glsl"
 #include "/lib/atmosphere/atmosphericFog.glsl"
+#include "/lib/atmosphere/volumetricFog.glsl"
+#include "/lib/lighting/cloudShadows.glsl"
 
 in vec2 texcoord;
 
@@ -58,7 +60,6 @@ void main() {
     gbufferModelViewInverse
   );
 
-
   if (translucents.a == 0.0) {
     if (inWater) {
       color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
@@ -66,11 +67,11 @@ void main() {
     return;
   }
 
-  Material material; 
-  Gbuffer gbuffer; 
+  Material material;
+  Gbuffer gbuffer;
 
   #ifdef VOXY
-  if(!VOXY_MASK){
+  if (!VOXY_MASK) {
     material = unpackMaterial(texture(colortex2, texcoord).rg);
     gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
   } else {
@@ -78,10 +79,9 @@ void main() {
     gbuffer = unpackGbuffer(texture(colortex16, texcoord).rgb);
   }
   #else
-    material = unpackMaterial(texture(colortex2, texcoord).rg);
-    gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  material = unpackMaterial(texture(colortex2, texcoord).rg);
+  gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
   #endif
-
 
   bool isWater = materialIsWater(material.id);
   if (isWater) {
@@ -104,7 +104,6 @@ void main() {
     gbufferModelViewInverse
   );
 
-
   // REFRACTION
   float refractedRayLength = distance(translucentViewPos, opaqueViewPos);
   float sqrf0 = sqrt(material.f0.r);
@@ -123,20 +122,21 @@ void main() {
   vec3 refractedPos = translucentViewPos + refractedDir * refractedRayLength;
   refractedPos = viewSpaceToScreenSpace(refractedPos);
   float refractedDepth = texture(depthtex1, refractedPos.xy).r;
-  if(clamp01(refractedPos) == refractedPos && refractedDepth != 1.0){
+  if (clamp01(refractedPos) == refractedPos && refractedDepth != 1.0) {
     if (refractedDepth > translucentDepth) {
       color.rgb = texture(colortex0, refractedPos.xy).rgb;
     }
-  } else if(inWater) {
+  } else {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
     vec3 sky = getSky(skyDir, true);
-    #ifdef CLOUDS
+    #ifdef VOLUMETRIC_CLOUDS
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
     #endif
+    // vec4 fog = analyticalFog(translucentFeetPlayerPos, skyDir);
+    // sky = fma(sky, vec3(fog.a), fog.rgb);
     color.rgb = sky * gbuffer.lightmap.y;
   }
-
 
   #ifdef MULTIPLICATIVE_TRANSLUCENTS
   if (!isWater) {
@@ -148,7 +148,11 @@ void main() {
   color.rgb = mix(color.rgb, translucents.rgb, translucents.a);
 
   if (isWater && !inWater) {
-    color.rgb = getWaterFog(color.rgb, translucentFeetPlayerPos, opaqueFeetPlayerPos);
+    color.rgb = getWaterFog(
+      color.rgb,
+      translucentFeetPlayerPos,
+      opaqueFeetPlayerPos
+    );
   }
 
   // TRANSLUCENT SHADING
@@ -168,13 +172,19 @@ void main() {
   // the blend here is incorrectly applying fresnel to the direct diffuse
   // on the surface
   // however, it looks fine, and translucents like this aren't physically accurate anyway
-  if(material.roughness <= ROUGH_SSR_THRESHOLD){
+  if (material.roughness <= ROUGH_SSR_THRESHOLD) {
     color.rgb = mix(color.rgb, indirectSpecular, f);
   }
   #ifndef WORLD_THE_NETHER
 
-  float shadow = getShadowFast(translucentFeetPlayerPos, gbuffer.surfaceNormal, gbuffer.lightmap.y);
+  float shadow = getShadowFast(
+    translucentFeetPlayerPos,
+    gbuffer.surfaceNormal,
+    gbuffer.lightmap.y
+  );
   shadow *= 1.0 - step(0.01, hitLength);
+
+  float cloudShadow = getCloudShadow(translucentFeetPlayerPos);
 
   vec3 specularHighlight =
     specularBRDF(
@@ -183,7 +193,8 @@ void main() {
       viewGeometryNormal,
       translucentViewPos
     ) *
-    shadow;
+    shadow *
+    cloudShadow;
   color.rgb += specularHighlight;
   #endif
 

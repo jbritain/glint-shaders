@@ -3,7 +3,7 @@
     "other": [
       "voxy.json",
       "voxy_opaque.glsl",
-      "voxy_translucent.glsl",
+      "voxy_translucent.glsl"
     ],
     "gbuffers": {
       "terrain": "opaque",
@@ -75,13 +75,18 @@
       {
         "path": "getClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS",
+        "enabledBy": "VOLUMETRIC_CLOUDS",
+        "dimensions": ["OVERWORLD"]
+      },
+      {
+        "path": "getVolumetricFog",
+        "programs": ["vsh", "fsh"],
         "dimensions": ["OVERWORLD"]
       },
       {
         "path": "blendClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS",
+        "enabledBy": "VOLUMETRIC_CLOUDS",
         "dimensions": ["OVERWORLD"],
         "defines": {"BLEND_BEFORE_TRANSLUCENTS": ""}
       },
@@ -92,34 +97,34 @@
       {
         "path": "blendClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS",
+        "enabledBy": "VOLUMETRIC_CLOUDS",
         "dimensions": ["OVERWORLD"],
         "defines": {"BLEND_AFTER_TRANSLUCENTS": ""}
       },
       {
         "path": "RTWForwardAnalysis",
         "programs": ["csh"],
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD", "THE_END"]
       },
       {
         "path": "RTWBackwardAnalysis",
         "programs": ["csh"],
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD", "THE_END"]
       },
       {
         "path": "RTWCalculateMaxWeights",
         "programs": ["csh"],
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD", "THE_END"]
       },
       {
         "path": "RTWBlurMaxWeights",
         "programs": ["vsh", "fsh"],
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD", "THE_END"]
       },
       {
         "path": "RTWComputeWarpFactor",
         "programs": ["csh"],
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD", "THE_END"]
       },
       {
         "path": "temporalFilter",

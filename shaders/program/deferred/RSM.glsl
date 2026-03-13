@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -46,7 +46,10 @@ void main() {
   }
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
-  globalIllumination = getReflectiveShadowMap(feetPlayerPos, gbuffer.geometryNormal);
+  globalIllumination = getReflectiveShadowMap(
+    feetPlayerPos,
+    gbuffer.geometryNormal
+  );
 
   #ifdef RSM_LIGHT_LEAK_FIX
   globalIllumination *= smoothstep(0.0, 0.2, gbuffer.lightmap.y);
@@ -64,10 +67,15 @@ void main() {
 
   if (
     clamp01(previousPos) == previousPos &&
-    ((distance(actualPreviousPos, previousViewPos) < 0.1) || distance(cameraPosition, previousCameraPosition) < 0.01)
+    (distance(actualPreviousPos, previousViewPos) < 0.1 ||
+      distance(cameraPosition, previousCameraPosition) < 0.01)
   ) {
     vec3 previousglobalIllumination = texture(colortex9, previousPos.xy).rgb;
-    globalIllumination = mix(globalIllumination, previousglobalIllumination, 0.9);
+    globalIllumination = mix(
+      globalIllumination,
+      previousglobalIllumination,
+      0.9
+    );
   }
 
   // show(globalIllumination * 10.0);

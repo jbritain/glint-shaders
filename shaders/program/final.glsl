@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -46,16 +46,20 @@ void main() {
   #endif
 
   #ifdef DEBUG_RECTILINEAR
-  if(gl_FragCoord.x < 256 && gl_FragCoord.y < 256){
+  if (gl_FragCoord.x < 256 && gl_FragCoord.y < 256) {
     color = vec3(
       texelFetch(shadowImportanceMapTex, ivec2(gl_FragCoord.xy), 0).r,
-      texelFetch(shadowtex0, ivec2(gl_FragCoord.xy * shadowMapResolution / 256), 0).r,
+      texelFetch(
+        shadowtex0,
+        ivec2(gl_FragCoord.xy * shadowMapResolution / 256),
+        0
+      ).r,
       0.0
-      );
+    );
     // color = vec3(getWarp(gl_FragCoord.xy / 255), 0);
-  } else if(gl_FragCoord.x < 266 && gl_FragCoord.y < 256) {
+  } else if (gl_FragCoord.x < 266 && gl_FragCoord.y < 256) {
     color = vec3(yWarpMap[int(gl_FragCoord.y)]);
-  } else if(gl_FragCoord.y < 266 && gl_FragCoord.x < 256){
+  } else if (gl_FragCoord.y < 266 && gl_FragCoord.x < 256) {
     color = vec3(xWarpMap[int(gl_FragCoord.x)]);
   }
   #endif

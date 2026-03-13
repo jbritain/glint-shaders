@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2026 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    
+    By jbritain
+    https://jbritain.net
+                                            
+*/
+
 #ifndef SSR_GLSL
 #define SSR_GLSL
 
@@ -8,6 +21,7 @@
 #include "/lib/util/misc.glsl"
 #include "/lib/lighting/brdf.glsl"
 #include "/lib/util/packing.glsl"
+#include "/lib/atmosphere/volumetricFog.glsl"
 
 vec3 SSRSample(
   inout vec3 origin,
@@ -23,17 +37,17 @@ vec3 SSRSample(
   vec3 reflectedDir = reflect(dir, normal);
 
   bool hit = rayIntersects(
-      origin,
-      reflectedDir,
-      samples,
-      jitter,
-      refine,
-      rayPos,
-      depthtex0,
-      gbufferProjection
-    );
+    origin,
+    reflectedDir,
+    samples,
+    jitter,
+    refine,
+    rayPos,
+    depthtex0,
+    gbufferProjection
+  );
   #ifdef VOXY
-  if(!hit){
+  if (!hit) {
     hit = rayIntersects(
       origin,
       reflectedDir,
@@ -47,9 +61,7 @@ vec3 SSRSample(
   }
   #endif
 
-  if (
-    hit
-  ) {
+  if (hit) {
     rayPos = screenSpaceToViewSpace(rayPos);
     hitLength = distance(rayPos, origin);
     rayPos = transformView(rayPos, gbufferModelViewInverse);
@@ -62,10 +74,16 @@ vec3 SSRSample(
     rayPos = viewSpaceToScreenSpace(origin);
     vec3 skyDir = mat3(gbufferModelViewInverse) * reflectedDir;
     vec3 sky = getSky(skyDir, false);
-    #ifdef CLOUDS
+    #ifdef VOLUMETRIC_CLOUDS
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
     #endif
+    // vec4 fog = analyticalFog(
+    //   transformView(origin, gbufferModelViewInverse),
+    //   skyDir
+    // );
+    // sky = fma(sky, vec3(fog.a), fog.rgb);
+    // show(fog.rgb * 10);
     return sky * skyLightmap;
   }
 }
@@ -81,9 +99,7 @@ vec3 getSSR(
   vec3 viewNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
   vec3 viewDir = normalize(viewPos);
 
-  if (
-    material.roughness < 0.01
-  ) {
+  if (material.roughness < 0.01) {
     SSRColor = SSRSample(
       viewPos,
       viewDir,
@@ -105,8 +121,7 @@ vec3 getSSR(
     for (int i = 0; i < ROUGH_SSR_SAMPLES; i++) {
       vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter, i);
       vec3 roughNormal =
-        tbn *
-        SampleVNDFGGX(tangentViewDir, vec2(material.roughness), noise.xy);
+        tbn * SampleVNDFGGX(tangentViewDir, vec2(material.roughness), noise.xy);
 
       float hitLength;
       SSRColor += SSRSample(

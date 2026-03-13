@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2026 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    
+    By jbritain
+    https://jbritain.net
+                                            
+*/
+
 #ifndef SSAO_GLSL
 #define SSAO_GLSL
 
@@ -30,12 +43,12 @@ float getSSAO(vec3 viewPos, vec3 worldNormal) {
     vec3 sampleViewPos = viewPos + offset;
     vec3 sampleScreenPos = viewSpaceToScreenSpace(sampleViewPos);
     float sampleDepth = screenSpaceToViewSpace(
-        texture(depthtex0, sampleScreenPos.xy).r
-      );
+      texture(depthtex0, sampleScreenPos.xy).r
+    );
 
     float sampleOcclusion =
       float(sampleDepth >= sampleViewPos.z + 0.025) *
-        smoothstep(0.0, 1.0, SSAO_RADIUS / abs(sampleDepth - sampleViewPos.z));
+      smoothstep(0.0, 1.0, SSAO_RADIUS / abs(sampleDepth - sampleViewPos.z));
     occlusion += 1.0 - sampleOcclusion;
   }
 

@@ -159,6 +159,7 @@ uniform sampler2D skyCloudMapTex;
 uniform usampler2D undistortedShadowMapTex;
 uniform usampler2D shadowImportanceMapTex;
 
+uniform sampler2D perlinnoisetex;
 uniform sampler3D bluenoisetex;
 
 uniform sampler2D moontex;

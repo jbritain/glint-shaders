@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -75,7 +75,7 @@ void main() {
       distance(projectedViewPos, actualProjectedPos) < 0.1
     ) {
       vec3 previousSSR = texture(colortex7, projectedPos.xy).rgb;
-      SSRColor = mix(SSRColor, previousSSR, 0.9);
+      SSRColor = mix(SSRColor, previousSSR, 0.6);
     }
   }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -66,7 +66,8 @@ void main() {
 
   vec4 historyColor = texture(colortex5, previousScreenPos.xy);
   actualPreviousViewPos.z = screenSpaceToViewSpace(historyColor.a);
-  // rejectSample = rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
+  rejectSample =
+    rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
 
   // neighbourhood clamping
   vec3 maxCol = vec3(0.0);
@@ -86,7 +87,7 @@ void main() {
 
   float weight = rejectSample ? 0.0 : depth != opaqueDepth ? 0.5 : 0.7;
 
-  color = mix(color, historyColor, weight);
+  // color = mix(color, historyColor, weight);
 
   newHistory.rgb = color.rgb;
 }

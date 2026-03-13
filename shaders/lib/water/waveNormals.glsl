@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -95,7 +95,7 @@ vec3 rotate(vec3 vector, vec3 from, vec3 to) {
 // returned value is in world space
 vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float heightmapFactor) {
   // if(abs(dot(worldFaceNormal, vec3(0.0, 1.0, 0.0))) <= 0.1){
-  	// return worldFaceNormal;
+  // return worldFaceNormal;
   // }
 
   vec2 ex = vec2(WAVE_E, 0);

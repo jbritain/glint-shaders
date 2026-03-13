@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2026 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    
+    By jbritain
+    https://jbritain.net
+                                            
+*/
+
 #ifndef SHADOWS_GLSL
 #define SHADOWS_GLSL
 
@@ -113,7 +126,6 @@ vec3 getShadow(
     shadowViewPos,
     shadowProjection
   );
-  shadowScreenPos.z /= SHADOW_Z_STRETCH;
   distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
 
   // vec3 screenSpaceShadow = vec3(1.0);
@@ -163,7 +175,6 @@ float getShadowFast(vec3 playerPos, vec3 playerNormal, float skyLightmap) {
     shadowViewPos,
     shadowProjection
   );
-  shadowScreenPos.z /= SHADOW_Z_STRETCH;
 
   shadowScreenPos.xy += getWarp(shadowScreenPos.xy);
 

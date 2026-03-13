@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -21,6 +21,7 @@ in vec2 mc_Entity;
 out vec2 texcoord;
 out vec4 glcolor;
 out vec3 normal;
+out vec3 shadowViewPos;
 
 flat out uint materialID;
 
@@ -28,6 +29,9 @@ flat out uint materialID;
 
 void main() {
   gl_Position = ftransform();
+
+  shadowViewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+
   normal = normalize(gl_NormalMatrix * gl_Normal);
   vec3 screenPos = gl_Position.xyz * 0.5 + 0.5;
   imageAtomicMax(
@@ -37,7 +41,6 @@ void main() {
   );
 
   screenPos.xy += getWarp(screenPos.xy);
-  screenPos.z /= SHADOW_Z_STRETCH;
   gl_Position.xyz = screenPos * 2.0 - 1.0;
 
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -54,8 +57,11 @@ void main() {
 in vec2 texcoord;
 in vec4 glcolor;
 in vec3 normal;
+in vec3 shadowViewPos;
 
 flat in uint materialID;
+
+#include "/lib/water/waveNormals.glsl"
 
 /* RENDERTARGETS: 0,1 */
 layout(location = 0) out vec4 color;
@@ -66,6 +72,36 @@ void main() {
   if (color.a < alphaTestRef) {
     discard;
   }
+
+  if (materialIsWater(materialID)) {
+    float blockerDistance =
+      texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r -
+      gl_FragCoord.z;
+    blockerDistance *= shadowRange;
+
+    color.rgb = exp(-waterExtinction * blockerDistance);
+    color.a = 0.0;
+
+    // vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
+    // vec3 wave = waveNormal(
+    //   feetPlayerPos.xz + cameraPosition.xz,
+    //   vec3(0.0, 1.0, 0.0),
+    //   1.0
+    // );
+
+    // vec3 refracted = refract(worldLightDir, wave, 1.0 / 1.33);
+    // vec3 oldPos = feetPlayerPos + worldLightDir * blockerDistance;
+    // vec3 newPos = feetPlayerPos + refracted * blockerDistance;
+
+    // // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
+    // // I do not understand entirely what this does but it seems to work
+    // float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
+    // float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
+
+    // color.a = 1.0 - (oldArea / newArea);
+
+  }
+
   encodedNormal = normal.xy * 0.5 + 0.5;
 }
 

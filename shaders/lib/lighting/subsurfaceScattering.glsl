@@ -1,3 +1,16 @@
+/*
+    Copyright (c) 2026 Josh Britain (jbritain)
+    Licensed under the MIT license
+
+    ┏┓┓•   
+    ┃┓┃┓┏┓╋
+    ┗┛┗┗┛┗┗
+    
+    By jbritain
+    https://jbritain.net
+                                            
+*/
+
 #ifndef SUBSURFACE_SCATTERING_GLSL
 #define SUBSURFACE_SCATTERING_GLSL
 
@@ -15,7 +28,7 @@ vec3 getSubsurfaceScattering(
     return vec3(0.0);
   }
 
-  blockerDistance = max(blockerDistance * 255, 0.01);
+  blockerDistance = max(blockerDistance * shadowRange, 0.01);
 
   float VoL = dot(playerDir, worldLightDir);
 
@@ -25,7 +38,13 @@ vec3 getSubsurfaceScattering(
     SUBSURFACE_SCATTERING_STRENGTH *
     phase *
     vec3(factor) *
-    vec3(exp(-blockerDistance / (albedo / max(0.1, sqrt(luminance(albedo))))));
+    vec3(
+      exp(
+        -blockerDistance *
+          SUBSURFACE_SCATTERING_DENSITY /
+          mix(vec3(1.0), albedo, 1.0 - SUBSURFACE_SCATTERING_SATURATION)
+      )
+    );
 
   return scatter;
 }

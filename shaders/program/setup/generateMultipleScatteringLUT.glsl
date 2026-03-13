@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -103,8 +103,7 @@ void getMulScattValues(vec3 pos, vec3 sunDir, out vec3 lumTotal, out vec3 fms) {
         vec3 rayleighInScattering = rayleighScattering * rayleighPhaseValue;
         float mieInScattering = mieScattering * miePhaseValue;
         vec3 inScattering =
-          (rayleighInScattering + mieInScattering) *
-          sunTransmittance;
+          (rayleighInScattering + mieInScattering) * sunTransmittance;
 
         // Integrated scattering within path segment.
         vec3 scatteringIntegral =

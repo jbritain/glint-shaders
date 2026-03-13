@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2025 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -52,6 +52,7 @@ void main() {
 #include "/lib/material/material.glsl"
 #include "/lib/lighting/brdf.glsl"
 #include "/lib/lighting/shadows.glsl"
+#include "/lib/lighting/cloudShadows.glsl"
 
 in vec2 lightmap;
 in vec2 texcoord;
@@ -101,16 +102,21 @@ void main() {
     gbuffer.surfaceNormal,
     gbuffer.lightmap.y
   );
-
+  float cloudShadow = getCloudShadow(feetPlayerPos);
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER
   color.rgb =
     diffuseBRDF(material, surfaceNormal, tbn[2], viewPos) *
     sunlightColor *
-    shadow;
+    shadow *
+    cloudShadow;
   #endif
 
-  color.rgb += gbuffer.lightmap.y * skylightColor * material.albedo;
+  color.rgb +=
+    gbuffer.lightmap.y *
+    skylightColor *
+    material.albedo *
+    (1.0 + (1.0 - cloudShadow));
   color.rgb += gbuffer.lightmap.x * blocklightColor * material.albedo;
   color.rgb += material.albedo * material.emission * EMISSIVE_STRENGTH;
 
