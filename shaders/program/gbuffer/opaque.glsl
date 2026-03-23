@@ -111,7 +111,6 @@ void main() {
     material.roughness = ROUGH_SSR_THRESHOLD;
   }
 
-  gbuffer.lightmap = lightmap;
   gbuffer.lightmap = applyLightmapFalloff(lightmap);
   // gbuffer.lightmap *= applyDirectionalLightmap(lightmap, viewPos, surfaceNormal, tbn, material.subsurface);
 

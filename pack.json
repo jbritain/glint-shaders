@@ -131,7 +131,11 @@
         "programs": ["vsh", "fsh"]
       },
       {
-        "path": "exposure",
+        "path": "autoExposureWriteLuminance",
+        "programs": ["vsh", "fsh"]
+      },
+      {
+        "path": "autoExposure",
         "programs": ["vsh", "fsh"]
       },
       {

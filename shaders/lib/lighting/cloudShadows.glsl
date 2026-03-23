@@ -18,6 +18,7 @@
 #include "/lib/atmosphere/planarClouds.glsl"
 
 float getCloudShadow(vec3 pos) {
+  #ifdef VOLUMETRIC_CLOUDS
   float shadow = 1.0;
 
   vec3 dir = normalize(pos);
@@ -45,6 +46,9 @@ float getCloudShadow(vec3 pos) {
   }
 
   return shadow;
+  #else
+  return 1.0;
+  #endif
 
 }
 

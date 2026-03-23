@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define vsh
-#include "/program/composite/autoExposure.glsl"
+#include "/program/composite/tonemap.glsl"

@@ -32,7 +32,7 @@ const float shadowRange = shadowFarPlane - shadowNearPlane;
 #define RSM_BRIGHTNESS 5.0
 // #define RSM_LIGHT_LEAK_FIX
 
-#define EMISSIVE_STRENGTH 10.0
+#define EMISSIVE_STRENGTH 0.1
 
 #define BLOCKLIGHT_COLOR_R 255
 #define BLOCKLIGHT_COLOR_G 128
@@ -42,7 +42,8 @@ const vec3 blocklightColor =
     vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0,
     vec3(1.0 / 2.2)
   ) *
-  EMISSIVE_STRENGTH;
+  EMISSIVE_STRENGTH /
+  16.0;
 
 #define MULTIPLICATIVE_TRANSLUCENTS
 
@@ -121,3 +122,4 @@ const vec3 waterExtinction = vec3(waterAbsorption + waterScattering);
 #define PLANAR_CLOUDS_HEIGHT 100
 #define PLANAR_CLOUDS_MULTIPLE_SCATTERING 50.0
 
+#define EXPOSURE_COMPENSATION 0.0

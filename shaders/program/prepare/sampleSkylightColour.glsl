@@ -37,11 +37,13 @@ void main() {
 
   values[id] = getSky(dir, false) / 64.0;
 
+  skylightColor = vec3(0.0);
+
   barrier();
 
-  skylightColor = vec3(0.0);
+  
   for(int i = 0; i < 64; i++){
-    skylightColor += values[i];
+    skylightColor += values[i] / PI;
   }
 }
 

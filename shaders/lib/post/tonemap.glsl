@@ -183,6 +183,6 @@ vec3 lottesTonemap(vec3 x) {
 //   return texture(tonyMcMapfaceTex, coord).rgb;
 // }
 
-#define tonemap lottesTonemap // [lottesTonemap agxTonemap jodieReinhardTonemap uncharted2FilmicTonemap hejlBurgessTonemap ACESTonemap tonyMcMapface]
+#define tonemap agxTonemap // [lottesTonemap agxTonemap jodieReinhardTonemap uncharted2FilmicTonemap hejlBurgessTonemap ACESTonemap tonyMcMapface]
 
 #endif // TONEMAP_GLSL
