@@ -67,7 +67,7 @@ void main() {
     occlusion = mix(occlusion, previousOcclusion, 0.5);
   }
 
-  show(occlusion);
+  // show(occlusion);
 
 }
 

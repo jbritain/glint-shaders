@@ -93,3 +93,4 @@ screen.Refraction = Refraction
 option.REFRACTION_NORMAL_HACK = Flattened Refraction Normals
 option.RT_REFRACTION = Ray-traced Refraction
 option.RT_REFRACTION_STEPS = Ray-traced Refraction Steps
+option.DEBUG_ENABLE = DEBUG_ENABLE

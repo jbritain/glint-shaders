@@ -26,7 +26,7 @@
       },
       "Min Shadow Radius": {
         "key": "PCSS_MIN_RADIUS",
-        "default": "2.0",
+        "default": "0.0",
         "values": "{frange(0.0, 5.1, 0.1)}"
       },
       "Max Shadow Radius": {
@@ -402,5 +402,9 @@
         "values": "{frange(4, 17, 1)}"
       }
     }
+  },
+  "DEBUG_ENABLE": {
+    "key": "DEBUG_ENABLE",
+    "default": false
   }
 }
