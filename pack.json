@@ -75,7 +75,7 @@
       {
         "path": "getClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "VOLUMETRIC_CLOUDS",
+        "enabledBy": "CLOUDS",
         "dimensions": ["OVERWORLD"]
       },
       {
@@ -86,7 +86,7 @@
       {
         "path": "blendClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "VOLUMETRIC_CLOUDS",
+        "enabledBy": "CLOUDS",
         "dimensions": ["OVERWORLD"],
         "defines": {"BLEND_BEFORE_TRANSLUCENTS": ""}
       },
@@ -97,7 +97,7 @@
       {
         "path": "blendClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "VOLUMETRIC_CLOUDS",
+        "enabledBy": "CLOUDS",
         "dimensions": ["OVERWORLD"],
         "defines": {"BLEND_AFTER_TRANSLUCENTS": ""}
       },

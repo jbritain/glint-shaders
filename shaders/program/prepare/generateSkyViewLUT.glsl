@@ -73,8 +73,7 @@ vec3 raymarchScattering(
       rayleighScattering * (rayleighPhaseValue * sunTransmittance + psiMS);
     vec3 mieInScattering =
       mieScattering * (miePhaseValue * sunTransmittance + psiMS);
-    vec3 inScattering =
-      (rayleighInScattering + mieInScattering) * sunIrradiance;
+    vec3 inScattering = rayleighInScattering + mieInScattering;
 
     // Integrated scattering within path segment.
     vec3 scatteringIntegral =
@@ -126,13 +125,25 @@ void main() {
   );
   float groundDist = rayIntersectSphere(atmospherePos, rayDir, groundRadiusMM);
   float tMax = groundDist < 0.0 ? atmoDist : groundDist;
-  vec3 lum = raymarchScattering(
-    atmospherePos,
-    rayDir,
-    worldSunDir,
-    tMax,
-    float(numScatteringSteps)
-  );
+  vec3 lum =
+    raymarchScattering(
+      atmospherePos,
+      rayDir,
+      worldSunDir,
+      tMax,
+      float(numScatteringSteps)
+    ) *
+    sunIrradiance;
+
+  lum +=
+    raymarchScattering(
+      atmospherePos,
+      rayDir,
+      worldMoonDir,
+      tMax,
+      float(numScatteringSteps)
+    ) *
+    moonIrradiance;
 
   imageStore(skyViewLUT, texelCoord, vec4(lum, 1.0));
 

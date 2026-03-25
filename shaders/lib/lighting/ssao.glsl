@@ -26,7 +26,7 @@ float getSSAO(vec3 viewPos, vec3 worldNormal) {
 
   float occlusion = 0.0;
 
-  for (int i = 0; i < SSAO_SAMPLES; i++) {
+  for (int i = 0; i < AO_SAMPLES; i++) {
     vec3 noise = blueNoise(floor(gl_FragCoord.xy), frameCounter, i);
 
     float cosTheta = sqrt(noise.x);
@@ -36,9 +36,9 @@ float getSSAO(vec3 viewPos, vec3 worldNormal) {
     vec3 sampleDir =
       tbn * vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
     vec3 worldSampleDir = mat3(gbufferModelViewInverse) * sampleDir;
-    float radius = noise.z;
+    float radius = pow2(noise.z);
 
-    vec3 offset = sampleDir * radius * SSAO_RADIUS;
+    vec3 offset = sampleDir * radius * AO_RADIUS;
 
     vec3 sampleViewPos = viewPos + offset;
     vec3 sampleScreenPos = viewSpaceToScreenSpace(sampleViewPos);
@@ -48,11 +48,11 @@ float getSSAO(vec3 viewPos, vec3 worldNormal) {
 
     float sampleOcclusion =
       float(sampleDepth >= sampleViewPos.z + 0.025) *
-      smoothstep(0.0, 1.0, SSAO_RADIUS / abs(sampleDepth - sampleViewPos.z));
+      smoothstep(0.0, 1.0, AO_RADIUS / abs(sampleDepth - sampleViewPos.z));
     occlusion += 1.0 - sampleOcclusion;
   }
 
-  return occlusion / SSAO_SAMPLES;
+  return occlusion / AO_SAMPLES;
 }
 
 #endif // SSAO_GLSL

@@ -67,7 +67,6 @@ void main() {
   float cloudShadow = getCloudShadow(feetPlayerPos);
   gbuffer.lightmap.y *= 1.0 + (1.0 - cloudShadow); // boost skylight in cloud shadow
   shadow *= cloudShadow;
-  show(cloudShadow);
 
   color.rgb =
     brdf(
@@ -124,7 +123,8 @@ void main() {
     diffuse += radiosity.rgb / max(1.0, radiosity.a) * material.albedo;
     diffuse += texture(radiosity_direct, texcoord).rgb * material.albedo;
     #else
-    diffuse += gbuffer.lightmap.y * skylightColor * material.albedo * occlusion;
+    diffuse +=
+      gbuffer.lightmap.y * weatherSkylightColor * material.albedo * occlusion;
     diffuse +=
       gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
     #endif

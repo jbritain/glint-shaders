@@ -27,6 +27,7 @@ vec3 getSurfaceNormal(vec2 texcoord, mat3 tbn) {
 vec2 applyLightmapFalloff(vec2 lightmap) {
   // attempt at an inverse square falloff
   const float f = 15;
+  lightmap = clamp01(lightmap);
   // lightmap.x = clamp01(1.0 / pow2(15 - lightmap.x * 15 + 1)) - 1 / pow2(f + 1);
   // lightmap.x = pow2(lightmap.x);
   // dithering before gbuffer packing

@@ -27,6 +27,7 @@ void main() {
 
 #include "/lib/material/material.glsl"
 #include "/lib/lighting/ssao.glsl"
+#include "/lib/lighting/gtao.glsl"
 
 in vec2 texcoord;
 
@@ -51,11 +52,22 @@ void main() {
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
+  #if OCCLUSION == 1
   occlusion = getSSAO(viewPos, gbuffer.geometryNormal);
+  #elif OCCLUSION == 2
+  occlusion = getGTAO(
+    viewPos,
+    mat3(gbufferModelView) * gbuffer.geometryNormal,
+    texcoord
+  );
+  #endif
+
   if (clamp01(previousPos) == previousPos) {
     float previousOcclusion = texture(colortex3, previousPos.xy).r;
     occlusion = mix(occlusion, previousOcclusion, 0.5);
   }
+
+  show(occlusion);
 
 }
 

@@ -12,6 +12,7 @@
 */
 
 #include "/lib/common.glsl"
+#include "/lib/util/packing.glsl"
 
 #ifdef csh
 
@@ -21,6 +22,7 @@ layout(local_size_x = 8, local_size_y = 8) in;
 const ivec3 workGroups = ivec3(1, 1, 1);
 
 shared vec3 values[64];
+shared vec3 valuesWithCloud[64];
 
 void main() {
   uint id = gl_GlobalInvocationID.x * 8 + gl_GlobalInvocationID.y;
@@ -35,16 +37,24 @@ void main() {
     cosTheta
   );
 
-  values[id] = getSky(dir, false) / 64.0;
+  vec3 sky = getSky(dir, false);
+  vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(dir));
 
-  skylightColor = vec3(0.0);
+  values[id] = sky / (64 * PI);
+  valuesWithCloud[id] = fma(sky, vec3(clouds.a), clouds.rgb) / (64 * PI);
+
 
   barrier();
 
-  
-  for(int i = 0; i < 64; i++){
-    skylightColor += values[i] / PI;
+  if(gl_GlobalInvocationID.x == 0){
+    skylightColor = vec3(0.0);
+    weatherSkylightColor = vec3(0.0);
+    for(int i = 0; i < 64; i++){
+      skylightColor += values[i];
+      weatherSkylightColor += valuesWithCloud[i];
+    }
   }
+
 }
 
 #endif

@@ -123,7 +123,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     radiance +=
       sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
 
-    radiance += skylightColor * EBS.y * isotropicPhase;
+    radiance += weatherSkylightColor * EBS.y * isotropicPhase;
 
     scattering +=
       transmittance *

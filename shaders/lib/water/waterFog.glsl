@@ -60,13 +60,13 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     vec2 causticsPos =
       (mat3(shadowModelView) * mod(rayPos + cameraPosition, 512)).xy / 128;
 
-    float t = frameTimeCounter * 0.005;
+    float t = worldTimeCounter * 0.005;
     float caustics = max(
       texture(noisetex, causticsPos + vec2(t, 0.0)).r,
       texture(noisetex, causticsPos + vec2(-t, t)).r
     );
 
-    caustics = pow3(caustics);
+    // caustics = pow3(caustics);
 
     shadow *= caustics;
 

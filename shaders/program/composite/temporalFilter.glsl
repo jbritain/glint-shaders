@@ -85,9 +85,9 @@ void main() {
 
   historyColor.rgb = clamp(historyColor.rgb, minCol, maxCol);
 
-  float weight = rejectSample ? 0.0 : depth != opaqueDepth ? 0.5 : 0.7;
+  float weight = rejectSample ? 0.0 : depth != opaqueDepth ? 0.9 : 0.7;
 
-  // color = mix(color, historyColor, weight);
+  color = mix(color, historyColor, weight);
 
   newHistory.rgb = color.rgb;
 }

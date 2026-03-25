@@ -88,21 +88,21 @@ float getBlockerDistance(
   }
 }
 
-float getShadowScreenSpace(vec3 viewPos, vec3 playerNormal) {
-  vec3 p;
-  return rayIntersects(
-    viewPos,
-    lightDir,
-    SCREEN_SPACE_SHADOW_STEPS,
-    blueNoise(gl_FragCoord.xy, frameCounter).r,
-    false,
-    p,
-    depthtex0,
-    gbufferProjection
-  )
-    ? 0.0
-    : 1.0;
-}
+// float getShadowScreenSpace(vec3 viewPos, vec3 playerNormal) {
+//   vec3 p;
+//   return rayIntersects(
+//     viewPos,
+//     lightDir,
+//     SCREEN_SPACE_SHADOW_STEPS,
+//     blueNoise(gl_FragCoord.xy, frameCounter).r,
+//     false,
+//     p,
+//     depthtex0,
+//     gbufferProjection
+//   )
+//     ? 0.0
+//     : 1.0;
+// }
 
 vec3 getShadow(
   vec3 playerPos,
@@ -126,7 +126,7 @@ vec3 getShadow(
     shadowViewPos,
     shadowProjection
   );
-  distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
+  distFade = 0.0; //smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
 
   // vec3 screenSpaceShadow = vec3(1.0);
   // if (distFade > 0.01) {
@@ -180,11 +180,11 @@ float getShadowFast(vec3 playerPos, vec3 playerNormal, float skyLightmap) {
 
   float shadow = texture(shadowtex0HW, shadowScreenPos).r;
 
-  float distFade = smoothstep(
-    0.5,
-    0.9,
-    maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0))
-  );
+  float distFade = 0.0; //smoothstep(
+  //   0.5,
+  //   0.9,
+  //   maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0))
+  // );
   shadow = mix(
     shadow,
     smoothstep(13.5 / 15.0, 14.5 / 15.0, skyLightmap),

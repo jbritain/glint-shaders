@@ -101,4 +101,20 @@ float perlinNoise(
   return value;
 }
 
+vec2 curl(vec2 pos) {
+  const float eps = rcp(maxVec2(textureSize(perlinnoisetex, 0)));
+
+  float n1 = texture(perlinnoisetex, vec2(pos.x + eps, pos.y)).r;
+  float n2 = texture(perlinnoisetex, vec2(pos.x - eps, pos.y)).r;
+
+  float a = (n1 - n2) / (2.0 * eps);
+
+  n1 = texture(perlinnoisetex, vec2(pos.x, pos.y + eps)).r;
+  n2 = texture(perlinnoisetex, vec2(pos.x, pos.y - eps)).r;
+
+  float b = (n1 - n2) / (2.0 * eps);
+
+  return vec2(b, -a);
+}
+
 #endif

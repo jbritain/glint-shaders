@@ -36,6 +36,7 @@ void main() {
 #include "/lib/atmosphere/atmosphericFog.glsl"
 #include "/lib/atmosphere/volumetricFog.glsl"
 #include "/lib/lighting/cloudShadows.glsl"
+#include "/lib/util/screenSpaceRayTrace.glsl"
 
 in vec2 texcoord;
 
@@ -88,7 +89,7 @@ void main() {
     gbuffer.surfaceNormal = getWaterParallaxNormal(
       translucentFeetPlayerPos,
       gbuffer.geometryNormal,
-      interleavedGradientNoise(floor(gl_FragCoord.xy)),
+      blueNoise(gl_FragCoord.xy, frameCounter).r,
       1.0
     );
   }
@@ -99,10 +100,6 @@ void main() {
   float opaqueDepth = texture(depthtex2, texcoord).r;
   vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
   voxyOverride(opaqueDepth, opaqueViewPos, texcoord, true);
-  vec3 opaqueFeetPlayerPos = transformView(
-    opaqueViewPos,
-    gbufferModelViewInverse
-  );
 
   // REFRACTION
   float refractedRayLength = distance(translucentViewPos, opaqueViewPos);
@@ -111,25 +108,48 @@ void main() {
   if (!inWater) {
     ior = 1.0 / ior;
   }
-  vec3 refractedDir = refract(
-    viewDir,
+  #ifdef REFRACTION_NORMAL_HACK
+  vec3 refractionNormal =
     ior < 1.0
       ? viewGeometryNormal - viewSurfaceNormal
-      : viewSurfaceNormal,
-    ior
-  );
+      : viewSurfaceNormal;
+  #else
+  vec3 refractionNormal = viewSurfaceNormal;
+  #endif
 
-  vec3 refractedPos = translucentViewPos + refractedDir * refractedRayLength;
-  refractedPos = viewSpaceToScreenSpace(refractedPos);
+  vec3 refractedDir = refract(viewDir, refractionNormal, ior);
+
+  #ifdef RT_REFRACTION
+  vec3 refractedPos;
+  if (
+    !rayIntersects(
+      translucentViewPos,
+      refractedDir,
+      RT_REFRACTION_STEPS,
+      interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+      true,
+      refractedPos,
+      depthtex1,
+      gbufferProjection
+    )
+  ) {
+    refractedPos = vec3(-1.0);
+  } else {
+    opaqueViewPos = screenSpaceToViewSpace(refractedPos);
+  }
+  #else
+  opaqueViewPos = translucentViewPos + refractedDir * refractedRayLength;
+  vec3 refractedPos = viewSpaceToScreenSpace(opaqueViewPos);
+  #endif
   float refractedDepth = texture(depthtex1, refractedPos.xy).r;
   if (clamp01(refractedPos) == refractedPos && refractedDepth != 1.0) {
     if (refractedDepth > translucentDepth) {
       color.rgb = texture(colortex0, refractedPos.xy).rgb;
     }
-  } else {
+  } else if (inWater || !isWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
     vec3 sky = getSky(skyDir, true);
-    #ifdef VOLUMETRIC_CLOUDS
+    #ifdef CLOUDS
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
     #endif
@@ -137,6 +157,11 @@ void main() {
     // sky = fma(sky, vec3(fog.a), fog.rgb);
     color.rgb = sky * gbuffer.lightmap.y;
   }
+
+  vec3 opaqueFeetPlayerPos = transformView(
+    opaqueViewPos,
+    gbufferModelViewInverse
+  );
 
   #ifdef MULTIPLICATIVE_TRANSLUCENTS
   if (!isWater) {

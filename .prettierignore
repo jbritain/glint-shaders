@@ -1,0 +1,4 @@
+shaders/lib/common/settings.glsl
+*.pyc
+*.md
+package-lock.json

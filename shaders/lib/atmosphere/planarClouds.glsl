@@ -20,33 +20,17 @@
 #include "/lib/util/misc.glsl"
 #include "/lib/util/perlinNoise.glsl"
 
-vec2 curl(vec2 pos) {
-  const float eps = rcp(maxVec2(textureSize(perlinnoisetex, 0)));
-
-  float n1 = texture(perlinnoisetex, vec2(pos.x + eps, pos.y)).r;
-  float n2 = texture(perlinnoisetex, vec2(pos.x - eps, pos.y)).r;
-
-  float a = (n1 - n2) / (2.0 * eps);
-
-  n1 = texture(perlinnoisetex, vec2(pos.x, pos.y + eps)).r;
-  n2 = texture(perlinnoisetex, vec2(pos.x, pos.y - eps)).r;
-
-  float b = (n1 - n2) / (2.0 * eps);
-
-  return vec2(b, -a);
-}
-
 float getPlanarCloudDensity(vec2 pos, bool highSamples) {
   float density = 0.0;
   float weight = 0.0;
 
   pos = pos / 500000;
 
-  pos += curl(pos * 0.9 - vec2(frameTimeCounter * 0.0001, 0.0)) / 5000.0;
+  pos += curl(pos * 0.9 - vec2(0.0, worldTimeCounter * 0.0001)) / 5000.0;
 
   for (int i = 0; i < 16; i++) {
     float sampleWeight = exp2(-float(i));
-    pos.y += frameTimeCounter * 0.000025 * sqrt(i + 1);
+    pos.y += worldTimeCounter * 0.000025 * sqrt(i + 1);
     vec2 samplePos = pos * exp2(float(i));
 
     density += texture(perlinnoisetex, fract(samplePos)).r * sampleWeight;
@@ -60,7 +44,7 @@ float getPlanarCloudDensity(vec2 pos, bool highSamples) {
 
   density /= weight;
 
-  float coverageFactor = 1.0 - (pow2(PLANAR_CLOUD_COVERAGE) * 0.5 + 0.5);
+  float coverageFactor = 1.0 - (pow2(PLANAR_CLOUDS_COVERAGE) * 0.5 + 0.5);
 
   density = smoothstep(
     mix(
@@ -72,7 +56,7 @@ float getPlanarCloudDensity(vec2 pos, bool highSamples) {
     density
   );
 
-  density *= PLANAR_CLOUD_DENSITY;
+  density *= PLANAR_CLOUDS_DENSITY;
 
   return density;
 }
