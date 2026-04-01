@@ -6,13 +6,6 @@
 // GTAO BY CYBEREALITY
 // https://cybereality.com/screen-space-indirect-lighting-with-visibility-bitmask-improvement-to-gtao-ssao-real-time-ambient-occlusion-algorithm-glsl-shader-implementation/
 
-// https://graphics.stanford.edu/%7Eseander/bithacks.html
-uint bitCount(uint value) {
-  value = value - ((value >> 1u) & 0x55555555u);
-  value = (value & 0x33333333u) + ((value >> 2u) & 0x33333333u);
-  return ((value + (value >> 4u)) & 0xF0F0F0Fu) * 0x1010101u >> 24u;
-}
-
 // https://cdrinmatane.github.io/posts/ssaovb-code/
 const uint sectorCount = 32u;
 uint updateSectors(float minHorizon, float maxHorizon, uint outBitfield) {

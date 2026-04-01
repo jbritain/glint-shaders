@@ -42,6 +42,10 @@ void main() {
   float averageLuminance = textureLod(colortex0, vec2(0.5), maxMipLevel).a;
 
   if (gl_FragCoord.xy == vec2(0.5)) {
+    if(frameCounter <= 1){
+      averageLuminanceSmooth = averageLuminance;
+    }
+
     averageLuminanceSmooth = mix(
       averageLuminance,
       averageLuminanceSmooth,

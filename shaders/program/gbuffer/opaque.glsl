@@ -61,7 +61,7 @@ in vec3 viewPos;
 
 flat in uint materialID;
 
-#ifdef SSAO
+#if AO > 0
 /* RENDERTARGETS: 1,2 */
 #else
 /* RENDERTARGETS: 1,2,3 */
