@@ -155,11 +155,20 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
 
             recurse_settings(pack, name, value, sliders, depth + 1)
         else:
+            if "condition" in value.keys():
+                pack["settings"].append(f"{'  ' * depth}#if {value['condition']}")
+                pack["settings"].append(f"{'  ' * (depth + 1) }#define {value['key']}")
+                pack["settings"].append(f"{'  ' * depth}#endif")
+                continue
+
             if not "hidden" in value.keys() or (value["hidden"] == False):
                 screen += f" {value["key"]}"
 
             if not "default" in value.keys():
                 value["default"] = ""
+
+            if "default" in value.keys() and not "values" in value.keys():
+                value["values"] = f"[ {value['default']}]"
 
             disabled = False
             if isinstance(value["default"], bool):
@@ -169,8 +178,8 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
             values = ""
             if "values" in value.keys():
                 values = eval('f"' + value["values"] + '"')
-                values = re.sub(r"\s\s+", " ", values)
                 values = values.replace("-", " -")
+                values = re.sub(r"\s\s+", " ", values)
                 values = values.replace("[ ", "[")
 
                 values = "// " + values

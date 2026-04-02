@@ -16,7 +16,8 @@
         "key": "shadowMapResolution",
         "default": "2048",
         "values": "[1024 2048 4096 8192]",
-        "const": true
+        "const": true,
+        "type": "int"
       },
       "Sun Angle": {
         "key": "sunPathRotation",
@@ -71,6 +72,10 @@
           "SSAO",
           "GTAO"
         ]
+      },
+      "SSAO": {
+        "key": "SSAO",
+        "condition": "AO > 0"
       },
       "Ambient Occlusion Samples": {
         "key": "AO_SAMPLES",

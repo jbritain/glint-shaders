@@ -109,7 +109,8 @@ void main() {
   }
 
   // show(texture(shadowtex0, texcoord));
-  show(texture(shadowcolor0, texcoord));
+  // show(texture(shadowcolor0, texcoord));
+
 }
 
 #endif

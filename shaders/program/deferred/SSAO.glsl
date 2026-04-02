@@ -52,9 +52,9 @@ void main() {
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
-  #if OCCLUSION == 1
+  #if AO == 1
   occlusion = getSSAO(viewPos, gbuffer.geometryNormal);
-  #elif OCCLUSION == 2
+  #elif AO == 2
   occlusion = getGTAO(
     viewPos,
     mat3(gbufferModelView) * gbuffer.geometryNormal,
