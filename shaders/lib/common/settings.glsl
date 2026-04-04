@@ -81,6 +81,11 @@
     #define PLANAR_CLOUDS_MULTIPLE_SCATTERING 50.0 // [50.0]
 
 // Water
+  #define VOLUMETRIC_WATER  // [True]
+  #ifdef VOLUMETRIC_WATER
+  #endif
+  #define VOLUMETRIC_WATER_SAMPLES 8 // [4 5 6 7 8 9 10 11 12 13 14 15 16]
+  #define WATER_MULTIPLE_SCATTERING 10 // [10]
   #define WATER_PARALLAX  // [True]
   #ifdef WATER_PARALLAX
   #endif

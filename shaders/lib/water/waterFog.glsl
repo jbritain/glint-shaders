@@ -30,7 +30,8 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
 
   vec3 dir = normalize(end - start);
   // float phase = dualHenyeyGreenstein(0.7, 0.2, dot(dir, worldLightDir), 0.5);
-  float phase = henyeyGreenstein(0.8, dot(dir, worldLightDir));
+  // float phase = henyeyGreenstein(0.9, dot(dir, worldLightDir));
+  float phase = fournierForand(0.01, 1.333, dot(dir, worldLightDir));
 
   vec3 rayStep = (end - start) / VOLUMETRIC_WATER_SAMPLES;
   float stepLength = length(rayStep);

@@ -17,34 +17,31 @@
 #include "/lib/atmosphere/volumetricClouds.glsl"
 #include "/lib/atmosphere/planarClouds.glsl"
 
-float getCloudShadow(vec3 pos) {
+float getCloudShadow(vec3 rayPos) {
   #ifdef CLOUDS
   float shadow = 1.0;
 
-  vec3 dir = normalize(pos);
+  vec3 dir = normalize(rayPos);
 
-  pos += cameraPosition;
+  rayPos += cameraPosition;
   if (
     rayPlaneIntersection(
-      pos,
+      rayPos,
       worldLightDir,
       mix(
         float(VOLUMETRIC_CLOUDS_BASE_ALTITUDE),
         float(VOLUMETRIC_CLOUDS_TOP_ALTITUDE),
         0.2
       ),
-      pos
+      rayPos
     )
   ) {
-    vec2 windDir = vec2(0.0, 1.0);
     vec2 wind = windDir * worldTimeCounter;
-    pos.xz += wind;
     float coverage = smoothstep(
       0.7 * (1.0 - wetness),
       1.0,
-      texture(cloudcoveragetex, fract(pos.xz / 50000.0)).r
+      texture(cloudcoveragetex, fract(rayPos.xz / 50000.0) + wind * 0.0005).r
     );
-
     shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
   }
 

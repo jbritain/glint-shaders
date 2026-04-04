@@ -30,7 +30,7 @@ void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
-  vec2 lmcoord = gl_MultiTexCoord1.xy / 255.0;
+  vec2 lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
   lightmap = lmcoord / (30.0 / 32.0) - 1.0 / 32.0;
 
   tbn[0] = normalize(gl_NormalMatrix * at_tangent.xyz);
@@ -112,7 +112,13 @@ void main() {
   }
 
   gbuffer.lightmap = applyLightmapFalloff(lightmap);
-  // gbuffer.lightmap *= applyDirectionalLightmap(lightmap, viewPos, surfaceNormal, tbn, material.subsurface);
+  gbuffer.lightmap *= applyDirectionalLightmap(
+    lightmap,
+    viewPos,
+    surfaceNormal,
+    tbn,
+    material.subsurface
+  );
 
   gbufferData = packGbuffer(gbuffer);
   materialData = packMaterial(material);

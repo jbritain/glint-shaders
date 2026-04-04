@@ -29,9 +29,7 @@ const float cloudScattering = 2.0;
 const float cloudAbsorption = 0.2;
 const float cloudExtinction = cloudScattering + cloudAbsorption;
 
-// float get2DCloudDensity(vec3 rayPos){
-
-// }
+const vec2 windDir = vec2(0.0, 1.0);
 
 float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
   #if VOLUMETRIC_CLOUDS_STYLE == 2
@@ -40,10 +38,8 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
 
   return texelFetch(vanillacloudtex, p, 0).r * CLOUDS_DENSITY;
   #else
-  vec2 windDir = vec2(0.0, 1.0);
-  vec2 wind = windDir * worldTimeCounter;
 
-  rayPos.xz += wind;
+  vec2 wind = windDir * worldTimeCounter;
 
   #if VOLUMETRIC_CLOUDS_STYLE == 1
   rayPos = floor(rayPos / 16) * 16;
@@ -54,7 +50,6 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
     VOLUMETRIC_CLOUDS_TOP_ALTITUDE,
     rayPos.y
   );
-  // rayPos.xz += windDir * heightInPlane * 20.0;
 
   // Based loosely upon "Real Time Volumetric Cloudscapes" by Andrew Schneider in GPU Pro 7
   // Coverage texture generated with 'Strepitus' by luna5ama (https://github.com/luna5ama/strepitus)
@@ -62,7 +57,7 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
   float coverage = smoothstep(
     0.7 * (1.0 - wetness),
     1.0,
-    texture(cloudcoveragetex, fract(rayPos.xz / 50000.0)).r
+    texture(cloudcoveragetex, fract(rayPos.xz / 50000.0) + wind * 0.0005).r
   ); // todo: make this a setting so it's consistent for cloud shadows
   // coverage += rainStrength;
   coverage *= heightInPlane * 0.3 + 0.7;

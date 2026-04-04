@@ -84,7 +84,7 @@
       },
       "Ambient Occlusion Radius": {
         "key": "AO_RADIUS",
-        "default": "2",
+        "default": "1",
         "values": "{frange(0.1, 5.1, 0.1)}"
       },
       "GTAO Direction Sample Count": {
@@ -272,6 +272,19 @@
     }
   },
   "Water": {
+    "Volumetric Water": {
+      "key": "VOLUMETRIC_WATER",
+      "default": true
+    },
+    "Volumetric Water Samples": {
+      "key": "VOLUMETRIC_WATER_SAMPLES",
+      "default": "8",
+      "values": "{frange(4, 17, 1)}"
+    },
+    "Water Multiple Scattering": {
+      "key": "WATER_MULTIPLE_SCATTERING",
+      "default": "10"
+    },
     "Water Parallax": {
       "key": "WATER_PARALLAX",
       "default": true

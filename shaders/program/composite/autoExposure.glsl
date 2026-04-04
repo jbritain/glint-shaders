@@ -42,7 +42,7 @@ void main() {
   float averageLuminance = textureLod(colortex0, vec2(0.5), maxMipLevel).a;
 
   if (gl_FragCoord.xy == vec2(0.5)) {
-    if(frameCounter <= 1){
+    if (frameCounter <= 1) {
       averageLuminanceSmooth = averageLuminance;
     }
 
@@ -62,7 +62,14 @@ void main() {
     pow(2.0, EV100 - EXPOSURE_COMPENSATION) /
     (LENS_VIGNETTE * SENSOR_SENSITIVITY);
   float exposure = rcp(Lmax);
+  exposure = clamp(exposure, 0.0, 0.1);
   color *= exposure;
+
+  // float purkinje = smoothstep(0.04, 0.05, exposure);
+  // color = hsv(color);
+  // color.g *= 1.0 - purkinje * 0.5;
+  // color = rgb(color);
+  // color.rg *= 1.0 - purkinje * 0.2;
 
 }
 

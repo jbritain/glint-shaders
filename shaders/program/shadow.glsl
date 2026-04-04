@@ -63,15 +63,18 @@ flat in uint materialID;
 
 #include "/lib/water/waveNormals.glsl"
 
-/* RENDERTARGETS: 0,1 */
+/* RENDERTARGETS: 0,1,2 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec2 encodedNormal;
+layout(location = 2) out float caustics;
 
 void main() {
   color = texture(gtexture, texcoord) * glcolor;
   if (color.a < alphaTestRef) {
     discard;
   }
+
+  caustics = 1.0;
 
   if (materialIsWater(materialID)) {
     float blockerDistance =
@@ -82,23 +85,23 @@ void main() {
     color.rgb = exp(-waterExtinction * blockerDistance);
     color.a = 0.0;
 
-    // vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
-    // vec3 wave = waveNormal(
-    //   feetPlayerPos.xz + cameraPosition.xz,
-    //   vec3(0.0, 1.0, 0.0),
-    //   1.0
-    // );
+    vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
+    vec3 wave = waveNormal(
+      feetPlayerPos.xz + cameraPosition.xz,
+      vec3(0.0, 1.0, 0.0),
+      1.0
+    );
 
-    // vec3 refracted = refract(worldLightDir, wave, 1.0 / 1.33);
-    // vec3 oldPos = feetPlayerPos + worldLightDir * blockerDistance;
-    // vec3 newPos = feetPlayerPos + refracted * blockerDistance;
+    vec3 refracted = refract(-worldLightDir, wave, 1.0 / 1.33);
+    vec3 oldPos = feetPlayerPos - worldLightDir * blockerDistance;
+    vec3 newPos = feetPlayerPos + refracted * blockerDistance;
 
-    // // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
-    // // I do not understand entirely what this does but it seems to work
-    // float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
-    // float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
+    // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
+    // I do not understand entirely what this does but it seems to work
+    float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
+    float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-    // color.a = 1.0 - (oldArea / newArea);
+    caustics = oldArea / newArea;
 
   }
 

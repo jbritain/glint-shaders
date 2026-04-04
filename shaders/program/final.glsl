@@ -34,6 +34,8 @@ uniform sampler2D debugtex;
 #include "/lib/post/tonemap.glsl"
 #include "/lib/util/dither.glsl"
 #include "/lib/util/rectilinearWarp.glsl"
+#include "/lib/util/textRenderer.glsl"
+#include "/lib/post/camera.glsl"
 
 void main() {
   color = pow(texture(colortex0, texcoord).rgb, vec3(rcp(2.2)));
@@ -43,6 +45,19 @@ void main() {
   if (hideGUI) {
     color = texture(debugtex, texcoord).rgb;
   }
+
+  beginText(ivec2(gl_FragCoord.xy / 2.0), ivec2(0, viewHeight / 2.0) + ivec2(8, -8));
+  printString((_D, _e, _b, _u, _g, _space, _m, _o, _d, _e, _space, _i, _s, _space, _a, _c, _t, _i, _v, _e));
+  printLine();
+  printString((_F, _r, _a, _m, _e, _colon, _space));
+  printInt(frameCounter);
+  printLine();
+
+  if (!hideGUI) {
+    printString((_P, _r, _e, _s, _s, _space, _F, _1, _space, _a, _n, _d, _space, _c, _a, _l, _l, _space, _s, _h, _o, _w, _opprn, _clprn));
+  }
+
+  endText(color.rgb);
   #endif
 
   #ifdef DEBUG_RECTILINEAR
