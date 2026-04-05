@@ -74,7 +74,7 @@ void main() {
     globalIllumination = mix(
       globalIllumination,
       previousglobalIllumination,
-      0.9
+      0.95
     );
   }
 

@@ -74,7 +74,7 @@ void main() {
     discard;
   }
 
-  caustics = 1.0;
+  caustics = 0.5;
 
   if (materialIsWater(materialID)) {
     float blockerDistance =

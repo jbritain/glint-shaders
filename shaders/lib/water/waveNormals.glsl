@@ -14,63 +14,55 @@
 #ifndef WAVE_NORMALS_GLSL
 #define WAVE_NORMALS_GLSL
 
-// "Very fast procedural ocean" by afl_ext
-// https://www.shadertoy.com/view/MdXyzX
-// https://opensource.org/license/mit
+#include "/lib/util/perlinNoise.glsl"
 
-#define DRAG_MULT 0.0 // changes how much waves pull on the water
-#define WAVE_E 0.1
-#define WAVE_DEPTH 0.3 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define WAVE_E 0.05
 
-// Calculates wave value and its derivative,
-// for the wave direction, position in space, wave frequency and time
-vec2 wavedx(vec2 position, vec2 direction, float frequency, float timeshift) {
-  float x = dot(direction, position) * frequency + timeshift;
-  x = mod(x, 2 * PI);
-  float wave = exp(sin(x) - 1.0) * 0.5;
-  float dx = wave * cos(x);
-  return vec2(wave, -dx);
+#define WAVE_INITIAL_AMPLITUDE 0.05
+#define WAVE_INITIAL_WAVELENGTH 10.0
+#define WAVE_AMPLITUDE_MULTIPLIER 0.8
+#define WAVE_WAVELENGTH_MULTIPLIER 0.8
+#define WAVE_OCTAVES 12
+
+const float totalWaveAmplitude =
+  WAVE_INITIAL_AMPLITUDE *
+  (1.0 - pow(WAVE_AMPLITUDE_MULTIPLIER, float(WAVE_OCTAVES))) /
+  (1.0 - WAVE_AMPLITUDE_MULTIPLIER);
+
+const float g = 9.8;
+
+float gerstner(vec2 pos, vec2 dir, float wavelength, float amplitude, float t) {
+  float k = TAU / wavelength;
+  float omega = sqrt(g * k);
+  vec2 K = normalize(dir) * k; // ensure dir is normalized
+
+  return amplitude * (cos(mod(dot(K, pos) - omega * t, TAU)) * 0.5 + 0.5);
 }
 
 // Calculates waves by summing octaves of various waves with various parameters
-float waveHeight(vec2 position) {
-  float wavePhaseShift = length(position) * 0.1; // this is to avoid every octave having exactly the same phase everywhere
-  float iter = 0.0; // this will help generating well distributed wave directions
-  float frequency = 1.0; // frequency of the wave, this will change every iteration
-  float timeMultiplier = 2.0; // time multiplier for the wave, this will change every iteration
-  float weight = 1.0; // weight in final sum for the wave, this will change every iteration
-  float sumOfValues = 0.0; // will store final sum of values
-  float sumOfWeights = 0.0; // will store final sum of weights
-  for (int i = 0; i < 16; i++) {
-    // generate some wave direction that looks kind of random
-    vec2 p = vec2(sin(mod(iter, 2 * PI)), cos(mod(iter, 2 * PI)));
+float waveHeight(vec2 pos) {
+  float noise = texture(
+    perlinnoisetex,
+    fract((pos + vec2(frameTimeCounter)) / 1500)
+  ).r;
 
-    // calculate wave data
-    vec2 res = wavedx(
-      position,
-      p,
-      frequency,
-      frameTimeCounter * timeMultiplier + wavePhaseShift
-    );
+  float height = 0.0;
+  float wavelength = WAVE_INITIAL_WAVELENGTH;
+  float amplitude = WAVE_INITIAL_AMPLITUDE;
 
-    // shift position around according to wave drag and derivative of the wave
-    position += p * res.y * weight * DRAG_MULT;
+  show(noise);
+  pos += (vec2(noise, -noise) * 2.0 - 1.0) * 20;
 
-    // add the results to sums
-    sumOfValues += res.x * weight;
-    sumOfWeights += weight;
-
-    // modify next octave ;
-    weight = mix(weight, 0.0, 0.2);
-    frequency *= 1.18;
-    timeMultiplier *= 1.07;
-
-    // add some kind of random value to make next wave look random too
-    iter += 1232.399963;
+  for (int i = 0; i < WAVE_OCTAVES; i++) {
+    float r = mod(i, TAU);
+    vec2 dir = vec2(sin(r), cos(r));
+    height += gerstner(pos, dir, wavelength, amplitude, frameTimeCounter * 0.5);
+    wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
+    amplitude *= WAVE_AMPLITUDE_MULTIPLIER;
   }
 
-  // calculate and return
-  return sumOfValues / sumOfWeights;
+  return height;
+
 }
 
 vec3 rotate(vec3 vector, vec3 from, vec3 to) {
@@ -99,7 +91,7 @@ vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float heightmapFactor) {
   // }
 
   vec2 ex = vec2(WAVE_E, 0);
-  float H = waveHeight(pos.xy) * WAVE_DEPTH * heightmapFactor;
+  float H = waveHeight(pos.xy) * heightmapFactor;
 
   vec3 a = vec3(pos.x, H, pos.y);
   vec3 waveNormal = normalize(
@@ -107,13 +99,13 @@ vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float heightmapFactor) {
       a -
         vec3(
           pos.x - WAVE_E,
-          waveHeight(pos.xy - ex.xy) * WAVE_DEPTH * heightmapFactor,
+          waveHeight(pos.xy - ex.xy) * heightmapFactor,
           pos.y
         ),
       a -
         vec3(
           pos.x,
-          waveHeight(pos.xy + ex.yx) * WAVE_DEPTH * heightmapFactor,
+          waveHeight(pos.xy + ex.yx) * heightmapFactor,
           pos.y + WAVE_E
         )
     )
@@ -134,7 +126,8 @@ vec3 getWaterParallaxNormal(
   // we know no wave is ever more than WAVE_DEPTH above the surface
   // so we shift the ray forwards until it is WAVE_DEPTH above the surface
   float fractionalDistance;
-  fractionalDistance = (abs(playerPos.y) - WAVE_DEPTH) / abs(playerPos.y);
+  fractionalDistance =
+    (abs(playerPos.y) - totalWaveAmplitude) / abs(playerPos.y);
   vec3 origin = playerPos * fractionalDistance;
 
   vec3 increment = (playerPos - origin) / float(WATER_PARALLAX_SAMPLES);

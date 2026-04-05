@@ -94,6 +94,7 @@ void main() {
     material.f0 = vec3(0.02);
     material.albedo = vec3(0.0);
     color.a = 0.01;
+
   }
 
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
