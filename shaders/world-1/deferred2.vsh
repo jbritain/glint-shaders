@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_THE_NETHER
 #define vsh
-#include "/program/deferred/RSMDenoise.glsl"
+#include "/program/deferred/opaqueSSR.glsl"

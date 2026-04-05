@@ -17,7 +17,7 @@
 #include "/lib/util/dither.glsl"
 
 vec3 getSurfaceNormal(vec2 texcoord, mat3 tbn) {
-  vec3 surfaceNormal = texture(normals, texcoord).rgb;
+  vec3 surfaceNormal = textureLod(normals, texcoord, 0).rgb;
   surfaceNormal = surfaceNormal * 2.0 - 1.0;
   surfaceNormal.z = sqrt(1.0 - dot(surfaceNormal.xy, surfaceNormal.xy)); // reconstruct z due to labPBR encoding
 

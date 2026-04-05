@@ -57,11 +57,7 @@
         "programs": ["vsh", "fsh"],
         "enabledBy": "RSM"
       },      
-      {
-        "path": "RSMDenoise",
-        "programs": ["vsh", "fsh"],
-        "enabledBy": "RSM"
-      },
+
       {
         "path": "opaqueSSR",
         "programs": ["vsh", "fsh"]
