@@ -81,7 +81,6 @@ void main() {
   #endif
 
   float occlusion = texture(colortex3, texcoord).r;
-  show(occlusion);
 
   vec3 specularc = texture(colortex7, texcoord).rgb;
   vec3 f = fresnelRoughness(

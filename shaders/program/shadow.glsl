@@ -149,7 +149,7 @@ void main() {
       1.0
     );
 
-    vec3 refracted = refract(worldLightDir, wave, 1.0 / 1.33);
+    vec3 refracted = refract(worldLightDir, wave, 1.0 / 1.333);
     vec3 oldPos = feetPlayerPos; // - worldLightDir * blockerDistance;
     vec3 newPos = feetPlayerPos + refracted * blockerDistance;
 
@@ -158,7 +158,7 @@ void main() {
     float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
     float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-    caustics = sqrt(oldArea / newArea);
+    caustics = oldArea / newArea * 0.2;
 
   }
 

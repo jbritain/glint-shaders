@@ -51,7 +51,7 @@ void main() {
 
   float opaqueDepth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
-  newHistory.a = screenSpaceToViewSpace(opaqueDepth);
+  newHistory.a = screenSpaceToViewSpace(depth);
 
   vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
   feetPlayerPos += cameraPosition;
@@ -65,9 +65,10 @@ void main() {
   bool rejectSample = clamp01(previousScreenPos.xy) != previousScreenPos.xy;
 
   vec4 historyColor = texture(colortex5, previousScreenPos.xy);
-  actualPreviousViewPos.z = screenSpaceToViewSpace(historyColor.a);
-  // rejectSample =
-  //   rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
+  actualPreviousViewPos.z = historyColor.a;
+
+  rejectSample =
+    rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
 
   // neighbourhood clamping
   vec3 maxCol = vec3(0.0);
@@ -90,6 +91,8 @@ void main() {
   color = mix(color, historyColor, weight);
 
   newHistory.rgb = color.rgb;
+
+  show(rejectSample);
 }
 
 #endif
