@@ -64,7 +64,9 @@ def generate_gbuffers(pack):
         )
 
     if os.path.exists(f"{shaders_path}/program/shadow.glsl"):
-        create_linked_shader_program(f"shadow", f"program/shadow.glsl")
+        create_linked_shader_program(
+            f"shadow", f"program/shadow.glsl", defines={"SHADOW": ""}
+        )
 
     if os.path.exists(f"{shaders_path}/program/shadow_voxels.glsl"):
         create_linked_shader_program(f"shadow_voxels", f"program/shadow_voxels.glsl")

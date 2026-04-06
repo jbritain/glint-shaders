@@ -93,7 +93,7 @@
       },
       "GTAO Thickness": {
         "key": "GTAO_THICKNESS",
-        "default": "4"
+        "default": "0.5 "
       }
     },
     "Reflections": {

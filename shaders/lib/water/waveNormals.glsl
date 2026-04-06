@@ -16,8 +16,6 @@
 
 #include "/lib/util/perlinNoise.glsl"
 
-#define WAVE_E 0.05
-
 #define WAVE_INITIAL_AMPLITUDE 0.05
 #define WAVE_INITIAL_WAVELENGTH 10.0
 #define WAVE_AMPLITUDE_MULTIPLIER 0.8
@@ -39,7 +37,21 @@ float gerstner(vec2 pos, vec2 dir, float wavelength, float amplitude, float t) {
   return amplitude * (cos(mod(dot(K, pos) - omega * t, TAU)) * 0.5 + 0.5);
 }
 
-// Calculates waves by summing octaves of various waves with various parameters
+vec2 gerstnerDeriv(
+  vec2 pos,
+  vec2 dir,
+  float wavelength,
+  float amplitude,
+  float t
+) {
+  float k = TAU / wavelength;
+  float omega = sqrt(g * k);
+  vec2 K = normalize(dir) * k;
+
+  float phase = dot(K, pos) - omega * t;
+  return -(amplitude / 2.0) * sin(phase) * K;
+}
+
 float waveHeight(vec2 pos) {
   float noise = texture(
     perlinnoisetex,
@@ -50,10 +62,13 @@ float waveHeight(vec2 pos) {
   float wavelength = WAVE_INITIAL_WAVELENGTH;
   float amplitude = WAVE_INITIAL_AMPLITUDE;
 
+  // TODO: the noise texture adds artifacts to caustics so we disable it in the shadow program
+  #ifndef SHADOW
   pos += (vec2(noise, -noise) * 2.0 - 1.0) * 20;
+  #endif
 
   for (int i = 0; i < WAVE_OCTAVES; i++) {
-    float r = mod(i, TAU);
+    float r = mod(i * 11.23456, TAU);
     vec2 dir = vec2(sin(r), cos(r));
     height += gerstner(pos, dir, wavelength, amplitude, frameTimeCounter * 0.5);
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
@@ -62,6 +77,37 @@ float waveHeight(vec2 pos) {
 
   return height;
 
+}
+
+vec2 waveHeightDeriv(vec2 pos) {
+  float noise = texture(
+    perlinnoisetex,
+    fract((pos + vec2(frameTimeCounter)) / 1500.0)
+  ).r;
+
+  #ifndef SHADOW
+  pos += (vec2(noise, -noise) * 2.0 - 1.0) * 20.0; // technically we need to differentiate the noise as well but who tf wants to do that
+  #endif
+
+  vec2 grad = vec2(0.0);
+  float wavelength = WAVE_INITIAL_WAVELENGTH;
+  float amplitude = WAVE_INITIAL_AMPLITUDE;
+
+  for (int i = 0; i < WAVE_OCTAVES; i++) {
+    float r = mod(float(i * 11.23456), TAU);
+    vec2 dir = vec2(sin(r), cos(r));
+    grad += gerstnerDeriv(
+      pos,
+      dir,
+      wavelength,
+      amplitude,
+      frameTimeCounter * 0.5
+    );
+    wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
+    amplitude *= WAVE_AMPLITUDE_MULTIPLIER;
+  }
+
+  return grad;
 }
 
 vec3 rotate(vec3 vector, vec3 from, vec3 to) {
@@ -89,26 +135,8 @@ vec3 waveNormal(vec2 pos, vec3 worldFaceNormal, float heightmapFactor) {
   // return worldFaceNormal;
   // }
 
-  vec2 ex = vec2(WAVE_E, 0);
-  float H = waveHeight(pos.xy) * heightmapFactor;
-
-  vec3 a = vec3(pos.x, H, pos.y);
-  vec3 waveNormal = normalize(
-    cross(
-      a -
-        vec3(
-          pos.x - WAVE_E,
-          waveHeight(pos.xy - ex.xy) * heightmapFactor,
-          pos.y
-        ),
-      a -
-        vec3(
-          pos.x,
-          waveHeight(pos.xy + ex.yx) * heightmapFactor,
-          pos.y + WAVE_E
-        )
-    )
-  );
+  vec2 deriv = waveHeightDeriv(pos);
+  vec3 waveNormal = normalize(vec3(-deriv.x, 1.0, -deriv.y));
 
   // rotate to align with face normal since the normal calculation assumes a surface facing straight up
   waveNormal = rotate(waveNormal, vec3(0.0, 1.0, 0.0), worldFaceNormal);

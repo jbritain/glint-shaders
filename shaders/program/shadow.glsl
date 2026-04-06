@@ -131,7 +131,7 @@ void main() {
     discard;
   }
 
-  caustics = 0.5;
+  caustics = 1.0;
 
   if (materialIsWater(materialID)) {
     float blockerDistance =
@@ -149,8 +149,8 @@ void main() {
       1.0
     );
 
-    vec3 refracted = refract(-worldLightDir, wave, 1.0 / 1.33);
-    vec3 oldPos = feetPlayerPos - worldLightDir * blockerDistance;
+    vec3 refracted = refract(worldLightDir, wave, 1.0 / 1.33);
+    vec3 oldPos = feetPlayerPos; // - worldLightDir * blockerDistance;
     vec3 newPos = feetPlayerPos + refracted * blockerDistance;
 
     // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
@@ -158,7 +158,7 @@ void main() {
     float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
     float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-    caustics = oldArea / newArea;
+    caustics = sqrt(oldArea / newArea);
 
   }
 

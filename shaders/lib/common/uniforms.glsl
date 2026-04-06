@@ -179,10 +179,8 @@ uniform sampler2D radiosity_direct;
 uniform sampler2D radiosity_direct_soft;
 #endif
 
-#ifdef FLOODFILL
 uniform usampler3D voxelMapTex;
 uniform sampler3D floodfillVoxelMapTex1;
 uniform sampler3D floodfillVoxelMapTex2;
-#endif
 
 #endif // UNIFORMS_GLSL

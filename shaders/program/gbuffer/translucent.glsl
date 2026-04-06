@@ -131,8 +131,7 @@ void main() {
     EMISSIVE_STRENGTH /
     16;
   #else
-  color.rgb +=
-    gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+  color.rgb += gbuffer.lightmap.x * blocklightColor * material.albedo;
   #endif
   color.rgb += material.albedo * material.emission * EMISSIVE_STRENGTH;
 
