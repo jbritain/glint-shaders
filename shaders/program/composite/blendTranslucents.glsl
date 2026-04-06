@@ -227,8 +227,6 @@ void main() {
     color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
   }
 
-  color.rgb = getAtmosphericFog(color.rgb, translucentViewPos);
-
 }
 
 #endif

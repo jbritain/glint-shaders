@@ -33,6 +33,7 @@ void main() {
 #include "/lib/lighting/subsurfaceScattering.glsl"
 #include "/lib/atmosphere/atmosphericFog.glsl"
 #include "/lib/lighting/cloudShadows.glsl"
+#include "/lib/misc/voxel.glsl"
 
 in vec2 texcoord;
 
@@ -113,7 +114,6 @@ void main() {
       sunlightColor *
       material.albedo *
       cloudShadow;
-    // show(texture(colortex9, texcoord).rgb);
     #endif
     #endif
     #endif
@@ -125,8 +125,22 @@ void main() {
     #else
     diffuse +=
       gbuffer.lightmap.y * weatherSkylightColor * material.albedo * occlusion;
+
+    #ifdef FLOODFILL
+    diffuse +=
+      sampleFloodfill(
+        feetPlayerPos,
+        gbuffer.geometryNormal,
+        gbuffer.surfaceNormal,
+        material.subsurface
+      ) *
+      material.albedo *
+      EMISSIVE_STRENGTH /
+      16;
+    #else
     diffuse +=
       gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+    #endif
     #endif
   }
   color.rgb += mix(
@@ -136,11 +150,6 @@ void main() {
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
-
-  color.rgb = getAtmosphericFog(color.rgb, viewPos);
-
-  // show(texture(indirectRadiosityTex, texcoord));
-
 }
 
 #endif

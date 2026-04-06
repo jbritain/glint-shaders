@@ -15,8 +15,11 @@
 #ifdef vsh
 
 layout(r32ui) uniform uimage2D undistortedShadowMap;
+layout(r32ui) uniform uimage3D voxelMap;
 
 in vec2 mc_Entity;
+in vec4 at_midBlock;
+in vec2 mc_midTexCoord;
 
 out vec2 texcoord;
 out vec4 glcolor;
@@ -26,6 +29,7 @@ out vec3 shadowViewPos;
 flat out uint materialID;
 
 #include "/lib/util/rectilinearWarp.glsl"
+#include "/lib/misc/voxel.glsl"
 
 void main() {
   gl_Position = ftransform();
@@ -39,6 +43,59 @@ void main() {
     ivec2(screenPos.xy * imageSize(undistortedShadowMap) + 0.5),
     floatBitsToUint(1.0 - screenPos.z)
   );
+
+  #ifdef FLOODFILL
+  vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
+  vec3 worldNormal = mat3(shadowModelViewInverse) * normal;
+  ivec3 voxelPos = mapVoxelPos(
+    feetPlayerPos +
+      (renderStage == MC_RENDER_STAGE_BLOCK_ENTITIES
+        ? -worldNormal * 0.2
+        : vec3(at_midBlock.xyz * rcp(64.0)))
+  );
+  if (
+    isWithinVoxelBounds(voxelPos) &&
+    gl_VertexID % 4 == 0 &&
+    (renderStage == MC_RENDER_STAGE_TERRAIN_SOLID ||
+      // renderStage == MC_RENDER_STAGE_BLOCK_ENTITIES ||
+      renderStage == MC_RENDER_STAGE_TERRAIN_TRANSLUCENT ||
+      renderStage == MC_RENDER_STAGE_BLOCK_ENTITIES)
+  ) {
+    VoxelData data;
+    vec4 averageTextureData =
+      textureLod(gtexture, mc_midTexCoord, 4) * gl_Color;
+
+    // data.color = getBlocklightColor(materialID);
+
+    data.color = pow(averageTextureData.rgb, vec3(2.2));
+    data.opacity = pow(averageTextureData.a, rcp(3));
+    data.emission = pow2(at_midBlock.w / 15.0);
+
+    // if (isEndPortal(blockEntityId)) {
+    //   data.emission = 1.0;
+    // }
+
+    // data.emission = textureLod(specular, mc_midTexCoord, 4).a;
+    // if(data.emission == 1.0){
+    //     data.emission = 0.0;
+    // }
+
+    // if (isTintedGlass(materialID)) {
+    //   data.opacity = 1.0;
+    // }
+
+    // if (isLetsLightThrough(materialID)) {
+    //   data.opacity = 0.0;
+    // }
+
+    // if (isWater(materialID)) {
+    //   data.color = 1.0 - WATER_SCATTERING;
+    // }
+
+    uint encodedVoxelData = encodeVoxelData(data);
+    imageAtomicMax(voxelMap, voxelPos, encodedVoxelData);
+  }
+  #endif
 
   screenPos.xy += getWarp(screenPos.xy);
   gl_Position.xyz = screenPos * 2.0 - 1.0;

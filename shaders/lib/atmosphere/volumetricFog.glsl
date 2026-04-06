@@ -20,6 +20,7 @@
 #include "/lib/util/phaseFunctions.glsl"
 #include "/lib/util/misc.glsl"
 #include "/lib/lighting/cloudShadows.glsl"
+#include "/lib/misc/voxel.glsl"
 
 const float fogScattering = 1.0;
 const float fogAbsorption = 0.0;
@@ -124,6 +125,10 @@ vec4 getVolumetricFog(vec3 position, float depth) {
       sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
 
     radiance += weatherSkylightColor * EBS.y * isotropicPhase;
+
+    #ifdef FLOODFILL
+    radiance += sampleFloodfill(rayPos - cameraPosition);
+    #endif
 
     scattering +=
       transmittance *

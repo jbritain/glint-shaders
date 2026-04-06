@@ -40,7 +40,7 @@ void main() {
   pos = transformView(pos, gbufferPreviousModelView);
   pos = viewSpaceToScreenSpace(pos, gbufferPreviousProjection);
   depth = texture(depthtex0, texcoord).r;
-  // show(depth);
+
 }
 
 #endif

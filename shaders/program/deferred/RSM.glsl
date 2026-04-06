@@ -78,8 +78,6 @@ void main() {
     );
   }
 
-  // show(globalIllumination * 10.0);
-
 }
 
 #endif

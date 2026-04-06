@@ -53,6 +53,7 @@ void main() {
 #include "/lib/lighting/brdf.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/cloudShadows.glsl"
+#include "/lib/misc/voxel.glsl"
 
 in vec2 lightmap;
 in vec2 texcoord;
@@ -118,7 +119,21 @@ void main() {
     skylightColor *
     material.albedo *
     (1.0 + (1.0 - cloudShadow));
-  color.rgb += gbuffer.lightmap.x * blocklightColor * material.albedo;
+  #ifdef FLOODFILL
+  color.rgb +=
+    sampleFloodfill(
+      feetPlayerPos,
+      gbuffer.geometryNormal,
+      gbuffer.surfaceNormal,
+      material.subsurface
+    ) *
+    material.albedo *
+    EMISSIVE_STRENGTH /
+    16;
+  #else
+  color.rgb +=
+    gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+  #endif
   color.rgb += material.albedo * material.emission * EMISSIVE_STRENGTH;
 
   gbufferData = packGbuffer(gbuffer);

@@ -166,8 +166,7 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
 
             if not "default" in value.keys():
                 value["default"] = ""
-
-            if "default" in value.keys() and not "values" in value.keys():
+            elif not "values" in value.keys():
                 value["values"] = f"[ {value['default']}]"
 
             disabled = False

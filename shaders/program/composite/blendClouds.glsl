@@ -32,9 +32,12 @@ in vec2 texcoord;
 layout(location = 0) out vec4 color;
 
 #include "/lib/atmosphere/volumetricClouds.glsl"
+#include "/lib/atmosphere/atmosphericFog.glsl"
 
 void main() {
   color = texture(colortex0, texcoord);
+  float depth = texture(depthtex0, texcoord).r;
+  vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
   // EXPLANATION:
   // fog should always be blended after translucents (no fog behind glass, cry about it)
@@ -51,7 +54,11 @@ void main() {
   blend = cameraPosition.y >= VOLUMETRIC_CLOUDS_BASE_ALTITUDE;
 
   if (!blend) {
+    if (depth != 1.0) {
+      color.rgb = getAtmosphericFog(color.rgb, viewPos);
+    }
     color.rgb = fma(color.rgb, vec3(fog.a), fog.rgb);
+
   }
   #endif
 
@@ -60,7 +67,11 @@ void main() {
 
     color.rgb = fma(color.rgb, vec3(clouds.a), clouds.rgb);
     #ifndef BLEND_BEFORE_TRANSLUCENTS
+    if (depth != 1.0) {
+      color.rgb = getAtmosphericFog(color.rgb, viewPos);
+    }
     color.rgb = fma(color.rgb, vec3(fog.a), fog.rgb);
+
     #endif
   }
 

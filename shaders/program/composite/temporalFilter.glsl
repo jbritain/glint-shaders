@@ -66,8 +66,8 @@ void main() {
 
   vec4 historyColor = texture(colortex5, previousScreenPos.xy);
   actualPreviousViewPos.z = screenSpaceToViewSpace(historyColor.a);
-  rejectSample =
-    rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
+  // rejectSample =
+  //   rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
 
   // neighbourhood clamping
   vec3 maxCol = vec3(0.0);

@@ -48,6 +48,11 @@
     ],
     "deferred": [
       {
+        "path": "floodfill",
+        "programs": ["csh"],
+        "enabledBy": "FLOODFILL"
+      },
+      {
         "path": "SSAO",
         "programs": ["vsh", "fsh"],
         "enabledBy": "SSAO"

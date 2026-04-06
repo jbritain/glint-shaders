@@ -83,7 +83,6 @@ vec3 SSRSample(
     //   skyDir
     // );
     // sky = fma(sky, vec3(fog.a), fog.rgb);
-    // show(fog.rgb * 10);
     return sky * skyLightmap;
   }
 }

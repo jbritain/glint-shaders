@@ -139,6 +139,21 @@
       }
     },
     "Blocklight": {
+      "Colored Blocklight": {
+        "key": "FLOODFILL"
+      },
+      "Voxel Map Size": {
+        "key": "VOXEL_MAP_SIZE",
+        "default": "ivec3(256, 128, 256)",
+        "hidden": true
+      },
+      "Voxel Distance": {
+        "key": "voxelDistance",
+        "default": 128,
+        "hidden": true,
+        "const": true,
+        "type": "float"
+      },
       "Emissive Strength": {
         "key": "EMISSIVE_STRENGTH",
         "default": 1000

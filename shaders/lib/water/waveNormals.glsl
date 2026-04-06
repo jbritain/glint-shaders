@@ -50,7 +50,6 @@ float waveHeight(vec2 pos) {
   float wavelength = WAVE_INITIAL_WAVELENGTH;
   float amplitude = WAVE_INITIAL_AMPLITUDE;
 
-  show(noise);
   pos += (vec2(noise, -noise) * 2.0 - 1.0) * 20;
 
   for (int i = 0; i < WAVE_OCTAVES; i++) {
