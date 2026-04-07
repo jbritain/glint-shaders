@@ -158,7 +158,7 @@ void main() {
     float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
     float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-    caustics = oldArea / newArea * 0.2;
+    caustics = oldArea / newArea * 0.1;
 
   }
 

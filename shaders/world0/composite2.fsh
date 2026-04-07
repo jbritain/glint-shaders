@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define fsh
 #define BLEND_BEFORE_TRANSLUCENTS 
-#include "/program/composite/blendClouds.glsl"
+#include "/program/composite/blendAtmospherics.glsl"

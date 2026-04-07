@@ -38,6 +38,21 @@ uniform sampler2D debugtex;
 #include "/lib/post/camera.glsl"
 
 void main() {
+  int maxMipLevel = int(floor(log2(max(viewWidth, viewHeight))));
+  float averageLuminance = textureLod(colortex0, vec2(0.5), maxMipLevel).a;
+
+  if (gl_FragCoord.xy == vec2(0.5)) {
+    if (frameCounter <= 10) {
+      averageLuminanceSmooth = averageLuminance;
+    }
+
+    averageLuminanceSmooth = mix(
+      averageLuminance,
+      averageLuminanceSmooth,
+      clamp01(exp2(frameTime * -1))
+    );
+  }
+
   color = pow(texture(colortex0, texcoord).rgb, vec3(rcp(2.2)));
   color += interleavedGradientNoise(floor(gl_FragCoord.xy), 0) / 255;
 

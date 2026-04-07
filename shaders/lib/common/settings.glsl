@@ -16,13 +16,10 @@
 
   // Ambient_Occlusion
     #define AO 2 // [0 1 2]
-    #if AO > 0
-      #define SSAO
-    #endif
     #define AO_SAMPLES 8 // [4 5 6 7 8 9 10 11 12 13 14 15 16]
     #define AO_RADIUS 1 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0]
     #define GTAO_DIRECTION_SAMPLE_COUNT 4 // [4]
-    #define GTAO_THICKNESS 0.5 // [0.5]
+    #define GTAO_THICKNESS 0.5  // [0.5 ]
 
   // Reflections
     #define SMOOTH_SSR_STEPS 16 // [8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64]
@@ -56,9 +53,17 @@
     #define SUBSURFACE_SCATTERING_DENSITY 1.0 // [0.1 0.6 1.1 1.6 2.1 2.6 3.1 3.6 4.1]
 
 // Atmospherics
-  #define ATMOSPHERIC_FOG_STRENGTH 20.0 // [20.0]
+
+  // Atmospheric_Fog
+    #define ATMOSPHERIC_FOG  
+    #ifdef ATMOSPHERIC_FOG
+    #endif
+    #define ATMOSPHERIC_FOG_STRENGTH 20.0 // [20.0]
 
   // Volumetric_Fog
+    #define VOLUMETRIC_FOG  
+    #ifdef VOLUMETRIC_FOG
+    #endif
     #define VOLUMETRIC_FOG_SAMPLES 32 // [4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128]
     #define VOLUMETRIC_FOG_DENSITY 0.01 // [0.001 0.002 0.003 0.004 0.005 0.006 0.007 0.008 0.009 0.01 0.011 0.012 0.013 0.014 0.015 0.016 0.017 0.018 0.019 0.02 ]
     #define VOLUMETRIC_FOG_MULTIPLE_SCATTERING 5.0 // [5.0]
@@ -66,9 +71,9 @@
     #define VOLUMETRIC_FOG_MIDDLE_PLANE 64 // [64]
     #define VOLUMETRIC_FOG_TOP_PLANE mix(128, 200, wetness) // [mix(128, 200, wetness)]
 
-  // Clouds
-    #define CLOUDS  
-    #ifdef CLOUDS
+  // Volumetric_Clouds
+    #define VOLUMETRIC_CLOUDS  
+    #ifdef VOLUMETRIC_CLOUDS
     #endif
     #define VOLUMETRIC_CLOUDS_PRIMARY_SAMPLES 16 // [16]
     #define VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES 4 // [4]
@@ -79,6 +84,9 @@
     #define VOLUMETRIC_CLOUDS_TOP_ALTITUDE 1700 // [1700]
 
   // Planar_Clouds
+    #define PLANAR_CLOUDS  
+    #ifdef PLANAR_CLOUDS
+    #endif
     #define PLANAR_CLOUDS_COVERAGE 0.5 // [0.5]
     #define PLANAR_CLOUDS_DENSITY 0.005 // [0.005]
     #define PLANAR_CLOUDS_HEIGHT 100 // [100]

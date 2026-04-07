@@ -18,12 +18,12 @@
 #include "/lib/atmosphere/planarClouds.glsl"
 
 float getCloudShadow(vec3 rayPos) {
-  #ifdef CLOUDS
   float shadow = 1.0;
 
   vec3 dir = normalize(rayPos);
 
   rayPos += cameraPosition;
+  #ifdef VOLUMETRIC_CLOUDS
   if (
     rayPlaneIntersection(
       rayPos,
@@ -44,13 +44,11 @@ float getCloudShadow(vec3 rayPos) {
     );
     shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
   }
+  #endif
 
   shadow = mix(1.0, shadow, smoothstep(0.0, 0.2, worldLightDir.y));
 
   return shadow;
-  #else
-  return 1.0;
-  #endif
 
 }
 

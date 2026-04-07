@@ -149,10 +149,10 @@ void main() {
   } else if (inWater || !isWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
     vec3 sky = getSky(skyDir, true);
-    #ifdef CLOUDS
+
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
-    #endif
+
     // vec4 fog = analyticalFog(translucentFeetPlayerPos, skyDir);
     // sky = fma(sky, vec3(fog.a), fog.rgb);
     color.rgb = sky * gbuffer.lightmap.y;

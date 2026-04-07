@@ -62,6 +62,9 @@ float getPlanarCloudDensity(vec2 pos, bool highSamples) {
 }
 
 vec4 getPlanarClouds(vec3 dir) {
+  #ifndef PLANAR_CLOUDS
+  return vec4(0.0, 0.0, 0.0, 1.0)
+  #endif
   vec3 point;
   if (
     !rayPlaneIntersection(cameraPosition, dir, PLANAR_CLOUDS_ALTITUDE, point)

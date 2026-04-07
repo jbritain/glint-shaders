@@ -73,10 +73,6 @@
           "GTAO"
         ]
       },
-      "SSAO": {
-        "key": "SSAO",
-        "condition": "AO > 0"
-      },
       "Ambient Occlusion Samples": {
         "key": "AO_SAMPLES",
         "default": "8",
@@ -197,11 +193,19 @@
     }
   },
   "Atmospherics": {
-    "Atmospheric Fog Strength": {
-      "key": "ATMOSPHERIC_FOG_STRENGTH",
-      "default": 20.0
+    "Atmospheric Fog": {
+      "Atmospheric Fog": {
+        "key": "ATMOSPHERIC_FOG"
+      },
+      "Atmospheric Fog Strength": {
+        "key": "ATMOSPHERIC_FOG_STRENGTH",
+        "default": 20.0
+      }
     },
     "Volumetric Fog": {
+      "Volumetric Fog": {
+        "key": "VOLUMETRIC_FOG"
+      },
       "Volumetric Fog Samples": {
         "key": "VOLUMETRIC_FOG_SAMPLES",
         "default": "32",
@@ -229,9 +233,9 @@
         "default": "mix(128, 200, wetness)"
       }
     },
-    "Clouds": {
-      "Clouds": {
-        "key": "CLOUDS"
+    "Volumetric Clouds": {
+      "Volumetric Clouds": {
+        "key": "VOLUMETRIC_CLOUDS"
       },
       "Volumetric Cloud Primary Samples": {
         "key": "VOLUMETRIC_CLOUDS_PRIMARY_SAMPLES",
@@ -264,6 +268,9 @@
       }
     },
     "Planar Clouds": {
+      "Planar Clouds": {
+        "key": "PLANAR_CLOUDS"
+      },
       "Planar Cloud Coverage": {
         "key": "PLANAR_CLOUDS_COVERAGE",
         "default": "0.5"

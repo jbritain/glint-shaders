@@ -144,6 +144,9 @@ float getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
 }
 
 vec4 getVolumetricClouds(inout vec3 position, bool sky) {
+  #ifndef VOLUMETRIC_CLOUDS
+  return vec4(0.0, 0.0, 0.0, 1.0);
+  #endif
   vec3 dir = normalize(position);
 
   vec3 start;

@@ -41,11 +41,15 @@ void main() {
 
   // EXPLANATION:
   // fog should always be blended after translucents (no fog behind glass, cry about it)
-  // which means that it should only be blended in the program where blend_before_translucents
+  // which means that it should only be blended in the program where blend_before_translucents is true
   // we then hijack the check for if the player is in the clouds
   // because that decides whether we blend fog or the clouds first
 
+  #ifdef VOLUMETRIC_FOG
   vec4 fog = texture(colortex12, texcoord);
+  #else
+  vec4 fog = vec4(0.0, 0.0, 0.0, 1.0);
+  #endif
 
   bool blend;
   #ifdef BLEND_BEFORE_TRANSLUCENTS

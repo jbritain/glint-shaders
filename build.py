@@ -98,10 +98,17 @@ def generate_post_processing(pack):
                     )
 
                 if "enabledBy" in program.keys():
+                    pack["properties"].append(f"#if {program['enabledBy']}")
                     for dim in all_dimensions.items():
                         pack["properties"].append(
-                            f"program.{dim[1]}/{program_name}.enabled = {program['enabledBy']}"
+                            f"program.{dim[1]}/{program_name}.enabled = true"
                         )
+                    pack["properties"].append(f"#else")
+                    for dim in all_dimensions.items():
+                        pack["properties"].append(
+                            f"program.{dim[1]}/{program_name}.enabled = false"
+                        )
+                    pack["properties"].append(f"#endif")
 
     if os.path.exists(f"{shaders_path}/program/final.glsl"):
         create_linked_shader_program(f"final", f"program/final.glsl")
@@ -204,6 +211,10 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
                 pack["settings"].append(
                     f"{'  ' * depth}#ifdef {value['key']}\n{'  ' * depth}#endif"
                 )
+
+            if "descriptions" in value.keys():
+                for i, description in enumerate(value["descriptions"]):
+                    pack["lang"].append(f"value.{value["key"]}.{i} = {description}")
 
             pack["lang"].append(f"option.{value['key']} = {name}")
     pack["properties"].append(screen)

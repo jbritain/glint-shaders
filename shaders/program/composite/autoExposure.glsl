@@ -38,21 +38,6 @@ const bool colortex0MipmapEnabled = true;
 void main() {
   color = texture(colortex0, texcoord).rgb;
 
-  int maxMipLevel = int(floor(log2(max(viewWidth, viewHeight))));
-  float averageLuminance = textureLod(colortex0, vec2(0.5), maxMipLevel).a;
-
-  if (gl_FragCoord.xy == vec2(0.5)) {
-    if (frameCounter <= 10) {
-      averageLuminanceSmooth = averageLuminance;
-    }
-
-    averageLuminanceSmooth = mix(
-      averageLuminance,
-      averageLuminanceSmooth,
-      clamp01(exp2(frameTime * -1))
-    );
-  }
-
   float EV100 = log2(
     averageLuminanceSmooth * SENSOR_SENSITIVITY / CALIBRATION_CONSTANT
   );

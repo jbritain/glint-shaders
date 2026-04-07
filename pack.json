@@ -55,12 +55,13 @@
       {
         "path": "SSAO",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "SSAO"
+        "enabledBy": "AO > 0"
       },
       {
         "path": "RSM",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "RSM"
+        "enabledBy": "defined RSM",
+        "dimensions": ["OVERWORLD", "THE_END"]
       },      
 
       {
@@ -81,18 +82,19 @@
       {
         "path": "getClouds",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS",
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS)",
         "dimensions": ["OVERWORLD"]
       },
       {
         "path": "getVolumetricFog",
         "programs": ["vsh", "fsh"],
-        "dimensions": ["OVERWORLD"]
+        "dimensions": ["OVERWORLD"],
+        "enabledBy": "(defined VOLUMETRIC_FOG)"
       },
       {
-        "path": "blendClouds",
+        "path": "blendAtmospherics",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS",
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS) || (defined VOLUMETRIC_FOG) || (defined ATMOSPHERIC_FOG)",
         "dimensions": ["OVERWORLD"],
         "defines": {"BLEND_BEFORE_TRANSLUCENTS": ""}
       },
@@ -101,9 +103,9 @@
         "programs": ["vsh", "fsh"]
       },
       {
-        "path": "blendClouds",
+        "path": "blendAtmospherics",
         "programs": ["vsh", "fsh"],
-        "enabledBy": "CLOUDS",
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS) || (defined VOLUMETRIC_FOG) || (defined ATMOSPHERIC_FOG)",
         "dimensions": ["OVERWORLD"],
         "defines": {"BLEND_AFTER_TRANSLUCENTS": ""}
       },
