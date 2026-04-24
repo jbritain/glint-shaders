@@ -91,8 +91,6 @@ void main() {
   color = mix(color, historyColor, weight);
 
   newHistory.rgb = color.rgb;
-
-  show(rejectSample);
 }
 
 #endif

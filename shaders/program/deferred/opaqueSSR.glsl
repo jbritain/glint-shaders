@@ -67,16 +67,10 @@ void main() {
       gbufferPreviousProjection
     );
 
-    vec3 actualProjectedPos = projectedViewPos;
-    actualProjectedPos.z = texture(colortex5, projectedPos.xy).a;
+    uint frameCount = min(texture(colortex11, texcoord).r, SSR_MAX_FRAMES);
 
-    if (
-      clamp01(projectedPos) == projectedPos &&
-      distance(projectedViewPos, actualProjectedPos) < 0.1
-    ) {
-      vec3 previousSSR = texture(colortex7, projectedPos.xy).rgb;
-      SSRColor = mix(SSRColor, previousSSR, 0.6);
-    }
+    vec3 previousSSR = texture(colortex7, projectedPos.xy).rgb;
+    SSRColor = (previousSSR * frameCount + SSRColor) / (frameCount + 1);
   }
 
 }

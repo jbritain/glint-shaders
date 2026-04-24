@@ -21,169 +21,290 @@
     "setup": [
       {
         "path": "generateSunTransmittanceLUT",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       },
       {
         "path": "generateMultipleScatteringLUT",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       }
     ],
     "prepare": [
       {
         "path": "generateSkyViewLUT",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       },
       {
         "path": "generateAerialPerspectiveLUT",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       },
       {
         "path": "sampleSkylightColour",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       },
       {
         "path": "generateSkyCloudMap",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       }
     ],
     "deferred": [
       {
+        "path": "accumHistory",
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
+      },
+      {
         "path": "floodfill",
-        "programs": ["csh"],
+        "programs": [
+          "csh"
+        ],
         "enabledBy": "FLOODFILL"
       },
       {
         "path": "SSAO",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "enabledBy": "AO > 0"
       },
       {
         "path": "RSM",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "enabledBy": "defined RSM",
-        "dimensions": ["OVERWORLD", "THE_END"]
-      },      
-
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
+      },
       {
         "path": "opaqueSSR",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       },
       {
         "path": "opaqueShadows",
-        "programs": ["vsh", "fsh"],
-        "dimensions": ["OVERWORLD", "THE_END"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
       },
       {
         "path": "opaqueShading",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       }
     ],
     "composite": [
       {
         "path": "getClouds",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS)",
-        "dimensions": ["OVERWORLD"]
+        "dimensions": [
+          "OVERWORLD"
+        ]
       },
       {
         "path": "getVolumetricFog",
-        "programs": ["vsh", "fsh"],
-        "dimensions": ["OVERWORLD"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "dimensions": [
+          "OVERWORLD"
+        ],
         "enabledBy": "(defined VOLUMETRIC_FOG)"
       },
       {
         "path": "blendAtmospherics",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS) || (defined VOLUMETRIC_FOG) || (defined ATMOSPHERIC_FOG)",
-        "dimensions": ["OVERWORLD"],
-        "defines": {"BLEND_BEFORE_TRANSLUCENTS": ""}
+        "dimensions": [
+          "OVERWORLD"
+        ],
+        "defines": {
+          "BLEND_BEFORE_TRANSLUCENTS": ""
+        }
       },
       {
         "path": "blendTranslucents",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       },
       {
         "path": "blendAtmospherics",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS) || (defined VOLUMETRIC_FOG) || (defined ATMOSPHERIC_FOG)",
-        "dimensions": ["OVERWORLD"],
-        "defines": {"BLEND_AFTER_TRANSLUCENTS": ""}
+        "dimensions": [
+          "OVERWORLD"
+        ],
+        "defines": {
+          "BLEND_AFTER_TRANSLUCENTS": ""
+        }
       },
       {
         "path": "RTWForwardAnalysis",
-        "programs": ["csh"],
-        "dimensions": ["OVERWORLD", "THE_END"]
+        "programs": [
+          "csh"
+        ],
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
       },
       {
         "path": "RTWBackwardAnalysis",
-        "programs": ["csh"],
-        "dimensions": ["OVERWORLD", "THE_END"]
+        "programs": [
+          "csh"
+        ],
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
       },
       {
         "path": "RTWCalculateMaxWeights",
-        "programs": ["csh"],
-        "dimensions": ["OVERWORLD", "THE_END"]
+        "programs": [
+          "csh"
+        ],
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
       },
       {
         "path": "RTWBlurMaxWeights",
-        "programs": ["vsh", "fsh"],
-        "dimensions": ["OVERWORLD", "THE_END"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
       },
       {
         "path": "RTWComputeWarpFactor",
-        "programs": ["csh"],
-        "dimensions": ["OVERWORLD", "THE_END"]
+        "programs": [
+          "csh"
+        ],
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
       },
       {
         "path": "temporalFilter",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       },
       {
         "path": "autoExposureWriteLuminance",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       },
       {
         "path": "autoExposure",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       },
       {
         "path": "bloomDownsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "0"
         }
       },
       {
         "path": "bloomDownsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "1"
         }
       },
       {
         "path": "bloomDownsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "2"
         }
       },
       {
         "path": "bloomDownsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "3"
         }
       },
       {
         "path": "bloomDownsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "4"
         }
       },
       {
         "path": "bloomUpsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "3"
         },
@@ -191,7 +312,10 @@
       },
       {
         "path": "bloomUpsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "2"
         },
@@ -199,7 +323,10 @@
       },
       {
         "path": "bloomUpsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "1"
         },
@@ -207,7 +334,10 @@
       },
       {
         "path": "bloomUpsample",
-        "programs": ["vsh", "fsh"],
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
         "defines": {
           "TILE_INDEX": "0"
         },
@@ -215,19 +345,28 @@
       },
       {
         "path": "tonemap",
-        "programs": ["vsh", "fsh"]
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
       },
       {
         "path": "SMAAEdgeWeights",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       },
       {
         "path": "SMAABlendWeights",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       },
       {
         "path": "SMAA",
-        "programs": ["csh"]
+        "programs": [
+          "csh"
+        ]
       }
     ]
   },

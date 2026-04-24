@@ -90,6 +90,10 @@
       "GTAO Thickness": {
         "key": "GTAO_THICKNESS",
         "default": "0.5 "
+      },
+      "Ambient Occlusion Accumulation Frame Cap": {
+        "key": "AO_MAX_FRAMES",
+        "default": "64"
       }
     },
     "Reflections": {
@@ -112,6 +116,10 @@
         "key": "ROUGH_SSR_THRESHOLD",
         "default": "0.2",
         "values": "{frange(0.0, 1.1, 0.1)}"
+      },
+      "Rough Reflection Accumulation Frame Cap": {
+        "key": "SSR_MAX_FRAMES",
+        "default": "64"
       }
     },
     "Global Illumination": {
@@ -132,6 +140,10 @@
         "key": "RSM_BRIGHTNESS",
         "default": "5.0",
         "values": "{frange(1.0, 10.5, 0.5)}"
+      },
+      "Global Illumination Accumulation Frame Cap": {
+        "key": "RSM_MAX_FRAMES",
+        "default": "64"
       }
     },
     "Blocklight": {

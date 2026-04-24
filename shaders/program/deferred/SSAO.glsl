@@ -62,10 +62,12 @@ void main() {
   );
   #endif
 
-  if (clamp01(previousPos) == previousPos) {
-    float previousOcclusion = texture(colortex3, previousPos.xy).r;
-    occlusion = mix(occlusion, previousOcclusion, 0.5);
-  }
+  uint frameCount = min(texture(colortex11, texcoord).r, AO_MAX_FRAMES);
+
+  float previousOcclusion = texture(colortex3, previousPos.xy).r;
+  occlusion = (previousOcclusion * frameCount + occlusion) / (frameCount + 1);
+
+  show(occlusion);
 
 }
 

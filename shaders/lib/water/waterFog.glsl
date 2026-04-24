@@ -71,7 +71,7 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     // caustics = pow3(caustics);
 
     // shadow *= caustics;
-    shadow *= texture(shadowcolor2, shadowRayPos.xy).r;
+    // shadow *= texture(shadowcolor2, shadowRayPos.xy).r * TAU;
 
     float distanceToSurface =
       max0(shadowRayPos.z - texture(shadowtex0, shadowRayPos.xy).r) *
