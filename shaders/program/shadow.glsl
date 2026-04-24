@@ -123,7 +123,7 @@ flat in uint materialID;
 /* RENDERTARGETS: 0,1,2 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec2 encodedNormal;
-layout(location = 2) out float caustics;
+layout(location = 2) out vec3 caustics;
 
 void main() {
   color = texture(gtexture, texcoord) * glcolor;
@@ -131,7 +131,7 @@ void main() {
     discard;
   }
 
-  caustics = 1.0;
+  caustics = vec3(1.0);
 
   if (materialIsWater(materialID)) {
     float blockerDistance =
@@ -149,16 +149,21 @@ void main() {
       1.0
     );
 
-    vec3 refracted = refract(worldLightDir, wave, 1.0 / 1.333);
-    vec3 oldPos = feetPlayerPos; // - worldLightDir * blockerDistance;
-    vec3 newPos = feetPlayerPos + refracted * blockerDistance;
+    const vec3 iors = vec3(1 / 1.332, 1 / 1.333, 1 / 1.336);
 
-    // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
-    // I do not understand entirely what this does but it seems to work
-    float oldArea = length(dFdx(oldPos)) * length(dFdy(oldPos));
-    float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
+    float oldArea = length(dFdx(feetPlayerPos)) * length(dFdy(feetPlayerPos));
 
-    caustics = oldArea / newArea * 0.1;
+    for (int i = 0; i < 3; i++) {
+      vec3 refracted = refract(worldLightDir, wave, iors[i]);
+      vec3 newPos = feetPlayerPos + refracted * blockerDistance;
+
+      // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
+      // I do not understand entirely what this does but it seems to work
+
+      float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
+
+      caustics[i] = oldArea / newArea * 0.1;
+    }
 
   }
 

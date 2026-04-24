@@ -68,7 +68,9 @@ void main() {
     );
 
     vec3 actualProjectedPos = projectedViewPos;
-    actualProjectedPos.z = texture(colortex5, projectedPos.xy).a;
+    actualProjectedPos.z = screenSpaceToViewSpace(
+      texture(colortex5, projectedPos.xy).a
+    );
 
     if (
       clamp01(projectedPos) == projectedPos &&

@@ -43,8 +43,9 @@ vec3 SSRSample(
     jitter,
     refine,
     rayPos,
-    depthtex0,
-    gbufferProjection
+    colortex5,
+    3,
+    gbufferPreviousProjection
   );
   #ifdef VOXY
   if (!hit) {
@@ -56,6 +57,7 @@ vec3 SSRSample(
       refine,
       rayPos,
       vxDepthTexTrans,
+      0,
       vxProj
     );
   }

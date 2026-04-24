@@ -156,7 +156,7 @@ vec3 getShadow(
     shadow *= texture(
       shadowcolor2,
       shadowScreenPos.xy + getWarp(shadowScreenPos.xy)
-    ).r;
+    ).rgb;
   }
 
   shadow = mix(

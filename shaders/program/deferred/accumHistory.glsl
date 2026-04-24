@@ -48,7 +48,9 @@ void main() {
   );
 
   vec3 actualPreviousPos = previousViewPos;
-  actualPreviousPos.z = texture(colortex5, previousPos.xy).a;
+  actualPreviousPos.z = screenSpaceToViewSpace(
+    texture(colortex5, previousPos.xy).a
+  );
 
   if (
     clamp01(previousPos) == previousPos &&

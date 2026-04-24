@@ -19,14 +19,23 @@
 
 const float handDepth = MC_HAND_DEPTH * 0.5 + 0.5;
 
-float getDepth(vec2 pos, sampler2D depthBuffer) {
-  return texelFetch(depthBuffer, ivec2(pos * vec2(viewWidth, viewHeight)), 0).r;
+float getDepth(vec2 pos, sampler2D depthBuffer, int component) {
+  return texelFetch(
+    depthBuffer,
+    ivec2(pos * vec2(viewWidth, viewHeight)),
+    0
+  )[component];
 }
 
-void binarySearch(inout vec3 rayPos, vec3 rayDir, sampler2D depthBuffer) {
+void binarySearch(
+  inout vec3 rayPos,
+  vec3 rayDir,
+  sampler2D depthBuffer,
+  int component
+) {
   vec3 lastGoodPos = rayPos; // stores the last position we know was inside, in case we accidentally step back out
   for (int i = 0; i < BINARY_REFINEMENTS; i++) {
-    float depth = getDepth(rayPos.xy, depthBuffer);
+    float depth = getDepth(rayPos.xy, depthBuffer, component);
     float intersect = sign(depth - rayPos.z);
     lastGoodPos = intersect == 1.0 && depth < 1.0 ? rayPos : lastGoodPos; // update last good pos if still inside
 
@@ -47,6 +56,7 @@ bool rayIntersects(
   bool refine,
   out vec3 rayPos,
   sampler2D depthBuffer,
+  int component,
   mat4 projection
 ) {
   if (viewDir.z > 0.0 && viewDir.z >= -viewOrigin.z) {
@@ -78,10 +88,22 @@ bool rayIntersects(
   for (int i = 0; i < maxSteps; ++i) {
     if (clamp01(rayPos) != rayPos) return false; // we went offscreen
 
-    float depth0 = getDepth(rayPos.xy, depthBuffer);
-    float depth1 = getDepth(rayPos.xy + rayStep.xy * 0.25, depthBuffer);
-    float depth2 = getDepth(rayPos.xy + rayStep.xy * 0.5, depthBuffer);
-    float depth3 = getDepth(rayPos.xy + rayStep.xy * 0.75, depthBuffer);
+    float depth0 = getDepth(rayPos.xy, depthBuffer, component);
+    float depth1 = getDepth(
+      rayPos.xy + rayStep.xy * 0.25,
+      depthBuffer,
+      component
+    );
+    float depth2 = getDepth(
+      rayPos.xy + rayStep.xy * 0.5,
+      depthBuffer,
+      component
+    );
+    float depth3 = getDepth(
+      rayPos.xy + rayStep.xy * 0.75,
+      depthBuffer,
+      component
+    );
 
     intersect =
       depth0 < rayPos.z &&
@@ -134,7 +156,7 @@ bool rayIntersects(
   }
 
   if (refine && intersect) {
-    binarySearch(rayPos, rayStep, depthBuffer);
+    binarySearch(rayPos, rayStep, depthBuffer, component);
   }
 
   rayPos.xy = (floor(rayPos.xy * res) + 0.5) / res;

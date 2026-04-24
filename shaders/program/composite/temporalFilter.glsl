@@ -51,7 +51,7 @@ void main() {
 
   float opaqueDepth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
-  newHistory.a = screenSpaceToViewSpace(depth);
+  newHistory.a = depth;
 
   vec3 feetPlayerPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
   feetPlayerPos += cameraPosition;
@@ -65,7 +65,7 @@ void main() {
   bool rejectSample = clamp01(previousScreenPos.xy) != previousScreenPos.xy;
 
   vec4 historyColor = texture(colortex5, previousScreenPos.xy);
-  actualPreviousViewPos.z = historyColor.a;
+  actualPreviousViewPos.z = screenSpaceToViewSpace(historyColor.a);
 
   rejectSample =
     rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;

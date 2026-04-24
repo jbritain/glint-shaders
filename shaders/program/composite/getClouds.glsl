@@ -61,7 +61,9 @@ void main() {
     );
 
     vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
-    float previousZ = texture(colortex5, previousPos.xy).a;
+    float previousZ = screenSpaceToViewSpace(
+      texture(colortex5, previousPos.xy).a
+    );
     float previousDepth = viewSpaceToScreenSpace(
       previousZ,
       gbufferPreviousProjection

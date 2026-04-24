@@ -150,6 +150,8 @@ void main() {
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
+
+  show(texture(colortex5, texcoord)[3]);
 }
 
 #endif
