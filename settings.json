@@ -202,6 +202,18 @@
         "default": "1.0",
         "values": "{frange(0.1, 4.5, 0.5)}"
       }
+    },
+    "Ambient Lighting": {
+      "Ambient Lighting Strength": {
+        "key": "AMBIENT_LIGHT_STRENGTH",
+        "default": "1.0",
+        "values": "{frange(0.0, 11.0, 1.0)}"
+      },
+      "Nether Ambient Lighting Boost": {
+        "key": "NETHER_AMBIENT_LIGHT_BOOST",
+        "default": "2.0",
+        "values": "{frange(5.0, 11.0, 1.0)}"
+      }
     }
   },
   "Atmospherics": {
@@ -238,11 +250,11 @@
       },
       "Volumetric Fog Middle Plane": {
         "key": "VOLUMETRIC_FOG_MIDDLE_PLANE",
-        "default": "64"
+        "default": "128"
       },
       "Volumetric Fog Top Plane": {
         "key": "VOLUMETRIC_FOG_TOP_PLANE",
-        "default": "mix(128, 200, wetness)"
+        "default": "200"
       }
     },
     "Volumetric Clouds": {

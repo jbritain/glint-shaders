@@ -23,6 +23,7 @@ out vec2 texcoord;
 out vec4 glcolor;
 out mat3 tbn;
 out vec3 viewPos;
+out float emission;
 
 flat out uint materialID;
 
@@ -42,6 +43,16 @@ void main() {
   glcolor = gl_Color;
 
   materialID = uint(mc_Entity.x);
+
+  if (
+    renderStage == MC_RENDER_STAGE_TERRAIN_SOLID ||
+    renderStage == MC_RENDER_STAGE_TERRAIN_CUTOUT
+  ) {
+    emission = at_midBlock.w / 15.0;
+  } else {
+    emission = 0;
+  }
+
 }
 #endif
 
@@ -58,6 +69,7 @@ in vec2 texcoord;
 in vec4 glcolor;
 in mat3 tbn;
 in vec3 viewPos;
+in float emission;
 
 flat in uint materialID;
 
@@ -103,6 +115,10 @@ void main() {
     texture(specular, texcoord),
     materialID
   );
+
+  #ifndef MC_TEXTURE_FORMAT_LAB_PBR
+  material.emission = emission;
+  #endif
 
   if (
     material.roughness > ROUGH_SSR_THRESHOLD &&

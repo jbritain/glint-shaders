@@ -30,9 +30,10 @@ void main() {
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 11 */
+/* RENDERTARGETS: 11,13 */
 
 layout(location = 0) out uint historyCount;
+layout(location = 1) out float reprojectedDepth;
 
 void main() {
   historyCount = 0;
@@ -47,10 +48,12 @@ void main() {
     gbufferPreviousProjection
   );
 
+  reprojectedDepth = texture(colortex5, previousPos.xy).a;
+
   vec3 actualPreviousPos = previousViewPos;
-  actualPreviousPos.z = screenSpaceToViewSpace(
-    texture(colortex5, previousPos.xy).a
-  );
+
+  actualPreviousPos.z = screenSpaceToViewSpace(reprojectedDepth);
+  show(-actualPreviousPos.z / far);
 
   if (
     clamp01(previousPos) == previousPos &&

@@ -145,7 +145,7 @@ def frange(start, stop, inc):
     return (
         str(arange(start, stop, inc))
         .replace("\n", "")
-        .replace(". ", ".0")
+        .replace(". ", ".0 ")
         .replace(".]", ".0]")
     )
 

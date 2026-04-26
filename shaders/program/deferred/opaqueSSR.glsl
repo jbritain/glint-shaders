@@ -47,7 +47,7 @@ void main() {
   Material material = unpackMaterial(texture(colortex2, texcoord).rg);
 
   float averageHitLength;
-  SSRColor = getSSR(viewPos, gbuffer, material, averageHitLength);
+  SSRColor = getSSR(viewPos, gbuffer, material, colortex13, averageHitLength);
   // averageHitLength *= 1.0 - material.roughness;
 
   if (material.roughness >= 0.01 && material.roughness < ROUGH_SSR_THRESHOLD) {

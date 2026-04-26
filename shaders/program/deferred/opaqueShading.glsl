@@ -102,29 +102,23 @@ void main() {
       ) *
       sunlightColor *
       cloudShadow;
-    diffuse += material.albedo * subsurfaceScattering;
+    diffuse += subsurfaceScattering;
 
     #ifdef PHOTONICS
-    diffuse +=
-      texture(indirectRadiosityTex, texcoord).rgb * material.albedo * occlusion;
+    diffuse += texture(indirectRadiosityTex, texcoord).rgb * occlusion;
     #else
     #ifdef RSM
-    diffuse +=
-      texture(colortex9, texcoord).rgb *
-      sunlightColor *
-      material.albedo *
-      cloudShadow;
+    diffuse += texture(colortex9, texcoord).rgb * sunlightColor * cloudShadow;
     #endif
     #endif
     #endif
 
     #ifdef PHOTONICS
     vec4 radiosity = texture(radiosity_direct_soft, texcoord);
-    diffuse += radiosity.rgb / max(1.0, radiosity.a) * material.albedo;
-    diffuse += texture(radiosity_direct, texcoord).rgb * material.albedo;
+    diffuse += radiosity.rgb / max(1.0, radiosity.a);
+    diffuse += texture(radiosity_direct, texcoord).rgb;
     #else
-    diffuse +=
-      gbuffer.lightmap.y * weatherSkylightColor * material.albedo * occlusion;
+    diffuse += gbuffer.lightmap.y * weatherSkylightColor * occlusion;
 
     #ifdef FLOODFILL
     diffuse +=
@@ -134,24 +128,26 @@ void main() {
         gbuffer.surfaceNormal,
         material.subsurface
       ) *
-      material.albedo *
       EMISSIVE_STRENGTH /
       16;
     #else
-    diffuse +=
-      gbuffer.lightmap.x * blocklightColor * material.albedo * occlusion;
+    diffuse += gbuffer.lightmap.x * blocklightColor * occlusion;
     #endif
+    #endif
+
+    diffuse += vec3(AMBIENT_LIGHT_STRENGTH) * occlusion;
+    #ifdef WORLD_THE_NETHER
+    diffuse += vec3(NETHER_AMBIENT_LIGHT_BOOST) * occlusion;
     #endif
   }
   color.rgb += mix(
-    diffuse,
+    diffuse * material.albedo,
     specularc,
     f * float(material.roughness <= ROUGH_SSR_THRESHOLD)
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
 
-  show(texture(colortex5, texcoord)[3]);
 }
 
 #endif

@@ -183,4 +183,9 @@ uniform usampler3D voxelMapTex;
 uniform sampler3D floodfillVoxelMapTex1;
 uniform sampler3D floodfillVoxelMapTex2;
 
+uniform sampler3D cloudshapetex;
+uniform sampler3D clouddetailtex;
+uniform sampler2D cloudcoveragetex;
+uniform sampler2D vanillacloudtex;
+
 #endif // UNIFORMS_GLSL

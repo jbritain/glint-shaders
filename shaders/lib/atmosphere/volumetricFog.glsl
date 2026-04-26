@@ -127,7 +127,10 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     radiance += weatherSkylightColor * EBS.y * isotropicPhase;
 
     #ifdef FLOODFILL
-    radiance += sampleFloodfill(rayPos - cameraPosition);
+    radiance +=
+      sampleFloodfill(rayPos - cameraPosition) *
+      EMISSIVE_STRENGTH *
+      isotropicPhase;
     #endif
 
     scattering +=

@@ -135,6 +135,11 @@ void main() {
   #endif
   color.rgb += material.albedo * material.emission * EMISSIVE_STRENGTH;
 
+  color.rgb += vec3(AMBIENT_LIGHT_STRENGTH) * material.albedo;
+  #ifdef WORLD_THE_NETHER
+  color.rgb += vec3(NETHER_AMBIENT_LIGHT_BOOST) * material.albedo;
+  #endif
+
   gbufferData = packGbuffer(gbuffer);
   materialData = packMaterial(material);
 }

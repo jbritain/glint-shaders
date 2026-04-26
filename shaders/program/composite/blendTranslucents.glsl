@@ -187,6 +187,7 @@ void main() {
     translucentViewPos,
     gbuffer,
     material,
+    depthtex0,
     hitLength
   );
 

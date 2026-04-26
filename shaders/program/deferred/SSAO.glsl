@@ -67,8 +67,6 @@ void main() {
   float previousOcclusion = texture(colortex3, previousPos.xy).r;
   occlusion = (previousOcclusion * frameCount + occlusion) / (frameCount + 1);
 
-  show(occlusion);
-
 }
 
 #endif

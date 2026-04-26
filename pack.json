@@ -178,6 +178,16 @@
         }
       },
       {
+        "path": "netherSmog",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "dimensions": [
+          "THE_NETHER"
+        ]
+      },
+      {
         "path": "RTWForwardAnalysis",
         "programs": [
           "csh"

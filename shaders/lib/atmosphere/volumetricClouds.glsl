@@ -20,11 +20,6 @@
 #include "/lib/util/misc.glsl"
 #include "/lib/util/perlinNoise.glsl"
 
-uniform sampler3D cloudshapetex;
-uniform sampler3D clouddetailtex;
-uniform sampler2D cloudcoveragetex;
-uniform sampler2D vanillacloudtex;
-
 const float cloudScattering = 2.0;
 const float cloudAbsorption = 0.2;
 const float cloudExtinction = cloudScattering + cloudAbsorption;
@@ -36,13 +31,13 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
   vec2 samplePos = (rayPos.xz + vec2(worldTimeCounter, 0.0)) * 2.0;
   ivec2 p = ivec2(floor(mod(samplePos / 24, 256)));
 
-  return texelFetch(vanillacloudtex, p, 0).r * CLOUDS_DENSITY;
+  return texelFetch(vanillacloudtex, p, 0).r * VOLUMETRIC_CLOUDS_DENSITY;
   #else
 
   vec2 wind = windDir * worldTimeCounter;
 
   #if VOLUMETRIC_CLOUDS_STYLE == 1
-  rayPos = floor(rayPos / 16) * 16;
+  rayPos = floor(rayPos / 64) * 64;
   #endif
 
   float heightInPlane = linearstep(

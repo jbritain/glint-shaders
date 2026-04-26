@@ -31,6 +31,7 @@ vec3 SSRSample(
   float jitter,
   int samples,
   bool refine,
+  sampler2D depthBuffer,
   out float hitLength
 ) {
   vec3 rayPos;
@@ -43,25 +44,10 @@ vec3 SSRSample(
     jitter,
     refine,
     rayPos,
-    colortex5,
-    3,
+    depthBuffer,
+    0,
     gbufferPreviousProjection
   );
-  #ifdef VOXY
-  if (!hit) {
-    hit = rayIntersects(
-      origin,
-      reflectedDir,
-      samples,
-      jitter,
-      refine,
-      rayPos,
-      vxDepthTexTrans,
-      0,
-      vxProj
-    );
-  }
-  #endif
 
   if (hit) {
     rayPos = screenSpaceToViewSpace(rayPos);
@@ -93,6 +79,7 @@ vec3 getSSR(
   vec3 viewPos,
   Gbuffer gbuffer,
   Material material,
+  sampler2D depthBuffer,
   out float averageHitLength
 ) {
   averageHitLength = 0.0;
@@ -109,6 +96,7 @@ vec3 getSSR(
       interleavedGradientNoise(floor(gl_FragCoord.xy)),
       SMOOTH_SSR_STEPS,
       true,
+      depthBuffer,
       averageHitLength
     );
   } else if (material.roughness <= ROUGH_SSR_THRESHOLD) {
@@ -133,6 +121,7 @@ vec3 getSSR(
         noise.z,
         ROUGH_SSR_STEPS,
         false,
+        depthBuffer,
         hitLength
       );
       averageHitLength += hitLength;

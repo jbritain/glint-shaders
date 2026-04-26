@@ -11,3 +11,4 @@ colortex9: global illumination (ACCUMULATED)
 colortex10: opaque shadowing (ACCUMULATED)
 colortex11: history counter
 colortex12: volumetric fog
+colortex13: previous frame depth reprojected to current frame
