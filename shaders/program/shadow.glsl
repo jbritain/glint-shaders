@@ -68,7 +68,10 @@ void main() {
     // data.color = getBlocklightColor(materialID);
 
     data.color = pow(averageTextureData.rgb, vec3(2.2));
-    data.opacity = pow(averageTextureData.a, rcp(3));
+    data.opacity =
+      renderStage == MC_RENDER_STAGE_TERRAIN_SOLID
+        ? 1.0
+        : pow(averageTextureData.a, rcp(3));
     data.emission = pow2(at_midBlock.w / 15.0);
 
     // if (isEndPortal(blockEntityId)) {

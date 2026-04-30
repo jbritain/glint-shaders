@@ -164,6 +164,7 @@ uniform sampler2D perlinnoisetex;
 uniform sampler3D bluenoisetex;
 
 uniform sampler2D moontex;
+uniform sampler2D startex;
 
 uniform bool isDay;
 uniform vec3 sunDir;

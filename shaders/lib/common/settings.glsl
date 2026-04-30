@@ -17,7 +17,7 @@
   // Ambient_Occlusion
     #define AO 2 // [0 1 2]
     #define AO_SAMPLES 8 // [4 5 6 7 8 9 10 11 12 13 14 15 16]
-    #define AO_RADIUS 1 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 ]
+    #define AO_RADIUS 1.0 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 ]
     #define GTAO_DIRECTION_SAMPLE_COUNT 4 // [4]
     #define GTAO_THICKNESS 0.5  // [0.5 ]
     #define AO_MAX_FRAMES 64 // [64]
@@ -75,8 +75,8 @@
     #define VOLUMETRIC_FOG_DENSITY 0.01 // [0.001 0.002 0.003 0.004 0.005 0.006 0.007 0.008 0.009 0.01 0.011 0.012 0.013 0.014 0.015 0.016 0.017 0.018 0.019 0.02 ]
     #define VOLUMETRIC_FOG_MULTIPLE_SCATTERING 5.0 // [5.0]
     #define VOLUMETRIC_FOG_BOTTOM_PLANE -64 // [-64]
-    #define VOLUMETRIC_FOG_MIDDLE_PLANE 64 // [64]
-    #define VOLUMETRIC_FOG_TOP_PLANE mix(128, 200, wetness) // [mix(128, 200, wetness)]
+    #define VOLUMETRIC_FOG_MIDDLE_PLANE 128 // [128]
+    #define VOLUMETRIC_FOG_TOP_PLANE 200 // [200]
 
   // Volumetric_Clouds
     #define VOLUMETRIC_CLOUDS  

@@ -29,12 +29,20 @@ const float totalWaveAmplitude =
 
 const float g = 9.8;
 
-float gerstner(vec2 pos, vec2 dir, float wavelength, float amplitude, float t) {
+float gerstner(
+  vec2 pos,
+  vec2 dir,
+  float wavelength,
+  float amplitude,
+  float t,
+  float steepness
+) {
   float k = TAU / wavelength;
   float omega = sqrt(g * k);
   vec2 K = normalize(dir) * k; // ensure dir is normalized
 
-  return amplitude * (cos(mod(dot(K, pos) - omega * t, TAU)) * 0.5 + 0.5);
+  return amplitude *
+  pow(cos(mod(dot(K, pos) - omega * t, TAU)) * 0.5 + 0.5, steepness);
 }
 
 vec2 gerstnerDeriv(
@@ -42,14 +50,20 @@ vec2 gerstnerDeriv(
   vec2 dir,
   float wavelength,
   float amplitude,
-  float t
+  float t,
+  float steepness // add steepness param
 ) {
   float k = TAU / wavelength;
   float omega = sqrt(g * k);
   vec2 K = normalize(dir) * k;
 
   float phase = dot(K, pos) - omega * t;
-  return -(amplitude / 2.0) * sin(phase) * K;
+  float cosHalf = cos(phase) * 0.5 + 0.5;
+
+  float scalar =
+    amplitude * steepness * pow(cosHalf, steepness - 1.0) * (-sin(phase) * 0.5);
+
+  return scalar * K;
 }
 
 float waveHeight(vec2 pos) {
@@ -70,7 +84,14 @@ float waveHeight(vec2 pos) {
   for (int i = 0; i < WAVE_OCTAVES; i++) {
     float r = mod(i * 11.23456, TAU);
     vec2 dir = vec2(sin(r), cos(r));
-    height += gerstner(pos, dir, wavelength, amplitude, frameTimeCounter * 0.5);
+    height += gerstner(
+      pos,
+      dir,
+      wavelength,
+      amplitude,
+      frameTimeCounter * 0.5,
+      2.0
+    );
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
     amplitude *= WAVE_AMPLITUDE_MULTIPLIER;
   }
@@ -101,7 +122,8 @@ vec2 waveHeightDeriv(vec2 pos) {
       dir,
       wavelength,
       amplitude,
-      frameTimeCounter * 0.5
+      frameTimeCounter * 0.5,
+      2.0
     );
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
     amplitude *= WAVE_AMPLITUDE_MULTIPLIER;

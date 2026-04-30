@@ -80,7 +80,7 @@
       },
       "Ambient Occlusion Radius": {
         "key": "AO_RADIUS",
-        "default": "1",
+        "default": "1.0",
         "values": "{frange(0.1, 5.1, 0.1)}"
       },
       "GTAO Direction Sample Count": {

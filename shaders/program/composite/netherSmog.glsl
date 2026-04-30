@@ -42,8 +42,6 @@ void main() {
 
   Volume smog = getNetherSmog(feetPlayerPos);
   color.rgb = fma(color.rgb, smog.transmittance, smog.scattering);
-
-  show(getNetherSmogDensity(feetPlayerPos + cameraPosition));
 }
 
 #endif

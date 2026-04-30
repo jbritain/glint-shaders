@@ -143,11 +143,18 @@ void main() {
       tMax,
       float(numScatteringSteps)
     ) *
-    moonIrradiance;
+    moonIrradiance *
+    abs(moonPhase - 4) /
+    4.0;
+
+  ;
 
   imageStore(skyViewLUT, texelCoord, vec4(lum, 1.0));
 
   if (texelCoord == ivec2(0.0)) {
+    #ifdef WORLD_THE_END
+    sunlightColor = vec3(0.0);
+    #else
     sunlightColor = isDay
       ? getValFromTLUT(
         sunTransmittanceLUTTex,
@@ -165,6 +172,7 @@ void main() {
       moonIrradiance *
       abs(moonPhase - 4) /
       4.0;
+    #endif
 
     // sunlightColor *= smoothstep(0.0, 0.005, worldLightDir.y); // fade out sunlight to stop hard transition between sun and moon
 

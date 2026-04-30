@@ -47,7 +47,8 @@ void main() {
     pow(2.0, EV100 - EXPOSURE_COMPENSATION) /
     (LENS_VIGNETTE * SENSOR_SENSITIVITY);
   float exposure = rcp(Lmax);
-  exposure = clamp(exposure, 0.0, 0.1);
+  exposure = clamp(exposure, 0.0, 0.05);
+  // exposure *= 0.05;
   color *= exposure;
 
   // float purkinje = smoothstep(0.04, 0.05, exposure);

@@ -36,7 +36,7 @@ float getSSAO(vec3 viewPos, vec3 worldNormal) {
     vec3 sampleDir =
       tbn * vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
     vec3 worldSampleDir = mat3(gbufferModelViewInverse) * sampleDir;
-    float radius = pow2(noise.z);
+    float radius = noise.z; // pow2(noise.z)
 
     vec3 offset = sampleDir * radius * AO_RADIUS;
 

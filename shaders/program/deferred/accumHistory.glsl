@@ -53,7 +53,6 @@ void main() {
   vec3 actualPreviousPos = previousViewPos;
 
   actualPreviousPos.z = screenSpaceToViewSpace(reprojectedDepth);
-  show(-actualPreviousPos.z / far);
 
   if (
     clamp01(previousPos) == previousPos &&
