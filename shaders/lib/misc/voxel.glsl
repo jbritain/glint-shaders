@@ -112,6 +112,9 @@ vec3 sampleFloodfill(
   vec3 offset = -geometryNormal * 0.5 + surfaceNormal;
   offset = mix(offset, vec3(0.0), sss * 0.25);
   vec3 voxelPosInterp = mapVoxelPosInterp(playerPos + offset);
+  if (clamp01(voxelPosInterp) != voxelPosInterp) {
+    return vec3(0.0);
+  }
 
   if (frameCounter % 2 == 0) {
     return texture(floodfillVoxelMapTex2, voxelPosInterp).rgb;
@@ -122,6 +125,9 @@ vec3 sampleFloodfill(
 
 vec3 sampleFloodfill(vec3 playerPos) {
   vec3 voxelPosInterp = mapVoxelPosInterp(playerPos);
+  if (clamp01(voxelPosInterp) != voxelPosInterp) {
+    return vec3(0.0);
+  }
   if (frameCounter % 2 == 0) {
     return texture(floodfillVoxelMapTex2, voxelPosInterp).rgb;
   } else {

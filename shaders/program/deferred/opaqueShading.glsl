@@ -147,7 +147,6 @@ void main() {
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
-  show(occlusion);
 }
 
 #endif

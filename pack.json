@@ -132,6 +132,17 @@
         ]
       },
       {
+        "path": "accumulateClouds",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS) || (defined PLANAR_CLOUDS)",
+        "dimensions": [
+          "OVERWORLD"
+        ]
+      },
+      {
         "path": "getVolumetricFog",
         "programs": [
           "vsh",

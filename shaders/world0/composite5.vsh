@@ -1,5 +1,5 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
-#define fsh
-#define BLEND_BEFORE_TRANSLUCENTS 
+#define vsh
+#define BLEND_AFTER_TRANSLUCENTS 
 #include "/program/composite/blendAtmospherics.glsl"

@@ -32,28 +32,48 @@ void main() {
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 14 */
+/* RENDERTARGETS: 8 */
 
 layout(location = 0) out vec4 clouds;
 
 void main() {
-  vec2 texcoord = texcoord + getJitterOffset(4, frameCounter) / resolution;
-
   clouds = vec4(0.0, 0.0, 0.0, 1.0);
   float depth = texture(depthtex0, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   voxyOverride(depth, viewPos, texcoord, true);
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
-
-  vec4 planarClouds = getPlanarClouds(normalize(feetPlayerPos));
-  vec4 volClouds = getVolumetricClouds(feetPlayerPos, depth == 1.0);
-
-  if (depth == 1.0) {
-    clouds = planarClouds;
+  if (depth == 1.0 || distance(cameraPosition, previousCameraPosition) < 0.01) {
+    vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
+    previousPos = transformView(previousPos, gbufferPreviousModelView);
+    previousPos = viewSpaceToScreenSpace(
+      previousPos,
+      gbufferPreviousProjection
+    );
+    vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
+    float previousZ = screenSpaceToViewSpace(
+      texture(colortex5, previousPos.xy).a
+    );
+    if (
+      saturate(previousPos.xy) == previousPos.xy &&
+      abs(viewPos.z - previousZ) < 0.1
+    ) {
+      clouds = previousClouds;
+    } else {
+      clouds = texture(colortex14, texcoord);
+    }
   }
 
-  clouds.rgb = fma(clouds.rgb, vec3(volClouds.a), volClouds.rgb);
-  clouds.a *= volClouds.a;
+  if (
+    ivec2(floor(vec2(gl_FragCoord.xy) / 4.0) * 4.0) +
+      getJitterOffset(4, frameCounter) ==
+    ivec2(gl_FragCoord.xy)
+  ) {
+    clouds = mix(
+      clouds,
+      texelFetch(colortex14, ivec2(gl_FragCoord.xy) / 4, 0),
+      0.5
+    );
+  }
 }
 
 #endif

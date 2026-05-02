@@ -109,8 +109,8 @@
       },
       "Rough Reflection Rays": {
         "key": "ROUGH_SSR_SAMPLES",
-        "default": "8",
-        "values": "{frange(8, 65, 1)}"
+        "default": "1",
+        "values": "{frange(1, 65, 1)}"
       },
       "Reflection Roughness Threshold": {
         "key": "ROUGH_SSR_THRESHOLD",
@@ -164,7 +164,8 @@
       },
       "Emissive Strength": {
         "key": "EMISSIVE_STRENGTH",
-        "default": 1000
+        "default": 1000,
+        "values": "{frange(0, 2100, 100)}"
       },
       "Blocklight Color R": {
         "key": "BLOCKLIGHT_COLOR_R",
