@@ -184,7 +184,7 @@
       },
       "Blocklight Color": {
         "key": "blocklightColor",
-        "default": "pow(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0, vec3(1.0 / 2.2)) * EMISSIVE_STRENGTH / 16.0"
+        "default": "sRGBToLinear(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0) * EMISSIVE_STRENGTH / 16.0"
       }
     },
     "Sub-Surface Scattering": {
@@ -437,8 +437,8 @@
     "Camera": {
       "Exposure Compensation": {
         "key": "EXPOSURE_COMPENSATION",
-        "default": "2.0",
-        "values": "{frange(-10, 11, 1)}"
+        "default": "0.0",
+        "values": "{frange(-10.0, 11.0, 1)}"
       }
     },
     "Bloom": {

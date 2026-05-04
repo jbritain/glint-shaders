@@ -59,18 +59,23 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
 
     float shadow = texture(shadowtex1HW, shadowRayPos).r;
     shadow *= getCloudShadow(rayPos);
-    // vec2 causticsPos =
-    //   (mat3(shadowModelView) * mod(rayPos + cameraPosition, 512)).xy / 128;
+    vec2 causticsPos =
+      (mat3(shadowModelView) * mod(rayPos + cameraPosition, 512)).xy / 128;
 
-    // float t = worldTimeCounter * 0.005;
-    // float caustics = max(
-    //   texture(noisetex, causticsPos + vec2(t, 0.0)).r,
-    //   texture(noisetex, causticsPos + vec2(-t, t)).r
-    // );
+    // extra caustics in the water fog
+    // they look pretty ass from above the surface so they're only enabled when the camera is underwater
+    if (isEyeInWater == 1) {
+      float t = frameTimeCounter * 0.005;
+      float caustics = max(
+        texture(noisetex, causticsPos + vec2(t, 0.0)).r,
+        texture(noisetex, causticsPos + vec2(-t, t)).r
+      );
 
-    // caustics = pow3(caustics);
+      caustics = pow3(caustics);
 
-    // shadow *= caustics;
+      shadow *= caustics;
+    }
+
     // shadow *= texture(shadowcolor2, shadowRayPos.xy).r * TAU;
 
     float distanceToSurface =
@@ -91,6 +96,10 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
       sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
 
     radiance += skylightColor * isotropicPhase * EBS.y;
+
+    #ifdef FLOODFILL
+    radiance += sampleFloodfill(rayPos) * EMISSIVE_STRENGTH * isotropicPhase;
+    #endif
 
     scattering +=
       transmittance *

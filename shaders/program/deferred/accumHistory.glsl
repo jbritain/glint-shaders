@@ -57,7 +57,8 @@ void main() {
   if (
     clamp01(previousPos) == previousPos &&
     (distance(actualPreviousPos, previousViewPos) < 0.1 ||
-      distance(cameraPosition, previousCameraPosition) < 0.01)
+      distance(cameraPosition, previousCameraPosition) < 0.01 ||
+      reprojectedDepth == 1.0 && depth == 1.0)
   ) {
     historyCount = texture(colortex11, texcoord).r + 1;
   }

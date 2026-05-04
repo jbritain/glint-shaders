@@ -17,7 +17,7 @@
 vec3 jodieReinhardTonemap(vec3 v) {
   float l = luminance(v);
   vec3 tv = v / (1.0f + v);
-  return pow(mix(v / (1.0f + l), tv, tv), vec3(rcp(2.2)));
+  return linearToSRGB(mix(v / (1.0f + l), tv, tv));
 }
 
 vec3 uncharted2TonemapPartial(vec3 x) {
@@ -107,8 +107,7 @@ vec3 agxEotf(vec3 val) {
   // Undo input transform
   val = agx_mat_inv * val;
 
-  // sRGB IEC 61966-2-1 2.2 Exponent Reference EOTF Display
-  val = pow(val, vec3(2.2));
+  val = linearToSRGB(val);
 
   return val;
 }

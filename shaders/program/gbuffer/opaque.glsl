@@ -111,7 +111,7 @@ void main() {
   }
 
   Material material = materialFromSpecularMap(
-    pow(color.rgb, vec3(2.2)),
+    sRGBToLinear(color.rgb),
     texture(specular, texcoord),
     materialID
   );

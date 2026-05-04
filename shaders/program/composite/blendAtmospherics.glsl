@@ -33,6 +33,7 @@ layout(location = 0) out vec4 color;
 
 #include "/lib/atmosphere/volumetricClouds.glsl"
 #include "/lib/atmosphere/atmosphericFog.glsl"
+#include "/lib/util/upsample.glsl"
 
 void main() {
   color = texture(colortex0, texcoord);
@@ -46,7 +47,7 @@ void main() {
   // because that decides whether we blend fog or the clouds first
 
   #ifdef VOLUMETRIC_FOG
-  vec4 fog = texture(colortex12, texcoord);
+  vec4 fog = upsample(colortex12, uvec2(gl_FragCoord.xy), depth, 2);
   #else
   vec4 fog = vec4(0.0, 0.0, 0.0, 1.0);
   #endif

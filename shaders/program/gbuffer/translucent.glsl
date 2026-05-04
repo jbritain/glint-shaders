@@ -54,6 +54,7 @@ void main() {
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/cloudShadows.glsl"
 #include "/lib/misc/voxel.glsl"
+#include "/lib/water/waveNormals.glsl"
 
 in vec2 lightmap;
 in vec2 texcoord;
@@ -85,10 +86,12 @@ void main() {
   }
 
   Material material = materialFromSpecularMap(
-    pow(color.rgb, vec3(2.2)),
+    sRGBToLinear(color.rgb),
     texture(specular, texcoord),
     materialID
   );
+
+  vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
   if (materialIsWater(materialID)) {
     material.roughness = 0.0;
@@ -96,9 +99,15 @@ void main() {
     material.albedo = vec3(0.0);
     color.a = 0.01;
 
+    // gbuffer.surfaceNormal = getWaterParallaxNormal(
+    //   feetPlayerPos,
+    //   gbuffer.geometryNormal,
+    //   blueNoise(gl_FragCoord.xy, frameCounter).r,
+    //   1.0
+    // );
+
   }
 
-  vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
   float shadow = getShadowFast(
     feetPlayerPos,
     gbuffer.surfaceNormal,

@@ -45,7 +45,7 @@ void main() {
     return;
   }
 
-  vec4 previousFog = texture(colortex12, texcoord);
+  // vec4 previousFog = texture(colortex12, texcoord);
   fog = getVolumetricFog(feetPlayerPos, depth);
 
   // fog = mix(fog, previousFog, 0.7);

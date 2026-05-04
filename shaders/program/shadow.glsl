@@ -35,6 +35,10 @@ void main() {
   gl_Position = ftransform();
 
   shadowViewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+  materialID = uint(mc_Entity.x);
+  vec3 worldNormal = mat3(shadowModelViewInverse) * normal;
+
+  vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
 
   normal = normalize(gl_NormalMatrix * gl_Normal);
   vec3 screenPos = gl_Position.xyz * 0.5 + 0.5;
@@ -45,8 +49,7 @@ void main() {
   );
 
   #ifdef FLOODFILL
-  vec3 feetPlayerPos = (shadowModelViewInverse * vec4(shadowViewPos, 1.0)).xyz;
-  vec3 worldNormal = mat3(shadowModelViewInverse) * normal;
+
   ivec3 voxelPos = mapVoxelPos(
     feetPlayerPos +
       (renderStage == MC_RENDER_STAGE_BLOCK_ENTITIES
@@ -67,7 +70,7 @@ void main() {
 
     // data.color = getBlocklightColor(materialID);
 
-    data.color = pow(averageTextureData.rgb, vec3(2.2));
+    data.color = sRGBToLinear(averageTextureData.rgb);
     data.opacity =
       renderStage == MC_RENDER_STAGE_TERRAIN_SOLID
         ? 1.0
@@ -106,7 +109,6 @@ void main() {
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
   glcolor = gl_Color;
 
-  materialID = uint(mc_Entity.x);
 }
 #endif
 

@@ -80,8 +80,6 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     shadowProjection
   );
 
-  float stepLength = distance(start, end) / VOLUMETRIC_FOG_SAMPLES;
-
   float jitter = blueNoise(gl_FragCoord.xy, frameCounter).r;
 
   float transmittance = 1.0;
@@ -89,10 +87,15 @@ vec4 getVolumetricFog(vec3 position, float depth) {
 
   float phase = hgDraine(11, dot(dir, worldLightDir));
 
+  vec3 previousRayPos = start;
+
   for (int i = 0; i < VOLUMETRIC_FOG_SAMPLES; i++) {
     float progress = float(i + jitter) / float(VOLUMETRIC_FOG_SAMPLES);
+    progress = exp(7.0 * (progress - 1.0));
 
     vec3 rayPos = mix(start, end, progress);
+    float stepLength = distance(previousRayPos, rayPos);
+    previousRayPos = rayPos;
     vec3 shadowRayPos = mix(shadowStart, shadowEnd, progress);
     shadowRayPos.xy += getWarp(shadowRayPos.xy);
 

@@ -50,4 +50,22 @@ vec2 vogelDisc(int stepIndex, int stepCount, float noise) {
   return r * vec2(cos(theta), sin(theta));
 }
 
+// https://www.shadertoy.com/view/7sfXDn
+float bayer2(vec2 a) {
+  a = floor(a);
+  return fract(a.x / 2.0 + a.y * a.y * 0.75);
+}
+
+#define bayer4(a) (bayer2(0.5 * (a)) * 0.25 + bayer2(a))
+#define bayer8(a) (bayer4(0.5 * (a)) * 0.25 + bayer2(a))
+#define bayer16(a) (bayer8(0.5 * (a)) * 0.25 + bayer2(a))
+#define bayer32(a) (bayer16(0.5 * (a)) * 0.25 + bayer2(a))
+#define bayer64(a) (bayer32(0.5 * (a)) * 0.25 + bayer2(a))
+
+float animateBayer(float value, int frameIndex, int bayerIndex) {
+  int totalFrames = bayerIndex * bayerIndex;
+  float offset = float(frameIndex % totalFrames) / float(totalFrames);
+  return fract(value + offset);
+}
+
 #endif // DITHER_GLSL

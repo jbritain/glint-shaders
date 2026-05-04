@@ -80,8 +80,13 @@ float viewSpaceToScreenSpace(float depth, mat4 proj) {
   return (proj[2].z * depth + proj[3].z) / -depth * 0.5 + 0.5;
 }
 
-vec3 transformView(vec3 position, mat4 view){
+vec3 transformView(vec3 position, mat4 view) {
   return (view * vec4(position, 1.0)).xyz;
+}
+
+vec3 projectAndDivide(vec3 position, mat4 proj) {
+  vec4 projected = proj * vec4(position, 1.0);
+  return projected.xyz / projected.w;
 }
 
 vec3 viewSpaceToScreenSpaceOrtho(vec3 viewPosition, mat4 proj) {

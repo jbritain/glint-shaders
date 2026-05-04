@@ -21,6 +21,7 @@
 #define WAVE_AMPLITUDE_MULTIPLIER 0.8
 #define WAVE_WAVELENGTH_MULTIPLIER 0.8
 #define WAVE_OCTAVES 12
+#define WAVE_STEEPNESS 2.0
 
 const float totalWaveAmplitude =
   WAVE_INITIAL_AMPLITUDE *
@@ -51,7 +52,7 @@ vec2 gerstnerDeriv(
   float wavelength,
   float amplitude,
   float t,
-  float steepness // add steepness param
+  float steepness
 ) {
   float k = TAU / wavelength;
   float omega = sqrt(g * k);
@@ -69,17 +70,12 @@ vec2 gerstnerDeriv(
 float waveHeight(vec2 pos) {
   float noise = texture(
     perlinnoisetex,
-    fract((pos + vec2(frameTimeCounter)) / 1500)
+    fract((pos + vec2(frameTimeCounter * 2.0 - 1.0) * 0.2) / 200.0)
   ).r;
 
   float height = 0.0;
   float wavelength = WAVE_INITIAL_WAVELENGTH;
   float amplitude = WAVE_INITIAL_AMPLITUDE;
-
-  // TODO: the noise texture adds artifacts to caustics so we disable it in the shadow program
-  #ifndef SHADOW
-  pos += (vec2(noise, -noise) * 2.0 - 1.0) * 20;
-  #endif
 
   for (int i = 0; i < WAVE_OCTAVES; i++) {
     float r = mod(i * 11.23456, TAU);
@@ -89,8 +85,8 @@ float waveHeight(vec2 pos) {
       dir,
       wavelength,
       amplitude,
-      frameTimeCounter * 0.5,
-      2.0
+      frameTimeCounter * 0.5 + noise * 10,
+      WAVE_STEEPNESS
     );
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
     amplitude *= WAVE_AMPLITUDE_MULTIPLIER;
@@ -103,12 +99,8 @@ float waveHeight(vec2 pos) {
 vec2 waveHeightDeriv(vec2 pos) {
   float noise = texture(
     perlinnoisetex,
-    fract((pos + vec2(frameTimeCounter)) / 1500.0)
+    fract((pos + vec2(frameTimeCounter * 2.0 - 1.0) * 0.2) / 200.0)
   ).r;
-
-  #ifndef SHADOW
-  pos += (vec2(noise, -noise) * 2.0 - 1.0) * 20.0; // technically we need to differentiate the noise as well but who tf wants to do that
-  #endif
 
   vec2 grad = vec2(0.0);
   float wavelength = WAVE_INITIAL_WAVELENGTH;
@@ -122,8 +114,8 @@ vec2 waveHeightDeriv(vec2 pos) {
       dir,
       wavelength,
       amplitude,
-      frameTimeCounter * 0.5,
-      2.0
+      frameTimeCounter * 0.5 + noise * 10,
+      WAVE_STEEPNESS
     );
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
     amplitude *= WAVE_AMPLITUDE_MULTIPLIER;

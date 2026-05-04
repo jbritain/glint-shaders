@@ -21,17 +21,13 @@ vec3 powVec3(vec3 v, float p) {
   return vec3(pow(v.x, p), pow(v.y, p), pow(v.z, p));
 }
 
-vec3 toSRGB(vec3 v) {
-  return powVec3(v, 1.0 / 2.2);
-}
-
 float RGBToLuminance(vec3 col) {
   return dot(col, vec3(0.2126f, 0.7152f, 0.0722f));
 }
 
 float karisAverage(vec3 col) {
   // Formula is 1 / (1 + luma)
-  float luma = RGBToLuminance(toSRGB(col)) * 0.25f;
+  float luma = RGBToLuminance(linearToSRGB(col)) * 0.25f;
   return 1.0f / (1.0f + luma);
 }
 

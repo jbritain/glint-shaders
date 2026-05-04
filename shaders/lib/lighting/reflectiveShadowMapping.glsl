@@ -28,6 +28,10 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   );
 
   vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).rg;
+  // vec2 jitter = vec2(
+  //   animateBayer(bayer8(gl_FragCoord.xy), frameCounter, 8),
+  //   interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter)
+  // );
   const float radius = RSM_RADIUS / shadowDistance;
 
   vec3 irradiance = vec3(0.0);
@@ -47,7 +51,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
     );
     vec4 sampleColor = texture(shadowcolor0, warpedPos);
     vec3 sampleFlux = sampleColor.rgb * sampleColor.a;
-    sampleFlux = pow(sampleFlux, vec3(2.2));
+    sampleFlux = sRGBToLinear(sampleFlux);
     vec3 sampleNormal = texture(shadowcolor1, warpedPos).rgb * 2.0 - 1.0;
     sampleNormal.z = sqrt(1.0 - dot(sampleNormal.xy, sampleNormal.xy));
 

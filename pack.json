@@ -16,7 +16,8 @@
       "clouds": "discard",
       "skytextured": "discard",
       "skybasic": "discard",
-      "voxels": "voxels"
+      "voxels": "voxels",
+      "weather": "translucent"
     },
     "setup": [
       {
@@ -83,6 +84,18 @@
       },
       {
         "path": "RSM",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "defined RSM",
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ]
+      },
+      {
+        "path": "accumulateRSM",
         "programs": [
           "vsh",
           "fsh"

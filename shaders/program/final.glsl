@@ -53,7 +53,7 @@ void main() {
     );
   }
 
-  color = pow(texture(colortex0, texcoord).rgb, vec3(rcp(2.2)));
+  color = texture(colortex0, texcoord).rgb;
   color += interleavedGradientNoise(floor(gl_FragCoord.xy), 0) / 255;
 
   #ifdef DEBUG_ENABLE

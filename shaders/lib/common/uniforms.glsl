@@ -120,14 +120,6 @@ uniform sampler2D colortex13;
 uniform sampler2D colortex14;
 uniform sampler2D colortex15;
 
-#ifdef VOXY
-uniform usampler2D colortex16;
-uniform usampler2D colortex17;
-
-uniform sampler2D vxDepthTexOpaque;
-uniform sampler2D vxDepthTexTrans;
-#endif
-
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
 uniform sampler2D depthtex2;

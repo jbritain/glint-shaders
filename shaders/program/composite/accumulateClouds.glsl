@@ -29,6 +29,7 @@ void main() {
 #include "/lib/atmosphere/planarClouds.glsl"
 #include "/lib/util/misc.glsl"
 #include "/lib/util/jitter.glsl"
+#include "/lib/util/upsample.glsl"
 
 in vec2 texcoord;
 
@@ -39,9 +40,27 @@ layout(location = 0) out vec4 clouds;
 void main() {
   clouds = vec4(0.0, 0.0, 0.0, 1.0);
   float depth = texture(depthtex0, texcoord).r;
+
+  if (texture(depthtex2, texcoord).r != texture(depthtex1, texcoord).r) {
+    return;
+  }
+
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   voxyOverride(depth, viewPos, texcoord, true);
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
+  // vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
+  // vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);
+  // previousPos = viewSpaceToScreenSpace(
+  //   previousViewPos,
+  //   gbufferPreviousProjection
+  // );
+
+  // vec4 previousClouds = texture(colortex8, previousPos.xy);
+
+  // clouds = upsample(colortex14, uvec2(gl_FragCoord.xy), depth, 4);
+  // uint frameCount = min(texture(colortex11, texcoord).r, RSM_MAX_FRAMES);
+  // clouds = (previousClouds * frameCount + clouds) / (frameCount + 1);
+
   if (depth == 1.0 || distance(cameraPosition, previousCameraPosition) < 0.01) {
     vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
     previousPos = transformView(previousPos, gbufferPreviousModelView);

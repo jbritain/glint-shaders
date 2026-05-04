@@ -40,7 +40,7 @@ void main() {
   vec2 texcoord = texcoord + getJitterOffset(4, frameCounter) / resolution;
 
   clouds = vec4(0.0, 0.0, 0.0, 1.0);
-  float depth = texture(depthtex0, texcoord).r;
+  float depth = texelFetch(depthtex0, ivec2(texcoord * resolution), 0).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
   voxyOverride(depth, viewPos, texcoord, true);
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);

@@ -71,18 +71,8 @@ void main() {
   Material material;
   Gbuffer gbuffer;
 
-  #ifdef VOXY
-  if (!VOXY_MASK) {
-    material = unpackMaterial(texture(colortex2, texcoord).rg);
-    gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
-  } else {
-    material = unpackMaterial(texture(colortex17, texcoord).rg);
-    gbuffer = unpackGbuffer(texture(colortex16, texcoord).rgb);
-  }
-  #else
   material = unpackMaterial(texture(colortex2, texcoord).rg);
   gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
-  #endif
 
   bool isWater = materialIsWater(material.id);
   if (isWater) {
