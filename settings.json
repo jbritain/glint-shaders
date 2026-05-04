@@ -124,7 +124,8 @@
     },
     "Global Illumination": {
       "Global Illumination": {
-        "key": "RSM"
+        "key": "RSM",
+        "default": false
       },
       "Global Illumination Samples": {
         "key": "RSM_SAMPLES",
@@ -442,7 +443,8 @@
       },
       "Depth Of Field": {
         "Depth Of Field": {
-          "key": "DOF"
+          "key": "DOF",
+          "default": false
         },
         "Depth of Field Radius": {
           "key": "DOF_MAX_RADIUS",
@@ -459,12 +461,12 @@
           "default": "4",
           "values": "{frange(2, 34, 2)}"
         }
-      }
-    },
-    "Bloom": {
-      "Bloom Radius": {
-        "key": "BLOOM_RADIUS",
-        "default": "1.0"
+      },
+      "Bloom": {
+        "Bloom Radius": {
+          "key": "BLOOM_RADIUS",
+          "default": "1.0"
+        }
       }
     }
   },

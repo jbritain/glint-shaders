@@ -30,7 +30,7 @@
     #define SSR_MAX_FRAMES 64 // [64]
 
   // Global_Illumination
-    #define RSM  
+    // #define RSM  // [False]
     #ifdef RSM
     #endif
     #define RSM_SAMPLES 4 // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
@@ -138,15 +138,15 @@
     #define EXPOSURE_COMPENSATION 0.0 // [-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]
 
     // Depth_Of_Field
-      #define DOF  
+      // #define DOF  // [False]
       #ifdef DOF
       #endif
       #define DOF_MAX_RADIUS 0.02 // [0.005 0.01 0.015 0.02 0.025 0.03 0.035 0.04 0.045 0.05 0.055 0.06 0.065 0.07 0.075 0.08 0.085 0.09 0.095 0.1 ]
       #define DOF_FOCUS_RANGE 1.0 // [0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0 8.5 9.0 9.5 10.0 ]
       #define DOF_SAMPLES 4 // [2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32]
 
-  // Bloom
-    #define BLOOM_RADIUS 1.0 // [1.0]
+    // Bloom
+      #define BLOOM_RADIUS 1.0 // [1.0]
 
 // Miscellaneous
   #define MULTIPLICATIVE_TRANSLUCENTS  
