@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define fsh
-#include "/program/composite/autoExposure.glsl"
+#include "/program/composite/autoExposureWriteLuminance.glsl"

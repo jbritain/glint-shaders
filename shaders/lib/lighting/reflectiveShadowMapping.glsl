@@ -37,7 +37,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   vec3 irradiance = vec3(0.0);
 
   for (int i = 0; i < RSM_SAMPLES; i++) {
-    float angle = fract(float(i) / RSM_SAMPLES + jitter.x) * 2.0 * PI;
+    float angle = fract(float(i) / RSM_SAMPLES + jitter.x) * TAU;
     float r = sqrt(float(i + jitter.y) / RSM_SAMPLES);
     vec2 offset = r * radius * vec2(sin(angle), cos(angle));
 

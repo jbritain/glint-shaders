@@ -38,9 +38,8 @@ const bool colortex0MipmapEnabled = true;
 void main() {
   color = texture(colortex0, texcoord).rgb;
 
-  float EV100 = log2(
-    averageLuminanceSmooth * SENSOR_SENSITIVITY / CALIBRATION_CONSTANT
-  );
+  float EV100 = getEV100(averageLuminanceSmooth);
+  EV100 = clamp(EV100, 4, 14);
 
   float Lmax =
     78 *

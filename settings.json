@@ -439,6 +439,26 @@
         "key": "EXPOSURE_COMPENSATION",
         "default": "0.0",
         "values": "{frange(-10.0, 11.0, 1)}"
+      },
+      "Depth Of Field": {
+        "Depth Of Field": {
+          "key": "DOF"
+        },
+        "Depth of Field Radius": {
+          "key": "DOF_MAX_RADIUS",
+          "default": "0.02",
+          "values": "{frange(0.005, 0.105, 0.005)}"
+        },
+        "Depth Of Field Focus Range": {
+          "key": "DOF_FOCUS_RANGE",
+          "default": "1.0",
+          "values": "{frange(0.0, 10.5, 0.5)}"
+        },
+        "Depth Of Field Samples": {
+          "key": "DOF_SAMPLES",
+          "default": "4",
+          "values": "{frange(2, 34, 2)}"
+        }
       }
     },
     "Bloom": {

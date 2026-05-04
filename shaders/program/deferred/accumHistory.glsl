@@ -40,6 +40,7 @@ void main() {
 
   float depth = texture(depthtex1, texcoord).r;
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
+  vec3 viewNormal = normalize(cross(dFdx(viewPos), dFdy(viewPos)));
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   vec3 previousViewPos = transformView(previousPos, gbufferPreviousModelView);
@@ -49,16 +50,24 @@ void main() {
   );
 
   reprojectedDepth = texture(colortex5, previousPos.xy).a;
-
   vec3 actualPreviousPos = previousViewPos;
-
   actualPreviousPos.z = screenSpaceToViewSpace(reprojectedDepth);
+  vec3 prevNormal = normalize(
+    cross(dFdx(actualPreviousPos), dFdy(actualPreviousPos))
+  );
+
+  // witchcraft by cyanember to try and prevent stretching of stuff around corners
+  float pixelSizeIncrease =
+    dot(normalize(viewPos), viewNormal) *
+    pow2(actualPreviousPos.z) /
+    (dot(-normalize(actualPreviousPos), prevNormal) * pow2(viewPos.z));
 
   if (
     clamp01(previousPos) == previousPos &&
     (distance(actualPreviousPos, previousViewPos) < 0.1 ||
       distance(cameraPosition, previousCameraPosition) < 0.01 ||
-      reprojectedDepth == 1.0 && depth == 1.0)
+      reprojectedDepth == 1.0 && depth == 1.0) &&
+    rcp(pixelSizeIncrease) < 0.1
   ) {
     historyCount = texture(colortex11, texcoord).r + 1;
   }

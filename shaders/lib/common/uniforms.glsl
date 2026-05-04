@@ -66,6 +66,8 @@ uniform float sunAngle;
 uniform float playerMood;
 uniform float constantMood;
 
+uniform float centerDepthSmooth;
+
 uniform ivec2 atlasSize;
 uniform ivec2 eyeBrightness;
 uniform ivec2 eyeBrightnessSmooth;

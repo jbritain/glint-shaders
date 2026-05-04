@@ -63,14 +63,24 @@ void main() {
 
   beginText(ivec2(gl_FragCoord.xy / 2.0), ivec2(0, viewHeight / 2.0) + ivec2(8, -8));
   printString((_D, _e, _b, _u, _g, _space, _m, _o, _d, _e, _space, _i, _s, _space, _a, _c, _t, _i, _v, _e));
+  if (!hideGUI) {
+    printLine();
+    printString((_P, _r, _e, _s, _s, _space, _F, _1, _space, _a, _n, _d, _space, _c, _a, _l, _l, _space, _s, _h, _o, _w, _opprn, _clprn));
+  }
   printLine();
   printString((_F, _r, _a, _m, _e, _colon, _space));
   printInt(frameCounter);
   printLine();
+  printString((_A, _v, _g, _space, _F, _P, _S, _colon, _space));
+  printFloat(frameCounter / frameTimeCounter);
 
-  if (!hideGUI) {
-    printString((_P, _r, _e, _s, _s, _space, _F, _1, _space, _a, _n, _d, _space, _c, _a, _l, _l, _space, _s, _h, _o, _w, _opprn, _clprn));
-  }
+  printLine();
+  printLine();
+
+  float EV100 = getEV100(averageLuminanceSmooth);
+  printString((_E, _V, _1, _0, _0, _colon, _space));
+  printFloat(EV100);
+
 
   endText(color.rgb);
   #endif

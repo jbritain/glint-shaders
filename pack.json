@@ -263,6 +263,14 @@
         ]
       },
       {
+        "path": "depthOfField",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "(defined DOF)"
+      },
+      {
         "path": "temporalFilter",
         "programs": [
           "vsh",

@@ -66,8 +66,8 @@ vec4 getVolumetricFog(vec3 position, float depth) {
   if (depth == 1.0) {
     rayPlaneIntersection(cameraPosition, dir, VOLUMETRIC_FOG_TOP_PLANE, end);
   }
-  if (distance(start, end) > 1000) {
-    end = start + dir * 1000;
+  if (distance(start, end) > 500) {
+    end = start + dir * 500;
   }
 
   vec3 shadowStart = viewSpaceToScreenSpaceOrtho(

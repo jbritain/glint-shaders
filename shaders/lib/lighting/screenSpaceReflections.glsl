@@ -49,30 +49,40 @@ vec3 SSRSample(
     gbufferPreviousProjection
   );
 
+  float skyBlendWeight = 1.0;
+  vec3 col = vec3(0.0);
+  hitLength = 0.0;
+
+  rayPos = screenSpaceToViewSpace(rayPos);
   if (hit) {
-    rayPos = screenSpaceToViewSpace(rayPos);
     hitLength = distance(rayPos, origin);
     rayPos = transformView(rayPos, gbufferModelViewInverse);
     rayPos += cameraPosition - previousCameraPosition;
     rayPos = transformView(rayPos, gbufferPreviousModelView);
     rayPos = viewSpaceToScreenSpace(rayPos, gbufferPreviousProjection);
-    return texture(colortex5, rayPos.xy).rgb;
-  } else {
-    hitLength = 0.0;
-    rayPos = viewSpaceToScreenSpace(origin);
+    skyBlendWeight = smoothstep(0.9, 1.0, maxVec2(abs(rayPos.xy * 2.0 - 1.0)));
+    col = texture(colortex5, rayPos.xy).rgb;
+
+  }
+
+  if (skyBlendWeight > 0.0) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * reflectedDir;
     vec3 sky = getSky(skyDir, false);
 
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    sky *= skyLightmap;
+
+    col = mix(col, sky, skyBlendWeight);
 
     // vec4 fog = analyticalFog(
     //   transformView(origin, gbufferModelViewInverse),
     //   skyDir
     // );
     // sky = fma(sky, vec3(fog.a), fog.rgb);
-    return sky * skyLightmap;
+
   }
+  return col;
 }
 
 vec3 getSSR(

@@ -26,4 +26,8 @@ float getMeteringWeight(vec2 texcoord) {
   return 1.0;
 }
 
+float getEV100(float val) {
+  return log2(val * SENSOR_SENSITIVITY / CALIBRATION_CONSTANT);
+}
+
 #endif // CAMERA_GLSL
