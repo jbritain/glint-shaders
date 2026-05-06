@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define csh
-#include "/program/composite/SMAA.glsl"
+#include "/program/composite/SMAAEdgeWeights.glsl"

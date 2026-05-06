@@ -35,7 +35,7 @@ layout(location = 0) out vec4 color;
 
 void main() {
   color.rgb = texture(colortex0, texcoord).rgb;
-  float weight = luminance(color.rgb);
+  float weight = (color.r + color.g + color.b) / 3;
   weight *= getMeteringWeight(texcoord);
 
   color.a = weight;

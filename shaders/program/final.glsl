@@ -46,22 +46,23 @@ void main() {
       averageLuminanceSmooth = averageLuminance;
     }
 
-    averageLuminanceSmooth = mix(
-      averageLuminance,
-      averageLuminanceSmooth,
-      clamp01(exp2(frameTime * -1))
-    );
+    averageLuminanceSmooth = averageLuminanceSmooth + (averageLuminance - averageLuminanceSmooth) * (1.0 - exp(-frameTime * EXPOSURE_ADAPTATION));
+    
+
   }
 
   color = texture(colortex0, texcoord).rgb;
+
   color += interleavedGradientNoise(floor(gl_FragCoord.xy), 0) / 255;
+
+  #if (defined DEBUG_ENABLE || defined CAMERA_INFO)
+  beginText(ivec2(gl_FragCoord.xy / 2.0), ivec2(0, viewHeight / 2.0) + ivec2(8, -8));
+  #endif
 
   #ifdef DEBUG_ENABLE
   if (hideGUI) {
     color = texture(debugtex, texcoord).rgb;
   }
-
-  beginText(ivec2(gl_FragCoord.xy / 2.0), ivec2(0, viewHeight / 2.0) + ivec2(8, -8));
   printString((_D, _e, _b, _u, _g, _space, _m, _o, _d, _e, _space, _i, _s, _space, _a, _c, _t, _i, _v, _e));
   if (!hideGUI) {
     printLine();
@@ -76,12 +77,36 @@ void main() {
 
   printLine();
   printLine();
+  #endif
 
-  float EV100 = getEV100(averageLuminanceSmooth);
+  #ifdef CAMERA_INFO
+  #ifdef AUTO_EXPOSURE
+  float EV100 = autoEV100(averageLuminanceSmooth);
+  #else
+  float EV100 = manualEV100();
+  #endif
   printString((_E, _V, _1, _0, _0, _colon, _space));
   printFloat(EV100);
+  printLine();
+  printString((_F, _o, _c, _a, _l, _space, _L, _e, _n, _g, _t, _h, _colon, _space));
+  printFloat(getFocalLength());
+  printString((_m, _m));
+  printLine();
+  printString((_I, _S, _O, _colon, _space));
+  printFloat(ISO);
+  printLine();
+  printString((_A, _p, _e, _r, _t, _u, _r, _e, _colon, _space, _f, _slash));
+  text.fpPrecision = 1;
+  printFloat(APERTURE);
+  text.fpPrecision = 2;
+  printLine();
+  printString((_S, _h, _u, _t, _t, _e, _r, _space, _S, _p, _e, _e, _d, _colon, _space, _1, _slash));
+  printInt(int(SHUTTER_TIME));
+  printString((_s));
+  
+  #endif
 
-
+  #if (defined DEBUG_ENABLE || defined CAMERA_INFO)
   endText(color.rgb);
   #endif
 

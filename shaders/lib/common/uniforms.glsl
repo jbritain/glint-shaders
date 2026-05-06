@@ -60,6 +60,8 @@ uniform float screenBrightness;
 uniform float viewHeight;
 uniform float viewWidth;
 uniform vec2 resolution;
+uniform float fov;
+uniform float horizontalFov;
 uniform vec2 pixelSize;
 uniform float wetness;
 uniform float sunAngle;

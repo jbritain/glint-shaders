@@ -1,4 +1,5 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define fsh
-#include "/program/composite/tonemap.glsl"
+#define TILE_INDEX 1
+#include "/program/composite/bloomUpsample.glsl"

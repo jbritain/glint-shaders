@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_THE_END
 #define fsh
-#include "/program/composite/depthOfField.glsl"
+#include "/program/composite/RTWBlurMaxWeights.glsl"

@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define vsh
-#include "/program/composite/RTWBlurMaxWeights.glsl"
+#include "/program/composite/tonemap.glsl"

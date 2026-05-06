@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define csh
-#include "/program/composite/SMAAEdgeWeights.glsl"
+#include "/program/composite/RTWComputeWarpFactor.glsl"

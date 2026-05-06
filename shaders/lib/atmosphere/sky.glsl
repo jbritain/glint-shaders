@@ -75,7 +75,7 @@ vec3 getMoon(vec3 dir) {
   return max(0.0, dot(normal, sunPhaseDir)) *
   hapkeApprox *
   pow(texture(moontex, vec2(lat, lon)).rgb, vec3(1.0 / 2.2)) *
-  moonRadiance /
+  moonLuminance /
   PI;
 }
 
@@ -90,11 +90,11 @@ vec3 getSky(vec3 dir, bool includeSun) {
 
   if (includeSun) {
     if (dot(dir, worldSunDir) > cos(sunAngularRadius)) {
-      sky += sunRadiance * transmittance;
+      sky += sunLuminance * transmittance;
     }
     sky += getMoon(dir) * transmittance;
   }
-  sky += sampleGalaxy(dir) * 5 * transmittance;
+  sky += sampleGalaxy(dir) * transmittance;
 
   return sky;
 }

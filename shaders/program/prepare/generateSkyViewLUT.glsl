@@ -133,7 +133,7 @@ void main() {
       tMax,
       float(numScatteringSteps)
     ) *
-    sunIrradiance;
+    sunIlluminance;
 
   lum +=
     raymarchScattering(
@@ -143,10 +143,9 @@ void main() {
       tMax,
       float(numScatteringSteps)
     ) *
-    moonIrradiance *
+    moonIlluminance *
     abs(moonPhase - 4) /
     4.0;
-
   ;
 
   imageStore(skyViewLUT, texelCoord, vec4(lum, 1.0));
@@ -162,14 +161,14 @@ void main() {
         atmospherePos,
         worldSunDir
       ) *
-      sunIrradiance
+      sunIlluminance
       : getValFromTLUT(
         sunTransmittanceLUTTex,
         tLUTRes,
         atmospherePos,
         -worldSunDir
       ) *
-      moonIrradiance *
+      moonIlluminance *
       abs(moonPhase - 4) /
       4.0;
     #endif

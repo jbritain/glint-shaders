@@ -45,23 +45,22 @@ void main() {
   bool isWater = materialIsWater(material.id);
   float depth;
 
-  if (inWater) {
-    float depth = texture(depthtex0, texcoord).r;
-  } else {
-    float depth = texture(depthtex1, texcoord).r;
-  }
+  depth = texture(depthtex0, texcoord).r;
 
   vec3 viewPos = screenSpaceToViewSpace(vec3(texcoord, depth));
 
   color = texture(colortex0, texcoord);
-  if (isWater || inWater) {
-    float lod = smoothstep(0.0, 8.0, length(viewPos)) * 8;
+  // color = blur13(colortex0, texcoord, 8, DIRECTION);
+  if (inWater) {
+    float lod = smoothstep(0.0, 64.0, length(viewPos)) * 4;
     color = mix(
       color,
-      blur13(colortex0, texcoord, int(lod), DIRECTION),
+      blur13(colortex0, texcoord, lod, DIRECTION),
       clamp01(lod)
     );
   }
+
+  show(color);
 
 }
 

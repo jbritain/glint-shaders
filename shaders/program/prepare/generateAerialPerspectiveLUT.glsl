@@ -88,7 +88,7 @@ vec3 raymarchScattering(
     vec3 scatteringIntegral =
       (inScattering - inScattering * sampleTransmittance) / extinction;
 
-    lum += scatteringIntegral * transmittance * sunIrradiance;
+    lum += scatteringIntegral * transmittance * sunIlluminance;
 
     transmittance *= sampleTransmittance;
   }

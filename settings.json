@@ -436,10 +436,49 @@
       }
     },
     "Camera": {
+      "Auto Exposure": {
+        "key": "AUTO_EXPOSURE"
+      },
+      "Auto Exposure Adaptation Speed": {
+        "key": "EXPOSURE_ADAPTATION",
+        "default": "1",
+        "values": "{frange(1, 17, 1)}"
+      },
+      "Aperture": {
+        "key": "APERTURE",
+        "default": "16.0",
+        "values": "[1.4 2.0 2.8 4.0 5.6 8.0 11.0 16.0]",
+        "prefix": "𝑓/"
+      },
+      "ISO": {
+        "key": "ISO",
+        "default": "100",
+        "values": "[20 50 100 200 400 800 1600 3200 6400]"
+      },
+      "Shutter Speed": {
+        "key": "SHUTTER_TIME",
+        "default": "125",
+        "values": "[1000 250 60 30]",
+        "prefix": "1/",
+        "suffix": "s"
+      },
+      "Sensor Size": {
+        "key": "SENSOR_SIZE",
+        "default": "35",
+        "suffix": "mm"
+      },
       "Exposure Compensation": {
         "key": "EXPOSURE_COMPENSATION",
         "default": "0.0",
         "values": "{frange(-10.0, 11.0, 1)}"
+      },
+      "Auto Exposure Min EV100": {
+        "key": "MIN_EV100",
+        "default": "4"
+      },
+      "Auto Exposure Max EV100": {
+        "key": "MAX_EV100",
+        "default": "200"
       },
       "Depth Of Field": {
         "Depth Of Field": {
@@ -467,6 +506,10 @@
           "key": "BLOOM_RADIUS",
           "default": "1.0"
         }
+      },
+      "Display Camera Info": {
+        "key": "CAMERA_INFO",
+        "default": false
       }
     }
   },

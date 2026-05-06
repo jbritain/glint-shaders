@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define fsh
 #define TILE_INDEX 3
-#include "/program/composite/bloomUpsample.glsl"
+#include "/program/composite/bloomDownsample.glsl"

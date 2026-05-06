@@ -214,14 +214,18 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
 
             if "descriptions" in value.keys():
                 for i, description in enumerate(value["descriptions"]):
-                    pack["lang"].append(f"value.{value["key"]}.{i} = {description}")
+                    pack["lang"].append(f"value.{value['key']}.{i} = {description}")
+            if "prefix" in value.keys():
+                pack["lang"].append(f"prefix.{value['key']} = {value['prefix']}")
+            if "suffix" in value.keys():
+                pack["lang"].append(f"suffix.{value['key']} = {value['suffix']}")
 
             pack["lang"].append(f"option.{value['key']} = {name}")
     pack["properties"].append(screen)
 
 
 def generate_settings(pack):
-    with open("settings.json") as s:
+    with open("settings.json", encoding="utf-8") as s:
         settings = json.loads(s.read())
     sliders = []
     recurse_settings(pack, None, settings, sliders)
@@ -231,12 +235,12 @@ def generate_settings(pack):
     with open(f"{shaders_path}/{settings_path}", "w+") as s:
         s.write("\n".join(pack["settings"]))
 
-    with open(f"{shaders_path}/{lang_path}", "w+") as l:
+    with open(f"{shaders_path}/{lang_path}", "w+", encoding="utf-8") as l:
         l.write("\n".join(pack["lang"]))
 
 
 def generate_pack():
-    with open(json_path) as j:
+    with open(json_path, encoding="utf-8") as j:
         pack = json.loads("".join(j.readlines()))
 
     pack["properties"] = []

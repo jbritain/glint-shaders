@@ -135,7 +135,17 @@
     #define SMAA_CORNER 25 // [0 25 50 75 100]
 
   // Camera
+    #define AUTO_EXPOSURE  
+    #ifdef AUTO_EXPOSURE
+    #endif
+    #define EXPOSURE_ADAPTATION 1 // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
+    #define APERTURE 16.0 // [1.4 2.0 2.8 4.0 5.6 8.0 11.0 16.0]
+    #define ISO 100 // [20 50 100 200 400 800 1600 3200 6400]
+    #define SHUTTER_TIME 125 // [1000 250 60 30]
+    #define SENSOR_SIZE 35 // [35]
     #define EXPOSURE_COMPENSATION 0.0 // [-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]
+    #define MIN_EV100 4 // [4]
+    #define MAX_EV100 200 // [200]
 
     // Depth_Of_Field
       // #define DOF  // [False]
@@ -147,6 +157,9 @@
 
     // Bloom
       #define BLOOM_RADIUS 1.0 // [1.0]
+    // #define CAMERA_INFO  // [False]
+    #ifdef CAMERA_INFO
+    #endif
 
 // Miscellaneous
   #define MULTIPLICATIVE_TRANSLUCENTS  

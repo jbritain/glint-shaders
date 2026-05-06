@@ -9,17 +9,20 @@
 const float sunRadius = 6.9634e8;
 const float sunDistance = 1.496e11;
 const float sunAngularRadius = sunRadius / sunDistance;
+const float sunSolidAngle = PI * pow2(sunAngularRadius);
 
-const vec3 sunIrradiance = vec3(1.0, 0.949, 0.937) * 1366;
-const vec3 sunRadiance = sunIrradiance / sunAngularRadius;
+// const vec3 sunIlluminance = vec3(1.0, 0.949, 0.937) * 1.6e5 * sunAngularRadius;
+// const vec3 sunLuminance = sunIlluminance / sunAngularRadius;
+const vec3 sunLuminance = vec3(1.6e9);
+const vec3 sunIlluminance = sunLuminance * sunSolidAngle;
 
-const float moonScale = 5.0;
-const float moonRadius = 1737e3 * moonScale;
+const float moonRadius = 1737e3;
 const float moonDistance = 384400e3;
 const float moonAngularRadius = moonRadius / moonDistance;
+const float moonSolidAngle = PI * pow2(moonAngularRadius);
 
-const vec3 moonRadiance = sunIrradiance;
-const vec3 moonIrradiance = moonRadiance * moonAngularRadius / moonScale;
+const vec3 moonLuminance = sunIlluminance;
+const vec3 moonIlluminance = moonLuminance * moonSolidAngle;
 
 // Units are in megametres.
 const float groundRadiusMM = 6.36;

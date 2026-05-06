@@ -212,6 +212,28 @@
         ]
       },
       {
+        "path": "waterBlur",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "defines": {
+          "DIRECTION": "vec2(1.0, 0.0)"
+        },
+        "enabledBy": "(defined WATER_BLUR)"
+      },
+      {
+        "path": "waterBlur",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "defines": {
+          "DIRECTION": "vec2(0.0, 1.0)"
+        },
+        "enabledBy": "(defined WATER_BLUR)"
+      },
+      {
         "path": "RTWForwardAnalysis",
         "programs": [
           "csh"

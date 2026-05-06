@@ -57,6 +57,7 @@ layout(std430, binding = 0) buffer environmentData {
   vec3 skylightColor;
   vec3 weatherSkylightColor;
   float averageLuminanceSmooth;
+  // float exposure;
 };
 #endif
 

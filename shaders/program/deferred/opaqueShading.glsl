@@ -135,7 +135,7 @@ void main() {
     #endif
     #endif
 
-    diffuse += vec3(AMBIENT_LIGHT_STRENGTH) * occlusion;
+    // diffuse += vec3(AMBIENT_LIGHT_STRENGTH) * occlusion;
     #ifdef WORLD_THE_NETHER
     diffuse += vec3(NETHER_AMBIENT_LIGHT_BOOST) * occlusion;
     #endif

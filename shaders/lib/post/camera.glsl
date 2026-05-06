@@ -14,20 +14,37 @@
 #ifndef CAMERA_GLSL
 #define CAMERA_GLSL
 
-// REFERENCES
-// https://placeholderart.wordpress.com/2014/12/15/implementing-a-physically-based-camera-automatic-exposure/
-// https://bruop.github.io/exposure/
+// https://google.github.io/filament/Filament.md.html
 
-#define SENSOR_SENSITIVITY 100
 #define CALIBRATION_CONSTANT 12.5
 #define LENS_VIGNETTE 0.65
+
+const float SHUTTER_SPEED = 1.0 / SHUTTER_TIME;
 
 float getMeteringWeight(vec2 texcoord) {
   return 1.0;
 }
 
-float getEV100(float val) {
-  return log2(val * SENSOR_SENSITIVITY / CALIBRATION_CONSTANT);
+float autoEV100(float luminance) {
+  return clamp(
+    log2(luminance * ISO / CALIBRATION_CONSTANT),
+    MIN_EV100,
+    MAX_EV100
+  );
+}
+
+float manualEV100() {
+  return log2(pow2(APERTURE) / SHUTTER_SPEED * 100.0 / ISO);
+}
+
+float calculateExposure(float ev100) {
+  return 1.0 / (pow(2.0, ev100) * 1.2);
+}
+
+// TODO: this can be a custom uniform I think
+// VALUE IS IN MM
+float getFocalLength() {
+  return SENSOR_SIZE * 0.5 / tan(horizontalFov * 0.5);
 }
 
 #endif // CAMERA_GLSL

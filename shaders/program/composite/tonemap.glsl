@@ -38,7 +38,7 @@ void main() {
   color = texture(colortex0, texcoord).rgb;
 
   vec3 bloom = texture(colortex6, texcoord * 0.5).rgb;
-  color = mix(color, bloom, 0.001);
+  // color = mix(color, bloom, 0.001);
 
   color = tonemap(color);
 

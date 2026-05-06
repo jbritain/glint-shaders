@@ -42,13 +42,20 @@ float DOF_MAX_RADIUS_PIXELS = DOF_MAX_RADIUS * min(viewWidth, viewHeight);
 const float DOF_STEP = DOF_MAX_RADIUS_PIXELS / DOF_SAMPLES;
 const float GOLDEN_ANGLE = 2.39996323;
 
-float getBlurRadius(float depth, float focusPoint) {
-  float coc = clamp((depth - focusPoint) / DOF_FOCUS_RANGE, -1.0, 1.0);
-  return abs(coc) * DOF_MAX_RADIUS_PIXELS;
+float getBlurRadius(float depth, float focusDepth) {
+  float focalLength = getFocalLength();
+  depth *= 1000; // convert to mm
+  focusDepth *= 1000;
+  float coc =
+    pow2(focalLength) /
+    (APERTURE * (focusDepth - focalLength)) *
+    (abs(depth - focusDepth) / depth);
+
+  return abs(coc) * viewWidth / SENSOR_SIZE;
 }
 void main() {
-  float depth = screenSpaceToViewSpace(texture(depthtex0, texcoord).r) / -far;
-  float focusDepth = screenSpaceToViewSpace(centerDepthSmooth) / -far;
+  float depth = -screenSpaceToViewSpace(texture(depthtex0, texcoord).r);
+  float focusDepth = -screenSpaceToViewSpace(centerDepthSmooth);
 
   float blurRadius = getBlurRadius(depth, focusDepth);
   color = texture(colortex0, texcoord).rgb;
@@ -60,8 +67,9 @@ void main() {
   for (int i = 0; i < DOF_SAMPLES; i++) {
     vec2 sampleCoord = texcoord + vec2(cos(ang), sin(ang)) * pixelSize * radius;
     vec3 sampleColor = texture(colortex0, sampleCoord).rgb;
-    float sampleDepth =
-      screenSpaceToViewSpace(texture(depthtex0, sampleCoord).r) / -far;
+    float sampleDepth = -screenSpaceToViewSpace(
+      texture(depthtex0, sampleCoord).r
+    );
     float sampleBlurRadius = getBlurRadius(sampleDepth, focusDepth);
     if (sampleDepth > depth) {
       sampleBlurRadius = clamp(sampleBlurRadius, 0.0, blurRadius * 2.0);

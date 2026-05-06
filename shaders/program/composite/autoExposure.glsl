@@ -38,23 +38,12 @@ const bool colortex0MipmapEnabled = true;
 void main() {
   color = texture(colortex0, texcoord).rgb;
 
-  float EV100 = getEV100(averageLuminanceSmooth);
-  EV100 = clamp(EV100, 4, 14);
-
-  float Lmax =
-    78 *
-    pow(2.0, EV100 - EXPOSURE_COMPENSATION) /
-    (LENS_VIGNETTE * SENSOR_SENSITIVITY);
-  float exposure = rcp(Lmax);
-  // exposure = clamp(exposure, 0.0, 0.05);
-  // exposure *= 0.05;
-  color *= exposure;
-
-  // float purkinje = smoothstep(0.04, 0.05, exposure);
-  // color = hsv(color);
-  // color.g *= 1.0 - purkinje * 0.5;
-  // color = rgb(color);
-  // color.rg *= 1.0 - purkinje * 0.2;
+  #ifdef AUTO_EXPOSURE
+  float EV100 = autoEV100(averageLuminanceSmooth);
+  #else
+  float EV100 = manualEV100();
+  #endif
+  color *= calculateExposure(EV100 - EXPOSURE_COMPENSATION);
 
 }
 

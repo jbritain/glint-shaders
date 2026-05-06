@@ -3,8 +3,8 @@
 
 // https://github.com/Experience-Monks/glsl-fast-gaussian-blur
 
-vec4 blur13(sampler2D image, vec2 uv, int lod, vec2 direction) {
-  vec2 resolution = textureSize(image, lod).xy;
+vec4 blur13(sampler2D image, vec2 uv, float lod, vec2 direction) {
+  vec2 resolution = textureSize(image, int(lod)).xy;
   vec4 color = vec4(0.0);
   vec2 off1 = vec2(1.411764705882353) * direction;
   vec2 off2 = vec2(3.2941176470588234) * direction;

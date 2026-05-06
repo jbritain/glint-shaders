@@ -1,4 +1,4 @@
 #version 460 compatibility
 #define WORLD_THE_NETHER
 #define fsh
-#include "/program/composite/depthOfField.glsl"
+#include "/program/composite/tonemap.glsl"
