@@ -32,10 +32,13 @@ void main() {
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 6 */
+/* RENDERTARGETS: 16 */
 layout(location = 0) out vec3 bloomColor;
 
 void main() {
-  bloomColor = upSample(colortex6, scaleFromBloomTile(texcoord, tiles[TILE_INDEX + 1]));
+  bloomColor = upSample(
+    colortex16,
+    scaleFromBloomTile(texcoord, tiles[TILE_INDEX + 1])
+  );
 }
 #endif

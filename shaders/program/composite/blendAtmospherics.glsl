@@ -68,9 +68,11 @@ void main() {
   #endif
 
   if (blend) {
+    #if defined VOLUMETRIC_CLOUDS || defined PLANAR_CLOUDS
     vec4 clouds = texture(colortex8, texcoord);
 
     color.rgb = fma(color.rgb, vec3(clouds.a), clouds.rgb);
+    #endif
     #ifndef BLEND_BEFORE_TRANSLUCENTS
     if (depth != 1.0) {
       color.rgb = getAtmosphericFog(color.rgb, viewPos);

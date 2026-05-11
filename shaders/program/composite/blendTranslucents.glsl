@@ -212,7 +212,7 @@ void main() {
     ) *
     shadow *
     cloudShadow;
-  color.rgb += specularHighlight;
+  color.rgb += specularHighlight * sunlightColor;
   #endif
 
   if (isWater && inWater) {

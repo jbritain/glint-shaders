@@ -47,4 +47,15 @@ float getFocalLength() {
   return SENSOR_SIZE * 0.5 / tan(horizontalFov * 0.5);
 }
 
+float circleOfConfusion(float depth, float focusDepth) {
+  float focalLength = getFocalLength();
+  depth *= 1000; // convert to mm
+  focusDepth *= 1000;
+  float baseCoC = SENSOR_SIZE * focalLength / (focusDepth - focalLength);
+  float depthTerm = (depth - focusDepth) / depth;
+  float CoC = baseCoC * depthTerm;
+
+  return CoC * viewWidth / SENSOR_SIZE;
+}
+
 #endif // CAMERA_GLSL

@@ -128,4 +128,6 @@ struct Volume {
   vec3 scattering;
 };
 
+#define isbad(x) (any(isnan(x)) || any(isinf(x)))
+
 #endif // SYNTAX_GLSL

@@ -85,7 +85,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
   float transmittance = 1.0;
   vec3 scattering = vec3(0.0);
 
-  float phase = hgDraine(11, dot(dir, worldLightDir));
+  float phase = hgDraine(2.1, dot(dir, worldLightDir));
 
   vec3 previousRayPos = start;
 

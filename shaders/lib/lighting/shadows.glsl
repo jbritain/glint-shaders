@@ -153,10 +153,12 @@ vec3 getShadow(
     );
 
     shadow = sampleShadowPCF(shadowScreenPos, radius, jitter, shadowViewNormal);
-    shadow *= texture(
-      shadowcolor2,
-      shadowScreenPos.xy + getWarp(shadowScreenPos.xy)
-    ).rgb;
+    shadow *=
+      1.0 -
+      texture(
+        shadowcolor2,
+        shadowScreenPos.xy + getWarp(shadowScreenPos.xy)
+      ).rgb;
   }
 
   shadow = mix(

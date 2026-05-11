@@ -112,6 +112,9 @@ vec3 brdf(
   float mappedNoL = clamp01(dot(surfaceNormal, L));
 
   float NoL = clamp01(mappedNoL * smoothstep(0.0, 0.1, faceNoL));
+  if (NoL <= 0.0) {
+    return vec3(0.0);
+  }
 
   vec3 V = normalize(-viewPos);
   vec3 N = surfaceNormal;
@@ -144,10 +147,7 @@ vec3 brdf(
     F *= material.albedo;
   }
 
-  vec3 specular = F * D * G / (4.0 * NoV + 1e-6);
-
-  // this was causing some weird issues
-  specular *= step(1e-6, NoL);
+  vec3 specular = F * D * G / (4.0 * NoV + 1e-6); // not divided by NoL to cancel multiplication by it later
 
   // commented out below is an attempt at hammon's diffuse model
   // I scrapped it because I cannot tell the different visually between it and lambert
@@ -182,6 +182,10 @@ vec3 diffuseBRDF(
   float faceNoL = clamp01(dot(geometryNormal, L));
   float mappedNoL = clamp01(dot(surfaceNormal, L));
 
+  if (faceNoL <= 0.0) {
+    return vec3(0.0);
+  }
+
   vec3 V = normalize(-viewPos);
   vec3 H = normalize(L + V);
   float HoV = dot(H, V);
@@ -202,6 +206,10 @@ vec3 specularBRDF(
   float mappedNoL = clamp01(dot(surfaceNormal, L));
 
   float NoL = clamp01(mappedNoL * smoothstep(0.0, 0.1, faceNoL));
+
+  if (NoL <= 0.0) {
+    return vec3(0.0);
+  }
 
   vec3 V = normalize(-viewPos);
   vec3 N = surfaceNormal;
@@ -236,16 +244,13 @@ vec3 specularBRDF(
 
   vec3 specular = F * D * G / (4.0 * NoV + 1e-6);
 
-  // this was causing some weird issues
-  specular *= step(1e-6, NoL);
+  return specular *
+  areaLightNormalization(
+    max(0.001, material.roughness),
+    dot(L, H),
+    sunAngularRadius
+  );
 
-  // prevent specular highlights blowing out the bloom
-  if (luminance(specular) > 1000) {
-    specular = hsv(specular);
-    specular.b = 1000;
-    specular = rgb(specular);
-  }
-  return specular;
 }
 
 #endif // BRDF_GLSL

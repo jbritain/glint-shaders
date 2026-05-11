@@ -285,6 +285,14 @@
         ]
       },
       {
+        "path": "depthOfFieldCoC",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "(defined DOF)"
+      },
+      {
         "path": "depthOfField",
         "programs": [
           "vsh",

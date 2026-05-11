@@ -103,6 +103,12 @@ void main() {
   printString((_S, _h, _u, _t, _t, _e, _r, _space, _S, _p, _e, _e, _d, _colon, _space, _1, _slash));
   printInt(int(SHUTTER_TIME));
   printString((_s));
+  printLine();
+  printString((_F, _o, _c, _u, _s, _space, _D, _i, _s, _t, _a, _n, _c, _e, _colon, _space));
+  printFloat(-screenSpaceToViewSpace(centerDepthSmooth));
+  printString((_m));
+  printLine();
+  printFloat(gbufferProjection[3][2] / (gbufferProjection[2][2] + 1.0));
   
   #endif
 

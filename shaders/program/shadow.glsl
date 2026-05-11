@@ -136,7 +136,7 @@ void main() {
     discard;
   }
 
-  caustics = vec3(1.0);
+  caustics = vec3(0.0);
 
   if (materialIsWater(materialID)) {
     float blockerDistance =
@@ -167,7 +167,7 @@ void main() {
 
       float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
 
-      caustics[i] = oldArea / newArea * 0.1;
+      caustics[i] = 1.0 - oldArea / newArea * 0.1;
     }
 
   }

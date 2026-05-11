@@ -4,7 +4,7 @@ colortex2: material (albedo, specular map etc)
 colortex3: SSAO (ACCUMULATED)
 colortex4: RTWSM warp maps
 colortex5: previous frame colour and depth (ACCUMULATED)
-colortex6: translucents, bloom
+colortex6: translucents, dof coc, lens flares
 colortex7: SSR (ACCUMULATED)
 colortex8: clouds (ACCUMULATED)
 colortex9: global illumination (ACCUMULATED)
@@ -14,3 +14,4 @@ colortex12: volumetric fog
 colortex13: previous frame depth reprojected to current frame
 colortex14: low resolution clouds
 colortex15: low resolution global illumination
+colortex16: bloom

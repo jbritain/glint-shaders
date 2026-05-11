@@ -37,8 +37,8 @@ layout(location = 0) out vec3 color;
 void main() {
   color = texture(colortex0, texcoord).rgb;
 
-  vec3 bloom = texture(colortex6, texcoord * 0.5).rgb;
-  // color = mix(color, bloom, 0.001);
+  vec3 bloom = texture(colortex16, texcoord * 0.5).rgb;
+  color = mix(color, bloom, 0.001);
 
   color = tonemap(color);
 

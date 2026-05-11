@@ -1,5 +1,5 @@
 /*
-const int colortex0Format = RGBA16F;
+const int colortex0Format = RGBA32F;
 const int colortex1Format = RGB16UI;
 const int colortex2Format = RG32UI;
 const int colortex3Format = R16;
@@ -14,6 +14,7 @@ const int colortex11Format = R16UI;
 const int colortex12Format = RGBA16F;
 const int colortex13Format = R32F;
 const int colortex14Format = RGBA16F;
+const int colortex16Format = RGBA32F;
 
 const int colortex17Format = RG32UI;
 

@@ -34,51 +34,49 @@ in vec2 texcoord;
 
 layout(location = 0) out vec3 color;
 
-// https://blog.voxagon.se/2018/05/04/bokeh-depth-of-field-in-single-pass.html
 // TODO: since DoF is applied before temporal filtering, screen space reflections etc reflect the DoF
+// TODO: cleanly handle issues with foreground and background separation
 
-float DOF_MAX_RADIUS_PIXELS = DOF_MAX_RADIUS * min(viewWidth, viewHeight);
+float getSampleWeight(float sampleCoC, float CoC, float radius) {
+  return abs(sampleCoC / 2) >= radius && sign(sampleCoC) <= sign(CoC)
+    ? sign(CoC) < 1
+      ? 2.0
+      : 1.0
+    : 0.0;
+}
 
-const float DOF_STEP = DOF_MAX_RADIUS_PIXELS / DOF_SAMPLES;
 const float GOLDEN_ANGLE = 2.39996323;
 
-float getBlurRadius(float depth, float focusDepth) {
-  float focalLength = getFocalLength();
-  depth *= 1000; // convert to mm
-  focusDepth *= 1000;
-  float coc =
-    pow2(focalLength) /
-    (APERTURE * (focusDepth - focalLength)) *
-    (abs(depth - focusDepth) / depth);
-
-  return abs(coc) * viewWidth / SENSOR_SIZE;
-}
 void main() {
   float depth = -screenSpaceToViewSpace(texture(depthtex0, texcoord).r);
   float focusDepth = -screenSpaceToViewSpace(centerDepthSmooth);
 
-  float blurRadius = getBlurRadius(depth, focusDepth);
-  color = texture(colortex0, texcoord).rgb;
-  float weight = 1.0;
+  float CoC = texture(colortex6, texcoord).r;
+  show(CoC);
+
+  float weight = 1.0 / (PI * pow2(CoC / 2) + 1.0);
+  color = texture(colortex0, texcoord).rgb * weight;
   vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).rg;
-  float radius = DOF_STEP * jitter.y;
-  float ang = jitter.x * TAU;
 
   for (int i = 0; i < DOF_SAMPLES; i++) {
-    vec2 sampleCoord = texcoord + vec2(cos(ang), sin(ang)) * pixelSize * radius;
-    vec3 sampleColor = texture(colortex0, sampleCoord).rgb;
-    float sampleDepth = -screenSpaceToViewSpace(
-      texture(depthtex0, sampleCoord).r
+    float radius = sqrt(
+      float(i + jitter.x) / DOF_SAMPLES * float(DOF_MAX_RADIUS)
     );
-    float sampleBlurRadius = getBlurRadius(sampleDepth, focusDepth);
-    if (sampleDepth > depth) {
-      sampleBlurRadius = clamp(sampleBlurRadius, 0.0, blurRadius * 2.0);
-    }
-    float m = smoothstep(radius - 0.5, radius + 0.5, sampleBlurRadius);
-    color += mix(color / weight, sampleColor, m);
-    weight += 1.0;
-    radius += DOF_STEP / radius;
-    ang = mod(ang + TAU / DOF_SAMPLES, TAU);
+    float ang = float(i) * GOLDEN_ANGLE + jitter.y * TAU;
+    vec2 sampleCoord = texcoord + vec2(cos(ang), sin(ang)) * pixelSize * radius;
+    vec3 sampleColor = texelFetch(
+      colortex0,
+      ivec2(sampleCoord * resolution),
+      0
+    ).rgb;
+    float sampleCoC = texture(colortex6, sampleCoord).r;
+
+    float sampleWeight =
+      getSampleWeight(sampleCoC, CoC, radius) /
+      (PI * pow2(sampleCoC / 2) + 1.0);
+
+    color += sampleColor * sampleWeight;
+    weight += sampleWeight;
   }
 
   color /= weight;

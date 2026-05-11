@@ -33,7 +33,7 @@ vec3 getNormal(vec2 coord) {
   return decodeUnitVector(packedGeometry);
 }
 
-float getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
+vec4 getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
   uint indirect = 0u;
   uint occlusion = 0u;
 
@@ -73,7 +73,9 @@ float getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
         vec3(sampleUV, texture(depthtex0, sampleUV).r)
       );
       vec3 sampleNormal = getNormal(sampleUV);
-      vec3 sampleLight = texture(colortex6, sampleUV).rgb;
+      #ifdef GTAO_GI
+      vec3 sampleLight = texture(colortex5, sampleUV).rgb;
+      #endif
       vec3 sampleDistance = samplePosition - position;
       float sampleLength = length(sampleDistance);
       vec3 sampleHorizon = sampleDistance / sampleLength;
@@ -88,11 +90,13 @@ float getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
       frontBackHorizon = clamp((frontBackHorizon + n + halfPi) / PI, 0.0, 1.0);
 
       indirect = updateSectors(frontBackHorizon.x, frontBackHorizon.y, 0u);
-      // lighting +=
-      //   (1.0 - float(bitCount(indirect & ~occlusion)) / float(sectorCount)) *
-      //   sampleLight *
-      //   clamp(dot(normal, sampleHorizon), 0.0, 1.0) *
-      //   clamp(dot(sampleNormal, -sampleHorizon), 0.0, 1.0);
+      #ifdef GTAO_GI
+      lighting +=
+        (1.0 - float(bitCount(indirect & ~occlusion)) / float(sectorCount)) *
+        sampleLight *
+        clamp(dot(normal, sampleHorizon), 0.0, 1.0) *
+        clamp(dot(sampleNormal, -sampleHorizon), 0.0, 1.0);
+      #endif
       occlusion |= indirect;
     }
     visibility += 1.0 - float(bitCount(occlusion)) / float(sectorCount);
@@ -100,7 +104,7 @@ float getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
 
   visibility /= AO_SAMPLES;
 
-  return visibility;
+  return vec4(lighting, visibility);
 }
 
 #endif

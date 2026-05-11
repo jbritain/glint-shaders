@@ -68,7 +68,7 @@ void main() {
       previousPos,
       gbufferPreviousProjection
     );
-    vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
+    vec4 previousClouds = texture(colortex8, previousPos.xy);
     float previousZ = screenSpaceToViewSpace(
       texture(colortex5, previousPos.xy).a
     );
@@ -90,9 +90,10 @@ void main() {
     clouds = mix(
       clouds,
       texelFetch(colortex14, ivec2(gl_FragCoord.xy) / 4, 0),
-      0.5
+      1.0
     );
   }
+
 }
 
 #endif

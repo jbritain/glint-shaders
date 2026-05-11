@@ -9,7 +9,7 @@
 const float sunRadius = 6.9634e8;
 const float sunDistance = 1.496e11;
 const float sunAngularRadius = sunRadius / sunDistance;
-const float sunSolidAngle = PI * pow2(sunAngularRadius);
+const float sunSolidAngle = TAU * (1.0 - cos(sunAngularRadius));
 
 // const vec3 sunIlluminance = vec3(1.0, 0.949, 0.937) * 1.6e5 * sunAngularRadius;
 // const vec3 sunLuminance = sunIlluminance / sunAngularRadius;

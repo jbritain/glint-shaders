@@ -59,7 +59,7 @@ void main() {
     viewPos,
     mat3(gbufferModelView) * gbuffer.geometryNormal,
     texcoord
-  );
+  ).a;
   #endif
 
   uint frameCount = min(texture(colortex11, texcoord).r, AO_MAX_FRAMES);

@@ -1,5 +1,5 @@
 #version 460 compatibility
 #define WORLD_THE_NETHER
 #define vsh
-#define TILE_INDEX 3
-#include "/program/composite/bloomUpsample.glsl"
+#define TILE_INDEX 4
+#include "/program/composite/bloomDownsample.glsl"

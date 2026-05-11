@@ -54,7 +54,8 @@ Volume getNetherSmog(vec3 pos) {
     vec3 radiance = vec3(0.0);
 
     #ifdef FLOODFILL
-    sampleFloodfill(rayPos) * EMISSIVE_STRENGTH;
+    radiance +=
+      sampleFloodfill(rayPos) * EMISSIVE_STRENGTH * isotropicPhase / 16;
     #endif
 
     radiance += vec3(5.0, 2.0, 1.0);

@@ -40,10 +40,6 @@ vec3 gatherLight(ivec3 voxelPos) {
 
     VoxelData sampleData = decodeVoxelData(imageLoad(voxelMap, offsetPos).r);
 
-    // if(sampleData.opacity == 1.0){
-    //   continue;
-    // }
-
     if (frameCounter % 2 == 0) {
       light += imageLoad(floodfillVoxelMap1, offsetPos).rgb;
     } else {

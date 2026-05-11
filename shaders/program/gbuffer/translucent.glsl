@@ -134,7 +134,8 @@ void main() {
       feetPlayerPos,
       gbuffer.geometryNormal,
       gbuffer.surfaceNormal,
-      material.subsurface
+      material.subsurface,
+      gbuffer.lightmap.x
     ) *
     material.albedo *
     EMISSIVE_STRENGTH /

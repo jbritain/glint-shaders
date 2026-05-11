@@ -33,7 +33,7 @@
     // #define RSM  // [False]
     #ifdef RSM
     #endif
-    #define RSM_SAMPLES 4 // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
+    #define RSM_SAMPLES 8 // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
     #define RSM_RADIUS 2.0 // [1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 ]
     #define RSM_BRIGHTNESS 5.0 // [1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0 8.5 9.0 9.5 10.0 ]
     #define RSM_MAX_FRAMES 64 // [64]
@@ -56,7 +56,7 @@
     #define SUBSURFACE_SCATTERING_DENSITY 1.0 // [0.1 0.6 1.1 1.6 2.1 2.6 3.1 3.6 4.1]
 
   // Ambient_Lighting
-    #define AMBIENT_LIGHT_STRENGTH 1.0 // [0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]
+    #define AMBIENT_LIGHT_STRENGTH 0.1 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0 ]
     #define NETHER_AMBIENT_LIGHT_BOOST 2.0 // [5.0 6.0 7.0 8.0 9.0 10.0]
 
 // Atmospherics
@@ -135,25 +135,26 @@
     #define SMAA_CORNER 25 // [0 25 50 75 100]
 
   // Camera
-    #define AUTO_EXPOSURE  
-    #ifdef AUTO_EXPOSURE
-    #endif
-    #define EXPOSURE_ADAPTATION 1 // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
+
+    // Auto_Exposure
+      #define AUTO_EXPOSURE  
+      #ifdef AUTO_EXPOSURE
+      #endif
+      #define MIN_EV100 4 // [4]
+      #define MAX_EV100 200 // [200]
+      #define EXPOSURE_ADAPTATION 1 // [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16]
+    #define EXPOSURE_COMPENSATION 0.0 // [-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]
     #define APERTURE 16.0 // [1.4 2.0 2.8 4.0 5.6 8.0 11.0 16.0]
     #define ISO 100 // [20 50 100 200 400 800 1600 3200 6400]
     #define SHUTTER_TIME 125 // [1000 250 60 30]
-    #define SENSOR_SIZE 35 // [35]
-    #define EXPOSURE_COMPENSATION 0.0 // [-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]
-    #define MIN_EV100 4 // [4]
-    #define MAX_EV100 200 // [200]
+    #define SENSOR_SIZE 35.0 // [35.0]
 
     // Depth_Of_Field
-      // #define DOF  // [False]
+      #define DOF  // [True]
       #ifdef DOF
       #endif
-      #define DOF_MAX_RADIUS 0.02 // [0.005 0.01 0.015 0.02 0.025 0.03 0.035 0.04 0.045 0.05 0.055 0.06 0.065 0.07 0.075 0.08 0.085 0.09 0.095 0.1 ]
-      #define DOF_FOCUS_RANGE 1.0 // [0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0 8.5 9.0 9.5 10.0 ]
-      #define DOF_SAMPLES 4 // [2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32]
+      #define DOF_SAMPLES 16 // [4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124]
+      #define DOF_MAX_RADIUS 20 // [5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 125 130 135 140 145 150 155 160 165 170 175 180 185 190 195 200]
 
     // Bloom
       #define BLOOM_RADIUS 1.0 // [1.0]

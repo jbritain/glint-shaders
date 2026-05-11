@@ -129,7 +129,7 @@
       },
       "Global Illumination Samples": {
         "key": "RSM_SAMPLES",
-        "default": "4",
+        "default": "8",
         "values": "{frange(1, 17, 1)}"
       },
       "Global Illumination Radius": {
@@ -208,8 +208,8 @@
     "Ambient Lighting": {
       "Ambient Lighting Strength": {
         "key": "AMBIENT_LIGHT_STRENGTH",
-        "default": "1.0",
-        "values": "{frange(0.0, 11.0, 1.0)}"
+        "default": "0.1",
+        "values": "{frange(0.0, 5.1, 0.1)}"
       },
       "Nether Ambient Lighting Boost": {
         "key": "NETHER_AMBIENT_LIGHT_BOOST",
@@ -437,12 +437,27 @@
     },
     "Camera": {
       "Auto Exposure": {
-        "key": "AUTO_EXPOSURE"
+        "Auto Exposure": {
+          "key": "AUTO_EXPOSURE"
+        },
+        "Auto Exposure Min EV100": {
+          "key": "MIN_EV100",
+          "default": "4"
+        },
+        "Auto Exposure Max EV100": {
+          "key": "MAX_EV100",
+          "default": "200"
+        },
+        "Auto Exposure Adaptation Speed": {
+          "key": "EXPOSURE_ADAPTATION",
+          "default": "1",
+          "values": "{frange(1, 17, 1)}"
+        }
       },
-      "Auto Exposure Adaptation Speed": {
-        "key": "EXPOSURE_ADAPTATION",
-        "default": "1",
-        "values": "{frange(1, 17, 1)}"
+      "Exposure Compensation": {
+        "key": "EXPOSURE_COMPENSATION",
+        "default": "0.0",
+        "values": "{frange(-10.0, 11.0, 1)}"
       },
       "Aperture": {
         "key": "APERTURE",
@@ -464,41 +479,22 @@
       },
       "Sensor Size": {
         "key": "SENSOR_SIZE",
-        "default": "35",
-        "suffix": "mm"
-      },
-      "Exposure Compensation": {
-        "key": "EXPOSURE_COMPENSATION",
-        "default": "0.0",
-        "values": "{frange(-10.0, 11.0, 1)}"
-      },
-      "Auto Exposure Min EV100": {
-        "key": "MIN_EV100",
-        "default": "4"
-      },
-      "Auto Exposure Max EV100": {
-        "key": "MAX_EV100",
-        "default": "200"
+        "default": "35.0"
       },
       "Depth Of Field": {
         "Depth Of Field": {
           "key": "DOF",
-          "default": false
+          "default": true
         },
-        "Depth of Field Radius": {
-          "key": "DOF_MAX_RADIUS",
-          "default": "0.02",
-          "values": "{frange(0.005, 0.105, 0.005)}"
-        },
-        "Depth Of Field Focus Range": {
-          "key": "DOF_FOCUS_RANGE",
-          "default": "1.0",
-          "values": "{frange(0.0, 10.5, 0.5)}"
-        },
-        "Depth Of Field Samples": {
+        "Samples": {
           "key": "DOF_SAMPLES",
-          "default": "4",
-          "values": "{frange(2, 34, 2)}"
+          "default": "16",
+          "values": "{frange(4, 128, 4)}"
+        },
+        "Max Radius": {
+          "key": "DOF_MAX_RADIUS",
+          "default": "20",
+          "values": "{frange(5, 205, 5)}"
         }
       },
       "Bloom": {

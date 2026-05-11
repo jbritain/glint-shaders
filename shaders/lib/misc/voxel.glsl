@@ -107,10 +107,15 @@ vec3 sampleFloodfill(
   vec3 playerPos,
   vec3 geometryNormal,
   vec3 surfaceNormal,
-  float sss
+  float sss,
+  float lightmap
 ) {
+  #ifdef MC_TEXTURE_FORMAT_LAB_PBR
   vec3 offset = -geometryNormal * 0.5 + surfaceNormal;
   offset = mix(offset, vec3(0.0), sss * 0.25);
+  #else
+  vec3 offset = geometryNormal * 0.5;
+  #endif
   vec3 voxelPosInterp = mapVoxelPosInterp(playerPos + offset);
   if (clamp01(voxelPosInterp) != voxelPosInterp) {
     return vec3(0.0);
