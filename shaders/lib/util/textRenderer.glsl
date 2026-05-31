@@ -133,6 +133,8 @@ const uint _equal = 0x01C0703u; // =
 const uint _plus  = 0x21364200u; // + good enough but could be better - tired of trial and error
 const uint _slash = 0x00022220u; // / same as above lol
 
+const uint _caret = 0x22A20000u; // by xirreal
+
 const int charWidth   = 5;
 const int charHeight  = 6;
 const int charSpacing = 1;

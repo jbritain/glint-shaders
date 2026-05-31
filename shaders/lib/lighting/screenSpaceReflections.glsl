@@ -97,7 +97,11 @@ vec3 getSSR(
   vec3 viewNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
   vec3 viewDir = normalize(viewPos);
 
-  if (material.roughness < 0.01) {
+  if (material.roughness < 0.01
+    #ifdef METAL_REFLECTION_OVERRIDE
+     || (ROUGH_SSR_THRESHOLD == 0.0 && (material.metalID != NO_METAL || material.roughness < 0.1))
+    #endif
+    ) {
     SSRColor = SSRSample(
       viewPos,
       viewDir,
@@ -109,7 +113,12 @@ vec3 getSSR(
       depthBuffer,
       averageHitLength
     );
-  } else if (material.roughness <= ROUGH_SSR_THRESHOLD) {
+  } else if (
+    material.roughness <= ROUGH_SSR_THRESHOLD
+    #ifdef METAL_REFLECTION_OVERRIDE
+     || (ROUGH_SSR_THRESHOLD > 0.0 && material.metalID != NO_METAL)
+    #endif
+  ) {
     mat3 tbn = generateTBN(viewNormal);
     vec3 tangentViewDir = normalize(-viewDir * tbn);
     vec3 f = fresnelRoughness(

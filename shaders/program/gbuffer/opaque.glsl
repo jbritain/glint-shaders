@@ -27,6 +27,12 @@ out float emission;
 
 flat out uint materialID;
 
+#ifdef PARALLAX
+flat out vec2 singleTexSize;
+flat out ivec2 pixelTexSize;
+flat out vec4 textureBounds;
+#endif
+
 void main() {
   gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -53,6 +59,17 @@ void main() {
     emission = 0;
   }
 
+  #ifdef PARALLAX
+  vec2 halfSize = abs(texcoord - mc_midTexCoord);
+  textureBounds = vec4(
+    mc_midTexCoord.xy - halfSize,
+    mc_midTexCoord.xy + halfSize
+  );
+
+  singleTexSize = halfSize * 2.0;
+  pixelTexSize = ivec2(singleTexSize * atlasSize);
+  #endif
+
 }
 #endif
 
@@ -70,6 +87,13 @@ in vec4 glcolor;
 in mat3 tbn;
 in vec3 viewPos;
 in float emission;
+
+#ifdef PARALLAX
+flat in vec2 singleTexSize;
+flat in ivec2 pixelTexSize;
+flat in vec4 textureBounds;
+#include "/lib/misc/parallax.glsl"
+#endif
 
 flat in uint materialID;
 
@@ -90,6 +114,34 @@ void main() {
   occlusion = pow2(glcolor.a);
   #endif
 
+  #ifdef PARALLAX
+
+  float pomJitter = interleavedGradientNoise(
+    floor(gl_FragCoord.xy),
+    frameCounter
+  );
+
+  vec3 parallaxPos;
+  vec2 dx = dFdx(texcoord);
+  vec2 dy = dFdy(texcoord);
+  vec2 texcoord = texcoord;
+  if (
+    renderStage == MC_RENDER_STAGE_TERRAIN_SOLID ||
+    renderStage == MC_RENDER_STAGE_ENTITIES ||
+    renderStage == MC_RENDER_STAGE_TERRAIN_TRANSLUCENT
+  ) {
+    texcoord = getParallaxTexcoord(
+      texcoord,
+      viewPos,
+      tbn,
+      parallaxPos,
+      dx,
+      dy,
+      pomJitter
+    );
+  }
+  #endif
+
   Gbuffer gbuffer;
 
   gbuffer.geometryNormal = mat3(gbufferModelViewInverse) * tbn[2];
@@ -99,14 +151,7 @@ void main() {
 
   vec4 color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
-  if (
-    color.a <
-    max(
-      alphaTestRef,
-      blueNoise(gl_FragCoord.xy, frameCounter).r *
-        float(renderStage == MC_RENDER_STAGE_ENTITIES)
-    )
-  ) {
+  if (color.a < alphaTestRef) {
     discard;
   }
 
@@ -115,6 +160,13 @@ void main() {
     texture(specular, texcoord),
     materialID
   );
+  // if (material.metalID != NO_METAL && gl_FragCoord.x > viewWidth / 2) {
+  //   material.metalID = OTHER_METAL;
+  // }
+
+  #ifdef WHITE_WORLD
+  material.albedo = vec3(1.0);
+  #endif
 
   #ifndef MC_TEXTURE_FORMAT_LAB_PBR
   material.emission = emission;
@@ -128,6 +180,8 @@ void main() {
   }
 
   gbuffer.lightmap = applyLightmapFalloff(lightmap);
+  // gbuffer.lightmap +=
+  //   (interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter) - 0.5) / 15;
   // gbuffer.lightmap *= applyDirectionalLightmap(
   //   lightmap,
   //   viewPos,

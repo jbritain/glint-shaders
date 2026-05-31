@@ -1,4 +1,5 @@
 #version 460 compatibility
 #define WORLD_OVERWORLD
 #define vsh
-#include "/program/deferred/opaqueShading.glsl"
+#define STRIDE 1
+#include "/program/deferred/denoiseRSM.glsl"

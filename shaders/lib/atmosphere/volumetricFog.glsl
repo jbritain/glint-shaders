@@ -25,11 +25,7 @@
 const float fogScattering = 1.0;
 const float fogAbsorption = 0.0;
 const float fogExtinction = fogScattering + fogAbsorption;
-float fogDensityFactor = mix(
-  pow2(1.0 - abs(worldLightDir.y)) * 0.9 + 0.1,
-  1.0,
-  wetness
-);
+float fogDensityFactor = mix(pow2(1.0 - abs(worldLightDir.y)), 1.0, wetness);
 
 float getFogDensity(vec3 position) {
   return (1.0 -

@@ -48,20 +48,15 @@ float getSampleWeight(float sampleCoC, float CoC, float radius) {
 const float GOLDEN_ANGLE = 2.39996323;
 
 void main() {
-  float depth = -screenSpaceToViewSpace(texture(depthtex0, texcoord).r);
-  float focusDepth = -screenSpaceToViewSpace(centerDepthSmooth);
-
   float CoC = texture(colortex6, texcoord).r;
-  show(CoC);
 
   float weight = 1.0 / (PI * pow2(CoC / 2) + 1.0);
   color = texture(colortex0, texcoord).rgb * weight;
   vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).rg;
 
   for (int i = 0; i < DOF_SAMPLES; i++) {
-    float radius = sqrt(
-      float(i + jitter.x) / DOF_SAMPLES * float(DOF_MAX_RADIUS)
-    );
+    float radius =
+      sqrt(float(i + jitter.x) / DOF_SAMPLES) * float(DOF_MAX_RADIUS);
     float ang = float(i) * GOLDEN_ANGLE + jitter.y * TAU;
     vec2 sampleCoord = texcoord + vec2(cos(ang), sin(ang)) * pixelSize * radius;
     vec3 sampleColor = texelFetch(

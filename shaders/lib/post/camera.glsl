@@ -22,7 +22,7 @@
 const float SHUTTER_SPEED = 1.0 / SHUTTER_TIME;
 
 float getMeteringWeight(vec2 texcoord) {
-  return 1.0;
+  return clamp01(1.0 - length(texcoord - 0.5) / 0.5) * (12 / PI);
 }
 
 float autoEV100(float luminance) {
@@ -56,6 +56,26 @@ float circleOfConfusion(float depth, float focusDepth) {
   float CoC = baseCoC * depthTerm;
 
   return CoC * viewWidth / SENSOR_SIZE;
+}
+
+vec3 purkinje(vec3 color) {
+  float shift = 1.0 - linearstep(0.03, 3.0, averageLuminanceSmooth);
+
+  // https://jamesferwerda.com/wp-content/uploads/2015/06/j09_thompson02_jgt.pdf
+  // https://github.com/tobspr/GLSL-Color-Spaces/blob/master/ColorSpaces.inc.glsl
+  const mat3 xyzMatrix = mat3(
+    0.4124564, 0.2126729, 0.0193339,
+    0.3575761, 0.7151522, 0.119192 ,
+    0.1804375, 0.072175 , 0.9503041
+  );
+  vec3 xyz = xyzMatrix * color;
+  float scotopicLuminance =
+    xyz.y * (1.33 * (1.0 + (xyz.y + xyz.z) / xyz.x) - 0.168);
+  vec3 purkinjeColor =
+    vec3(scotopicLuminance) * vec3(PURKINJE_R, PURKINJE_G, PURKINJE_B) / 255.0;
+
+  return mix(color, purkinjeColor, shift);
+
 }
 
 #endif // CAMERA_GLSL

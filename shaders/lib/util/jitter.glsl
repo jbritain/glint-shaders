@@ -15,6 +15,7 @@
 #define JITTER_GLSL
 
 ivec2 getJitterOffset(int resolutionFraction, int frame) {
+  frame = frame % (resolutionFraction * resolutionFraction);
   int x = frame % resolutionFraction;
   int y = frame / resolutionFraction % resolutionFraction;
 

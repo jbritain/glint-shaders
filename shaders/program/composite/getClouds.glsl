@@ -37,7 +37,10 @@ in vec2 texcoord;
 layout(location = 0) out vec4 clouds;
 
 void main() {
-  vec2 texcoord = texcoord + getJitterOffset(4, frameCounter) / resolution;
+  ;
+  ivec2 fullResPixel =
+    ivec2(gl_FragCoord.xy) * 4 + getJitterOffset(4, frameCounter);
+  vec2 texcoord = (vec2(fullResPixel) + 0.5) / resolution;
 
   clouds = vec4(0.0, 0.0, 0.0, 1.0);
   float depth = texelFetch(depthtex0, ivec2(texcoord * resolution), 0).r;
@@ -54,6 +57,8 @@ void main() {
 
   clouds.rgb = fma(clouds.rgb, vec3(volClouds.a), volClouds.rgb);
   clouds.a *= volClouds.a;
+
+  clouds.rgb /= sunlightColor;
 }
 
 #endif

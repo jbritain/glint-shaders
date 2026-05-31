@@ -109,6 +109,7 @@ void main() {
     #else
     #ifdef RSM
     diffuse += texture(colortex9, texcoord).rgb * sunlightColor * cloudShadow;
+    
     #endif
     #endif
     #endif
@@ -144,7 +145,11 @@ void main() {
   color.rgb += mix(
     diffuse * material.albedo,
     specularc,
-    f * float(material.roughness <= ROUGH_SSR_THRESHOLD)
+    f * float(material.roughness <= ROUGH_SSR_THRESHOLD
+    #ifdef METAL_REFLECTION_OVERRIDE
+     || ROUGH_SSR_THRESHOLD > 0.0 && material.metalID != NO_METAL
+    #endif
+    )
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;

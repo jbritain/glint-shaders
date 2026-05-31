@@ -95,6 +95,66 @@
         ]
       },
       {
+        "path": "denoiseRSM",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "defined RSM",
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ],
+        "defines": {
+          "STRIDE": "8"
+        }
+      },
+      {
+        "path": "denoiseRSM",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "defined RSM",
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ],
+        "defines": {
+          "STRIDE": "4"
+        }
+      },
+      {
+        "path": "denoiseRSM",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "defined RSM",
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ],
+        "defines": {
+          "STRIDE": "2"
+        }
+      },
+      {
+        "path": "denoiseRSM",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "defined RSM",
+        "dimensions": [
+          "OVERWORLD",
+          "THE_END"
+        ],
+        "defines": {
+          "STRIDE": "1"
+        }
+      },
+      {
         "path": "accumulateRSM",
         "programs": [
           "vsh",
@@ -414,6 +474,36 @@
           "TILE_INDEX": "0"
         },
         "blend": "ONE ONE ZERO ZERO"
+      },
+      {
+        "path": "lensFlareFeatures",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "(defined LENS_FLARES)"
+      },
+      {
+        "path": "lensFlareBlur",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "(defined LENS_FLARES)",
+        "defines": {
+          "DIRECTION": "vec2(0.0, 1.0)"
+        }
+      },
+      {
+        "path": "lensFlareBlur",
+        "programs": [
+          "vsh",
+          "fsh"
+        ],
+        "enabledBy": "(defined LENS_FLARES)",
+        "defines": {
+          "DIRECTION": "vec2(1.0, 0.0)"
+        }
       },
       {
         "path": "tonemap",

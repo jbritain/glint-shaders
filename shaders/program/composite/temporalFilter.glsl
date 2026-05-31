@@ -68,7 +68,9 @@ void main() {
   actualPreviousViewPos.z = screenSpaceToViewSpace(historyColor.a);
 
   rejectSample =
-    rejectSample || distance(previousViewPos, actualPreviousViewPos) > 0.1;
+    rejectSample ||
+    distance(previousViewPos, actualPreviousViewPos) > 0.1 &&
+      !(historyColor.a == 1.0 && depth == 1.0);
 
   // neighbourhood clamping
   vec3 maxCol = vec3(0.0);

@@ -50,7 +50,13 @@ void main() {
   SSRColor = getSSR(viewPos, gbuffer, material, colortex13, averageHitLength);
   // averageHitLength *= 1.0 - material.roughness;
 
-  if (material.roughness >= 0.01 && material.roughness < ROUGH_SSR_THRESHOLD) {
+  if (
+    (material.roughness >= 0.01 && material.roughness < ROUGH_SSR_THRESHOLD)
+    #ifdef METAL_REFLECTION_OVERRIDE
+     || (ROUGH_SSR_THRESHOLD > 0.0 && material.metalID != NO_METAL)
+    #endif
+  ) {
+
     vec3 viewNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
     vec3 viewDir = normalize(viewPos);
     vec3 reflectDir = reflect(viewDir, viewNormal);
@@ -79,6 +85,8 @@ void main() {
       vec3 previousSSR = texture(colortex7, projectedPos.xy).rgb;
       SSRColor = mix(SSRColor, previousSSR, 0.6);
     }
+
+  
   }
 
 }

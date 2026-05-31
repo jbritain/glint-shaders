@@ -90,15 +90,57 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float K) {
 
 // TODO: HCM
 
+// Ray Tracing Gems II - "The Schlick Fresnel Approximation"
+vec3 schlick(vec3 f0, float cosTheta, float roughness) {
+  // roughness term as suggested by sebastian lagarde
+  // https://seblagarde.wordpress.com/2011/08/17/hello-world/
+  // TODO: see if someone has come up with a better approximation for this
+  return mix(f0, max(vec3(1.0 - roughness), f0), clamp01(pow5(1.0 - cosTheta)));
+}
+
+vec3 schlickLazanyi(vec3 f0, vec3 f82, float cosTheta, float roughness) {
+  // Hoffman, N. - "Fresnel equations considered harmful"
+  vec3 a = 823543.0 / 46656.0 * (f0 - f82) + 49.0 / 6.0 * (1.0 - f0);
+
+  const float alpha = 6;
+
+  return mix(
+    f0,
+    max(vec3(1.0 - roughness), f0),
+    clamp01(pow5(1.0 - cosTheta)) - a * cosTheta * pow(1 - cosTheta, alpha)
+  );
+}
+
 vec3 fresnel(Material material, float NoV) {
-  // normal schlick approx.
-  return clamp01(vec3(material.f0 + (1.0 - material.f0) * pow5(1.0 - NoV)));
+  if (material.metalID == NO_METAL || material.metalID == OTHER_METAL) {
+    return clamp01(schlick(material.f0, NoV, 0.0));
+  } else {
+    return clamp01(
+      schlickLazanyi(
+        metalF0[material.metalID],
+        metalF82[material.metalID],
+        NoV,
+        0.0
+      )
+    ) *
+    material.albedo;
+  }
 }
 
 vec3 fresnelRoughness(Material material, float NoV) {
-  return material.f0 +
-  (max(vec3(1.0 - material.roughness), material.f0) - material.f0) *
-    pow5(clamp01(1.0 - NoV));
+  if (material.metalID == NO_METAL || material.metalID == OTHER_METAL) {
+    return clamp01(schlick(material.f0, NoV, material.roughness));
+  } else {
+    return clamp01(
+      schlickLazanyi(
+        metalF0[material.metalID],
+        metalF82[material.metalID],
+        NoV,
+        material.roughness
+      ) *
+        material.albedo
+    );
+  }
 }
 
 vec3 brdf(
@@ -129,6 +171,7 @@ vec3 brdf(
     NoL,
     NoV,
     VoL,
+    // TODO: use pulsar angular radius in end
     isDay
       ? sunAngularRadius
       : moonAngularRadius
@@ -244,11 +287,13 @@ vec3 specularBRDF(
 
   vec3 specular = F * D * G / (4.0 * NoV + 1e-6);
 
-  return specular *
-  areaLightNormalization(
-    max(0.001, material.roughness),
-    dot(L, H),
-    sunAngularRadius
+  return max0(
+    specular *
+      areaLightNormalization(
+        max(0.001, material.roughness),
+        dot(L, H),
+        sunAngularRadius
+      )
   );
 
 }

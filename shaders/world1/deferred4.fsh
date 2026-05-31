@@ -1,4 +1,5 @@
 #version 460 compatibility
 #define WORLD_THE_END
 #define fsh
-#include "/program/deferred/accumulateRSM.glsl"
+#define STRIDE 8
+#include "/program/deferred/denoiseRSM.glsl"

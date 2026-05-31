@@ -6,6 +6,8 @@
 // GTAO BY CYBEREALITY
 // https://cybereality.com/screen-space-indirect-lighting-with-visibility-bitmask-improvement-to-gtao-ssao-real-time-ambient-occlusion-algorithm-glsl-shader-implementation/
 
+// #define GTAO_GI
+
 // https://cdrinmatane.github.io/posts/ssaovb-code/
 const uint sectorCount = 32u;
 uint updateSectors(float minHorizon, float maxHorizon, uint outBitfield) {
@@ -103,6 +105,7 @@ vec4 getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
   }
 
   visibility /= AO_SAMPLES;
+  lighting /= AO_SAMPLES;
 
   return vec4(lighting, visibility);
 }

@@ -33,12 +33,22 @@ layout(location = 0) out vec3 color;
 
 #include "/lib/post/tonemap.glsl"
 #include "/lib/util/dither.glsl"
+#include "/lib/post/camera.glsl"
 
 void main() {
   color = texture(colortex0, texcoord).rgb;
 
   vec3 bloom = texture(colortex16, texcoord * 0.5).rgb;
-  color = mix(color, bloom, 0.001);
+  color = mix(color, bloom, BLOOM_STRENGTH);
+
+  #ifdef LENS_FLARES
+  vec3 lensFlares = texture(colortex6, texcoord).rgb;
+  color += lensFlares;
+  #endif
+
+  #ifdef PURKINJE
+  color = purkinje(color);
+  #endif
 
   color = tonemap(color);
 

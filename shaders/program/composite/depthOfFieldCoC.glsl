@@ -35,8 +35,14 @@ layout(location = 0) out float coc;
 
 void main() {
   float depth = -screenSpaceToViewSpace(texture(depthtex0, texcoord).r);
-  float focusDepth = -screenSpaceToViewSpace(centerDepthSmooth);
-  coc = circleOfConfusion(depth, focusDepth);
+
+  if (texture(depthtex2, texcoord).r != texture(depthtex1, texcoord).r) {
+    coc = 0.0;
+  } else {
+    float focusDepth = -screenSpaceToViewSpace(centerDepthSmooth);
+    coc = circleOfConfusion(depth, focusDepth);
+  }
+
 }
 
 #endif

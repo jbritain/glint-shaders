@@ -21,6 +21,7 @@ const ivec3 workGroups = ivec3(25, 25, 1);
 layout(rgba16f) uniform image2D skyViewLUT;
 
 #include "/lib/atmosphere/atmosphere.glsl"
+#include "/lib/atmosphere/pulsar.glsl"
 
 /* 
     'Production Sky Rendering' by Andrew Helmer
@@ -152,7 +153,7 @@ void main() {
 
   if (texelCoord == ivec2(0.0)) {
     #ifdef WORLD_THE_END
-    sunlightColor = vec3(0.0);
+    sunlightColor = pulsarIlluminance;
     #else
     sunlightColor = isDay
       ? getValFromTLUT(

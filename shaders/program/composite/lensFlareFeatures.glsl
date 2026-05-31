@@ -36,7 +36,13 @@ layout(location = 0) out vec3 lensFlares;
 // const bool colortex0MipmapEnabled = true;
 
 void main() {
-  lensFlares = sampleGhosts(texcoord);
+  lensFlares = sampleGhosts(texcoord) * 0.0001;
+
+  lensFlares += sampleHalos(texcoord) * 0.0001;
+
+  lensFlares.g *= 0.7;
+
+  lensFlares;
 
 }
 

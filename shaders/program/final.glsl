@@ -36,6 +36,7 @@ uniform sampler2D debugtex;
 #include "/lib/util/rectilinearWarp.glsl"
 #include "/lib/util/textRenderer.glsl"
 #include "/lib/post/camera.glsl"
+#include "/lib/atmosphere/pulsar.glsl"
 
 void main() {
   int maxMipLevel = int(floor(log2(max(viewWidth, viewHeight))));
@@ -108,9 +109,14 @@ void main() {
   printFloat(-screenSpaceToViewSpace(centerDepthSmooth));
   printString((_m));
   printLine();
-  printFloat(gbufferProjection[3][2] / (gbufferProjection[2][2] + 1.0));
+  printString((_A, _v, _e, _r, _a, _g, _e, _space, _S, _c, _e, _n, _e, _space, _L, _u, _m, _i, _n, _a, _n, _c, _e, _colon, _space));
+  printFloat(averageLuminanceSmooth);
+  printString((_c, _d, _slash, _m, _caret, _2));
   
   #endif
+
+  printLine();
+  printFloat(pulsarIlluminance.b);
 
   #if (defined DEBUG_ENABLE || defined CAMERA_INFO)
   endText(color.rgb);

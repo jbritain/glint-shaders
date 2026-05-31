@@ -72,6 +72,14 @@ void main() {
     historyCount = texture(colortex11, texcoord).r + 1;
   }
 
+  actualPreviousPos = transformView(
+    actualPreviousPos,
+    inverse(gbufferPreviousModelView)
+  );
+  actualPreviousPos += previousCameraPosition - cameraPosition;
+  actualPreviousPos = transformView(actualPreviousPos, gbufferModelView);
+  reprojectedDepth = viewSpaceToScreenSpace(actualPreviousPos.z);
+
 }
 
 #endif

@@ -148,4 +148,12 @@ vec3 unmapSphere(vec2 uv) {
   return vec3(cosTheta * cosPhi, y, cosTheta * sinPhi);
 }
 
+vec3 rotate(vec3 vector, vec3 axis, float angle) {
+  // https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+  vec2 sc = vec2(sin(angle), cos(angle));
+  return sc.y * vector +
+  sc.x * cross(axis, vector) +
+  (1.0 - sc.y) * dot(axis, vector) * axis;
+}
+
 #endif // MISC_GLSL

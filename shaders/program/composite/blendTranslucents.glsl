@@ -45,6 +45,8 @@ in vec2 texcoord;
 layout(location = 0) out vec4 color;
 
 void main() {
+  vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter);
+
   vec4 translucents = texture(colortex6, texcoord);
   color = texture(colortex0, texcoord);
 
@@ -79,7 +81,7 @@ void main() {
     gbuffer.surfaceNormal = getWaterParallaxNormal(
       translucentFeetPlayerPos,
       gbuffer.geometryNormal,
-      blueNoise(gl_FragCoord.xy, frameCounter).r,
+      noise.r,
       1.0
     );
   }
@@ -107,6 +109,15 @@ void main() {
   vec3 refractionNormal = viewSurfaceNormal;
   #endif
 
+  #ifdef ROUGH_REFRACTION
+  if (material.roughness > 0.01) {
+    mat3 tbn = generateTBN(refractionNormal);
+    vec3 tangentViewDir = normalize(-viewDir * tbn);
+    refractionNormal =
+      tbn * SampleVNDFGGX(tangentViewDir, vec2(material.roughness), noise.xy);
+  }
+
+  #endif
   vec3 refractedDir = refract(viewDir, refractionNormal, ior);
 
   #ifdef RT_REFRACTION
@@ -140,10 +151,8 @@ void main() {
   } else if (inWater || !isWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
     vec3 sky = getSky(skyDir, true);
-
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
-
     // vec4 fog = analyticalFog(translucentFeetPlayerPos, skyDir);
     // sky = fma(sky, vec3(fog.a), fog.rgb);
     color.rgb = sky * gbuffer.lightmap.y;
@@ -213,6 +222,8 @@ void main() {
     shadow *
     cloudShadow;
   color.rgb += specularHighlight * sunlightColor;
+
+  show(lessThan(specularHighlight, vec3(0.0)));
   #endif
 
   if (isWater && inWater) {

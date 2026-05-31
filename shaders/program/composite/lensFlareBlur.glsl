@@ -27,23 +27,13 @@ void main() {
 
 in vec2 texcoord;
 
-#ifdef BLEND
-/* RENDERTARGETS: 0 */
-#else
 /* RENDERTARGETS: 6 */
-#endif
 
 #include "/lib/util/blur.glsl"
-layout(location = 0) out vec3 color;
+layout(location = 0) out vec3 lensFlares;
 
 void main() {
-  vec3 lensFlares = blur13(colortex6, texcoord, 0, DIRECTION).rgb;
-
-  #ifdef BLEND
-  color = texture(colortex0, texcoord).rgb + lensFlares * 0.1;
-  #else
-  color = lensFlares;
-  #endif
+  lensFlares = blur13(colortex6, texcoord, 0, DIRECTION).rgb;
 }
 
 #endif

@@ -33,6 +33,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   //   interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter)
   // );
   const float radius = RSM_RADIUS / shadowDistance;
+  const float areaPerSample = PI * pow2(RSM_RADIUS) / RSM_SAMPLES;
 
   vec3 irradiance = vec3(0.0);
 
@@ -57,15 +58,32 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
 
     vec3 dir = normalize(shadowViewPos - samplePos); // direction from fragment to sample
 
+    // this bit taken from zombye's implementation in spectrum
+    // the original paper does not properly account for the radius but this seems to work
+    float sampleIn = 2.0 * r;
+    float sampleOut = clamp01(dot(sampleNormal, dir)) / PI;
+    float bounceIn = clamp01(dot(shadowViewNormal, -dir));
+    const float bounceOut = 1.0 / PI;
+
     irradiance +=
-      sampleFlux *
-      max0(dot(dir, sampleNormal)) *
-      max0(dot(-dir, shadowViewNormal)) /
-      pow2(distance(samplePos, shadowViewPos) + 1.0);
+      sampleIn *
+      sampleOut *
+      bounceIn *
+      bounceOut *
+      sampleFlux /
+      pow2(distance(samplePos, shadowViewPos));
+
+    // irradiance +=
+    //   sampleFlux *
+    //   max0(dot(dir, sampleNormal)) *
+    //   max0(dot(-dir, shadowViewNormal));
+
   }
 
-  irradiance /= float(RSM_SAMPLES);
-  irradiance *= PI * RSM_RADIUS * RSM_BRIGHTNESS;
+  // irradiance /= float(RSM_SAMPLES);
+  // irradiance *= PI * RSM_RADIUS * RSM_BRIGHTNESS;
+  irradiance *= areaPerSample;
+  irradiance *= RSM_BRIGHTNESS;
 
   return irradiance;
 }

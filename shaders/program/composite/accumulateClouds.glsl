@@ -61,14 +61,14 @@ void main() {
   // uint frameCount = min(texture(colortex11, texcoord).r, RSM_MAX_FRAMES);
   // clouds = (previousClouds * frameCount + clouds) / (frameCount + 1);
 
-  if (depth == 1.0 || distance(cameraPosition, previousCameraPosition) < 0.01) {
+  if (depth == 1.0) {
     vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
     previousPos = transformView(previousPos, gbufferPreviousModelView);
     previousPos = viewSpaceToScreenSpace(
       previousPos,
       gbufferPreviousProjection
     );
-    vec4 previousClouds = texture(colortex8, previousPos.xy);
+    vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
     float previousZ = screenSpaceToViewSpace(
       texture(colortex5, previousPos.xy).a
     );
@@ -90,7 +90,7 @@ void main() {
     clouds = mix(
       clouds,
       texelFetch(colortex14, ivec2(gl_FragCoord.xy) / 4, 0),
-      1.0
+      0.5
     );
   }
 

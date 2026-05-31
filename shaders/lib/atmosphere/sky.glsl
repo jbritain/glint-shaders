@@ -15,6 +15,8 @@
 #define SKY_GLSL
 
 #include "/lib/util/misc.glsl"
+#include "/lib/atmosphere/pulsar.glsl"
+#include "/lib/util/misc.glsl"
 
 vec3 sampleGalaxy(vec3 dir) {
   float theta = atan(dir.z, dir.x);
@@ -33,20 +35,12 @@ vec3 getSky(vec3 dir, bool includeSun) {
 }
 #elif defined WORLD_THE_END
 vec3 getSky(vec3 dir, bool includeSun) {
-  return sampleGalaxy(dir) * 10;
+  return getPulsar(dir, includeSun) + sampleGalaxy(dir);
 }
 #else
 #include "/lib/atmosphere/atmosphere.glsl"
 
 // TODO: moon phases
-
-vec3 rotate(vec3 vector, vec3 axis, float angle) {
-  // https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
-  vec2 sc = vec2(sin(angle), cos(angle));
-  return sc.y * vector +
-  sc.x * cross(axis, vector) +
-  (1.0 - sc.y) * dot(axis, vector) * axis;
-}
 
 vec3 getMoon(vec3 dir) {
   float VoL = dot(dir, worldMoonDir);

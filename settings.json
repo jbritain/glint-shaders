@@ -117,6 +117,9 @@
         "default": "0.2",
         "values": "{frange(0.0, 1.1, 0.1)}"
       },
+      "Metal Reflection Override": {
+        "key": "METAL_REFLECTION_OVERRIDE"
+      },
       "Rough Reflection Accumulation Frame Cap": {
         "key": "SSR_MAX_FRAMES",
         "default": "64"
@@ -125,7 +128,7 @@
     "Global Illumination": {
       "Global Illumination": {
         "key": "RSM",
-        "default": false
+        "default": true
       },
       "Global Illumination Samples": {
         "key": "RSM_SAMPLES",
@@ -142,9 +145,12 @@
         "default": "5.0",
         "values": "{frange(1.0, 10.5, 0.5)}"
       },
-      "Global Illumination Accumulation Frame Cap": {
+      "Light Leak Fix": {
+        "key": "RSM_LIGHT_LEAK_FIX"
+      },
+      "Frame Cap": {
         "key": "RSM_MAX_FRAMES",
-        "default": "64"
+        "default": "16"
       }
     },
     "Blocklight": {
@@ -215,6 +221,54 @@
         "key": "NETHER_AMBIENT_LIGHT_BOOST",
         "default": "2.0",
         "values": "{frange(5.0, 11.0, 1.0)}"
+      }
+    }
+  },
+  "Materials": {
+    "Parallax Occlusion Mapping": {
+      "Parallax Occlusion Mapping": {
+        "key": "PARALLAX"
+      },
+      "Parallax Distance": {
+        "key": "PARALLAX_DISTANCE",
+        "default": "32.0",
+        "values": "[4.0 8.0 16.0 32.0 64.0 128.0 256.0 512.0 1024.0]"
+      },
+      "Parallax Distance Curve": {
+        "key": "PARALLAX_DISTANCE_CURVE",
+        "default": "0.8",
+        "hidden": true
+      },
+      "Parallax Samples": {
+        "key": "PARALLAX_SAMPLES",
+        "default": "32",
+        "values": "[4 8 16 32 64 128]"
+      },
+      "Parallax Depth": {
+        "key": "PARALLAX_HEIGHT",
+        "default": "0.25",
+        "values": "[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.0]"
+      }
+    },
+    "Translucent Tint": {
+      "key": "MULTIPLICATIVE_TRANSLUCENTS"
+    },
+    "Refraction": {
+      "Rough Refraction": {
+        "key": "ROUGH_REFRACTION"
+      },
+      "Flattened Refraction Normals": {
+        "key": "REFRACTION_NORMAL_HACK",
+        "default": true
+      },
+      "Ray-traced Refraction": {
+        "key": "RT_REFRACTION",
+        "default": false
+      },
+      "Ray-traced Refraction Steps": {
+        "key": "RT_REFRACTION_STEPS",
+        "default": "8",
+        "values": "{frange(4, 17, 1)}"
       }
     }
   },
@@ -442,7 +496,8 @@
         },
         "Auto Exposure Min EV100": {
           "key": "MIN_EV100",
-          "default": "4"
+          "default": "2",
+          "values": "[-4 -2 0 2 4]"
         },
         "Auto Exposure Max EV100": {
           "key": "MAX_EV100",
@@ -452,6 +507,9 @@
           "key": "EXPOSURE_ADAPTATION",
           "default": "1",
           "values": "{frange(1, 17, 1)}"
+        },
+        "Exclude Sun From Auto Exposure": {
+          "key": "EXCLUDE_SUN_AUTO_EXPOSURE"
         }
       },
       "Exposure Compensation": {
@@ -484,7 +542,7 @@
       "Depth Of Field": {
         "Depth Of Field": {
           "key": "DOF",
-          "default": true
+          "default": false
         },
         "Samples": {
           "key": "DOF_SAMPLES",
@@ -498,39 +556,54 @@
         }
       },
       "Bloom": {
+        "Bloom Strength": {
+          "key": "BLOOM_STRENGTH",
+          "default": "0.005",
+          "values": "{frange(0.0, 0.011, 0.001)}"
+        },
         "Bloom Radius": {
           "key": "BLOOM_RADIUS",
           "default": "1.0"
         }
       },
-      "Display Camera Info": {
-        "key": "CAMERA_INFO",
-        "default": false
+      "Lens Flares": {
+        "key": "LENS_FLARES"
+      },
+      "Purkinje Shift": {
+        "Purkinje Shift": {
+          "key": "PURKINJE"
+        },
+        "Purkinje Shift Red": {
+          "key": "PURKINJE_R",
+          "default": 40,
+          "values": "{frange(0, 251, 1)}"
+        },
+        "Purkinje Shift Green": {
+          "key": "PURKINJE_G",
+          "default": 80,
+          "values": "{frange(0, 251, 1)}"
+        },
+        "Purkinje Shift Blue": {
+          "key": "PURKINJE_B",
+          "default": 255,
+          "values": "{frange(0, 251, 1)}"
+        },
+        "Display Camera Info": {
+          "key": "CAMERA_INFO",
+          "default": false
+        }
       }
     }
   },
-  "Miscellaneous": {
-    "Translucent Tint": {
-      "key": "MULTIPLICATIVE_TRANSLUCENTS"
-    },
-    "Refraction": {
-      "Flattened Refraction Normals": {
-        "key": "REFRACTION_NORMAL_HACK",
-        "default": true
-      },
-      "Ray-traced Refraction": {
-        "key": "RT_REFRACTION",
-        "default": false
-      },
-      "Ray-traced Refraction Steps": {
-        "key": "RT_REFRACTION_STEPS",
-        "default": "8",
-        "values": "{frange(4, 17, 1)}"
-      }
-    }
-  },
-  "DEBUG_ENABLE": {
+  "Miscellaneous": {},
+  "Debug Mode": {
     "key": "DEBUG_ENABLE",
     "default": false
+  },
+  "Debugging": {
+    "White World": {
+      "key": "WHITE_WORLD",
+      "default": false
+    }
   }
 }

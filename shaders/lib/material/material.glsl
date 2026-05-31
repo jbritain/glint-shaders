@@ -29,6 +29,8 @@ uvec3 packGbuffer(Gbuffer gbuffer) {
   vec2 packedSurface = encodeUnitVector(gbuffer.surfaceNormal);
   vec2 packedGeometry = encodeUnitVector(gbuffer.geometryNormal);
 
+  gbuffer.lightmap = pow(gbuffer.lightmap, vec2(rcp(2.2)));
+
   packedGbuffer.r = bitfieldInsert(
     packedGbuffer.r,
     uint(packedSurface.r * 255),
@@ -89,6 +91,7 @@ Gbuffer unpackGbuffer(uvec3 packedGbuffer) {
   gbuffer.lightmap.x = float(bitfieldExtract(packedGbuffer.b, 0, 8)) / 255.0;
   gbuffer.lightmap.y = float(bitfieldExtract(packedGbuffer.b, 8, 8)) / 255.0;
 
+  gbuffer.lightmap = pow(gbuffer.lightmap, vec2(2.2));
   gbuffer.lightmap = clamp01(gbuffer.lightmap);
 
   return gbuffer;
@@ -104,6 +107,31 @@ Gbuffer unpackGbuffer(uvec3 packedGbuffer) {
 #define PLATINUM 7
 #define SILVER 8
 #define OTHER_METAL 9
+
+// metal properties obtained from https://physicallybased.info/
+const vec3 metalF0[9] = vec3[](
+  vec3(0.04),
+  vec3(0.53, 0.513, 0.494),
+  vec3(1.059, 0.773, 0.307),
+  vec3(0.916, 0.923, 0.924),
+  vec3(0.654, 0.685, 0.701),
+  vec3(0.932, 0.623, 0.522),
+  vec3(0.626, 0.64, 0.693),
+  vec3(0.765, 0.73, 0.676),
+  vec3(0.991, 0.985, 0.974)
+);
+
+const vec3 metalF82[9] = vec3[](
+  vec3(1.0),
+  vec3(0.765, 0.767, 0.802),
+  vec3(0.971, 1.018, 0.994),
+  vec3(0.91, 0.936, 0.959),
+  vec3(0.688, 0.728, 0.798),
+  vec3(0.982, 0.947, 0.945),
+  vec3(0.758, 0.773, 0.799),
+  vec3(0.793, 0.815, 0.84),
+  vec3(0.994, 0.995, 0.998)
+);
 
 struct Material {
   vec3 albedo;

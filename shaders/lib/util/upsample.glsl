@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2024 Josh Britain (jbritain)
+    Copyright (c) 2026 Josh Britain (jbritain)
     Licensed under the MIT license
 
     ┏┓┓•   
@@ -42,7 +42,7 @@ vec4 upsample(
 ) {
   vec2 grad = vec2(dFdx(depth), dFdy(depth));
 
-  vec3 centrePos = vec3(vec2(pixelCoord) + 0.5 / resolution, depth);
+  vec3 centrePos = vec3((vec2(pixelCoord) + 0.5) / resolution, depth);
 
   uvec2 downscaled = pixelCoord / scalingFactor;
   uvec2 rounded = downscaled * scalingFactor;
@@ -54,11 +54,12 @@ vec4 upsample(
     fractional.x * fractional.y,
   };
 
+
   float totalWeight = 0.0;
   vec4 color = vec4(0.0);
   for(int i = 0; i < 4; i++){
     uvec2 samplePos = rounded + OFFSETS[i] * scalingFactor;
-    vec3 sampleScreenPos = vec3((samplePos + 0.5 / resolution), texelFetch(depthtex0, ivec2(samplePos), 0).r);
+    vec3 sampleScreenPos = vec3((vec2(samplePos) + 0.5) / resolution, texelFetch(depthtex0, ivec2(samplePos), 0).r);
 
     float weight = depthWeight(centrePos, sampleScreenPos, grad) * interpolationWeights[i];
     color += texelFetch(undersampled, ivec2(downscaled + OFFSETS[i]), 0) * weight;

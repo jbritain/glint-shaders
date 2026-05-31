@@ -14,15 +14,16 @@
 #ifndef DEBUG_GLSL
 #define DEBUG_GLSL
 
-#ifdef DEBUG_ENABLE
-#endif
-
 #if defined DEBUG_ENABLE && defined fsh
 layout(rgba8) uniform image2D debug;
 
 void show(vec4 x) {
   imageStore(debug, ivec2(gl_FragCoord.xy), x);
 }
+
+#else
+void show(vec4 x) {}
+#endif
 
 void show(vec3 x) {
   show(vec4(x, 1.0));
@@ -40,16 +41,16 @@ void show(bool x) {
   show(float(x));
 }
 
-#else
-void show(vec4 x) {}
+void show(bvec2 x) {
+  show(vec2(x));
+}
 
-void show(vec3 x) {}
+void show(bvec3 x) {
+  show(vec3(x));
+}
 
-void show(vec2 x) {}
-
-void show(float x) {}
-
-void show(bool x) {}
-#endif
+void show(bvec4 x) {
+  show(vec4(x));
+}
 
 #endif // DEBUG_GLSL

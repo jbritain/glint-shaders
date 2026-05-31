@@ -42,7 +42,7 @@ float getCloudShadow(vec3 rayPos) {
       1.0,
       texture(cloudcoveragetex, fract(rayPos.xz / 50000.0) + wind * 0.0005).r
     );
-    shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
+    shadow *= pow3(1.0 - coverage) * 0.7 + 0.3; // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
   }
   #endif
 

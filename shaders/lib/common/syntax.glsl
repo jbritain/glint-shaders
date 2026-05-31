@@ -130,4 +130,20 @@ struct Volume {
 
 #define isbad(x) (any(isnan(x)) || any(isinf(x)))
 
+vec3 maxMask(vec3 v) {
+  return step(max(max(v.x, v.y), v.z), v);
+}
+
+vec2 maxMask(vec2 v) {
+  return step(max(v.x, v.y), v);
+}
+
+vec3 minMask(vec3 v) {
+  return step(min(min(v.x, v.y), v.z), v);
+}
+
+vec2 minMask(vec2 v) {
+  return step(min(v.x, v.y), v);
+}
+
 #endif // SYNTAX_GLSL
