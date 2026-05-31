@@ -58,7 +58,7 @@ void main() {
   clouds.rgb = fma(clouds.rgb, vec3(volClouds.a), volClouds.rgb);
   clouds.a *= volClouds.a;
 
-  clouds.rgb /= sunlightColor;
+  clouds.rgb /= max(vec3(1.0), sunlightColor);
 }
 
 #endif

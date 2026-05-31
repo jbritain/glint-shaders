@@ -48,7 +48,7 @@ void main() {
 
   #ifdef VOLUMETRIC_FOG
   vec4 fog = upsample(colortex12, uvec2(gl_FragCoord.xy), depth, 2);
-  fog.rgb *= sunlightColor;
+  fog.rgb *= max(vec3(1.0), sunlightColor);
   #else
   vec4 fog = vec4(0.0, 0.0, 0.0, 1.0);
   #endif
@@ -71,7 +71,7 @@ void main() {
   if (blend) {
     #if defined VOLUMETRIC_CLOUDS || defined PLANAR_CLOUDS
     vec4 clouds = texture(colortex8, texcoord);
-    clouds.rgb *= sunlightColor;
+    clouds.rgb *= max(vec3(1.0), sunlightColor);
 
     color.rgb = fma(color.rgb, vec3(clouds.a), clouds.rgb);
     #endif

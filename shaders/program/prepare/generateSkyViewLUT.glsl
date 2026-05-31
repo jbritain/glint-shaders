@@ -170,8 +170,7 @@ void main() {
         -worldSunDir
       ) *
       moonIlluminance *
-      abs(moonPhase - 4) /
-      4.0;
+      abs((moonPhase - 4) / 4.0);
     #endif
 
     // sunlightColor *= smoothstep(0.0, 0.005, worldLightDir.y); // fade out sunlight to stop hard transition between sun and moon

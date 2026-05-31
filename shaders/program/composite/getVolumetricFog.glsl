@@ -47,7 +47,7 @@ void main() {
 
   // vec4 previousFog = texture(colortex12, texcoord);
   fog = getVolumetricFog(feetPlayerPos, depth);
-  fog.rgb /= sunlightColor;
+  fog.rgb /= max(vec3(1.0), sunlightColor);
 
   // fog = mix(fog, previousFog, 0.7);
   // fog = analyticalFog(vec3(0.0), normalize(feetPlayerPos));

@@ -26,7 +26,7 @@ vec3 sampleGalaxy(vec3 dir) {
   float phi = acos(dir.y);
 
   vec2 uv = vec2(theta / (2 * PI), phi / PI);
-  return texture(startex, uv).rgb;
+  return pow(texture(startex, uv).rgb, vec3(1.0));
 }
 
 #if defined WORLD_THE_NETHER
