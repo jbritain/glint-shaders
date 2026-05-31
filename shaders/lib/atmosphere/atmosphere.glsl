@@ -19,7 +19,7 @@ const vec3 sunIlluminance = sunLuminance * sunSolidAngle;
 const float moonRadius = 1737e3;
 const float moonDistance = 384400e3;
 const float moonAngularRadius = moonRadius / moonDistance;
-const float moonSolidAngle = PI * pow2(moonAngularRadius);
+const float moonSolidAngle = TAU * (1.0 - cos(moonAngularRadius));
 
 const vec3 moonLuminance = sunIlluminance;
 const vec3 moonIlluminance = moonLuminance * moonSolidAngle;
