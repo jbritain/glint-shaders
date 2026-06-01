@@ -444,7 +444,7 @@
     },
     "Water Scattering G": {
       "key": "WATER_SCATTERING_G",
-      "default": "30",
+      "default": "20",
       "values": "{frange(0, 256, 1)}"
     },
     "Water Scattering B": {
