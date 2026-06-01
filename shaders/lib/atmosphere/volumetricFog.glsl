@@ -34,6 +34,11 @@ float getFogDensity(vec3 position) {
       VOLUMETRIC_FOG_TOP_PLANE,
       position.y
     )) *
+  linearstep(
+    VOLUMETRIC_FOG_BOTTOM_PLANE,
+    VOLUMETRIC_FOG_MIDDLE_PLANE,
+    position.y
+  ) *
   VOLUMETRIC_FOG_DENSITY *
   fogDensityFactor;
 }
@@ -41,15 +46,26 @@ float getFogDensity(vec3 position) {
 float integrateFogDensity(vec3 position, vec3 dir) {
   float density = 0.0;
   vec3 p;
-  if (rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_MIDDLE_PLANE, p)) {
-    density +=
-      distance(p, position) * VOLUMETRIC_FOG_DENSITY * fogDensityFactor;
-    position = p;
+
+  if (position.y < VOLUMETRIC_FOG_MIDDLE_PLANE) {
+    if (rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_MIDDLE_PLANE, p)) {
+      density +=
+        distance(position, p) * VOLUMETRIC_FOG_DENSITY * fogDensityFactor;
+      position = p;
+    } else {
+      return density;
+    }
   }
 
-  if (rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_TOP_PLANE, p)) {
-    density += distance(position, p) * getFogDensity(vec3(position)) / 2;
+  if (position.y < VOLUMETRIC_FOG_TOP_PLANE) {
+    if (rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_TOP_PLANE, p)) {
+      density +=
+        distance(position, p) *
+        (getFogDensity(position) + getFogDensity(p)) /
+        2.0;
+    }
   }
+
   return density;
 }
 
@@ -60,11 +76,21 @@ vec4 getVolumetricFog(vec3 position, float depth) {
   vec3 end = position + cameraPosition;
 
   if (depth == 1.0) {
-    rayPlaneIntersection(cameraPosition, dir, VOLUMETRIC_FOG_TOP_PLANE, end);
+    if (dir.y > 0.0) {
+      rayPlaneIntersection(cameraPosition, dir, VOLUMETRIC_FOG_TOP_PLANE, end);
+    } else {
+      rayPlaneIntersection(
+        cameraPosition,
+        dir,
+        VOLUMETRIC_FOG_BOTTOM_PLANE,
+        end
+      );
+    }
+
   }
-  if (distance(start, end) > 500) {
-    end = start + dir * 500;
-  }
+  // if (distance(start, end) > 500) {
+  //   end = start + dir * 500;
+  // }
 
   vec3 shadowStart = viewSpaceToScreenSpaceOrtho(
     transformView(start - cameraPosition, shadowModelView),
@@ -156,8 +182,13 @@ vec4 analyticalFog(vec3 origin, vec3 dir) {
 
   float phase = hgDraine(11, dot(dir, worldLightDir));
 
+  float transmittanceToSun = exp(
+    -integrateFogDensity(origin, worldLightDir) * fogExtinction
+  );
+
   vec3 radiance =
-    sunlightColor * phase + skylightColor * isotropicPhase * EBS.y;
+    sunlightColor * phase * transmittanceToSun +
+    skylightColor * isotropicPhase * EBS.y;
 
   float fMS =
     (1.0 - exp(-VOLUMETRIC_FOG_MULTIPLE_SCATTERING * density * fogExtinction)) *
@@ -165,7 +196,8 @@ vec4 analyticalFog(vec3 origin, vec3 dir) {
     fogExtinction;
   fMS = mix(fMS, fMS * 0.99, smoothstep(0.99, 1.0, fMS)); // this part by luna
 
-  radiance += sunlightColor * 0.02 * isotropicPhase * fMS / (1.0 - fMS); // made up bullshit
+  radiance +=
+    sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS); // made up bullshit
 
   float transmittance = exp(-density * fogExtinction);
   vec3 scatter =

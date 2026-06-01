@@ -73,13 +73,15 @@ vec3 SSRSample(
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
     sky *= skyLightmap;
 
-    col = mix(col, sky, skyBlendWeight);
-
-    // vec4 fog = analyticalFog(
+    //     vec4 fog = analyticalFog(
     //   transformView(origin, gbufferModelViewInverse),
     //   skyDir
     // );
     // sky = fma(sky, vec3(fog.a), fog.rgb);
+
+    col = mix(col, sky, skyBlendWeight);
+
+
 
   }
   return col;

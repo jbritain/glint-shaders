@@ -53,11 +53,15 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
   for (int i = 0; i < VOLUMETRIC_WATER_SAMPLES; i++) {
     float progress = float(i + jitter) / float(VOLUMETRIC_WATER_SAMPLES);
 
+    float shadow = 1.0;
+    float distanceToSurface = dot(worldLightDir, vec3(1.0)) * stepLength * i;
     vec3 shadowRayPos = mix(shadowStart, shadowEnd, progress);
     vec3 rayPos = mix(start, end, progress);
-    shadowRayPos.xy += getWarp(shadowRayPos.xy);
+    if (clamp01(shadowRayPos) == shadowRayPos) {
+      shadowRayPos.xy += getWarp(shadowRayPos.xy);
+      shadow = texture(shadowtex1HW, shadowRayPos).r;
+    }
 
-    float shadow = texture(shadowtex1HW, shadowRayPos).r;
     shadow *= getCloudShadow(rayPos);
     vec2 causticsPos =
       (mat3(shadowModelView) * mod(rayPos + cameraPosition, 512)).xy / 128;
@@ -77,11 +81,6 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     }
 
     // shadow *= texture(shadowcolor2, shadowRayPos.xy).r * TAU;
-
-    float distanceToSurface =
-      max0(shadowRayPos.z - texture(shadowtex0, shadowRayPos.xy).r) *
-      shadowRange *
-      shadow;
 
     vec3 transmittanceToSun =
       shadow * exp(-distanceToSurface * waterExtinction);

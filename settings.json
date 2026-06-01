@@ -293,7 +293,7 @@
       },
       "Volumetric Fog Density": {
         "key": "VOLUMETRIC_FOG_DENSITY",
-        "default": "0.01",
+        "default": "0.001",
         "values": "{frange(0.001, 0.021, 0.001)}"
       },
       "Volumetric Fog Multiple Scattering": {
@@ -310,7 +310,7 @@
       },
       "Volumetric Fog Top Plane": {
         "key": "VOLUMETRIC_FOG_TOP_PLANE",
-        "default": "200"
+        "default": "320"
       }
     },
     "Volumetric Clouds": {
