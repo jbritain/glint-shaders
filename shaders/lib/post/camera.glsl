@@ -74,7 +74,7 @@ vec3 purkinje(vec3 color) {
   vec3 purkinjeColor =
     vec3(scotopicLuminance) * vec3(PURKINJE_R, PURKINJE_G, PURKINJE_B) / 255.0;
 
-  return mix(color, purkinjeColor, shift);
+  return mix(color, purkinjeColor, shift * PURKINJE_STRENGTH);
 
 }
 

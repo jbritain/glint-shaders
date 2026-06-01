@@ -18,6 +18,7 @@
 #include "/lib/material/material.glsl"
 #include "/lib/lighting/brdf.glsl"
 #include "/lib/lighting/shadows.glsl"
+#include "/lib/material/integratedPBR.glsl"
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out uvec3 gbufferData;
@@ -40,16 +41,13 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
   Material material = defaultMaterial;
   material.albedo = pow(color.rgb, vec3(2.2));
   material.id = params.customId;
+  applyIntegratedPBR(material);
+  if (materialIsWater(material.id)) {
+    color.a = 0.01;
+  }
 
   gbuffer.lightmap = params.lightMap;
   gbuffer.lightmap = applyLightmapFalloff(gbuffer.lightmap);
-
-  if (materialIsWater(material.id)) {
-    material.roughness = 0.0;
-    material.f0 = vec3(0.02);
-    material.albedo = vec3(0.0);
-    color.a = 0.01;
-  }
 
   vec3 viewPos = screenSpaceToViewSpace(
     gl_FragCoord.xyz / vec3(viewWidth, viewHeight, 1.0)

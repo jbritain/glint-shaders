@@ -122,8 +122,11 @@ vec3 fresnel(Material material, float NoV) {
         NoV,
         0.0
       )
-    ) *
-    material.albedo;
+    )
+          #ifdef ALBEDO_METAL_TINT
+        * material.albedo
+      #endif
+    ;
   }
 }
 
@@ -137,9 +140,11 @@ vec3 fresnelRoughness(Material material, float NoV) {
         metalF82[material.metalID],
         NoV,
         material.roughness
-      ) *
-        material.albedo
-    );
+      )) 
+      #ifdef ALBEDO_METAL_TINT
+        * material.albedo
+      #endif
+    ;
   }
 }
 

@@ -227,9 +227,6 @@ Material unpackMaterial(uvec2 data) {
   float specularG = bitfieldExtract(data.g, 8, 8) / 255.0;
   if (specularG <= 229.0 / 255.0) {
     material.f0 = vec3(specularG);
-    if (material.f0 == vec3(0.0)) {
-      material.f0 = vec3(0.04);
-    }
     material.metalID = NO_METAL;
   } else {
     material.f0 = material.albedo;

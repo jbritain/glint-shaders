@@ -7,5 +7,24 @@
     "%minecraft:crops",
     "%minecraft:flowers",
     "%minecraft:edible_for_sheep"
+  ],
+  "leaves": [
+    "%minecraft:leaves"
+  ],
+  "iron": [
+    "minecraft:iron_block",
+    "minecraft:iron_door",
+    "minecraft:iron_trapdoor",
+    "minecraft:iron_bars",
+    "minecraft:iron_chain"
+  ],
+  "gold": [
+    "minecraft:gold_block"
+  ],
+  "copper": [
+    "%minecraft:copper"
+  ],
+  "obsidian": [
+    "minecraft:obsidian"
   ]
 }

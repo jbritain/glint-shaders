@@ -171,7 +171,7 @@ void main() {
   #endif
 
   #ifndef MC_TEXTURE_FORMAT_LAB_PBR
-  material.emission = emission;
+  material.emission = luminance(material.albedo) * emission;
   #endif
 
   if (

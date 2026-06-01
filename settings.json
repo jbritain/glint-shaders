@@ -225,6 +225,11 @@
     }
   },
   "Materials": {
+    "Integrated PBR": {
+      "Integrated Specular": {
+        "key": "INTEGRATED_SPECULAR"
+      }
+    },
     "Parallax Occlusion Mapping": {
       "Parallax Occlusion Mapping": {
         "key": "PARALLAX"
@@ -271,6 +276,9 @@
         "default": "8",
         "values": "{frange(4, 17, 1)}"
       }
+    },
+    "Albedo Metal Tint": {
+      "key": "ALBEDO_METAL_TINT"
     }
   },
   "Atmospherics": {
@@ -573,6 +581,11 @@
       "Purkinje Shift": {
         "Purkinje Shift": {
           "key": "PURKINJE"
+        },
+        "Purkinje Shift Strength": {
+          "key": "PURKINJE_STRENGTH",
+          "default": "0.5",
+          "values": "{frange(0.0, 1.1, 0.1)}"
         },
         "Purkinje Shift Red": {
           "key": "PURKINJE_R",
