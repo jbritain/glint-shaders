@@ -255,7 +255,8 @@
     },
     "Refraction": {
       "Rough Refraction": {
-        "key": "ROUGH_REFRACTION"
+        "key": "ROUGH_REFRACTION",
+        "default": false
       },
       "Flattened Refraction Normals": {
         "key": "REFRACTION_NORMAL_HACK",

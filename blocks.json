@@ -1,0 +1,11 @@
+{
+  "water": [
+    "minecraft:water"
+  ],
+  "foliage": [
+    "%minecraft:leaves",
+    "%minecraft:crops",
+    "%minecraft:flowers",
+    "%minecraft:edible_for_sheep"
+  ]
+}

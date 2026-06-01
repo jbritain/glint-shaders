@@ -80,7 +80,7 @@
   #endif
 
   // Refraction
-    #define ROUGH_REFRACTION  
+    // #define ROUGH_REFRACTION  // [False]
     #ifdef ROUGH_REFRACTION
     #endif
     #define REFRACTION_NORMAL_HACK  // [True]

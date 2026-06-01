@@ -36,7 +36,7 @@ layout(location = 0) out vec4 color;
 
 void main() {
   color.rgb = texture(colortex0, texcoord).rgb;
-  float weight = luminance(color.rgb);
+  float weight = max0(luminance(color.rgb));
 
   #ifdef EXCLUDE_SUN_AUTO_EXPOSURE
   float depth = texture(depthtex0, texcoord).r;

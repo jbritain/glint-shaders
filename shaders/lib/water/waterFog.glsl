@@ -54,7 +54,8 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     float progress = float(i + jitter) / float(VOLUMETRIC_WATER_SAMPLES);
 
     float shadow = 1.0;
-    float distanceToSurface = dot(worldLightDir, vec3(1.0)) * stepLength * i;
+    float distanceToSurface =
+      abs(dot(worldLightDir, vec3(0.0, 1.0, 0.0))) * stepLength * i;
     vec3 shadowRayPos = mix(shadowStart, shadowEnd, progress);
     vec3 rayPos = mix(start, end, progress);
     if (clamp01(shadowRayPos) == shadowRayPos) {

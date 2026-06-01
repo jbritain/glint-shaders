@@ -8,7 +8,6 @@ from numpy import arange
 # from watchdog.events import FileSystemEvent, FileSystemEventHandler
 # from watchdog.observers import Observer
 
-json_path = "./pack.json"
 shaders_path = "shaders"
 material_id_path = "lib/material/materialIDs.glsl"
 settings_path = "lib/common/settings.glsl"
@@ -126,21 +125,6 @@ def generate_properties(pack):
         f.truncate()
 
 
-def generate_material_ids(pack):
-    block_properties = []
-    mappings = []
-    for i, (group_name, blocks) in enumerate(pack["blockMappings"].items()):
-        block_properties.append(f"block.{i + 1000} = {blocks}")
-        mappings.append(
-            f"bool materialIs{group_name.title()}(uint id){{return id == {i + 1000};}}"
-        )
-
-    with open(f"{shaders_path}/block.properties", "w") as f:
-        f.writelines(block_properties)
-    with open(f"{shaders_path}/{material_id_path}", "w") as f:
-        f.writelines(mappings)
-
-
 def frange(start, stop, inc):
     return (
         str(arange(start, stop, inc))
@@ -239,8 +223,72 @@ def generate_settings(pack):
         l.write("\n".join(pack["lang"]))
 
 
+def generate_block_properties(pack):
+    block_properties = []
+    with open("blocks.json", encoding="utf-8") as b:
+        block_mappings = json.loads(b.read())
+
+    ids = {}
+    next_id = 1000
+
+    for blocks in block_mappings.values():
+        for block in blocks:
+            if not block in ids.values():
+                ids[next_id] = block
+                next_id += 1
+
+    for id, block in ids.items():
+        block_properties.append(f"block.{id} = {block}")
+
+    # TODO: ID deduplication - if IDs are only ever referenced by the same mapping, combine them
+
+    inverse_id_map = {v: k for k, v in ids.items()}
+
+    mappings = {}
+
+    for mapping_name, blocks in block_mappings.items():
+        mappings[mapping_name] = [inverse_id_map[b] for b in blocks]
+
+    mapping_functions = []
+
+    with open(f"{shaders_path}/block.properties", "w") as f:
+        f.writelines([b + "\n" for b in block_properties])
+
+    for mapping_name, ids in mappings.items():
+        if len(ids) == 1:
+            mapping_functions.append(
+                f"bool materialIs{mapping_name.title()}(uint id){{return id == {ids[0]};}}"
+            )
+        else:
+            mapping_function = (
+                f"bool materialIs{mapping_name.title()}(uint id){{return "
+            )
+            for id in ids:
+                mapping_function += f"id == {id} || "
+            mapping_function = mapping_function[:-4] + ";}"
+            mapping_functions.append(mapping_function)
+
+    with open(f"{shaders_path}/{material_id_path}", "w") as f:
+        f.writelines([f + "\n" for f in mapping_functions])
+
+
+# def generate_material_ids(pack):
+#     block_properties = []
+#     mappings = []
+#     for i, (group_name, blocks) in enumerate(pack["blockMappings"].items()):
+#         block_properties.append(f"block.{i + 1000} = {blocks}")
+#         mappings.append(
+#             f"bool materialIs{group_name.title()}(uint id){{return id == {i + 1000};}}"
+#         )
+
+#     with open(f"{shaders_path}/block.properties", "w") as f:
+#         f.writelines(block_properties)
+#     with open(f"{shaders_path}/{material_id_path}", "w") as f:
+#         f.writelines(mappings)
+
+
 def generate_pack():
-    with open(json_path, encoding="utf-8") as j:
+    with open("./pack.json", encoding="utf-8") as j:
         pack = json.loads("".join(j.readlines()))
 
     pack["properties"] = []
@@ -255,7 +303,7 @@ def generate_pack():
     generate_others(pack)
     generate_settings(pack)
     generate_properties(pack)
-    generate_material_ids(pack)
+    generate_block_properties(pack)
 
 
 generate_pack()

@@ -79,6 +79,7 @@ void main() {
 
 #include "/lib/util/gbuffer.glsl"
 #include "/lib/material/material.glsl"
+#include "/lib/material/integratedPBR.glsl"
 #include "/lib/util/dither.glsl"
 
 in vec2 lightmap;
@@ -160,6 +161,7 @@ void main() {
     texture(specular, texcoord),
     materialID
   );
+  applyIntegratedPBR(material);
   // if (material.metalID != NO_METAL && gl_FragCoord.x > viewWidth / 2) {
   //   material.metalID = OTHER_METAL;
   // }

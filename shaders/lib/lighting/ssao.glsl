@@ -43,7 +43,7 @@ float getSSAO(vec3 viewPos, vec3 worldNormal) {
     vec3 sampleViewPos = viewPos + offset;
     vec3 sampleScreenPos = viewSpaceToScreenSpace(sampleViewPos);
     float sampleDepth = screenSpaceToViewSpace(
-      texture(depthtex0, sampleScreenPos.xy).r
+      texture(depthtex2, sampleScreenPos.xy).r
     );
 
     float sampleOcclusion =

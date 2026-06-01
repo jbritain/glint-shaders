@@ -82,6 +82,7 @@ void main() {
     if (inWater) {
       color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
     }
+    color.rgb = max(vec3(0.0), color.rgb);
     return;
   }
 
@@ -261,6 +262,8 @@ void main() {
   if (isWater && inWater) {
     color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
   }
+
+  color.rgb = max(vec3(0.0), color.rgb);
 
 }
 

@@ -55,6 +55,7 @@ void main() {
 #include "/lib/lighting/cloudShadows.glsl"
 #include "/lib/misc/voxel.glsl"
 #include "/lib/water/waveNormals.glsl"
+#include "/lib/material/integratedPBR.glsl"
 
 in vec2 lightmap;
 in vec2 texcoord;
@@ -90,22 +91,12 @@ void main() {
     texture(specular, texcoord),
     materialID
   );
+  applyIntegratedPBR(material);
 
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
 
   if (materialIsWater(materialID)) {
-    material.roughness = 0.0;
-    material.f0 = vec3(0.02);
-    material.albedo = vec3(0.0);
     color.a = 0.01;
-
-    // gbuffer.surfaceNormal = getWaterParallaxNormal(
-    //   feetPlayerPos,
-    //   gbuffer.geometryNormal,
-    //   blueNoise(gl_FragCoord.xy, frameCounter).r,
-    //   1.0
-    // );
-
   }
 
   float shadow = getShadowFast(

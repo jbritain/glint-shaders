@@ -1,1 +1,2 @@
 bool materialIsWater(uint id){return id == 1000;}
+bool materialIsFoliage(uint id){return id == 1001 || id == 1002 || id == 1003 || id == 1004;}
