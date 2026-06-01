@@ -47,7 +47,6 @@ layout(location = 0) out vec4 color;
 void main() {
   vec3 noise = blueNoise(gl_FragCoord.xy, frameCounter);
 
-  vec4 translucents = texture(colortex6, texcoord);
   color = texture(colortex0, texcoord);
 
   bool inWater = isEyeInWater == 1;
@@ -56,14 +55,30 @@ void main() {
   vec3 translucentViewPos = screenSpaceToViewSpace(
     vec3(texcoord, translucentDepth)
   );
-  voxyOverride(translucentDepth, translucentViewPos, texcoord, false);
+
   vec3 viewDir = normalize(translucentViewPos);
   vec3 translucentFeetPlayerPos = transformView(
     translucentViewPos,
     gbufferModelViewInverse
   );
 
-  if (translucents.a == 0.0) {
+  float opaqueDepth = texture(depthtex2, texcoord).r;
+
+  #ifdef VOXY
+  bool isVoxy = texture(vxDepthTexTrans, texcoord).r != 1.0;
+
+  #else
+  bool isVoxy = false;
+  #endif
+
+  if (
+    translucentDepth == opaqueDepth
+    #ifdef VOXY
+     &&
+    texture(vxDepthTexTrans, texcoord).r ==
+      texture(vxDepthTexOpaque, texcoord).r
+    #endif
+  ) {
     if (inWater) {
       color.rgb = getWaterFog(color.rgb, vec3(0.0), translucentFeetPlayerPos);
     }
@@ -72,9 +87,28 @@ void main() {
 
   Material material;
   Gbuffer gbuffer;
+  vec4 translucents = texture(colortex6, texcoord);
+  #ifdef VOXY
+
+  if(isVoxy){
+    opaqueDepth = viewSpaceToScreenSpace(screenSpaceToViewSpace(texture(vxDepthTexOpaque, texcoord).r, vxProjInv));
+  }
+
+  if (isVoxy && translucents.a == 0) {
+    translucents = texture(colortex29, texcoord);
+    material = unpackMaterial(texture(colortex31, texcoord).rg);
+    gbuffer = unpackGbuffer(texture(colortex30, texcoord).rgb);
+
+  } else {
+    translucents = texture(colortex6, texcoord);
+    material = unpackMaterial(texture(colortex2, texcoord).rg);
+    gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  }
+  #else
 
   material = unpackMaterial(texture(colortex2, texcoord).rg);
   gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  #endif
 
   bool isWater = materialIsWater(material.id);
   if (isWater) {
@@ -89,9 +123,7 @@ void main() {
   vec3 viewGeometryNormal = mat3(gbufferModelView) * gbuffer.geometryNormal;
   vec3 viewSurfaceNormal = mat3(gbufferModelView) * gbuffer.surfaceNormal;
 
-  float opaqueDepth = texture(depthtex2, texcoord).r;
   vec3 opaqueViewPos = screenSpaceToViewSpace(vec3(texcoord, opaqueDepth));
-  voxyOverride(opaqueDepth, opaqueViewPos, texcoord, true);
 
   // REFRACTION
   float refractedRayLength = distance(translucentViewPos, opaqueViewPos);
@@ -103,7 +135,7 @@ void main() {
   #ifdef REFRACTION_NORMAL_HACK
   vec3 refractionNormal =
     ior < 1.0
-      ? viewGeometryNormal - viewSurfaceNormal
+      ? viewGeometryNormal - viewSurfaceNormal * 0.7
       : viewSurfaceNormal;
   #else
   vec3 refractionNormal = viewSurfaceNormal;
@@ -173,6 +205,7 @@ void main() {
   color.rgb = mix(color.rgb, translucents.rgb, translucents.a);
 
   if (isWater && !inWater) {
+    show(-screenSpaceToViewSpace(opaqueDepth) / 100);
     color.rgb = getWaterFog(
       color.rgb,
       translucentFeetPlayerPos,
@@ -223,7 +256,6 @@ void main() {
     cloudShadow;
   color.rgb += specularHighlight * sunlightColor;
 
-  show(lessThan(specularHighlight, vec3(0.0)));
   #endif
 
   if (isWater && inWater) {

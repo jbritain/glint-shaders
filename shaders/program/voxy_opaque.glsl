@@ -47,7 +47,7 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
   }
 
   gbuffer.lightmap = params.lightMap;
-  gbuffer.lightmap = applyLightmapFalloff(gbuffer.lightmap);
+  // gbuffer.lightmap = applyLightmapFalloff(gbuffer.lightmap);
 
   gbufferData = packGbuffer(gbuffer);
   materialData = packMaterial(material);

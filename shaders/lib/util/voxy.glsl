@@ -3,32 +3,35 @@
 
 bool VOXY_MASK = false;
 
-#ifdef VOXY
+// #ifdef VOXY
 
+// void voxyOverride(inout float depth, inout vec3 viewPos, vec2 texcoord, bool opaque){
+//   if(depth != 1.0){
+//     return;
+//   };
 
+//   if(opaque){
+//     depth = texture(vxDepthTexOpaque, texcoord).r;
+//   } else {
+//     depth = texture(vxDepthTexTrans, texcoord).r;
+//   }
 
-void voxyOverride(inout float depth, inout vec3 viewPos, vec2 texcoord, bool opaque){
-  if(depth != 1.0){
-    return;
-  };
+//   VOXY_MASK = depth != 1.0;
 
-  if(opaque){
-    depth = texture(vxDepthTexOpaque, texcoord).r;
-  } else {
-    depth = texture(vxDepthTexTrans, texcoord).r;
-  }
+//   viewPos = screenSpaceToViewSpace(vec3(texcoord, depth), vxProjInv);
+// }
 
-  VOXY_MASK = depth != 1.0;
+// #else
 
-  viewPos = screenSpaceToViewSpace(vec3(texcoord, depth), vxProjInv);
-}
-
-#else
-
-void voxyOverride(inout float depth, inout vec3 viewPos, vec2 texcoord, bool opaque){
+void voxyOverride(
+  inout float depth,
+  inout vec3 viewPos,
+  vec2 texcoord,
+  bool opaque
+) {
   return;
 }
 
-#endif
+// #endif
 
 #endif

@@ -4,6 +4,8 @@
 const float PI = 3.14159265358;
 const float TAU = PI * 2.0;
 
+#define discard discard;return
+
 // macro wizardry by BruceKnowsHow
 #define DEFINE_genFType(func)                                                  \
   func ( float ) func ( vec2 ) func ( vec3 ) func ( vec4 )

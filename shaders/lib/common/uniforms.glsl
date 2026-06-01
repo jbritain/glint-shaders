@@ -105,6 +105,8 @@ uniform mat4 shadowProjectionInverse;
 uniform mat4 vxProj;
 uniform mat4 vxProjInv;
 uniform int vxRenderDistance;
+uniform sampler2D vxDepthTexOpaque;
+uniform sampler2D vxDepthTexTrans;
 #endif
 
 uniform sampler2D colortex0;
@@ -125,6 +127,10 @@ uniform sampler2D colortex14;
 uniform sampler2D colortex15;
 uniform sampler2D colortex16;
 uniform sampler2D colortex17;
+
+uniform sampler2D colortex29;
+uniform usampler2D colortex30;
+uniform usampler2D colortex31;
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;

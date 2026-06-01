@@ -41,13 +41,6 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
   material.albedo = pow(color.rgb, vec3(2.2));
   material.id = params.customId;
 
-  if (
-    material.roughness > ROUGH_SSR_THRESHOLD &&
-    material.metalID != NO_METAL
-  ) {
-    material.roughness = ROUGH_SSR_THRESHOLD;
-  }
-
   gbuffer.lightmap = params.lightMap;
   gbuffer.lightmap = applyLightmapFalloff(gbuffer.lightmap);
 
@@ -62,11 +55,7 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
     gl_FragCoord.xyz / vec3(viewWidth, viewHeight, 1.0)
   );
   vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
-  float shadow = getShadowFast(
-    feetPlayerPos,
-    gbuffer.surfaceNormal,
-    gbuffer.lightmap.y
-  );
+  float shadow = smoothstep(13.5 / 15.0, 14.5 / 15.0, gbuffer.lightmap.y);
 
   color.rgb = vec3(0.0);
   #ifndef WORLD_THE_NETHER

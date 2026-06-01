@@ -25,6 +25,13 @@ void main() {
   }
 
   vec2 texcoord = texelCoord / (resolution * workGroupsRender);
+
+  #ifdef VOXY
+  if (texture(vxDepthTexOpaque, texcoord).r != 1.0) {
+    return;
+  }
+  #endif
+
   float depth0 = textureLod(depthtex0, texcoord, 0).r;
   float depth1 = textureLod(depthtex2, texcoord, 0).r;
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);

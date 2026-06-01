@@ -126,7 +126,7 @@ vec3 getShadow(
     shadowViewPos,
     shadowProjection
   );
-  distFade = 0.0; //smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
+  distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
 
   // vec3 screenSpaceShadow = vec3(1.0);
   // if (distFade > 0.01) {

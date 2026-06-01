@@ -51,39 +51,33 @@ void main() {
   Material material = unpackMaterial(texture(colortex2, texcoord).rg);
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
 
+  #ifdef VOXY
+  bool isVoxy = texture(vxDepthTexOpaque, texcoord).r != 1.0;
+  #else
+  bool isVoxy = false;
+  #endif
+
   float blockerDistance;
   float shadowFade;
-  vec3 shadow = getShadow(
-    feetPlayerPos,
-    gbuffer.geometryNormal,
-    material.subsurface,
-    gbuffer.lightmap.y,
-    blockerDistance,
-    shadowFade
-  );
+  vec3 shadow;
+  if (!isVoxy) {
+    shadow = getShadow(
+      feetPlayerPos,
+      gbuffer.geometryNormal,
+      material.subsurface,
+      gbuffer.lightmap.y,
+      blockerDistance,
+      shadowFade
+    );
+  } else {
+    shadowFade = 1.0;
+    shadow = vec3(smoothstep(13.5 / 15, 14.5 / 15, gbuffer.lightmap.y));
+  }
 
   float occlusion = texture(colortex3, texcoord).r;
-  float fakeBlockerDistance = (1.0 - occlusion) * 10.0;
-  blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
+  float fakeBlockerDistance = pow2(1.0 - occlusion) * 0.1;
 
-  #ifdef VOXY
-  vec3 p;
-  if (VOXY_MASK) {
-    shadow = rayIntersects(
-      viewPos,
-      lightDir,
-      SCREEN_SPACE_SHADOW_STEPS,
-      blueNoise(gl_FragCoord.xy, frameCounter).r,
-      false,
-      p,
-      vxDepthTexTrans,
-      0,
-      vxProj
-    )
-      ? vec3(0.0)
-      : vec3(1.0);
-  }
-  #endif
+  blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
 
   shadowAndBlockerDistance = vec4(shadow, blockerDistance);
 

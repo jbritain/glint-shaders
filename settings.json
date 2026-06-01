@@ -587,11 +587,11 @@
           "key": "PURKINJE_B",
           "default": 255,
           "values": "{frange(0, 251, 1)}"
-        },
-        "Display Camera Info": {
-          "key": "CAMERA_INFO",
-          "default": false
         }
+      },
+      "Display Camera Info": {
+        "key": "CAMERA_INFO",
+        "default": false
       }
     }
   },
