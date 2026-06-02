@@ -1,3 +1,23 @@
+## Glint
+![](https://raw.githubusercontent.com/jbritain/glint-shaders/refs/heads/docs/assets/banner.png)
+Glint is a physically based shaderpack for Minecraft.
+
+## Features
+- Volumetric fog, water, and clouds
+- Coloured lighting
+- Global illumination
+- Physically based camera
+- Voxy support
+- Full LabPBR support
+- Much more...
+
+## Compatibility
+The following is required
+- OpenGL version 4.3 or greater
+- Iris version 1.10.5 or greater
+
+OptiFine is not supported. MacOS is not supported. Oculus probably won't work.
+
 ## Acknowledgements
 I would like to thank...
 
@@ -10,3 +30,4 @@ I would like to thank...
 - [Luna5ama](https://github.com/luna5ama), for [strepitus](https://github.com/luna5ama/strepitus) and general advice in implementing clouds.
 - [Meckryl](https://github.com/meckryl/), for some help with rectilinear warped shadow maps.
 - Everyone else in ShaderLabs for their continued support and help.
+- Many more people, credited inline in code...

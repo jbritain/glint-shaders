@@ -302,7 +302,7 @@
       },
       "Volumetric Fog Density": {
         "key": "VOLUMETRIC_FOG_DENSITY",
-        "default": "0.001",
+        "default": "0.01",
         "values": "{frange(0.001, 0.021, 0.001)}"
       },
       "Volumetric Fog Multiple Scattering": {

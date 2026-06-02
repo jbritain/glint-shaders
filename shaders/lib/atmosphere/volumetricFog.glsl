@@ -88,9 +88,9 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     }
 
   }
-  // if (distance(start, end) > 500) {
-  //   end = start + dir * 500;
-  // }
+  if (distance(start, end) > 10000) {
+    end = start + dir * 10000;
+  }
 
   vec3 shadowStart = viewSpaceToScreenSpaceOrtho(
     transformView(start - cameraPosition, shadowModelView),
