@@ -353,7 +353,7 @@
       },
       "Volumetric Cloud Top Altitude": {
         "key": "VOLUMETRIC_CLOUDS_TOP_ALTITUDE",
-        "default": "3000"
+        "default": "2000"
       }
     },
     "Planar Clouds": {

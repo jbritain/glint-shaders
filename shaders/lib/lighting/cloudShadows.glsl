@@ -28,18 +28,19 @@ float getCloudShadow(vec3 rayPos) {
     rayPlaneIntersection(
       rayPos,
       worldLightDir,
-      mix(
-        float(VOLUMETRIC_CLOUDS_BASE_ALTITUDE),
-        float(VOLUMETRIC_CLOUDS_TOP_ALTITUDE),
-        0.2
-      ),
+      float(VOLUMETRIC_CLOUDS_BASE_ALTITUDE),
       rayPos
     )
   ) {
-    vec2 coverageCoord = fract((rayPos.xz + getWind()) / 150000 + 0.5);
-    vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
-    float coverage = linearstep(0.5 * (1.0 - wetness), 0.7, coverageData.r);
-    shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
+    // vec2 coverageCoord = fract((rayPos.xz + getWind()) / 150000 + 0.5);
+    // vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
+    // float coverage = linearstep(0.5 * (1.0 - wetness), 0.7, coverageData.r);
+    // shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
+    float shadow = getVolumetricCloudTransmittanceToSun(
+      rayPos,
+      worldLightDir,
+      vec2(0.0)
+    ).r;
   }
   #endif
 

@@ -20,7 +20,7 @@
 #include "/lib/util/misc.glsl"
 #include "/lib/util/perlinNoise.glsl"
 
-const float cloudScattering = 0.08;
+const float cloudScattering = 0.2;
 const float cloudAbsorption = 0.0;
 const float cloudExtinction = cloudScattering + cloudAbsorption;
 
@@ -99,7 +99,7 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
 
 vec2 getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
   vec3 jitterDir = unmapSphere(jitter);
-  dir = normalize(dir + jitterDir * 0.1);
+  dir = normalize(dir + jitterDir * 0.02);
 
   vec3 a = start;
   vec3 b;
@@ -235,7 +235,7 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     vec3 radiance = sunlightColor * transmittanceToSun.x * phase;
 
     // ambient scattering
-    radiance += skylightColor * pow3(1.0 - density) * isotropicPhase * 2.0;
+    radiance += skylightColor * pow2(1.0 - density) * isotropicPhase * 10.0;
 
     // multiple scattering
     float fMS =
@@ -243,9 +243,9 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
       cloudScattering /
       cloudExtinction;
 
-    // fMS = pow(fMS, 1.5);
+    fMS = pow(fMS, 1.5);
 
-    fMS *= 5.0;
+    fMS *= 6.0;
 
     radiance += fMS * sunlightColor * transmittanceToSun.y * msPhase;
 
