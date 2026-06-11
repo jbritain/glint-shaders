@@ -90,7 +90,7 @@ void main() {
     clouds = mix(
       clouds,
       texelFetch(colortex14, ivec2(gl_FragCoord.xy) / 4, 0),
-      0.5
+      0.8
     );
   }
 

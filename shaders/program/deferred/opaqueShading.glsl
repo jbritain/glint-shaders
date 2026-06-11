@@ -153,6 +153,8 @@ void main() {
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
+
+  show(texture(cloudCoverageTex, texcoord).r);
 }
 
 #endif

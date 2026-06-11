@@ -36,13 +36,10 @@ float getCloudShadow(vec3 rayPos) {
       rayPos
     )
   ) {
-    vec2 wind = windDir * worldTimeCounter;
-    float coverage = smoothstep(
-      0.7 * (1.0 - wetness),
-      1.0,
-      texture(cloudcoveragetex, fract(rayPos.xz / 50000.0) + wind * 0.0005).r
-    );
-    shadow *= pow3(1.0 - coverage) * 0.7 + 0.3; // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
+    vec2 coverageCoord = fract((rayPos.xz + getWind()) / 150000 + 0.5);
+    vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
+    float coverage = linearstep(0.5 * (1.0 - wetness), 0.7, coverageData.r);
+    shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
   }
   #endif
 

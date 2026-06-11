@@ -116,7 +116,6 @@ void main() {
   #endif
 
   printLine();
-  printFloat(pulsarIlluminance.b);
 
   #if (defined DEBUG_ENABLE || defined CAMERA_INFO)
   endText(color.rgb);

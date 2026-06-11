@@ -52,6 +52,11 @@ void applyIntegratedPBR(inout Material material) {
   if (materialIsObsidian(material.id)) {
     material.roughness = material.albedo.r * 0.1 + 0.02;
   }
+
+  if (materialIsIce(material.id)) {
+    material.roughness = 0.0;
+    material.f0 = vec3(0.02);
+  }
   #endif
 }
 

@@ -20,95 +20,84 @@
 #include "/lib/util/misc.glsl"
 #include "/lib/util/perlinNoise.glsl"
 
-const float cloudScattering = 2.0;
-const float cloudAbsorption = 0.2;
+const float cloudScattering = 0.08;
+const float cloudAbsorption = 0.0;
 const float cloudExtinction = cloudScattering + cloudAbsorption;
 
 const vec2 windDir = vec2(0.0, 1.0);
+const float windSpeed = 10;
+
+vec2 getWind() {
+  return windDir * worldTimeCounter * windSpeed;
+}
 
 float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
-  #if VOLUMETRIC_CLOUDS_STYLE == 2
-  vec2 samplePos = (rayPos.xz + vec2(worldTimeCounter, 0.0)) * 2.0;
-  ivec2 p = ivec2(floor(mod(samplePos / 24, 256)));
+  vec2 coverageCoord = fract((rayPos.xz + getWind()) / 200000 + 0.5);
+  vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
+  float coverage = linearstep(0.5 - 0.2 * wetness, 0.7, coverageData.r);
 
-  return texelFetch(vanillacloudtex, p, 0).r * VOLUMETRIC_CLOUDS_DENSITY;
-  #else
+  float cloudHeight = coverageData.g;
+  cloudHeight = mix(cloudHeight, 1.0, wetness);
+  float topAltitude =
+    (VOLUMETRIC_CLOUDS_TOP_ALTITUDE - VOLUMETRIC_CLOUDS_BASE_ALTITUDE) *
+      cloudHeight +
+    VOLUMETRIC_CLOUDS_BASE_ALTITUDE;
 
-  vec2 wind = windDir * worldTimeCounter;
-
-  #if VOLUMETRIC_CLOUDS_STYLE == 1
-  rayPos = floor(rayPos / 64) * 64;
-  #endif
+  vec3 lowFrequencyNoiseCoord = fract(rayPos / 3000 + 0.5);
+  vec2 lowFrequencyNoises = texture(
+    lowFrequencyCloudNoiseTex,
+    lowFrequencyNoiseCoord
+  ).xy;
+  float lowFrequencyWorleyFBM = lowFrequencyNoises.x;
+  float lowFrequencyPerlinWorley = lowFrequencyNoises.y;
 
   float heightInPlane = linearstep(
     VOLUMETRIC_CLOUDS_BASE_ALTITUDE,
-    VOLUMETRIC_CLOUDS_TOP_ALTITUDE,
+    topAltitude,
     rayPos.y
   );
 
-  // Based loosely upon "Real Time Volumetric Cloudscapes" by Andrew Schneider in GPU Pro 7
-  // Coverage texture generated with 'Strepitus' by luna5ama (https://github.com/luna5ama/strepitus)
-  // Shape and detail textures generated with jaekmichie97's noise generator (https://github.com/jcm2606/volume-noise-generator)
-  float coverage = smoothstep(
-    0.7 * (1.0 - wetness),
-    1.0,
-    texture(cloudcoveragetex, fract(rayPos.xz / 50000.0) + wind * 0.0005).r
-  ); // todo: make this a setting so it's consistent for cloud shadows
-  // coverage += rainStrength;
-  coverage *= heightInPlane * 0.3 + 0.7;
+  heightInPlane /= 2.0;
 
-  // coverage = sqrt(coverage);
+  float heightFade =
+    linearstep(0.0, 0.15, heightInPlane) *
+    pow2(1.0 - linearstep(0.15, 1.2, heightInPlane));
 
-  vec4 lowFrequencyNoise = texture(cloudshapetex, fract(rayPos.xyz / 1100.0));
-  float lowFrequencyFBM =
-    lowFrequencyNoise.g * 0.625 +
-    lowFrequencyNoise.b * 0.25 +
-    lowFrequencyNoise.a * 0.125;
+  coverage *= pow2(heightFade);
+
   float density = remap(
-    lowFrequencyNoise.r,
-    lowFrequencyFBM * 0.7,
+    lowFrequencyPerlinWorley,
+    -lowFrequencyWorleyFBM * 2.0,
     1.0,
     0.0,
     1.0
   );
-  density = sqrt(density);
-
-  float heightFactor = min(
-    smoothstep(0.0, 0.15, heightInPlane / 2),
-    pow2(1.0 - smoothstep(0.15, 1.0, heightInPlane / 2))
-  );
-  density *= heightFactor;
-
+  // float density = 1.0;
   density = remap(density, 1.0 - coverage, 1.0, 0.0, 1.0);
-  // density *= coverage;
-
-  // density = pow(density, 1.5);
+  // density *= heightFade;
 
   if (highQuality) {
-    vec3 highFrequencyNoise = texture(
-      clouddetailtex,
-      fract(rayPos.xyz / 300.0 + vec3(wind.x * 0.02, 0.0, wind.y * 0.02))
-    ).rgb;
-    float highFrequencyFBM =
-      highFrequencyNoise.r * 0.625 +
-      highFrequencyNoise.g * 0.25 +
-      highFrequencyNoise.b * 0.125;
-    highFrequencyFBM = mix(
-      highFrequencyFBM,
-      1.0 - highFrequencyFBM,
-      saturate(heightInPlane * 10.0)
+    vec3 highFrequencyNoiseCoord = fract(rayPos / 400 + 0.5);
+    float highFrequencyNoise = texture(
+      highFrequencyCloudNoiseTex,
+      highFrequencyNoiseCoord
+    ).r;
+    highFrequencyNoise = mix(
+      1.0 - highFrequencyNoise,
+      highFrequencyNoise,
+      clamp01(heightInPlane * 10)
     );
 
-    density = remap(density, highFrequencyFBM * 0.7, 1.0, 0.0, 1.0);
-  } else {
-    density = remap(density, 0.25, 1.0, 0.0, 1.0); // the remap operation from the high quality noise affects the overall density - this emulates that
+    density = remap(density, 0.6 * highFrequencyNoise, 1.0, 0.0, 1.0);
   }
 
-  return density * VOLUMETRIC_CLOUDS_DENSITY * (1.0 + wetness * 4.0);
-  #endif
+  density *= coverage;
+
+  density *= 1.0 + wetness;
+  return density * VOLUMETRIC_CLOUDS_DENSITY;
 }
 
-float getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
+vec2 getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
   vec3 jitterDir = unmapSphere(jitter);
   dir = normalize(dir + jitterDir * 0.1);
 
@@ -116,7 +105,7 @@ float getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
   vec3 b;
   if (!rayPlaneIntersection(a, dir, VOLUMETRIC_CLOUDS_TOP_ALTITUDE, b)) {
     if (!rayPlaneIntersection(a, dir, VOLUMETRIC_CLOUDS_BASE_ALTITUDE, b)) {
-      return 1.0;
+      return vec2(1.0);
     }
   }
 
@@ -135,7 +124,12 @@ float getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
     previousSamplePos = samplePos;
   }
 
-  return exp(-density * cloudExtinction);
+  float beers = exp(-density * cloudExtinction);
+  // float powder = (1.0 - exp(-0.001 * density * cloudExtinction)) * 500;
+  // return beers;
+  // return powder;
+  return vec2(beers, exp(-density * cloudExtinction * 0.3));
+  // return 4.0 * (1.0 - exp(-2.0 * density * cloudExtinction));
 }
 
 vec4 getVolumetricClouds(inout vec3 position, bool sky) {
@@ -208,7 +202,9 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
   float transmittance = 1.0;
   vec3 scattering = vec3(0.0);
 
-  float phase = hgDraine(11, dot(dir, worldLightDir));
+  float VoL = dot(dir, worldLightDir);
+  float phase = hgDraine(11, VoL);
+  float msPhase = isotropicPhase;
 
   bool hasHitStart = false;
   position = mix(start, end, 0.5) - cameraPosition;
@@ -231,32 +227,27 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     }
 
     // single scattering
-    float transmittanceToSun = getVolumetricCloudTransmittanceToSun(
+    vec2 transmittanceToSun = getVolumetricCloudTransmittanceToSun(
       rayPos,
       worldLightDir,
       jitter.yz
     );
-    vec3 radiance = sunlightColor * transmittanceToSun * phase;
-
-    // multiple scattering approximation by ohmygggod (窝的舔)
-    // https://zhuanlan.zhihu.com/p/457997155
-    // "discovered" by Luna5ama
-    float fMS =
-      (1.0 -
-        exp(
-          -VOLUMETRIC_CLOUDS_MULTIPLE_SCATTERING *
-            density *
-            cloudExtinction *
-            stepLength
-        )) *
-      cloudScattering /
-      cloudExtinction;
-    // fMS = mix(fMS, fMS * 0.99, smoothstep(0.99, 1.0, fMS)); // this part by luna
-    radiance +=
-      sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
+    vec3 radiance = sunlightColor * transmittanceToSun.x * phase;
 
     // ambient scattering
-    radiance += skylightColor;
+    radiance += skylightColor * pow3(1.0 - density) * isotropicPhase * 2.0;
+
+    // multiple scattering
+    float fMS =
+      (1.0 - exp(-0.5 * density * cloudExtinction * stepLength)) *
+      cloudScattering /
+      cloudExtinction;
+
+    // fMS = pow(fMS, 1.5);
+
+    fMS *= 5.0;
+
+    radiance += fMS * sunlightColor * transmittanceToSun.y * msPhase;
 
     scattering +=
       transmittance *

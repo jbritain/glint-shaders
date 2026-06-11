@@ -328,15 +328,15 @@
       },
       "Volumetric Cloud Primary Samples": {
         "key": "VOLUMETRIC_CLOUDS_PRIMARY_SAMPLES",
-        "default": "16"
+        "default": "32"
       },
       "Volumetric Cloud Secondary Samples": {
         "key": "VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES",
-        "default": "4"
+        "default": "6"
       },
       "Volumetric Cloud Density": {
         "key": "VOLUMETRIC_CLOUDS_DENSITY",
-        "default": "0.01"
+        "default": "1.0"
       },
       "Volumetric Cloud Multiple Scattering": {
         "key": "VOLUMETRIC_CLOUDS_MULTIPLE_SCATTERING",
@@ -353,7 +353,7 @@
       },
       "Volumetric Cloud Top Altitude": {
         "key": "VOLUMETRIC_CLOUDS_TOP_ALTITUDE",
-        "default": "1700"
+        "default": "3000"
       }
     },
     "Planar Clouds": {
@@ -366,7 +366,7 @@
       },
       "Planar Cloud Density": {
         "key": "PLANAR_CLOUDS_DENSITY",
-        "default": "0.005"
+        "default": "0.01"
       },
       "Planar Cloud Height": {
         "key": "PLANAR_CLOUDS_HEIGHT",

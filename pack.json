@@ -31,6 +31,24 @@
         "programs": [
           "csh"
         ]
+      },
+      {
+        "path": "generateLowFrequencyCloudNoise",
+        "programs": [
+          "csh"
+        ]
+      },
+      {
+        "path": "generateHighFrequencyCloudNoise",
+        "programs": [
+          "csh"
+        ]
+      },
+      {
+        "path": "generateCloudCoverage",
+        "programs": [
+          "csh"
+        ]
       }
     ],
     "prepare": [

@@ -206,7 +206,6 @@ void main() {
   color.rgb = mix(color.rgb, translucents.rgb, translucents.a);
 
   if (isWater && !inWater) {
-    show(-screenSpaceToViewSpace(opaqueDepth) / 100);
     color.rgb = getWaterFog(
       color.rgb,
       translucentFeetPlayerPos,

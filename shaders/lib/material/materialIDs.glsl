@@ -5,3 +5,4 @@ bool materialIsIron(uint id){return id == 1005 || id == 1006 || id == 1007 || id
 bool materialIsGold(uint id){return id == 1010;}
 bool materialIsCopper(uint id){return id == 1011;}
 bool materialIsObsidian(uint id){return id == 1012;}
+bool materialIsIce(uint id){return id == 1013;}

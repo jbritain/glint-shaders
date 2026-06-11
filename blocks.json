@@ -26,5 +26,8 @@
   ],
   "obsidian": [
     "minecraft:obsidian"
+  ],
+  "ice": [
+    "minecraft:ice"
   ]
 }

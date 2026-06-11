@@ -55,8 +55,12 @@ void main() {
     clouds = planarClouds;
   }
 
-  clouds.rgb = fma(clouds.rgb, vec3(volClouds.a), volClouds.rgb);
+  clouds.rgb *= volClouds.a;
+  clouds.rgb += volClouds.rgb;
   clouds.a *= volClouds.a;
+
+  // clouds.rgb = fma(clouds.rgb, vec3(volClouds.a), volClouds.rgb);
+  // clouds.a *= volClouds.a;
 
   clouds.rgb /= max(vec3(1.0), sunlightColor);
 }

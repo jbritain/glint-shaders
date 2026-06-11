@@ -188,6 +188,10 @@ uniform usampler3D voxelMapTex;
 uniform sampler3D floodfillVoxelMapTex1;
 uniform sampler3D floodfillVoxelMapTex2;
 
+uniform sampler3D lowFrequencyCloudNoiseTex;
+uniform sampler3D highFrequencyCloudNoiseTex;
+uniform sampler2D cloudCoverageTex;
+
 uniform sampler3D cloudshapetex;
 uniform sampler3D clouddetailtex;
 uniform sampler2D cloudcoveragetex;
