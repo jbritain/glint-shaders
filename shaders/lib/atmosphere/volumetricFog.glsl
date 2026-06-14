@@ -43,8 +43,7 @@ float getFogDensity(vec3 position) {
     VOLUMETRIC_FOG_MIDDLE_PLANE,
     position.y
   ) *
-  fogDensityFactor *
-  exp(-length(position.xz - cameraPosition.xz) * 5e-4);
+  fogDensityFactor;
 }
 
 float integrateFogDensity(vec3 position, vec3 dir) {
@@ -117,7 +116,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
 
   for (int i = 0; i < VOLUMETRIC_FOG_SAMPLES; i++) {
     float progress = float(i + jitter) / float(VOLUMETRIC_FOG_SAMPLES);
-    progress = exp(7.0 * (progress - 1.0));
+    // progress = exp(5.0 * (progress - 1.0));
 
     vec3 rayPos = mix(start, end, progress);
     float stepLength = distance(previousRayPos, rayPos);

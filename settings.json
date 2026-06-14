@@ -307,7 +307,7 @@
       },
       "Volumetric Fog Multiple Scattering": {
         "key": "VOLUMETRIC_FOG_MULTIPLE_SCATTERING",
-        "default": "5.0"
+        "default": "1.0"
       },
       "Volumetric Fog Bottom Plane": {
         "key": "VOLUMETRIC_FOG_BOTTOM_PLANE",

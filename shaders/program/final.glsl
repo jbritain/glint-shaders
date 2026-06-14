@@ -117,9 +117,6 @@ void main() {
   #endif
 
   printLine();
-  printFloat(cameraPosition.y - VOLUMETRIC_FOG_MIDDLE_PLANE);
-  printLine();
-  printFloat(getFogDensity(cameraPosition));
 
   #if (defined DEBUG_ENABLE || defined CAMERA_INFO)
   endText(color.rgb);
