@@ -315,7 +315,7 @@
       },
       "Volumetric Fog Middle Plane": {
         "key": "VOLUMETRIC_FOG_MIDDLE_PLANE",
-        "default": "128"
+        "default": "64"
       },
       "Volumetric Fog Top Plane": {
         "key": "VOLUMETRIC_FOG_TOP_PLANE",
@@ -444,7 +444,7 @@
     },
     "Water Scattering G": {
       "key": "WATER_SCATTERING_G",
-      "default": "20",
+      "default": "25",
       "values": "{frange(0, 256, 1)}"
     },
     "Water Scattering B": {

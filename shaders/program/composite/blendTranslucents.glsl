@@ -183,7 +183,7 @@ void main() {
     }
   } else if (inWater || !isWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
-    vec3 sky = getSky(skyDir, true);
+    vec3 sky = getSky(skyDir, false);
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
     // vec4 fog = analyticalFog(translucentFeetPlayerPos, skyDir);

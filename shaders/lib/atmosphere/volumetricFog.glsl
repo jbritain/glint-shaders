@@ -28,45 +28,49 @@ const float fogExtinction = fogScattering + fogAbsorption;
 float fogDensityFactor = mix(pow2(1.0 - abs(worldLightDir.y)), 1.0, wetness);
 
 float getFogDensity(vec3 position) {
-  return (1.0 -
-    linearstep(
-      VOLUMETRIC_FOG_MIDDLE_PLANE,
-      VOLUMETRIC_FOG_TOP_PLANE,
-      position.y
-    )) *
+  const float falloff = 0.01;
+  const float topFactor = exp(
+    -(VOLUMETRIC_FOG_TOP_PLANE - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff
+  );
+
+  return VOLUMETRIC_FOG_DENSITY *
+  clamp01(
+    (exp(-(position.y - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff) - topFactor) /
+      (1.0 - topFactor)
+  ) *
   linearstep(
     VOLUMETRIC_FOG_BOTTOM_PLANE,
     VOLUMETRIC_FOG_MIDDLE_PLANE,
     position.y
   ) *
-  VOLUMETRIC_FOG_DENSITY *
-  fogDensityFactor;
+  fogDensityFactor *
+  exp(-length(position.xz - cameraPosition.xz) * 5e-4);
 }
 
 float integrateFogDensity(vec3 position, vec3 dir) {
-  float density = 0.0;
-  vec3 p;
-
-  if (position.y < VOLUMETRIC_FOG_MIDDLE_PLANE) {
-    if (rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_MIDDLE_PLANE, p)) {
-      density +=
-        distance(position, p) * VOLUMETRIC_FOG_DENSITY * fogDensityFactor;
-      position = p;
-    } else {
-      return density;
-    }
+  const float steps = 8;
+  if (
+    position.y > VOLUMETRIC_FOG_TOP_PLANE && dir.y > 0 ||
+    position.y < VOLUMETRIC_FOG_BOTTOM_PLANE && dir.y < 0.0
+  ) {
+    return 0.0;
+  }
+  vec3 end;
+  if (dir.y > 0.0) {
+    rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_TOP_PLANE, end);
+  } else {
+    rayPlaneIntersection(cameraPosition, dir, VOLUMETRIC_FOG_BOTTOM_PLANE, end);
   }
 
-  if (position.y < VOLUMETRIC_FOG_TOP_PLANE) {
-    if (rayPlaneIntersection(position, dir, VOLUMETRIC_FOG_TOP_PLANE, p)) {
-      density +=
-        distance(position, p) *
-        (getFogDensity(position) + getFogDensity(p)) /
-        2.0;
-    }
+  float totalDensity = 0.0;
+  vec3 rayStep = (end - position) / steps;
+
+  for (int i = 0; i < steps - 1; i++) {
+    totalDensity += getFogDensity(position);
+    position += rayStep;
   }
 
-  return density;
+  return totalDensity * length(rayStep);
 }
 
 vec4 getVolumetricFog(vec3 position, float depth) {
@@ -149,7 +153,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     radiance +=
       sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
 
-    radiance += weatherSkylightColor * EBS.y * isotropicPhase;
+    radiance += weatherSkylightColor * EBS.y * 2.0; // should be divided by 2 but I like it brighter
 
     #ifdef FLOODFILL
     radiance +=

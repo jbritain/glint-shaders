@@ -38,9 +38,9 @@ layout(location = 0) out vec3 bloomColor;
 void main() {
   #if TILE_INDEX == 0
   bloomColor = downSample(colortex0, texcoord, true);
-  bloomColor = hsv(bloomColor);
-  bloomColor.b = min(bloomColor.b, 100); // clamp brightness of bloom to prevent it blowing out
-  bloomColor = rgb(bloomColor);
+  // bloomColor = hsv(bloomColor);
+  // bloomColor.b = min(bloomColor.b, 100); // clamp brightness of bloom to prevent it blowing out
+  // bloomColor = rgb(bloomColor);
   #else
   bloomColor = downSample(
     colortex16,

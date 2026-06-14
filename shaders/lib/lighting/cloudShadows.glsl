@@ -20,8 +20,6 @@
 float getCloudShadow(vec3 rayPos) {
   float shadow = 1.0;
 
-  vec3 dir = normalize(rayPos);
-
   rayPos += cameraPosition;
   #ifdef VOLUMETRIC_CLOUDS
   if (
@@ -32,11 +30,7 @@ float getCloudShadow(vec3 rayPos) {
       rayPos
     )
   ) {
-    // vec2 coverageCoord = fract((rayPos.xz + getWind()) / 150000 + 0.5);
-    // vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
-    // float coverage = linearstep(0.5 * (1.0 - wetness), 0.7, coverageData.r);
-    // shadow *= pow3(1.0 - coverage); // I tried doing actual stuff with beer's law but this works quite well as is and is very cheap
-    float shadow = getVolumetricCloudTransmittanceToSun(
+    shadow = getVolumetricCloudTransmittanceToSun(
       rayPos,
       worldLightDir,
       vec2(0.0)

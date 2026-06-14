@@ -71,11 +71,6 @@ vec3 atrousGetNormal(vec2 uv) {
   return unpackGbuffer(texture(colortex1, uv).rgb).geometryNormal;
 }
 
-vec3 atrousGetPosition(vec2 uv) {
-  float depth = texture(depthtex0, uv).r;
-  return screenSpaceToViewSpace(vec3(uv, depth));
-}
-
 vec3 atrous(
   sampler2D colorMap,
   vec2 sampleUV,
@@ -88,10 +83,19 @@ vec3 atrous(
   vec2 step = rcp(textureSize(colorMap, 0)); // resolution
   vec3 cval = texture2D(colorMap, sampleUV).rgb;
   vec3 nval = atrousGetNormal(sampleUV);
-  vec3 pval = atrousGetPosition(sampleUV);
+
+  float dval = texture(depthtex0, sampleUV).r;
+  vec3 pval = screenSpaceToViewSpace(vec3(sampleUV, dval));
   float cum_w = 0.0;
   for (int i = 0; i < 25; i++) {
     vec2 uv = sampleUV + atrousOffsets[i] * step * stepwidth;
+
+    float dtmp = texture(depthtex0, uv).r;
+    if (dtmp == 1.0) {
+      continue;
+    }
+    vec3 ptmp = screenSpaceToViewSpace(vec3(uv, dtmp));
+
     vec3 ctmp = texture2D(colorMap, uv).rgb;
     vec3 t = cval - ctmp;
 
@@ -101,7 +105,7 @@ vec3 atrous(
     t = nval - ntmp;
     dist2 = max(dot(t, t) / (stepwidth * stepwidth), 0.0);
     float n_w = min(exp(-dist2 / n_phi), 1.0);
-    vec3 ptmp = atrousGetPosition(uv);
+
     t = pval - ptmp;
     dist2 = dot(t, t);
     float p_w = min(exp(-dist2 / p_phi), 1.0);
@@ -109,6 +113,11 @@ vec3 atrous(
     sum += ctmp * weight * atrousKernel[i];
     cum_w += weight * atrousKernel[i];
   }
+
+  if (cum_w == 0.0) {
+    return vec3(0.0);
+  }
+
   return sum / cum_w;
 }
 

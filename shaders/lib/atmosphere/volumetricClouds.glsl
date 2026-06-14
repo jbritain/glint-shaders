@@ -175,8 +175,8 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
   }
 
   // limit ray length if inside cloud plane
-  if (start == cameraPosition && distance(cameraPosition, end) > 1000) {
-    end = start + dir * 1000;
+  if (start == cameraPosition && distance(cameraPosition, end) > 10000) {
+    end = start + dir * 10000;
   }
 
   if (!sky) {

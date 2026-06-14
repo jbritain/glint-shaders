@@ -37,6 +37,7 @@ uniform sampler2D debugtex;
 #include "/lib/util/textRenderer.glsl"
 #include "/lib/post/camera.glsl"
 #include "/lib/atmosphere/pulsar.glsl"
+#include "/lib/atmosphere/volumetricFog.glsl"
 
 void main() {
   int maxMipLevel = int(floor(log2(max(viewWidth, viewHeight))));
@@ -116,6 +117,9 @@ void main() {
   #endif
 
   printLine();
+  printFloat(cameraPosition.y - VOLUMETRIC_FOG_MIDDLE_PLANE);
+  printLine();
+  printFloat(getFogDensity(cameraPosition));
 
   #if (defined DEBUG_ENABLE || defined CAMERA_INFO)
   endText(color.rgb);

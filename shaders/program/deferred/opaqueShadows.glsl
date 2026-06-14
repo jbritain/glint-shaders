@@ -75,9 +75,26 @@ void main() {
   }
 
   float occlusion = texture(colortex3, texcoord).r;
-  float fakeBlockerDistance = pow2(1.0 - occlusion) * 0.1;
+  float fakeBlockerDistance = 10.0; //pow2(1.0 - occlusion) * 10.0; // todo: good subsurface scattering heuristic for distant terrain
 
   blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
+  if (shadowFade > 0.01) {
+    vec3 p;
+    float screenSpaceShadow = rayIntersects(
+      viewPos,
+      lightDir,
+      8,
+      interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+      false,
+      p,
+      depthtex0,
+      0,
+      gbufferProjection
+    )
+      ? 0.0
+      : 1.0;
+    shadow = mix(shadow, vec3(screenSpaceShadow), shadowFade);
+  }
 
   shadowAndBlockerDistance = vec4(shadow, blockerDistance);
 
