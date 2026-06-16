@@ -36,19 +36,22 @@
         "path": "generateLowFrequencyCloudNoise",
         "programs": [
           "csh"
-        ]
+        ],
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS)"
       },
       {
         "path": "generateHighFrequencyCloudNoise",
         "programs": [
           "csh"
-        ]
+        ],
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS)"
       },
       {
         "path": "generateCloudCoverage",
         "programs": [
           "csh"
-        ]
+        ],
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS)"
       }
     ],
     "prepare": [
@@ -77,6 +80,7 @@
         ]
       }
     ],
+    "shadowcomp": [],
     "deferred": [
       {
         "path": "accumHistory",

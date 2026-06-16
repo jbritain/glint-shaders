@@ -46,6 +46,7 @@ void main() {
   }
 
   Gbuffer gbuffer = unpackGbuffer(texture(colortex1, texcoord).rgb);
+  float caustics;
   globalIllumination = getReflectiveShadowMap(
     feetPlayerPos,
     gbuffer.geometryNormal

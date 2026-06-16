@@ -11,6 +11,7 @@
 
 */
 #include "/lib/common.glsl"
+#include "/lib/util/rectilinearWarp.glsl"
 
 #ifdef vsh
 
@@ -28,7 +29,6 @@ out vec3 shadowViewPos;
 
 flat out uint materialID;
 
-#include "/lib/util/rectilinearWarp.glsl"
 #include "/lib/misc/voxel.glsl"
 
 void main() {
@@ -128,17 +128,21 @@ flat in uint materialID;
 /* RENDERTARGETS: 0,1,2 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec2 encodedNormal;
-layout(location = 2) out vec3 caustics;
+layout(location = 2) out float waterMask;
 
 void main() {
+  vec3 normal = normal;
   color = texture(gtexture, texcoord) * glcolor;
   if (color.a < alphaTestRef) {
     discard;
   }
 
-  caustics = vec3(0.0);
+  waterMask = 0.0;
+
+  ;
 
   if (materialIsWater(materialID)) {
+    waterMask = 1.0;
     float blockerDistance =
       texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r -
       gl_FragCoord.z;
@@ -147,28 +151,15 @@ void main() {
     color.rgb = exp(-waterExtinction * blockerDistance);
     color.a = 0.0;
 
+    #if ( defined REFRACTIVE_CAUSTICS || defined REFLECTIVE_CAUSTICS )
     vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
     vec3 wave = waveNormal(
       feetPlayerPos.xz + cameraPosition.xz,
       vec3(0.0, 1.0, 0.0),
       1.0
     );
-
-    const vec3 iors = vec3(1 / 1.332, 1 / 1.333, 1 / 1.336);
-
-    float oldArea = length(dFdx(feetPlayerPos)) * length(dFdy(feetPlayerPos));
-
-    for (int i = 0; i < 3; i++) {
-      vec3 refracted = refract(worldLightDir, wave, iors[i]);
-      vec3 newPos = feetPlayerPos + refracted * blockerDistance;
-
-      // https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c
-      // I do not understand entirely what this does but it seems to work
-
-      float newArea = length(dFdx(newPos)) * length(dFdy(newPos));
-
-      caustics[i] = 1.0 - oldArea / newArea * 0.1;
-    }
+    normal = mat3(shadowModelView) * wave;
+    #endif
 
   }
 

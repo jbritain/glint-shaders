@@ -20,7 +20,6 @@
 vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   vec3 shadowViewPos = transformView(playerPos, shadowModelView);
   // shadowViewPos.z -= 0.1;
-
   vec3 shadowViewNormal = mat3(shadowModelView) * playerNormal;
   vec3 shadowScreenPos = viewSpaceToScreenSpaceOrtho(
     shadowViewPos,
@@ -28,10 +27,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
   );
 
   vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).rg;
-  // vec2 jitter = vec2(
-  //   animateBayer(bayer8(gl_FragCoord.xy), frameCounter, 8),
-  //   interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter)
-  // );
+
   const float radius = RSM_RADIUS / shadowDistance;
   const float areaPerSample = PI * pow2(RSM_RADIUS) / RSM_SAMPLES;
 

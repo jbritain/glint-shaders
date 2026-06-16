@@ -134,9 +134,14 @@ def frange(start, stop, inc):
     )
 
 
-def recurse_settings(pack, screen_name, settings, sliders, depth=0):
+def recurse_settings(pack, screen_name, settings, sliders, default_profile, depth=0):
     screen = f"screen{'.' if screen_name else ''}{screen_name if screen_name else ''} ="
+    if depth == 0:
+        screen += "<profile> "
     for name, value in settings.items():
+
+        if name in ["profiles", "defaultProfile"]:
+            continue
 
         if not "key" in value.keys():
             old_name = name
@@ -146,7 +151,7 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
             pack["settings"].append("")
             pack["settings"].append(f"{'  ' * depth}// {name}")
 
-            recurse_settings(pack, name, value, sliders, depth + 1)
+            recurse_settings(pack, name, value, sliders, default_profile, depth + 1)
         else:
             if "condition" in value.keys():
                 pack["settings"].append(f"{'  ' * depth}#if {value['condition']}")
@@ -157,8 +162,27 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
             if not "hidden" in value.keys() or (value["hidden"] == False):
                 screen += f" {value["key"]}"
 
+            if "default" in value.keys() and "defaults" in value.keys():
+                raise Exception(
+                    f"Setting {name} has both profile-specific defaults and a default value!"
+                )
+
             if not "default" in value.keys():
-                value["default"] = ""
+                if "defaults" in value.keys():
+                    if "*" in value["defaults"].keys():
+                        for profile in pack["profiles"].keys():
+                            pack["profiles"][profile][value["key"]] = value["defaults"][
+                                "*"
+                            ]
+                        value["default"] = value["defaults"]["*"]
+                    for profile, default in value["defaults"].items():
+                        if profile == "*":
+                            continue
+                        pack["profiles"][profile][value["key"]] = default
+                    if default_profile in value["defaults"].keys():
+                        value["default"] = value["defaults"][default_profile]
+                else:
+                    value["default"] = ""
             elif not "values" in value.keys():
                 value["values"] = f"[ {value['default']}]"
 
@@ -196,13 +220,17 @@ def recurse_settings(pack, screen_name, settings, sliders, depth=0):
                     f"{'  ' * depth}#ifdef {value['key']}\n{'  ' * depth}#endif"
                 )
 
-            if "descriptions" in value.keys():
-                for i, description in enumerate(value["descriptions"]):
-                    pack["lang"].append(f"value.{value['key']}.{i} = {description}")
+            if "labels" in value.keys():
+                for i, label in enumerate(value["labels"]):
+                    pack["lang"].append(f"value.{value['key']}.{i} = {label}")
             if "prefix" in value.keys():
                 pack["lang"].append(f"prefix.{value['key']} = {value['prefix']}")
             if "suffix" in value.keys():
                 pack["lang"].append(f"suffix.{value['key']} = {value['suffix']}")
+            if "description" in value.keys():
+                pack["lang"].append(
+                    f"option.{value['key']}.comment = {value['description']}"
+                )
 
             pack["lang"].append(f"option.{value['key']} = {name}")
     pack["properties"].append(screen)
@@ -212,7 +240,22 @@ def generate_settings(pack):
     with open("settings.json", encoding="utf-8") as s:
         settings = json.loads(s.read())
     sliders = []
-    recurse_settings(pack, None, settings, sliders)
+    default_profile = settings["defaultProfile"]
+    pack["profiles"] = {}
+    for p in settings["profiles"]:
+        pack["profiles"][p] = {}
+    recurse_settings(pack, None, settings, sliders, default_profile)
+
+    for profile, defaults in pack["profiles"].items():
+        profile_string = f"profile.{profile.title()} = "
+        for setting, value in defaults.items():
+            if value == True:
+                profile_string += f"{setting} "
+            elif value == False:
+                profile_string += f"!{setting} "
+            else:
+                profile_string += f"{setting}:{value} "
+        pack["properties"].append(profile_string)
 
     pack["properties"].append(f"sliders = {' '.join(sliders)}")
 

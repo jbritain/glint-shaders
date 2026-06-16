@@ -34,6 +34,7 @@ void main() {
 #include "/lib/atmosphere/atmosphericFog.glsl"
 #include "/lib/lighting/cloudShadows.glsl"
 #include "/lib/misc/voxel.glsl"
+#include "/lib/lighting/reflectiveCaustics.glsl"
 
 in vec2 texcoord;
 
@@ -104,6 +105,9 @@ void main() {
       cloudShadow;
     diffuse += subsurfaceScattering;
 
+    float reflectiveCaustics = sampleReflectiveCaustics(feetPlayerPos, gbuffer.geometryNormal);
+    diffuse += reflectiveCaustics * sunlightColor;
+
     #ifdef PHOTONICS
     diffuse += texture(indirectRadiosityTex, texcoord).rgb * occlusion;
     #else
@@ -154,7 +158,7 @@ void main() {
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
 
-  show(texture(cloudCoverageTex, texcoord).r);
+  show(textureLod(shadowcolor2, texcoord, 0));
 }
 
 #endif

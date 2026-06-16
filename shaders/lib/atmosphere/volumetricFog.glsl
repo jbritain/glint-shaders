@@ -28,7 +28,7 @@ const float fogExtinction = fogScattering + fogAbsorption;
 float fogDensityFactor = mix(pow2(1.0 - abs(worldLightDir.y)), 1.0, wetness);
 
 float getFogDensity(vec3 position) {
-  const float falloff = 0.01;
+  const float falloff = VOLUMETRIC_FOG_HEIGHT_FALLOFF;
   const float topFactor = exp(
     -(VOLUMETRIC_FOG_TOP_PLANE - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff
   );

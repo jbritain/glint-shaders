@@ -17,6 +17,7 @@
 #include "/lib/util/dither.glsl"
 #include "/lib/util/rectilinearWarp.glsl"
 #include "/lib/util/screenSpaceRayTrace.glsl"
+#include "/lib/water/waveNormals.glsl"
 
 vec3 sampleShadow(vec3 shadowScreenPos) {
   float transparentShadow = texture(shadowtex0HW, shadowScreenPos).r;
@@ -41,9 +42,11 @@ vec3 sampleShadowPCF(
   vec3 shadowScreenPos,
   float radius,
   float jitter,
-  vec3 shadowViewNormal
+  vec3 shadowViewNormal,
+  out float causticWeight
 ) {
   vec3 shadow = vec3(0.0);
+  causticWeight = 0.0;
 
   for (int i = 0; i < SHADOW_PCF_SAMPLES; i++) {
     vec2 offset = vogelDisc(i, SHADOW_PCF_SAMPLES, jitter) * radius;
@@ -51,7 +54,9 @@ vec3 sampleShadowPCF(
     vec3 offsetPos = shadowScreenPos + vec3(offset, 0.0);
     offsetPos.xy += getWarp(offsetPos.xy);
     shadow += sampleShadow(offsetPos);
+    causticWeight += texture(shadowcolor2, offsetPos.xy).x;
   }
+  causticWeight /= SHADOW_PCF_SAMPLES;
   return shadow / SHADOW_PCF_SAMPLES;
 }
 
@@ -88,22 +93,6 @@ float getBlockerDistance(
   }
 }
 
-// float getShadowScreenSpace(vec3 viewPos, vec3 playerNormal) {
-//   vec3 p;
-//   return rayIntersects(
-//     viewPos,
-//     lightDir,
-//     SCREEN_SPACE_SHADOW_STEPS,
-//     blueNoise(gl_FragCoord.xy, frameCounter).r,
-//     false,
-//     p,
-//     depthtex0,
-//     gbufferProjection
-//   )
-//     ? 0.0
-//     : 1.0;
-// }
-
 vec3 getShadow(
   vec3 playerPos,
   vec3 playerNormal,
@@ -128,16 +117,6 @@ vec3 getShadow(
   );
   distFade = smoothstep(0.5, 0.9, maxVec2(abs(shadowScreenPos.xy * 2.0 - 1.0)));
 
-  // vec3 screenSpaceShadow = vec3(1.0);
-  // if (distFade > 0.01) {
-  //   screenSpaceShadow = vec3(
-  //     getShadowScreenSpace(
-  //       transformView(playerPos, gbufferModelView),
-  //       playerNormal
-  //     )
-  //   );
-  // }
-
   vec3 shadow = vec3(1.0);
   if (distFade < 1.0) {
     blockerDistance = getBlockerDistance(
@@ -152,13 +131,31 @@ vec3 getShadow(
       blockerDistance
     );
 
-    shadow = sampleShadowPCF(shadowScreenPos, radius, jitter, shadowViewNormal);
-    shadow *=
-      1.0 -
-      texture(
-        shadowcolor2,
-        shadowScreenPos.xy + getWarp(shadowScreenPos.xy)
-      ).rgb;
+    float causticWeight;
+    shadow = sampleShadowPCF(
+      shadowScreenPos,
+      radius,
+      jitter,
+      shadowViewNormal,
+      causticWeight
+    );
+    #ifdef REFRACTIVE_CAUSTICS
+    if (causticWeight > 0.0) {
+      vec3 causticSamplePos = playerPos + worldLightDir * blockerDistance;
+      vec3 waveNormal = waveNormal(
+        causticSamplePos.xz + cameraPosition.xz,
+        vec3(0.0, 1.0, 0.0),
+        1.0
+      );
+      vec3 halfwayVector = normalize(vec3(0.0, 1.0, 0.0) + worldLightDir);
+      float caustics = pow(
+        dot(waveNormal, halfwayVector),
+        blockerDistance * shadowRange * 2
+      );
+      shadow *= mix(1.0, caustics, causticWeight);
+    }
+
+    #endif
   }
 
   shadow = mix(

@@ -1,10 +1,20 @@
 {
+  "profiles": [
+    "low",
+    "medium",
+    "high",
+    "ultra"
+  ],
+  "defaultProfile": "high",
   "Lighting": {
     "Shadows": {
       "Shadow Samples": {
         "key": "SHADOW_PCF_SAMPLES",
-        "default": "8",
-        "values": "{frange(0, 33, 1)}"
+        "defaults": {
+          "*": "8",
+          "low": "4"
+        },
+        "values": "{frange(1, 33, 1)}"
       },
       "Shadow Distance": {
         "key": "shadowDistance",
@@ -65,9 +75,13 @@
     "Ambient Occlusion": {
       "Ambient Occlusion Mode": {
         "key": "AO",
-        "default": "1",
+        "defaults": {
+          "low": "0",
+          "medium": "1",
+          "*": "2"
+        },
         "values": "[0 1 2]",
-        "descriptions": [
+        "labels": [
           "Vanilla",
           "SSAO",
           "GTAO"
@@ -76,24 +90,29 @@
       "Ambient Occlusion Samples": {
         "key": "AO_SAMPLES",
         "default": "8",
-        "values": "{frange(4, 17, 1)}"
+        "values": "{frange(4, 17, 1)}",
+        "description": "Affects both SSAO and GTAO"
       },
       "Ambient Occlusion Radius": {
         "key": "AO_RADIUS",
         "default": "1.0",
-        "values": "{frange(0.1, 5.1, 0.1)}"
+        "values": "{frange(0.1, 5.1, 0.1)}",
+        "description": "Affects both SSAO and GTAO"
       },
       "GTAO Direction Sample Count": {
         "key": "GTAO_DIRECTION_SAMPLE_COUNT",
-        "default": "4"
+        "default": "4",
+        "values": "{frange(1, 16, 1)}"
       },
       "GTAO Thickness": {
         "key": "GTAO_THICKNESS",
-        "default": "0.5 "
+        "default": "0.5",
+        "values": "{frange(0.1, 1.1, 0.1)}"
       },
       "Ambient Occlusion Accumulation Frame Cap": {
         "key": "AO_MAX_FRAMES",
-        "default": "64"
+        "default": "64",
+        "hidden": true
       }
     },
     "Reflections": {
@@ -114,21 +133,27 @@
       },
       "Reflection Roughness Threshold": {
         "key": "ROUGH_SSR_THRESHOLD",
-        "default": "0.2",
+        "defaults": {
+          "low": "0.0",
+          "medium": "0.0",
+          "high": "0.2",
+          "ultra": "0.5"
+        },
         "values": "{frange(0.0, 1.1, 0.1)}"
       },
       "Metal Reflection Override": {
         "key": "METAL_REFLECTION_OVERRIDE"
-      },
-      "Rough Reflection Accumulation Frame Cap": {
-        "key": "SSR_MAX_FRAMES",
-        "default": "64"
       }
     },
     "Global Illumination": {
       "Global Illumination": {
         "key": "RSM",
-        "default": true
+        "defaults": {
+          "low": false,
+          "medium": false,
+          "high": true,
+          "ultra": true
+        }
       },
       "Global Illumination Samples": {
         "key": "RSM_SAMPLES",
@@ -146,11 +171,13 @@
         "values": "{frange(1.0, 10.5, 0.5)}"
       },
       "Light Leak Fix": {
-        "key": "RSM_LIGHT_LEAK_FIX"
+        "key": "RSM_LIGHT_LEAK_FIX",
+        "description": "Reduces global illumination in areas with no skylight."
       },
       "Frame Cap": {
         "key": "RSM_MAX_FRAMES",
-        "default": "16"
+        "default": "16",
+        "hidden": true
       }
     },
     "Blocklight": {
@@ -288,7 +315,8 @@
       },
       "Atmospheric Fog Strength": {
         "key": "ATMOSPHERIC_FOG_STRENGTH",
-        "default": 20.0
+        "default": 20.0,
+        "values": "{frange(1.0, 40.0, 1.0)}"
       }
     },
     "Volumetric Fog": {
@@ -307,19 +335,28 @@
       },
       "Volumetric Fog Multiple Scattering": {
         "key": "VOLUMETRIC_FOG_MULTIPLE_SCATTERING",
-        "default": "1.0"
+        "default": "1.0",
+        "values": "{frange(0.1, 2.0, 0.1)}"
       },
       "Volumetric Fog Bottom Plane": {
         "key": "VOLUMETRIC_FOG_BOTTOM_PLANE",
-        "default": "-64"
+        "default": "-64",
+        "values": "{frange(-64, 384, 4)}"
       },
       "Volumetric Fog Middle Plane": {
         "key": "VOLUMETRIC_FOG_MIDDLE_PLANE",
-        "default": "64"
+        "default": "64",
+        "values": "{frange(-64, 384, 4)}"
       },
       "Volumetric Fog Top Plane": {
         "key": "VOLUMETRIC_FOG_TOP_PLANE",
-        "default": "320"
+        "default": "320",
+        "values": "{frange(-64, 384, 4)}"
+      },
+      "Volumetric Fog Height Falloff": {
+        "key": "VOLUMETRIC_FOG_HEIGHT_FALLOFF",
+        "default": "0.01",
+        "values": "{frange(0.01, 0.1, 0.01)}"
       }
     },
     "Volumetric Clouds": {
@@ -337,10 +374,6 @@
       "Volumetric Cloud Density": {
         "key": "VOLUMETRIC_CLOUDS_DENSITY",
         "default": "1.0"
-      },
-      "Volumetric Cloud Multiple Scattering": {
-        "key": "VOLUMETRIC_CLOUDS_MULTIPLE_SCATTERING",
-        "default": "1.5"
       },
       "Volumetric Cloud Style": {
         "key": "VOLUMETRIC_CLOUDS_STYLE",
@@ -383,6 +416,24 @@
     }
   },
   "Water": {
+    "Caustics": {
+      "Refractive Caustics": {
+        "key": "REFRACTIVE_CAUSTICS",
+        "default": true
+      },
+      "Reflective Caustics": {
+        "key": "REFLECTIVE_CAUSTICS",
+        "default": true
+      },
+      "Reflective Caustic Steps": {
+        "key": "REFLECTIVE_CAUSTICS_STEPS",
+        "default": "8"
+      },
+      "Reflective Caustic Radius": {
+        "key": "REFLECTIVE_CAUSTICS_RADIUS",
+        "default": "10.0"
+      }
+    },
     "Volumetric Water": {
       "key": "VOLUMETRIC_WATER",
       "default": true
@@ -394,7 +445,8 @@
     },
     "Water Multiple Scattering": {
       "key": "WATER_MULTIPLE_SCATTERING",
-      "default": "10"
+      "default": "10",
+      "values": "{frange(0, 20, 1)}"
     },
     "Water Parallax": {
       "key": "WATER_PARALLAX",
@@ -410,66 +462,68 @@
       "default": 0.8,
       "values": "{frange(-1.0, 1.1, 0.1)}"
     },
-    "Water Absorption R": {
-      "key": "WATER_ABSORPTION_R",
-      "default": "100",
-      "values": "{frange(0, 256, 1)}"
-    },
-    "Water Absorption G": {
-      "key": "WATER_ABSORPTION_G",
-      "default": "40",
-      "values": "{frange(0, 256, 1)}"
-    },
-    "Water Absorption B": {
-      "key": "WATER_ABSORPTION_B",
-      "default": "24",
-      "values": "{frange(0, 256, 1)}"
-    },
-    "Water Absorption Multiplier": {
-      "key": "WATER_ABSORPTION_MOD",
-      "default": "0.5",
-      "values": "{frange(0, 2.1, 0.1)}"
-    },
-    "Water Absorption": {
-      "key": "waterAbsorption",
-      "default": "WATER_ABSORPTION_MOD * vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) / 255",
-      "const": true,
-      "type": "vec3",
-      "hidden": true
-    },
-    "Water Scattering R": {
-      "key": "WATER_SCATTERING_R",
-      "default": "14",
-      "values": "{frange(0, 256, 1)}"
-    },
-    "Water Scattering G": {
-      "key": "WATER_SCATTERING_G",
-      "default": "25",
-      "values": "{frange(0, 256, 1)}"
-    },
-    "Water Scattering B": {
-      "key": "WATER_SCATTERING_B",
-      "default": "30",
-      "values": "{frange(0, 256, 1)}"
-    },
-    "Water Scattering Multiplier": {
-      "key": "WATER_SCATTERING_MOD",
-      "default": "0.2",
-      "values": "{frange(0, 2.1, 0.1)}"
-    },
-    "Water Scattering": {
-      "key": "waterScattering",
-      "default": "WATER_SCATTERING_MOD * vec3(WATER_SCATTERING_R, WATER_SCATTERING_G, WATER_SCATTERING_B) / 255",
-      "const": true,
-      "type": "vec3",
-      "hidden": true
-    },
-    "Water Extinction": {
-      "key": "waterExtinction",
-      "default": "waterAbsorption + waterScattering",
-      "const": true,
-      "type": "vec3",
-      "hidden": true
+    "Water Color": {
+      "Water Absorption R": {
+        "key": "WATER_ABSORPTION_R",
+        "default": "100",
+        "values": "{frange(0, 256, 1)}"
+      },
+      "Water Absorption G": {
+        "key": "WATER_ABSORPTION_G",
+        "default": "40",
+        "values": "{frange(0, 256, 1)}"
+      },
+      "Water Absorption B": {
+        "key": "WATER_ABSORPTION_B",
+        "default": "24",
+        "values": "{frange(0, 256, 1)}"
+      },
+      "Water Absorption Multiplier": {
+        "key": "WATER_ABSORPTION_MOD",
+        "default": "0.5",
+        "values": "{frange(0, 2.1, 0.1)}"
+      },
+      "Water Absorption": {
+        "key": "waterAbsorption",
+        "default": "WATER_ABSORPTION_MOD * vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) / 255",
+        "const": true,
+        "type": "vec3",
+        "hidden": true
+      },
+      "Water Scattering R": {
+        "key": "WATER_SCATTERING_R",
+        "default": "14",
+        "values": "{frange(0, 256, 1)}"
+      },
+      "Water Scattering G": {
+        "key": "WATER_SCATTERING_G",
+        "default": "25",
+        "values": "{frange(0, 256, 1)}"
+      },
+      "Water Scattering B": {
+        "key": "WATER_SCATTERING_B",
+        "default": "30",
+        "values": "{frange(0, 256, 1)}"
+      },
+      "Water Scattering Multiplier": {
+        "key": "WATER_SCATTERING_MOD",
+        "default": "0.2",
+        "values": "{frange(0, 2.1, 0.1)}"
+      },
+      "Water Scattering": {
+        "key": "waterScattering",
+        "default": "WATER_SCATTERING_MOD * vec3(WATER_SCATTERING_R, WATER_SCATTERING_G, WATER_SCATTERING_B) / 255",
+        "const": true,
+        "type": "vec3",
+        "hidden": true
+      },
+      "Water Extinction": {
+        "key": "waterExtinction",
+        "default": "waterAbsorption + waterScattering",
+        "const": true,
+        "type": "vec3",
+        "hidden": true
+      }
     }
   },
   "Post-Processing": {

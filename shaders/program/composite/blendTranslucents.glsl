@@ -119,6 +119,10 @@ void main() {
       noise.r,
       1.0
     );
+    
+    float mixFactor = smoothstep(200.0, 500.0, length(translucentFeetPlayerPos.xz));
+    gbuffer.surfaceNormal = normalize(slerp(gbuffer.surfaceNormal, gbuffer.geometryNormal, mixFactor));
+    material.roughness = sqrt(mix(pow2(material.roughness), pow2(waterRoughness), mixFactor));
   }
 
   vec3 viewGeometryNormal = mat3(gbufferModelView) * gbuffer.geometryNormal;
@@ -136,7 +140,7 @@ void main() {
   #ifdef REFRACTION_NORMAL_HACK
   vec3 refractionNormal =
     ior < 1.0
-      ? viewGeometryNormal - viewSurfaceNormal * 0.7
+      ? viewGeometryNormal - viewSurfaceNormal
       : viewSurfaceNormal;
   #else
   vec3 refractionNormal = viewSurfaceNormal;

@@ -156,4 +156,15 @@ vec3 rotate(vec3 vector, vec3 axis, float angle) {
   (1.0 - sc.y) * dot(axis, vector) * axis;
 }
 
+vec3 slerp(vec3 p0, vec3 p1, float t) {
+  float dotp = dot(normalize(p0), normalize(p1));
+  if (dotp > 0.9999 || dotp < -0.9999) {
+    if (t <= 0.5) return p0;
+    return p1;
+  }
+  float theta = acos(dotp);
+  vec3 P = (p0 * sin((1 - t) * theta) + p1 * sin(t * theta)) / sin(theta);
+  return P;
+}
+
 #endif // MISC_GLSL

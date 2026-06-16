@@ -28,7 +28,7 @@ void main() {
     1.0 -
     (0.625 * worleyNoise(texcoord, 4) +
       0.25 * worleyNoise(texcoord, 8) +
-      0.125 * worleyNoise(texcoord, 12));
+      0.125 * worleyNoise(texcoord, 16));
   imageStore(
     highFrequencyCloudNoise,
     ivec3(gl_GlobalInvocationID.xyz),

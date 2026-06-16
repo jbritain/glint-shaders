@@ -82,6 +82,12 @@ void main() {
   color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
 
+  #ifdef GBUFFERS_WEATHER
+  if (color.b > color.g) {
+    discard;
+  }
+  #endif
+
   if (color.a < alphaTestRef) {
     discard;
   }

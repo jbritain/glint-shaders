@@ -23,6 +23,10 @@
 #define WAVE_OCTAVES 12
 #define WAVE_STEEPNESS 2.0
 
+const float waterRoughness = sqrt(
+  sqrt(WAVE_STEEPNESS * WAVE_OCTAVES / (1.0 + WAVE_STEEPNESS * WAVE_OCTAVES))
+);
+
 const float totalWaveAmplitude =
   WAVE_INITIAL_AMPLITUDE *
   (1.0 - pow(WAVE_AMPLITUDE_MULTIPLIER, float(WAVE_OCTAVES))) /
