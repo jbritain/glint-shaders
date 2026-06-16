@@ -329,9 +329,36 @@
         "values": "{frange(4, 132, 4)}"
       },
       "Volumetric Fog Density": {
-        "key": "VOLUMETRIC_FOG_DENSITY",
-        "default": "0.01",
-        "values": "{frange(0.001, 0.021, 0.001)}"
+        "Morning": {
+          "key": "VOLUMETRIC_FOG_DENSITY_MORNING",
+          "default": "0.005",
+          "values": "{frange(0.0, 0.021, 0.001)}"
+        },
+        "Day": {
+          "key": "VOLUMETRIC_FOG_DENSITY_DAY",
+          "default": "0.001",
+          "values": "{frange(0.0, 0.021, 0.001)}"
+        },
+        "Evening": {
+          "key": "VOLUMETRIC_FOG_DENSITY_EVENING",
+          "default": "0.0",
+          "values": "{frange(0.0, 0.021, 0.001)}"
+        },
+        "Night": {
+          "key": "VOLUMETRIC_FOG_DENSITY_NIGHT",
+          "default": "0.003",
+          "values": "{frange(0.0, 0.021, 0.001)}"
+        },
+        "Rain": {
+          "key": "VOLUMETRIC_FOG_DENSITY_RAIN",
+          "default": "0.02",
+          "values": "{frange(0.0, 0.021, 0.001)}"
+        },
+        "Thunder": {
+          "key": "VOLUMETRIC_FOG_DENSITY_THUNDER",
+          "default": "0.02",
+          "values": "{frange(0.0, 0.021, 0.001)}"
+        }
       },
       "Volumetric Fog Multiple Scattering": {
         "key": "VOLUMETRIC_FOG_MULTIPLE_SCATTERING",
@@ -375,18 +402,15 @@
         "key": "VOLUMETRIC_CLOUDS_DENSITY",
         "default": "1.0"
       },
-      "Volumetric Cloud Style": {
-        "key": "VOLUMETRIC_CLOUDS_STYLE",
-        "default": "0",
-        "values": "[0 1 2]"
-      },
       "Volumetric Cloud Base Altitude": {
         "key": "VOLUMETRIC_CLOUDS_BASE_ALTITUDE",
-        "default": "1000"
+        "default": "1000",
+        "values": "{frange(0, 5000, 50)}"
       },
       "Volumetric Cloud Top Altitude": {
         "key": "VOLUMETRIC_CLOUDS_TOP_ALTITUDE",
-        "default": "2000"
+        "default": "2000",
+        "values": "{frange(0, 5000, 50)}"
       }
     },
     "Planar Clouds": {
@@ -527,6 +551,10 @@
     }
   },
   "Post-Processing": {
+    "Tonemap": {
+      "key": "tonemap",
+      "elsewhere": true
+    },
     "Anti-Aliasing": {
       "SMAA": {
         "key": "SMAA"

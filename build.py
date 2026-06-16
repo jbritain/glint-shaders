@@ -153,6 +153,11 @@ def recurse_settings(pack, screen_name, settings, sliders, default_profile, dept
 
             recurse_settings(pack, name, value, sliders, default_profile, depth + 1)
         else:
+
+            if "elsewhere" in value.keys():
+                screen += value["key"] + " "
+                continue
+
             if "condition" in value.keys():
                 pack["settings"].append(f"{'  ' * depth}#if {value['condition']}")
                 pack["settings"].append(f"{'  ' * (depth + 1) }#define {value['key']}")

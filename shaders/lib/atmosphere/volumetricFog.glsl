@@ -25,7 +25,6 @@
 const float fogScattering = 1.0;
 const float fogAbsorption = 0.0;
 const float fogExtinction = fogScattering + fogAbsorption;
-float fogDensityFactor = mix(pow2(1.0 - abs(worldLightDir.y)), 1.0, wetness);
 
 float getFogDensity(vec3 position) {
   const float falloff = VOLUMETRIC_FOG_HEIGHT_FALLOFF;
@@ -33,8 +32,45 @@ float getFogDensity(vec3 position) {
     -(VOLUMETRIC_FOG_TOP_PLANE - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff
   );
 
-  return VOLUMETRIC_FOG_DENSITY *
-  clamp01(
+  float fogDensityFactor = 0.0;
+  if (sunAngle <= 0.25) {
+    fogDensityFactor = mix(
+      VOLUMETRIC_FOG_DENSITY_MORNING,
+      VOLUMETRIC_FOG_DENSITY_DAY,
+      smoothstep(0.0, 0.25, sunAngle)
+    );
+  } else if (sunAngle <= 0.5) {
+    fogDensityFactor = mix(
+      VOLUMETRIC_FOG_DENSITY_DAY,
+      VOLUMETRIC_FOG_DENSITY_EVENING,
+      smoothstep(0.25, 0.5, sunAngle)
+    );
+  } else if (sunAngle <= 0.75) {
+    fogDensityFactor = mix(
+      VOLUMETRIC_FOG_DENSITY_EVENING,
+      VOLUMETRIC_FOG_DENSITY_NIGHT,
+      smoothstep(0.5, 0.75, sunAngle)
+    );
+  } else if (sunAngle <= 1.0) {
+    fogDensityFactor = mix(
+      VOLUMETRIC_FOG_DENSITY_NIGHT,
+      VOLUMETRIC_FOG_DENSITY_MORNING,
+      smoothstep(0.75, 1.0, sunAngle)
+    );
+  }
+
+  fogDensityFactor = mix(
+    fogDensityFactor,
+    VOLUMETRIC_FOG_DENSITY_RAIN,
+    wetness
+  );
+  fogDensityFactor = mix(
+    fogDensityFactor,
+    VOLUMETRIC_FOG_DENSITY_THUNDER,
+    thunderStrength
+  );
+
+  return clamp01(
     (exp(-(position.y - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff) - topFactor) /
       (1.0 - topFactor)
   ) *

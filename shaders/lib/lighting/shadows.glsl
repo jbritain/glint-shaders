@@ -150,7 +150,7 @@ vec3 getShadow(
       vec3 halfwayVector = normalize(vec3(0.0, 1.0, 0.0) + worldLightDir);
       float caustics = pow(
         dot(waveNormal, halfwayVector),
-        blockerDistance * shadowRange * 2
+        blockerDistance * shadowRange * 4
       );
       shadow *= mix(1.0, caustics, causticWeight);
     }

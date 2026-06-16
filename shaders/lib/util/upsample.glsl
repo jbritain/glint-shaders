@@ -17,14 +17,14 @@
 // DEPTH WEIGHT AND UPSAMPLER BY BALINT
 
 float depthWeight(vec3 p1, vec3 p2, vec2 grad){
-    const float DEPTH_WEIGHT_PARAM = 64.0;
-    if (p1.z == p2.z)
-    {
-        return 1.0;
-    }
-    float expectedDepthDifference = dot(grad, p2.xy - p1.xy);
-    float depthDifference = p2.z - p1.z;
-    return exp(-abs((depthDifference - expectedDepthDifference) / (expectedDepthDifference + 0.01)) * DEPTH_WEIGHT_PARAM);
+  const float DEPTH_WEIGHT_PARAM = 64.0;
+  if (p1.z == p2.z)
+  {
+      return 1.0;
+  }
+  float expectedDepthDifference = dot(grad, p2.xy - p1.xy);
+  float depthDifference = p2.z - p1.z;
+  return exp(-abs((depthDifference - expectedDepthDifference) / (expectedDepthDifference + 0.01)) * DEPTH_WEIGHT_PARAM);
 }
 
 const uvec2 OFFSETS[] = {
@@ -55,6 +55,7 @@ vec4 upsample(
   };
 
 
+
   float totalWeight = 0.0;
   vec4 color = vec4(0.0);
   for(int i = 0; i < 4; i++){
@@ -69,6 +70,10 @@ vec4 upsample(
   if(totalWeight == 0.0){
     return vec4(0.0);
   }
+
+  // color = texture(undersampled, centrePos.xy);
+
+  // show(color.rgb * 100 / totalWeight);
 
   return color / totalWeight;
 }

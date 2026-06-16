@@ -32,9 +32,9 @@ vec2 getWind() {
 }
 
 float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
-  rayPos.xz += windDir * 100;
+  rayPos.xz += getWind();
 
-  vec2 coverageCoord = fract((rayPos.xz + getWind()) / 200000 + 0.5);
+  vec2 coverageCoord = fract(rayPos.xz / 200000 + 0.5);
   vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
   float coverage = linearstep(0.5 - 0.2 * wetness, 0.7, coverageData.r);
 

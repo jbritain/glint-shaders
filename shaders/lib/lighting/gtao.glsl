@@ -61,7 +61,7 @@ vec4 getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
 
     float signN = sign(dot(orthoDirection, projNormal));
     float cosN = clamp(dot(projNormal, camera) / projLength, 0.0, 1.0);
-    float n = signN * acos(cosN);
+    float n = signN * facos(cosN);
 
     for (
       float currentSample = 0.0;
@@ -88,7 +88,7 @@ vec4 getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
         camera
       );
 
-      frontBackHorizon = acos(frontBackHorizon);
+      frontBackHorizon = facos(frontBackHorizon);
       frontBackHorizon = clamp((frontBackHorizon + n + halfPi) / PI, 0.0, 1.0);
 
       indirect = updateSectors(frontBackHorizon.x, frontBackHorizon.y, 0u);

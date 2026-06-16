@@ -158,7 +158,7 @@ void main() {
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
 
-  show(textureLod(shadowcolor2, texcoord, 0));
+  // show(textureLod(shadowcolor2, texcoord, 0));
 }
 
 #endif

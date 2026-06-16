@@ -67,6 +67,25 @@ DEFINE_genFType(pow6_)
 DEFINE_genFType(pow7_)
 DEFINE_genFType(pow8_)
 
+#define fsqrt(x) intBitsToFloat(0x1FBD1DF5 + (floatBitsToInt(x) >> 1)) // Error of 1.42%
+
+#define finversesqrt(x) intBitsToFloat(0x5F33E79F - (floatBitsToInt(x) >> 1)) // Error of 1.62%
+
+float facos(float x) { // Under 3% error
+  float ax = abs(x);
+  float res = -0.156583 * ax + PI/2;
+  res *= fsqrt(1.0 - ax);
+  return x >= 0 ? res : PI - res;
+}
+
+#define facos_(type) type facos(type x) { \
+  type ax = abs(x); \
+  type res = (-0.156583 * ax + PI/2); \
+  res *= fsqrt(1.0 - ax); \
+  return mix(PI - res, res, b##type(greaterThanEqual(x, type(0.0)))); \
+}
+DEFINE_genVType(facos_)
+
 #define max0(x) max(x, 0.0)
 #define max1(x) max(x, 1.0)
 #define min0(x) min(x, 0.0)
@@ -147,5 +166,7 @@ vec3 minMask(vec3 v) {
 vec2 minMask(vec2 v) {
   return step(min(v.x, v.y), v);
 }
+
+
 
 #endif // SYNTAX_GLSL

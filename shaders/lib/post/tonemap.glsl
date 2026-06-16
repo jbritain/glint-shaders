@@ -31,16 +31,15 @@ vec3 uncharted2TonemapPartial(vec3 x) {
 }
 
 vec3 uncharted2FilmicTonemap(vec3 v) {
-  float exposure_bias = 2.0f;
+  float exposure_bias = 4.0f;
   vec3 curr = uncharted2TonemapPartial(v * exposure_bias);
 
   vec3 W = vec3(11.2f);
   vec3 white_scale = vec3(1.0f) / uncharted2TonemapPartial(W);
-  return curr * white_scale;
+  return linearToSRGB(curr * white_scale);
 }
 
 vec3 hejlBurgessTonemap(vec3 v) {
-  v /= 2.0;
   vec3 x = max0(v - 0.004);
   return x * (6.2 * x + 0.5) / (x * (6.2 * x + 1.7) + 0.06);
 }
@@ -51,7 +50,7 @@ vec3 ACESTonemap(vec3 v) {
   float c = 2.43;
   float d = 0.59;
   float e = 0.14;
-  return clamp01(v * (a * v + b) / (v * (c * v + d) + e));
+  return linearToSRGB(clamp01(v * (a * v + b) / (v * (c * v + d) + e)));
 }
 
 // 0: Default, 1: Golden, 2: Punchy
@@ -148,8 +147,6 @@ vec3 agxTonemap(vec3 col) {
 
 // https://github.com/dmnsgn/glsl-tone-map/blob/main/lottes.glsl
 vec3 lottesTonemap(vec3 x) {
-  x *= 0.4;
-
   const vec3 a = vec3(1.6);
   const vec3 d = vec3(0.977);
   const vec3 hdrMax = vec3(8.0);
@@ -164,13 +161,13 @@ vec3 lottesTonemap(vec3 x) {
       pow(hdrMax, a) * pow(midIn, a * d) * midOut) /
     ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
 
-  return pow(x, a) / (pow(x, a * d) * b + c);
+  return linearToSRGB(pow(x, a) / (pow(x, a * d) * b + c));
 }
 
 uniform sampler3D tonyMcMapfaceTex;
 // https://github.com/h3r2tic/tony-mc-mapface/
 vec3 tonyMcMapface(vec3 stimulus) {
-  stimulus *= 3.0;
+  stimulus *= 4.0;
 
   // Apply a non-linear transform that the LUT is encoded with.
   vec3 encoded = stimulus / (stimulus + 1.0);
