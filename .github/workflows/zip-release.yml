@@ -27,8 +27,8 @@ jobs:
           # your assets on Modrinth.
           modrinth-id: FQST0Z8M
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          # curseforge-id: 1167533
-          # curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 1585852
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           files: "Glint-${{ github.event.release.tag_name }}.zip"
           loaders: iris
