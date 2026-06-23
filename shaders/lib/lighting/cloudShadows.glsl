@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -23,6 +24,7 @@ float getCloudShadow(vec3 rayPos) {
   rayPos += cameraPosition;
   #ifdef VOLUMETRIC_CLOUDS
   if (
+    rayPos.y > VOLUMETRIC_CLOUDS_BASE_ALTITUDE ||
     rayPlaneIntersection(
       rayPos,
       worldLightDir,

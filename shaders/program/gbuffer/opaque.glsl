@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -81,6 +82,7 @@ void main() {
 #include "/lib/material/material.glsl"
 #include "/lib/material/integratedPBR.glsl"
 #include "/lib/util/dither.glsl"
+#include "/lib/water/puddles.glsl"
 
 in vec2 lightmap;
 in vec2 texcoord;
@@ -145,11 +147,6 @@ void main() {
 
   Gbuffer gbuffer;
 
-  gbuffer.geometryNormal = mat3(gbufferModelViewInverse) * tbn[2];
-  vec3 surfaceNormal = getSurfaceNormal(texcoord, tbn);
-  gbuffer.surfaceNormal = mat3(gbufferModelViewInverse) * surfaceNormal;
-  gbuffer.lightmap = lightmap;
-
   vec4 color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
   if (color.a < alphaTestRef) {
@@ -161,10 +158,25 @@ void main() {
     texture(specular, texcoord),
     materialID
   );
+  vec3 surfaceNormal = getSurfaceNormal(texcoord, tbn);
+  vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
   applyIntegratedPBR(material);
+  applyPuddles(
+    material,
+    texture(gtexture, texcoord).a,
+    feetPlayerPos + cameraPosition,
+    surfaceNormal,
+    tbn[2],
+    lightmap.y
+  );
   // if (material.metalID != NO_METAL && gl_FragCoord.x > viewWidth / 2) {
   //   material.metalID = OTHER_METAL;
   // }
+
+  gbuffer.geometryNormal = mat3(gbufferModelViewInverse) * tbn[2];
+
+  gbuffer.surfaceNormal = mat3(gbufferModelViewInverse) * surfaceNormal;
+  gbuffer.lightmap = lightmap;
 
   #ifdef WHITE_WORLD
   material.albedo = vec3(1.0);

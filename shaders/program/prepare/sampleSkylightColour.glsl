@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -38,10 +39,17 @@ void main() {
   );
 
   vec3 sky = getSky(dir, false);
-  vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(dir));
+
 
   values[id] = sky / (64 * PI);
+
+  #ifdef WORLD_OVERWORLD
+  vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(dir));
+  
   valuesWithCloud[id] = fma(sky, vec3(clouds.a), clouds.rgb) / (64 * PI);
+  #else
+  valuesWithCloud[id] = values[id];
+  #endif
 
 
   barrier();

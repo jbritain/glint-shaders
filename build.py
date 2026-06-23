@@ -1,20 +1,28 @@
 import json
-import time
+import fsspec
 import os
 import shutil
 import re
-from numpy import arange
-
-# from watchdog.events import FileSystemEvent, FileSystemEventHandler
-# from watchdog.observers import Observer
+import urllib.request
+from numpy import arange, linspace
 
 shaders_path = "shaders"
 material_id_path = "lib/material/materialIDs.glsl"
 settings_path = "lib/common/settings.glsl"
 lang_path = "lang/en_US.lang"
 version = "460 compatibility"
+minecraft_version = "26.1.2"
 
 all_dimensions = {"OVERWORLD": "world0", "THE_NETHER": "world-1", "THE_END": "world1"}
+
+
+def download_tags():
+    path = f"./tags/{minecraft_version}.json"
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(
+            f"https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/{minecraft_version}/data/minecraft/tags/block/_all.json",
+            path,
+        )
 
 
 def create_linked_shader_program(
@@ -125,9 +133,14 @@ def generate_properties(pack):
         f.truncate()
 
 
+# https://stackoverflow.com/a/47250077/12646131
+def safe_arange(start, stop, step):
+    return step * arange(start / step, stop / step)
+
+
 def frange(start, stop, inc):
     return (
-        str(arange(start, stop, inc))
+        str(safe_arange(start, stop, inc))
         .replace("\n", "")
         .replace(". ", ".0 ")
         .replace(".]", ".0]")
@@ -155,7 +168,8 @@ def recurse_settings(pack, screen_name, settings, sliders, default_profile, dept
         else:
 
             if "elsewhere" in value.keys():
-                screen += value["key"] + " "
+                screen += " " + value["key"]
+                pack["lang"].append(f"option.{value['key']} = {name}")
                 continue
 
             if "condition" in value.keys():
@@ -271,45 +285,82 @@ def generate_settings(pack):
         l.write("\n".join(pack["lang"]))
 
 
+def recurse_tags(blocks, tags):
+    new_blocks = []
+    for block in blocks:
+        if block.startswith("#") or block.startswith("%"):
+            new_blocks += recurse_tags(tags[block[11:]]["values"], tags)
+        else:
+            new_blocks.append(block)
+    return new_blocks
+
+
 def generate_block_properties(pack):
     block_properties = []
     with open("blocks.json", encoding="utf-8") as b:
         block_mappings = json.loads(b.read())
 
+    with open(f"./tags/{minecraft_version}.json") as t:
+        tags = json.loads(t.read())
+
+    inverse_block_mappings = {}
+    for material, untagged_blocks in block_mappings.items():
+        blocks = recurse_tags(untagged_blocks, tags)
+        for block in blocks:
+            if not block in inverse_block_mappings.keys():
+                inverse_block_mappings[block] = [material]
+            else:
+                inverse_block_mappings[block].append(material)
+
     ids = {}
     next_id = 1000
 
-    for blocks in block_mappings.values():
-        for block in blocks:
-            if not block in ids.values():
-                ids[next_id] = block
-                next_id += 1
+    for i in inverse_block_mappings.keys():
+        h = hash(frozenset(inverse_block_mappings[i]))
+        if h not in ids.keys():
+            ids[h] = next_id
+            next_id += 1
+        inverse_block_mappings[i] = (inverse_block_mappings[i], ids[h])
 
-    for id, block in ids.items():
-        block_properties.append(f"block.{id} = {block}")
+    # reverse_inverse_block_mappings = {v: k for k, v in inverse_block_mappings.items()}
 
-    # TODO: ID deduplication - if IDs are only ever referenced by the same mapping, combine them
+    materials_to_ids = {}
+    ids_to_blocks = {}
+    for block, (materials, id) in inverse_block_mappings.items():
+        for material in materials:
+            if not material in materials_to_ids.keys():
+                materials_to_ids[material] = [id]
+            elif id not in materials_to_ids[material]:
+                materials_to_ids[material].append(id)
 
-    inverse_id_map = {v: k for k, v in ids.items()}
+        if not id in ids_to_blocks.keys():
+            ids_to_blocks[id] = [block]
+        else:
+            ids_to_blocks[id].append(block)
 
-    mappings = {}
-
-    for mapping_name, blocks in block_mappings.items():
-        mappings[mapping_name] = [inverse_id_map[b] for b in blocks]
-
-    mapping_functions = []
-
+    for id, blocks in ids_to_blocks.items():
+        block_properties.append(f"block.{id} = {" ".join(blocks)}")
     with open(f"{shaders_path}/block.properties", "w") as f:
         f.writelines([b + "\n" for b in block_properties])
 
-    for mapping_name, ids in mappings.items():
+    mapping_functions = []
+
+    for material, ids in materials_to_ids.items():
+        title = material
+        prefix = "material"
+        if not title.split(" ")[0] in ["lets", "emits"]:
+            prefix += "Is"
+
         if len(ids) == 1:
             mapping_functions.append(
-                f"bool materialIs{mapping_name.title()}(uint id){{return id == {ids[0]};}}"
+                f"bool {(prefix + title.title()).replace(" ", "")}(uint id){{return id == {ids[0]};}}"
+            )
+            mapping_functions.append(
+                f"#define MATERIAL_{title.upper().replace(" ", "_")} {ids[0]}"
             )
         else:
             mapping_function = (
-                f"bool materialIs{mapping_name.title()}(uint id){{return "
+                f"bool {(prefix + title.title()).replace(" ", "")}(uint id){{return "
             )
             for id in ids:
                 mapping_function += f"id == {id} || "
@@ -336,6 +387,8 @@ def generate_block_properties(pack):
 
 
 def generate_pack():
+    download_tags()
+
     with open("./pack.json", encoding="utf-8") as j:
         pack = json.loads("".join(j.readlines()))
 

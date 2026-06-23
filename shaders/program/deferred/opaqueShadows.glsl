@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -69,31 +70,47 @@ void main() {
       blockerDistance,
       shadowFade
     );
+
+    if (shadowFade > 0.01) {
+      float occlusion = texture(colortex3, texcoord).r;
+      float fakeBlockerDistance = 10.0; //pow2(1.0 - occlusion) * 10.0; // todo: good subsurface scattering heuristic for distant terrain
+      blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
+
+      vec3 p;
+      float screenSpaceShadow = rayIntersects(
+        viewPos,
+        lightDir,
+        8,
+        bayer64(gl_FragCoord.xy),
+        false,
+        p,
+        depthtex0,
+        0,
+        gbufferProjection
+      )
+        ? 0.0
+        : 1.0;
+      shadow = mix(shadow, vec3(screenSpaceShadow), shadowFade);
+    }
+
   } else {
-    shadowFade = 1.0;
-    shadow = vec3(smoothstep(13.5 / 15, 14.5 / 15, gbuffer.lightmap.y));
-  }
-
-  float occlusion = texture(colortex3, texcoord).r;
-  float fakeBlockerDistance = 10.0; //pow2(1.0 - occlusion) * 10.0; // todo: good subsurface scattering heuristic for distant terrain
-
-  blockerDistance = mix(blockerDistance, fakeBlockerDistance, shadowFade);
-  if (shadowFade > 0.01) {
+    #ifdef VOXY
     vec3 p;
-    float screenSpaceShadow = rayIntersects(
+    shadow = rayIntersects(
       viewPos,
       lightDir,
       8,
-      interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+      bayer64(gl_FragCoord.xy),
       false,
       p,
-      depthtex0,
+      vxDepthTexTrans,
       0,
-      gbufferProjection
+      vxProj
     )
-      ? 0.0
-      : 1.0;
-    shadow = mix(shadow, vec3(screenSpaceShadow), shadowFade);
+      ? vec3(0.0)
+      : vec3(1.0);
+    #endif
+    blockerDistance = 10.0;
   }
 
   shadowAndBlockerDistance = vec4(shadow, blockerDistance);

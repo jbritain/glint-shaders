@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -69,8 +70,10 @@ vec3 SSRSample(
     vec3 skyDir = mat3(gbufferModelViewInverse) * reflectedDir;
     vec3 sky = getSky(skyDir, false);
 
+    #ifdef WORLD_OVERWORLD
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    #endif
     sky *= skyLightmap;
 
     //     vec4 fog = analyticalFog(

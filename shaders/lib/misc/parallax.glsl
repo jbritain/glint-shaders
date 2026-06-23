@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -69,9 +70,6 @@ vec2 getParallaxTexcoord(
   vec2 dy,
   float jitter
 ) {
-  #ifndef MC_TEXTURE_FORMAT_LAB_PBR_1_3
-  return texcoord;
-  #endif
   float distFade = smoothstep(
     PARALLAX_DISTANCE * PARALLAX_DISTANCE_CURVE,
     PARALLAX_DISTANCE,

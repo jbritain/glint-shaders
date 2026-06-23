@@ -294,13 +294,17 @@
         "key": "REFRACTION_NORMAL_HACK",
         "default": true
       },
-      "Ray-traced Refraction": {
-        "key": "RT_REFRACTION",
-        "default": false
+      "High Quality Refraction": {
+        "key": "NEWTON_REFRACTION",
+        "defaults": {
+          "*": false,
+          "ultra": true
+        },
+        "description": "Uses scene data to find the correct refraction intersection point."
       },
-      "Ray-traced Refraction Steps": {
-        "key": "RT_REFRACTION_STEPS",
-        "default": "8",
+      "High Quality Refraction Steps": {
+        "key": "NEWTON_REFRACTION_STEPS",
+        "default": "4",
         "values": "{frange(4, 17, 1)}"
       }
     },
@@ -332,32 +336,32 @@
         "Morning": {
           "key": "VOLUMETRIC_FOG_DENSITY_MORNING",
           "default": "0.005",
-          "values": "{frange(0.0, 0.021, 0.001)}"
+          "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Day": {
           "key": "VOLUMETRIC_FOG_DENSITY_DAY",
           "default": "0.001",
-          "values": "{frange(0.0, 0.021, 0.001)}"
+          "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Evening": {
           "key": "VOLUMETRIC_FOG_DENSITY_EVENING",
           "default": "0.0",
-          "values": "{frange(0.0, 0.021, 0.001)}"
+          "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Night": {
           "key": "VOLUMETRIC_FOG_DENSITY_NIGHT",
           "default": "0.003",
-          "values": "{frange(0.0, 0.021, 0.001)}"
+          "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Rain": {
           "key": "VOLUMETRIC_FOG_DENSITY_RAIN",
           "default": "0.02",
-          "values": "{frange(0.0, 0.021, 0.001)}"
+          "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Thunder": {
           "key": "VOLUMETRIC_FOG_DENSITY_THUNDER",
           "default": "0.02",
-          "values": "{frange(0.0, 0.021, 0.001)}"
+          "values": "{frange(0.0, 0.051, 0.001)}"
         }
       },
       "Volumetric Fog Multiple Scattering": {
@@ -404,12 +408,12 @@
       },
       "Volumetric Cloud Base Altitude": {
         "key": "VOLUMETRIC_CLOUDS_BASE_ALTITUDE",
-        "default": "1000",
+        "default": "1000.0",
         "values": "{frange(0, 5000, 50)}"
       },
       "Volumetric Cloud Top Altitude": {
         "key": "VOLUMETRIC_CLOUDS_TOP_ALTITUDE",
-        "default": "2000",
+        "default": "2000.0",
         "values": "{frange(0, 5000, 50)}"
       }
     },
@@ -551,10 +555,6 @@
     }
   },
   "Post-Processing": {
-    "Tonemap": {
-      "key": "tonemap",
-      "elsewhere": true
-    },
     "Anti-Aliasing": {
       "SMAA": {
         "key": "SMAA"
@@ -583,52 +583,61 @@
     "Camera": {
       "Auto Exposure": {
         "Auto Exposure": {
-          "key": "AUTO_EXPOSURE"
+          "key": "AUTO_EXPOSURE",
+          "description": "Automatically adjusts the exposure of the camera based on the brightness of the scene."
         },
         "Auto Exposure Min EV100": {
           "key": "MIN_EV100",
           "default": "2",
-          "values": "[-4 -2 0 2 4]"
+          "values": "[-4 -2 0 2 4]",
+          "description": "The lowest EV100 value the exposure can reach."
         },
         "Auto Exposure Max EV100": {
           "key": "MAX_EV100",
-          "default": "200"
+          "default": "200",
+          "description": "The highest EV100 value the exposure can reach."
         },
         "Auto Exposure Adaptation Speed": {
           "key": "EXPOSURE_ADAPTATION",
           "default": "1",
-          "values": "{frange(1, 17, 1)}"
+          "values": "{frange(1, 17, 1)}",
+          "description": "How quickly the auto exposure adapts to changes in scene brightness."
         },
         "Exclude Sun From Auto Exposure": {
           "key": "EXCLUDE_SUN_AUTO_EXPOSURE"
+        },
+        "Auto Exposure Compensation": {
+          "key": "EXPOSURE_COMPENSATION",
+          "default": "0.0",
+          "values": "{frange(-10.0, 11.0, 1)}",
+          "description": "This value is subtracted from the EV100 used to compute the auto exposure. A higher value results in a brighter image."
         }
-      },
-      "Exposure Compensation": {
-        "key": "EXPOSURE_COMPENSATION",
-        "default": "0.0",
-        "values": "{frange(-10.0, 11.0, 1)}"
       },
       "Aperture": {
         "key": "APERTURE",
         "default": "16.0",
-        "values": "[1.4 2.0 2.8 4.0 5.6 8.0 11.0 16.0]",
-        "prefix": "𝑓/"
+        "values": "[16.0 11.0 8.0 5.6 4.0 2.8 2.0 1.4]",
+        "prefix": "𝑓/",
+        "description": "The size of the camera aperture. A larger aperture (i.e 𝑓/1.4) will allow more light in, which brightens the image. A larger aperture will also result in a shallower depth of field."
       },
       "ISO": {
         "key": "ISO",
         "default": "100",
-        "values": "[20 50 100 200 400 800 1600 3200 6400]"
+        "values": "[20 50 100 200 400 800 1600 3200 6400]",
+        "description": "The sensor's sensitivity to light. A higher value will make the image brighter."
       },
       "Shutter Speed": {
         "key": "SHUTTER_TIME",
         "default": "125",
-        "values": "[1000 250 60 30]",
+        "values": "[1000 250 125 60 30]",
         "prefix": "1/",
-        "suffix": "s"
+        "suffix": "s",
+        "description": "The amount of time the sensor is exposed to the light for. A higher value (i.e 1/30s) will result in a brighter image than a lower value (i.e 1/1000s)."
       },
       "Sensor Size": {
         "key": "SENSOR_SIZE",
-        "default": "35.0"
+        "default": "35",
+        "suffix": "mm"
       },
       "Depth Of Field": {
         "Depth Of Field": {
@@ -689,6 +698,30 @@
         "key": "CAMERA_INFO",
         "default": false
       }
+    },
+    "Tonemap": {
+      "key": "tonemap",
+      "elsewhere": true
+    },
+    "Contrast": {
+      "key": "CONTRAST",
+      "values": "{frange(-1.0, 1.1, 0.1)}",
+      "default": "0.0"
+    },
+    "Hue": {
+      "key": "HUE",
+      "values": "{frange(-1.0, 1.1, 0.1)}",
+      "default": "0.0"
+    },
+    "Saturation": {
+      "key": "SATURATION",
+      "values": "{frange(-1.0, 1.1, 0.1)}",
+      "default": "0.0"
+    },
+    "LIGHTNESS": {
+      "key": "LIGHTNESS",
+      "values": "{frange(-1.0, 1.1, 0.1)}",
+      "default": "0.0"
     }
   },
   "Miscellaneous": {},

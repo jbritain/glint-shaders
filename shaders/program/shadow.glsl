@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -77,26 +78,21 @@ void main() {
         : pow(averageTextureData.a, rcp(3));
     data.emission = pow2(at_midBlock.w / 15.0);
 
-    // if (isEndPortal(blockEntityId)) {
-    //   data.emission = 1.0;
-    // }
+    if (materialIsEndPortal(blockEntityId)) {
+      data.emission = 1.0;
+    }
 
-    // data.emission = textureLod(specular, mc_midTexCoord, 4).a;
-    // if(data.emission == 1.0){
-    //     data.emission = 0.0;
-    // }
+    if (materialIsTintedGlass(materialID)) {
+      data.opacity = 1.0;
+    }
 
-    // if (isTintedGlass(materialID)) {
-    //   data.opacity = 1.0;
-    // }
+    if (materialLetsLightThrough(materialID)) {
+      data.opacity = 0.0;
+    }
 
-    // if (isLetsLightThrough(materialID)) {
-    //   data.opacity = 0.0;
-    // }
-
-    // if (isWater(materialID)) {
-    //   data.color = 1.0 - WATER_SCATTERING;
-    // }
+    if (materialIsWater(materialID)) {
+      data.color = 1.0 - waterScattering;
+    }
 
     uint encodedVoxelData = encodeVoxelData(data);
     imageAtomicMax(voxelMap, voxelPos, encodedVoxelData);
@@ -149,7 +145,7 @@ void main() {
     blockerDistance *= shadowRange;
 
     color.rgb = exp(-waterExtinction * blockerDistance);
-    color.a = 0.0;
+    color.a = 0.01;
 
     #if ( defined REFRACTIVE_CAUSTICS || defined REFLECTIVE_CAUSTICS )
     vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);

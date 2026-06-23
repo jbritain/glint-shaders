@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -22,8 +23,8 @@ const float pulsarDistance = 1e4;
 const float pulsarAngularRadius = pulsarRadius / pulsarDistance;
 const float pulsarSolidAngle = TAU * (1.0 - cos(pulsarAngularRadius));
 
-const float pulsarConeRadius = 1000;
-const float pulsarConeLength = 20000;
+const float pulsarConeRadius = 10000;
+const float pulsarConeLength = 200000;
 
 const vec3 pulsarLuminance = vec3(0.15, 0.3, 1.0) * 1.6e6;
 const vec3 pulsarIlluminance = pulsarLuminance * pulsarSolidAngle;

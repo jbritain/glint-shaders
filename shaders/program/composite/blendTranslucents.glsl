@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -120,9 +121,9 @@ void main() {
       1.0
     );
     
-    float mixFactor = smoothstep(200.0, 500.0, length(translucentFeetPlayerPos.xz));
-    gbuffer.surfaceNormal = normalize(slerp(gbuffer.surfaceNormal, gbuffer.geometryNormal, mixFactor));
-    material.roughness = sqrt(mix(pow2(material.roughness), pow2(waterRoughness), mixFactor));
+    // float mixFactor = smoothstep(200.0, 500.0, length(translucentFeetPlayerPos.xz));
+    // gbuffer.surfaceNormal = normalize(slerp(gbuffer.surfaceNormal, gbuffer.geometryNormal, mixFactor));
+    // material.roughness = sqrt(mix(pow2(material.roughness), pow2(waterRoughness), mixFactor));
   }
 
   vec3 viewGeometryNormal = mat3(gbufferModelView) * gbuffer.geometryNormal;
@@ -157,25 +158,38 @@ void main() {
   #endif
   vec3 refractedDir = refract(viewDir, refractionNormal, ior);
 
-  #ifdef RT_REFRACTION
+  #ifdef NEWTON_REFRACTION
   vec3 refractedPos;
-  if (
-    !rayIntersects(
-      translucentViewPos,
-      refractedDir,
-      RT_REFRACTION_STEPS,
-      interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
-      true,
-      refractedPos,
-      depthtex1,
-      0,
-      gbufferProjection
-    )
-  ) {
-    refractedPos = vec3(-1.0);
-  } else {
-    opaqueViewPos = screenSpaceToViewSpace(refractedPos);
+  // https://jcgt.org/published/0015/01/03/
+  
+  vec2 sampleCoord = texcoord;
+  for(int i = 0; i < 4; i++){
+    float sampleDepth = texture(depthtex1, sampleCoord).r;
+    vec3 sampleNormal = mat3(gbufferModelView) * unpackGbuffer(texture(colortex1, sampleCoord).rgb).geometryNormal;
+    vec3 samplePos = screenSpaceToViewSpace(vec3(sampleCoord, sampleDepth));
+    refractedPos = viewSpaceToScreenSpace(intersectPlane(translucentViewPos, refractedDir, sampleNormal, samplePos));
+    sampleCoord = refractedPos.xy;
   }
+  opaqueViewPos = translucentViewPos + refractedDir * refractedRayLength;
+
+  // if (
+  //   !rayIntersects(
+  //     translucentViewPos,
+  //     refractedDir,
+  //     NEWTON_REFRACTION_STEPS,
+  //     interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
+  //     true,
+  //     refractedPos,
+  //     depthtex1,
+  //     0,
+  //     gbufferProjection
+  //   )
+  // ) {
+  //   refractedPos = vec3(-1.0);
+  // } else {
+  //   opaqueViewPos = screenSpaceToViewSpace(refractedPos);
+  // }
+
   #else
   opaqueViewPos = translucentViewPos + refractedDir * refractedRayLength;
   vec3 refractedPos = viewSpaceToScreenSpace(opaqueViewPos);
@@ -188,8 +202,10 @@ void main() {
   } else if (inWater || !isWater) {
     vec3 skyDir = mat3(gbufferModelViewInverse) * refractedDir;
     vec3 sky = getSky(skyDir, false);
+    #ifdef WORLD_OVERWORLD
     vec4 clouds = texture(skyCloudMapTex, encodeUnitVector(skyDir));
     sky = fma(sky, vec3(clouds.a), clouds.rgb);
+    #endif
     // vec4 fog = analyticalFog(translucentFeetPlayerPos, skyDir);
     // sky = fma(sky, vec3(fog.a), fog.rgb);
     color.rgb = sky * gbuffer.lightmap.y;

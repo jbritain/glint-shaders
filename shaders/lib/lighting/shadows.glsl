@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -78,7 +79,7 @@ float getBlockerDistance(
     offsetPos.xy += getWarp(offsetPos.xy);
     float blockerDistance = max(
       0.0,
-      offsetPos.z - texture(shadowtex0, offsetPos.xy).r
+      offsetPos.z - texture(shadowtex1, offsetPos.xy).r
     );
 
     blockerDistanceSum += blockerDistance;

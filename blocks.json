@@ -6,7 +6,10 @@
     "%minecraft:leaves",
     "%minecraft:crops",
     "%minecraft:flowers",
-    "%minecraft:edible_for_sheep"
+    "%minecraft:edible_for_sheep",
+    "minecraft:tall_grass",
+    "minecraft:short_grass",
+    "minecraft:bush"
   ],
   "leaves": [
     "%minecraft:leaves"
@@ -27,7 +30,104 @@
   "obsidian": [
     "minecraft:obsidian"
   ],
+  "diamond": [
+    "minecraft:diamond_block"
+  ],
   "ice": [
     "minecraft:ice"
+  ],
+  "end portal": [
+    "minecraft:end_gateway",
+    "minecraft:end_portal"
+  ],
+  "tinted glass": [
+    "minecraft:tinted_glass"
+  ],
+  "wool": [
+    "%minecraft:wool"
+  ],
+  "sand": [
+    "minecraft:sand",
+    "minecraft:red_sand"
+  ],
+  "glass": [
+    "minecraft:glass",
+    "minecraft:tinted_glass",
+    "minecraft:white_stained_glass",
+    "minecraft:orange_stained_glass",
+    "minecraft:magenta_stained_glass",
+    "minecraft:light_blue_stained_glass",
+    "minecraft:yellow_stained_glass",
+    "minecraft:lime_stained_glass",
+    "minecraft:pink_stained_glass",
+    "minecraft:gray_stained_glass",
+    "minecraft:light_gray_stained_glass",
+    "minecraft:cyan_stained_glass",
+    "minecraft:purple_stained_glass",
+    "minecraft:blue_stained_glass",
+    "minecraft:brown_stained_glass",
+    "minecraft:green_stained_glass",
+    "minecraft:red_stained_glass",
+    "minecraft:black_stained_glass",
+    "minecraft:glass_pane",
+    "minecraft:tinted_glass_pane",
+    "minecraft:white_stained_glass_pane",
+    "minecraft:orange_stained_glass_pane",
+    "minecraft:magenta_stained_glass_pane",
+    "minecraft:light_blue_stained_glass_pane",
+    "minecraft:yellow_stained_glass_pane",
+    "minecraft:lime_stained_glass_pane",
+    "minecraft:pink_stained_glass_pane",
+    "minecraft:gray_stained_glass_pane",
+    "minecraft:light_gray_stained_glass_pane",
+    "minecraft:cyan_stained_glass_pane",
+    "minecraft:purple_stained_glass_pane",
+    "minecraft:blue_stained_glass_pane",
+    "minecraft:brown_stained_glass_pane",
+    "minecraft:green_stained_glass_pane",
+    "minecraft:red_stained_glass_pane",
+    "minecraft:black_stained_glass_pane"
+  ],
+  "lets light through": [
+    "%minecraft:slabs",
+    "minecraft:barrier",
+    "minecraft:beacon",
+    "minecraft:azalea",
+    "minecraft:flowering_azalea",
+    "minecraft:bamboo",
+    "minecraft:bell",
+    "minecraft:sculk_sensor",
+    "minecraft:calibrated_sculk_sensor",
+    "minecraft:campfire",
+    "minecraft:soul_campfire",
+    "minecraft:cauldron",
+    "minecraft:chest",
+    "minecraft:chorus_flower",
+    "minecraft:chorus_plant",
+    "minecraft:conduit",
+    "minecraft:daylight_detector",
+    "minecraft:decorated_pot",
+    "minecraft:dirt_path",
+    "minecraft:dragon_egg",
+    "minecraft:enchanting_table",
+    "minecraft:end_portal_frame",
+    "minecraft:end_rod",
+    "minecraft:ender_chest",
+    "minecraft:farmland",
+    "minecraft:flower_pot",
+    "minecraft:grindstone",
+    "minecraft:hopper",
+    "minecraft:iron_bars",
+    "minecraft:ladder",
+    "minecraft:lectern",
+    "minecraft:lightning_rod",
+    "minecraft:lily_pad",
+    "minecraft:moss_carpet",
+    "minecraft:piston:extended=true",
+    "minecraft:piston_head",
+    "minecraft:sticky_piston:extended=true",
+    "minecraft:snow",
+    "minecraft:stonecutter",
+    "minecraft:trapped_chest"
   ]
 }

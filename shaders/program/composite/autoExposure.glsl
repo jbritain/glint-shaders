@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -40,10 +41,11 @@ void main() {
 
   #ifdef AUTO_EXPOSURE
   float EV100 = autoEV100(averageLuminanceSmooth);
+  color *= calculateExposure(EV100 - EXPOSURE_COMPENSATION);
   #else
   float EV100 = manualEV100();
+  color *= calculateExposure(EV100);
   #endif
-  color *= calculateExposure(EV100 - EXPOSURE_COMPENSATION);
 
 }
 

@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -34,6 +35,7 @@ layout(location = 0) out vec3 color;
 #include "/lib/post/tonemap.glsl"
 #include "/lib/util/dither.glsl"
 #include "/lib/post/camera.glsl"
+#include "/lib/post/color.glsl"
 
 void main() {
   color = texture(colortex0, texcoord).rgb;
@@ -51,6 +53,7 @@ void main() {
   #endif
 
   color = tonemap(color);
+  color = grade(color);
 
 }
 

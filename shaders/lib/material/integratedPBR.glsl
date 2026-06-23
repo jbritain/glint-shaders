@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -35,27 +36,29 @@ void applyIntegratedPBR(inout Material material) {
   if (materialIsIron(material.id)) {
     material.roughness = pow2(luminance(material.albedo)) * 0.1;
     material.metalID = IRON;
-  }
-
-  if (materialIsGold(material.id)) {
+  } else if (materialIsGold(material.id)) {
     material.roughness = pow2(luminance(material.albedo)) * 0.1;
     material.metalID = GOLD;
-  }
-
-  if (materialIsCopper(material.id)) {
+  } else if (materialIsCopper(material.id)) {
     material.roughness = pow2(material.albedo.g);
     if (material.albedo.g < material.albedo.r) {
       material.metalID = COPPER;
     }
-  }
-
-  if (materialIsObsidian(material.id)) {
+  } else if (materialIsDiamond(material.id)) {
+    material.roughness = 0.0;
+    material.f0 = vec3(0.171);
+    material.subsurface = 1.0;
+  } else if (materialIsObsidian(material.id)) {
     material.roughness = material.albedo.r * 0.1 + 0.02;
-  }
-
-  if (materialIsIce(material.id)) {
+  } else if (materialIsIce(material.id)) {
     material.roughness = 0.0;
     material.f0 = vec3(0.02);
+  } else if (materialIsWool(material.id)) {
+    material.subsurface = 1.0;
+  } else if (materialIsSand(material.id)) {
+    material.subsurface = 1.0;
+  } else if (materialIsGlass(material.id)) {
+    material.roughness = 0.0;
   }
   #endif
 }

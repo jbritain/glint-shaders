@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -133,6 +134,12 @@ bool rayPlaneIntersection(
   point = cameraPosition + t * direction;
 
   return t >= 0;
+}
+
+vec3 intersectPlane(vec3 origin, vec3 dir, vec3 planeNormal, vec3 planePos) {
+  float t = dot(planePos - origin, planeNormal) / dot(planeNormal, dir);
+
+  return origin + t * dir;
 }
 
 // TODO: move this somewhere more sensible

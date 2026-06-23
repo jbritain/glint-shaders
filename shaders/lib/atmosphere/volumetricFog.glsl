@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -141,7 +142,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     shadowProjection
   );
 
-  float jitter = blueNoise(gl_FragCoord.xy, frameCounter).r;
+  vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).xy;
 
   float transmittance = 1.0;
   vec3 scattering = vec3(0.0);
@@ -151,7 +152,8 @@ vec4 getVolumetricFog(vec3 position, float depth) {
   vec3 previousRayPos = start;
 
   for (int i = 0; i < VOLUMETRIC_FOG_SAMPLES; i++) {
-    float progress = float(i + jitter) / float(VOLUMETRIC_FOG_SAMPLES);
+    float progress = float(i + jitter.x) / float(VOLUMETRIC_FOG_SAMPLES);
+    // progress = pow(progress, 1.0 / (jitter.y * 0.5 + 0.5));
     // progress = exp(5.0 * (progress - 1.0));
 
     vec3 rayPos = mix(start, end, progress);

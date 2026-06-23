@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2026 Josh Britain (jbritain)
-    Licensed under the MIT license
+    Licensed under a custom non-commercial license.
+    See LICENSE for full terms.
 
     ┏┓┓•   
     ┃┓┃┓┏┓╋
@@ -35,7 +36,7 @@ vec3 getSky(vec3 dir, bool includeSun) {
 }
 #elif defined WORLD_THE_END
 vec3 getSky(vec3 dir, bool includeSun) {
-  return getPulsar(dir, includeSun) + sampleGalaxy(dir);
+  return getPulsar(dir, includeSun) + sampleGalaxy(dir) * 10;
 }
 #else
 #include "/lib/atmosphere/atmosphere.glsl"
