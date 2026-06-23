@@ -1,0 +1,35 @@
+name: Build and Distribute Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  zip-release:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v2
+      - uses: vimtor/action-zip@v1.2
+        with:
+          files: LICENSE shaders/
+          dest: "Glint-${{ github.event.release.tag_name }}.zip"
+          recursive: false
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "Glint-${{ github.event.release.tag_name }}.zip"
+          asset_name: "Glint-${{ github.event.release.tag_name }}.zip"
+          tag: ${{ github.ref || github.event.release.tag_name }}
+      - uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          # Only include this section if you wish to publish
+          # your assets on Modrinth.
+          modrinth-id: FQST0Z8M
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          # curseforge-id: 1167533
+          # curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          files: "Glint-${{ github.event.release.tag_name }}.zip"
+          loaders: iris
+          game-versions: ">=1.21.11"
