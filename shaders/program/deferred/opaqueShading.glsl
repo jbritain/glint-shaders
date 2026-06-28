@@ -127,7 +127,7 @@ void main() {
     diffuse += gbuffer.lightmap.y * weatherSkylightColor * occlusion;
 
     #ifdef FLOODFILL
-    diffuse +=
+    vec3 floodfill = 
       sampleFloodfill(
         feetPlayerPos,
         gbuffer.geometryNormal,
@@ -137,6 +137,9 @@ void main() {
       ) *
       EMISSIVE_STRENGTH /
       16;
+  
+
+    diffuse += mix(vec3(gbuffer.lightmap.x * blocklightColor * occlusion), floodfill, floodfillFalloff(feetPlayerPos));
     #else
     diffuse += gbuffer.lightmap.x * blocklightColor * occlusion;
     #endif
@@ -158,8 +161,6 @@ void main() {
   );
 
   color.rgb += material.emission * material.albedo * EMISSIVE_STRENGTH;
-
-  // show(textureLod(shadowcolor2, texcoord, 0));
 }
 
 #endif

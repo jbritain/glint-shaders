@@ -85,6 +85,15 @@ ivec3 mapVoxelPos(vec3 playerPos) {
   );
 }
 
+float floodfillFalloff(vec3 playerPos) {
+  float falloff =
+    1.0 -
+    maxVec3(
+      linearstep(0.4 * VOXEL_MAP_SIZE, 0.5 * VOXEL_MAP_SIZE, abs(playerPos))
+    );
+  return falloff;
+}
+
 vec3 unmapVoxelPos(ivec3 voxelPos) {
   return vec3(voxelPos) - VOXEL_MAP_SIZE / 2 - cameraPositionFract;
 }

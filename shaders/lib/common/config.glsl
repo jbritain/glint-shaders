@@ -22,7 +22,7 @@ const int colortex30Format = RGB16UI;
 const int colortex31Format = RG32UI;
 
 const int shadowcolor1Format = RG8;
-const int shadowcolor2Format = R8;
+const int shadowcolor2Format = RGB32F;
 */
 
 const bool shadowHardwareFiltering = true;

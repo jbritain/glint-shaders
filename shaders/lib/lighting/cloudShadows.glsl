@@ -19,6 +19,7 @@
 #include "/lib/atmosphere/planarClouds.glsl"
 
 float getCloudShadow(vec3 rayPos) {
+  Clouds clouds = defaultClouds;
   float shadow = 1.0;
 
   rayPos += cameraPosition;
@@ -34,6 +35,7 @@ float getCloudShadow(vec3 rayPos) {
   ) {
     shadow = getVolumetricCloudTransmittanceToSun(
       rayPos,
+      clouds,
       worldLightDir,
       vec2(0.0)
     ).r;

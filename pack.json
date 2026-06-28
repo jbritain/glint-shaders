@@ -83,7 +83,15 @@
         ]
       }
     ],
-    "shadowcomp": [],
+    "shadowcomp": [
+      {
+        "path": "generateShadowMapCaustics",
+        "programs": [
+          "vsh",
+          "fsh"
+        ]
+      }
+    ],
     "deferred": [
       {
         "path": "accumHistory",
@@ -541,19 +549,22 @@
         "path": "SMAAEdgeWeights",
         "programs": [
           "csh"
-        ]
+        ],
+        "enabledBy": "(defined SMAA)"
       },
       {
         "path": "SMAABlendWeights",
         "programs": [
           "csh"
-        ]
+        ],
+        "enabledBy": "(defined SMAA)"
       },
       {
         "path": "SMAA",
         "programs": [
           "csh"
-        ]
+        ],
+        "enabledBy": "(defined SMAA)"
       }
     ]
   }

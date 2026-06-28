@@ -72,10 +72,6 @@ vec4 upsample(
     return vec4(0.0);
   }
 
-  // color = texture(undersampled, centrePos.xy);
-
-  // show(color.rgb * 100 / totalWeight);
-
   return color / totalWeight;
 }
 

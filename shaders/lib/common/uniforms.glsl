@@ -190,11 +190,10 @@ uniform sampler3D floodfillVoxelMapTex2;
 
 uniform sampler3D lowFrequencyCloudNoiseTex;
 uniform sampler3D highFrequencyCloudNoiseTex;
-uniform sampler2D cloudCoverageTex;
+uniform sampler2D cloudCoverageTex1;
+uniform sampler2D cloudCoverageTex2;
+uniform sampler2D cloudProfileTex;
 
-uniform sampler3D cloudshapetex;
-uniform sampler3D clouddetailtex;
-uniform sampler2D cloudcoveragetex;
 uniform sampler2D vanillacloudtex;
 
 #endif // UNIFORMS_GLSL

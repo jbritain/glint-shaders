@@ -42,7 +42,7 @@ void voxy_emitFragment(VoxyFragmentParameters params) {
   material.id = params.customId;
   applyIntegratedPBR(material);
 
-  gbuffer.lightmap = params.lightMap;
+  gbuffer.lightmap = pow3(params.lightMap);
   // gbuffer.lightmap = applyLightmapFalloff(gbuffer.lightmap);
 
   gbufferData = packGbuffer(gbuffer);

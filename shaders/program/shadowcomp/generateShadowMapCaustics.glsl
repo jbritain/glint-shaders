@@ -34,23 +34,23 @@ in vec2 texcoord;
 layout(location = 0) out vec2 caustics;
 
 void main() {
-  vec3 originalPosAndCaustics = texture(shadowcolor2, texcoord).xyz;
-  vec2 trueCoord = originalPosAndCaustics.yz * 2.0 - 1.0;
+  vec3 originalPosAndWaterMask = texture(shadowcolor2, texcoord).xyz;
+  vec2 trueCoord = originalPosAndWaterMask.yz * 2.0 - 1.0;
 
-  // check if any surrounding texels have water to decide whether we generate caustics
-  const int radius = 5;
-  bool doCaustics = false;
-  for (int x = -radius; x < radius; x++) {
-    for (int y = -radius; y < radius; y++) {
-      if (
-        texelFetch(shadowcolor2, ivec2(gl_FragCoord.xy) + ivec2(x, y), 0).x >
-        0.5
-      ) {
-        doCaustics = true;
-        break;
-      }
-    }
-  }
+  // // check if any surrounding texels have water to decide whether we generate caustics
+  // const int radius = 5;
+  // bool doCaustics = false;
+  // for (int x = -radius; x < radius; x++) {
+  //   for (int y = -radius; y < radius; y++) {
+  //     if (
+  //       texelFetch(shadowcolor2, ivec2(gl_FragCoord.xy) + ivec2(x, y), 0).x >
+  //       0.5
+  //     ) {
+  //       doCaustics = true;
+  //       break;
+  //     }
+  //   }
+  // }
 
   // if (!doCaustics) {
   //   return;
@@ -76,9 +76,15 @@ void main() {
     1.0
   );
 
-  caustics.x = originalPosAndCaustics.x;
-  vec3 halfwayVector = normalize(vec3(0.0, 1.0, 0.0) + worldLightDir);
-  caustics.y = pow(dot(normal, halfwayVector), 32);
+  vec3 oldPos = feetPlayerPos - worldLightDir * blockerDistance;
+  vec3 refractedDir = refract(-worldLightDir, normal, 1.0 / 1.333);
+  vec3 newPos = feetPlayerPos + refractedDir * blockerDistance;
+
+  float oldArea = length(cross(dFdx(oldPos), dFdy(oldPos)));
+  float newArea = length(cross(dFdx(newPos), dFdy(newPos)));
+
+  caustics.x = originalPosAndWaterMask.x;
+  caustics.y = clamp01(oldArea / newArea * 0.2);
 
 }
 

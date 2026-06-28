@@ -61,8 +61,6 @@ void main() {
     );
   }
 
-  // show(color);
-
 }
 
 #endif

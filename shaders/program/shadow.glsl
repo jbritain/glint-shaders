@@ -27,6 +27,7 @@ out vec2 texcoord;
 out vec4 glcolor;
 out vec3 normal;
 out vec3 shadowViewPos;
+out vec2 originalPos;
 
 flat out uint materialID;
 
@@ -36,7 +37,16 @@ void main() {
   gl_Position = ftransform();
 
   shadowViewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
-  materialID = uint(mc_Entity.x);
+  if (
+    renderStage == MC_RENDER_STAGE_TERRAIN_SOLID ||
+    renderStage == MC_RENDER_STAGE_TERRAIN_CUTOUT ||
+    renderStage == MC_RENDER_STAGE_TERRAIN_TRANSLUCENT
+  ) {
+    materialID = uint(mc_Entity.x);
+  } else {
+    materialID = 0;
+  }
+
   vec3 worldNormal = mat3(shadowModelViewInverse) * normal;
 
   vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
@@ -99,6 +109,7 @@ void main() {
   }
   #endif
 
+  originalPos = screenPos.xy;
   screenPos.xy += getWarp(screenPos.xy);
   gl_Position.xyz = screenPos * 2.0 - 1.0;
 
@@ -116,6 +127,7 @@ in vec2 texcoord;
 in vec4 glcolor;
 in vec3 normal;
 in vec3 shadowViewPos;
+in vec2 originalPos;
 
 flat in uint materialID;
 
@@ -124,7 +136,7 @@ flat in uint materialID;
 /* RENDERTARGETS: 0,1,2 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec2 encodedNormal;
-layout(location = 2) out float waterMask;
+layout(location = 2) out vec3 originalPosAndWaterMask;
 
 void main() {
   vec3 normal = normal;
@@ -133,12 +145,10 @@ void main() {
     discard;
   }
 
-  waterMask = 0.0;
-
-  ;
+  originalPosAndWaterMask = vec3(0.0, originalPos * 0.5 + 0.5);
 
   if (materialIsWater(materialID)) {
-    waterMask = 1.0;
+    originalPosAndWaterMask.r = 1.0;
     float blockerDistance =
       texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r -
       gl_FragCoord.z;

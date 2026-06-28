@@ -127,7 +127,7 @@ void main() {
     material.albedo *
     (1.0 + (1.0 - cloudShadow));
   #ifdef FLOODFILL
-  color.rgb +=
+  vec3 floodfill =
     sampleFloodfill(
       feetPlayerPos,
       gbuffer.geometryNormal,
@@ -135,9 +135,16 @@ void main() {
       material.subsurface,
       gbuffer.lightmap.x
     ) *
-    material.albedo *
     EMISSIVE_STRENGTH /
     16;
+
+  color.rgb +=
+    mix(
+      vec3(gbuffer.lightmap.x * blocklightColor),
+      floodfill,
+      floodfillFalloff(feetPlayerPos)
+    ) *
+    material.albedo;
   #else
   color.rgb += gbuffer.lightmap.x * blocklightColor * material.albedo;
   #endif

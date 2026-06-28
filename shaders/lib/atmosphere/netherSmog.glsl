@@ -29,7 +29,7 @@ float getNetherSmogDensity(vec3 pos) {
     0.8,
     1.0,
     texture(
-      cloudshapetex,
+      lowFrequencyCloudNoiseTex,
       fract(pos / vec3(200, 50, 200) + vec3(frameTimeCounter * 0.01, 0.0, 0.0))
     ).r
   ) +

@@ -51,8 +51,6 @@ void main() {
   #endif
 
   weight *= getMeteringWeight(texcoord);
-  // show(weight);
-  // show(getMeteringWeight(texcoord));
 
   color.a = weight;
 }

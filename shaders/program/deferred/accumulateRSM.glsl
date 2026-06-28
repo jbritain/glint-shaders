@@ -60,7 +60,6 @@ void main() {
   vec3 previousGI = texture(colortex9, previousPos.xy).rgb;
   globalIllumination =
     (previousGI * frameCount + globalIllumination) / (frameCount + 1);
-  // show(globalIllumination * 100);
 }
 
 #endif

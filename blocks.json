@@ -90,6 +90,7 @@
   ],
   "lets light through": [
     "%minecraft:slabs",
+    "%minecraft:signs",
     "minecraft:barrier",
     "minecraft:beacon",
     "minecraft:azalea",

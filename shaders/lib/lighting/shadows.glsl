@@ -57,7 +57,7 @@ vec3 sampleShadowPCF(
     shadow += sampleShadow(offsetPos);
     causticWeight += texture(shadowcolor2, offsetPos.xy).x;
   }
-  causticWeight /= SHADOW_PCF_SAMPLES;
+  // causticWeight /= SHADOW_PCF_SAMPLES;
   return shadow / SHADOW_PCF_SAMPLES;
 }
 
@@ -79,7 +79,7 @@ float getBlockerDistance(
     offsetPos.xy += getWarp(offsetPos.xy);
     float blockerDistance = max(
       0.0,
-      offsetPos.z - texture(shadowtex1, offsetPos.xy).r
+      offsetPos.z - texture(shadowtex0, offsetPos.xy).r
     );
 
     blockerDistanceSum += blockerDistance;
@@ -148,12 +148,11 @@ vec3 getShadow(
         vec3(0.0, 1.0, 0.0),
         1.0
       );
-      vec3 halfwayVector = normalize(vec3(0.0, 1.0, 0.0) + worldLightDir);
-      float caustics = pow(
-        dot(waveNormal, halfwayVector),
-        blockerDistance * shadowRange * 4
-      );
-      shadow *= mix(1.0, caustics, causticWeight);
+      float caustics = texture(
+        shadowcolor2,
+        shadowScreenPos.xy + getWarp(shadowScreenPos.xy)
+      ).g;
+      shadow *= mix(1.0, caustics, clamp01(causticWeight));
     }
 
     #endif

@@ -118,13 +118,15 @@ DEFINE_genVType(facos_)
 #define GREEN vec3(0.0, 1.0, 0.0)
 #define BLUE vec3(0.0, 0.0, 1.0)
 
+#define linearstep(edge0, edge1, x) (clamp01((x - edge0) / (edge1 - edge0)))
+
 float luminance(vec3 color) {
   return dot(color, vec3(0.2126, 0.7152, 0.0722));
 }
 
-float linearstep(float edge0, float edge1, float x) {
-  return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-}
+// float linearstep(float edge0, float edge1, float x) {
+//   return ;
+// }
 
 vec3 hsv(vec3 c) {
   const vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);

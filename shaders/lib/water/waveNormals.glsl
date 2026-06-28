@@ -75,7 +75,7 @@ vec2 gerstnerDeriv(
 float waveHeight(vec2 pos) {
   float noise = texture(
     perlinnoisetex,
-    fract((pos + vec2(worldTimeCounter * 2.0 - 1.0) * 0.2) / 200.0)
+    fract((pos + vec2(frameTimeCounter * 2.0 - 1.0) * 0.2) / 200.0)
   ).r;
 
   float height = 0.0;
@@ -90,7 +90,7 @@ float waveHeight(vec2 pos) {
       dir,
       wavelength,
       amplitude,
-      worldTimeCounter * 0.5 + noise * 10,
+      frameTimeCounter * 0.5 + noise * 10,
       WAVE_STEEPNESS
     );
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;
@@ -104,7 +104,7 @@ float waveHeight(vec2 pos) {
 vec2 waveHeightDeriv(vec2 pos) {
   float noise = texture(
     perlinnoisetex,
-    fract((pos + vec2(worldTimeCounter * 2.0 - 1.0) * 0.2) / 200.0)
+    fract((pos + vec2(frameTimeCounter * 2.0 - 1.0) * 0.2) / 200.0)
   ).r;
 
   vec2 grad = vec2(0.0);
@@ -119,7 +119,7 @@ vec2 waveHeightDeriv(vec2 pos) {
       dir,
       wavelength,
       amplitude,
-      worldTimeCounter * 0.5 + noise * 10,
+      frameTimeCounter * 0.5 + noise * 10,
       WAVE_STEEPNESS
     );
     wavelength *= WAVE_WAVELENGTH_MULTIPLIER;

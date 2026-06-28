@@ -163,37 +163,29 @@ void main() {
   // https://jcgt.org/published/0015/01/03/
   
   vec2 sampleCoord = texcoord;
+  float sampleDepth;
+  vec3 refractedViewPos = opaqueViewPos;
   for(int i = 0; i < 4; i++){
-    float sampleDepth = texture(depthtex1, sampleCoord).r;
+    sampleDepth = texture(depthtex1, sampleCoord).r;
     vec3 sampleNormal = mat3(gbufferModelView) * unpackGbuffer(texture(colortex1, sampleCoord).rgb).geometryNormal;
     vec3 samplePos = screenSpaceToViewSpace(vec3(sampleCoord, sampleDepth));
-    refractedPos = viewSpaceToScreenSpace(intersectPlane(translucentViewPos, refractedDir, sampleNormal, samplePos));
+    refractedViewPos = intersectPlane(translucentViewPos, refractedDir, sampleNormal, samplePos);
+    refractedPos = viewSpaceToScreenSpace(refractedViewPos);
     sampleCoord = refractedPos.xy;
   }
-  opaqueViewPos = translucentViewPos + refractedDir * refractedRayLength;
 
-  // if (
-  //   !rayIntersects(
-  //     translucentViewPos,
-  //     refractedDir,
-  //     NEWTON_REFRACTION_STEPS,
-  //     interleavedGradientNoise(floor(gl_FragCoord.xy), frameCounter),
-  //     true,
-  //     refractedPos,
-  //     depthtex1,
-  //     0,
-  //     gbufferProjection
-  //   )
-  // ) {
-  //   refractedPos = vec3(-1.0);
-  // } else {
-  //   opaqueViewPos = screenSpaceToViewSpace(refractedPos);
-  // }
+    if(sampleDepth <= translucentDepth){
+      opaqueViewPos = refractedViewPos;
+    } else {
+      refractedPos = vec3(-1);
+    }
 
   #else
+
   opaqueViewPos = translucentViewPos + refractedDir * refractedRayLength;
   vec3 refractedPos = viewSpaceToScreenSpace(opaqueViewPos);
   #endif
+  
   float refractedDepth = texture(depthtex1, refractedPos.xy).r;
   if (clamp01(refractedPos) == refractedPos && refractedDepth != 1.0) {
     if (refractedDepth > translucentDepth) {

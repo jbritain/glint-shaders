@@ -298,6 +298,7 @@
         "key": "NEWTON_REFRACTION",
         "defaults": {
           "*": false,
+          "high": true,
           "ultra": true
         },
         "description": "Uses scene data to find the correct refraction intersection point."
@@ -305,7 +306,7 @@
       "High Quality Refraction Steps": {
         "key": "NEWTON_REFRACTION_STEPS",
         "default": "4",
-        "values": "{frange(4, 17, 1)}"
+        "values": "[4 5 6 7 8 9 10 11 12 13 14 15 16]"
       }
     },
     "Albedo Metal Tint": {
@@ -396,7 +397,7 @@
       },
       "Volumetric Cloud Primary Samples": {
         "key": "VOLUMETRIC_CLOUDS_PRIMARY_SAMPLES",
-        "default": "32"
+        "default": "128"
       },
       "Volumetric Cloud Secondary Samples": {
         "key": "VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES",
