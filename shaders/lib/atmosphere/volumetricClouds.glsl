@@ -261,16 +261,16 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     transmittance *= sampleTransmittance;
   }
 
-  // apply aerial perspective to clouds
-  if (hasHitStart) {
-    // fuck it - random density value
-    // the assumption here is that any clouds far enough away to have aerial perspective
-    // applied to them are unlikely to have any terrain behind them
-    // so we can just fade them out into the sky
-    float atmoTransmittance = exp(-length(position) * 5e-5);
-    scattering *= atmoTransmittance;
-    transmittance = mix(1.0, transmittance, atmoTransmittance);
-  }
+  // // apply aerial perspective to clouds
+  // if (hasHitStart) {
+  //   // fuck it - random density value
+  //   // the assumption here is that any clouds far enough away to have aerial perspective
+  //   // applied to them are unlikely to have any terrain behind them
+  //   // so we can just fade them out into the sky
+  //   float atmoTransmittance = exp(-length(position) * 5e-5);
+  //   scattering *= atmoTransmittance;
+  //   transmittance = mix(1.0, transmittance, atmoTransmittance);
+  // }
 
   return vec4(scattering, transmittance);
 }

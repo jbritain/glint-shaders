@@ -19,7 +19,7 @@
 layout(local_size_x = 8, local_size_y = 8) in;
 const ivec3 workGroups = ivec3(128, 128, 1);
 
-layout(r8) uniform image2D cloudCoverage;
+layout(rg8) uniform image2D cloudCoverage;
 
 void main() {
   vec3 texcoord = vec3(gl_GlobalInvocationID.xy / 1024.0, 0.0);

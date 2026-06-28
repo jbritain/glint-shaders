@@ -190,9 +190,10 @@ uniform sampler3D floodfillVoxelMapTex2;
 
 uniform sampler3D lowFrequencyCloudNoiseTex;
 uniform sampler3D highFrequencyCloudNoiseTex;
-uniform sampler2D cloudCoverageTex1;
-uniform sampler2D cloudCoverageTex2;
-uniform sampler2D cloudProfileTex;
+// uniform sampler2D cloudCoverageTex1;
+// uniform sampler2D cloudCoverageTex2;
+uniform sampler2D cloudCoverageTex;
+// uniform sampler2D cloudProfileTex;
 
 uniform sampler2D vanillacloudtex;
 
