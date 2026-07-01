@@ -1,5 +1,4 @@
 import json
-import fsspec
 import os
 import shutil
 import re
@@ -19,6 +18,8 @@ all_dimensions = {"OVERWORLD": "world0", "THE_NETHER": "world-1", "THE_END": "wo
 def download_tags():
     path = f"./tags/{minecraft_version}.json"
     if not os.path.exists(path):
+        if not os.path.exists("./tags"):
+            os.mkdir("./tags")
         urllib.request.urlretrieve(
             f"https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/{minecraft_version}/data/minecraft/tags/block/_all.json",
             path,

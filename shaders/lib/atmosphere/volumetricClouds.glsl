@@ -127,12 +127,10 @@ vec2 getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
     previousSamplePos = samplePos;
   }
 
-  float beers = exp(-density * cloudExtinction);
-  // float powder = (1.0 - exp(-0.001 * density * cloudExtinction)) * 500;
-  // return beers;
-  // return powder;
-  return vec2(beers, exp(-density * cloudExtinction * 0.3));
-  // return 4.0 * (1.0 - exp(-2.0 * density * cloudExtinction));
+  return vec2(
+    exp(-density * cloudExtinction), // direct transmittance
+    exp(-density * cloudExtinction * 0.3) // multiple scattering transmittance
+  );
 }
 
 vec4 getVolumetricClouds(inout vec3 position, bool sky) {
@@ -235,22 +233,18 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
       worldLightDir,
       jitter.yz
     );
-    vec3 radiance = sunlightColor * transmittanceToSun.x * phase;
+    vec3 radiance = sunlightColor * transmittanceToSun.x * phase * 2;
 
     // ambient scattering
-    radiance += skylightColor * pow2(1.0 - density) * isotropicPhase * 10.0;
+    radiance += skylightColor * pow2(1.0 - density); // no isotropic phase because it comes from every direction which cancels out
 
     // multiple scattering
     float fMS =
-      (1.0 - exp(-0.5 * density * cloudExtinction * stepLength)) *
+      (1.0 - exp(-1000.0 * density * cloudExtinction)) *
       cloudScattering /
       cloudExtinction;
 
-    fMS = pow(fMS, 1.5);
-
-    fMS *= 6.0;
-
-    radiance += fMS * sunlightColor * transmittanceToSun.y * msPhase;
+    radiance += fMS * sunlightColor * transmittanceToSun.y * msPhase * 2;
 
     scattering +=
       transmittance *

@@ -162,12 +162,12 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     vec3 shadowRayPos = mix(shadowStart, shadowEnd, progress);
     shadowRayPos.xy += getWarp(shadowRayPos.xy);
 
-    float density = getFogDensity(rayPos) * stepLength;
+    float density = getFogDensity(rayPos);
     if (density == 0.0) {
       continue;
     }
 
-    float sampleTransmittance = exp(-density * fogExtinction);
+    float sampleTransmittance = exp(-density * stepLength * fogExtinction);
 
     float shadow =
       shadowRayPos == clamp01(shadowRayPos)
