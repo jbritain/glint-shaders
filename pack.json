@@ -17,7 +17,9 @@
       "skytextured": "discard",
       "skybasic": "discard",
       "voxels": "voxels",
-      "weather": "translucent"
+      "weather": "translucent",
+      "lightning": "glowing",
+      "spidereyes": "glowing"
     },
     "setup": [
       {

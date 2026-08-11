@@ -104,7 +104,7 @@ void main() {
       ) *
       sunlightColor *
       cloudShadow;
-    diffuse += subsurfaceScattering;
+    diffuse += subsurfaceScattering * occlusion;
 
     float reflectiveCaustics = sampleReflectiveCaustics(feetPlayerPos, gbuffer.geometryNormal);
     diffuse += reflectiveCaustics * sunlightColor;

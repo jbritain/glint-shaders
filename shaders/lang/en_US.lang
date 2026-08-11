@@ -182,3 +182,5 @@ screen.Miscellaneous = Miscellaneous
 option.DEBUG_ENABLE = Debug Mode
 screen.Debugging = Debugging
 option.WHITE_WORLD = White World
+option.EVERYTHING_CHROME.comment = ...in the future
+option.EVERYTHING_CHROME = Everything is Chrome...

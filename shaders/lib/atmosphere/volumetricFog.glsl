@@ -196,7 +196,6 @@ vec4 getVolumetricFog(vec3 position, float depth) {
     radiance +=
       sampleFloodfill(rayPos - cameraPosition) *
       EMISSIVE_STRENGTH *
-      isotropicPhase /
       16;
     #endif
 

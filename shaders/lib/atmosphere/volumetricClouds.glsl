@@ -20,10 +20,9 @@
 #include "/lib/util/phaseFunctions.glsl"
 #include "/lib/util/misc.glsl"
 #include "/lib/util/perlinNoise.glsl"
+#include "/lib/atmosphere/atmosphericFog.glsl"
 
-const float cloudScattering = 0.2;
-const float cloudAbsorption = 0.0;
-const float cloudExtinction = cloudScattering + cloudAbsorption;
+const float cloudExtinction = 0.2;
 
 const vec2 windDir = vec2(0.0, 1.0);
 const float windSpeed = 10;
@@ -37,10 +36,10 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
 
   vec2 coverageCoord = fract(rayPos.xz / 200000 + 0.5);
   vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
-  float coverage = linearstep(0.5 - 0.2 * wetness, 0.7, coverageData.r);
+  float coverage = linearstep(0.5 * (1.0 - wetness), 0.7, coverageData.r);
 
   float cloudHeight = coverageData.g;
-  cloudHeight = mix(cloudHeight, 1.0, wetness);
+  // cloudHeight = mix(cloudHeight, 1.0, wetness);
   float topAltitude =
     (VOLUMETRIC_CLOUDS_TOP_ALTITUDE - VOLUMETRIC_CLOUDS_BASE_ALTITUDE) *
       cloudHeight +
@@ -63,7 +62,7 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
   heightInPlane /= 2.0;
 
   float heightFade =
-    linearstep(0.0, 0.15, heightInPlane) *
+    sqrt(linearstep(0.0, 0.15, heightInPlane)) *
     pow2(1.0 - linearstep(0.15, 1.2, heightInPlane));
 
   coverage *= pow2(heightFade);
@@ -96,19 +95,16 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
 
   density *= coverage;
 
-  density *= 1.0 + wetness;
+  density *= 1.0;
   return density * VOLUMETRIC_CLOUDS_DENSITY;
 }
 
-vec2 getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
-  vec3 jitterDir = unmapSphere(jitter);
-  dir = normalize(dir + jitterDir * 0.02);
-
+float getVolumetricCloudOpticalDepth(vec3 start, vec3 dir, float jitter) {
   vec3 a = start;
   vec3 b;
   if (!rayPlaneIntersection(a, dir, VOLUMETRIC_CLOUDS_TOP_ALTITUDE, b)) {
     if (!rayPlaneIntersection(a, dir, VOLUMETRIC_CLOUDS_BASE_ALTITUDE, b)) {
-      return vec2(1.0);
+      return 1.0;
     }
   }
 
@@ -117,7 +113,7 @@ vec2 getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
   vec3 previousSamplePos = a;
   for (int i = 0; i < VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES; i++) {
     float progress =
-      (float(i) + jitter.x) / float(VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES);
+      (float(i) + jitter) / float(VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES);
     vec3 samplePos = mix(a, b, exp(5.0 * (progress - 1.0)));
 
     density +=
@@ -127,10 +123,7 @@ vec2 getVolumetricCloudTransmittanceToSun(vec3 start, vec3 dir, vec2 jitter) {
     previousSamplePos = samplePos;
   }
 
-  return vec2(
-    exp(-density * cloudExtinction), // direct transmittance
-    exp(-density * cloudExtinction * 0.3) // multiple scattering transmittance
-  );
+  return density;
 }
 
 vec4 getVolumetricClouds(inout vec3 position, bool sky) {
@@ -175,13 +168,13 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     end = swap;
   }
 
-  // limit ray length if inside cloud plane
-  if (start == cameraPosition && distance(cameraPosition, end) > 10000) {
-    end = start + dir * 10000;
-  }
+  // // limit ray length if inside cloud plane
+  // if (start == cameraPosition && distance(cameraPosition, end) > 10000) {
+  //   end = start + dir * 10000;
+  // }
 
   if (!sky) {
-    // if terrain is closer than entry point, don't both
+    // if terrain is closer than entry point, don't bother
     if (distance(cameraPosition, start) > length(position)) {
       return vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -205,10 +198,25 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
 
   float VoL = dot(dir, worldLightDir);
   float phase = hgDraine(11, VoL);
-  float msPhase = isotropicPhase;
+  // float msPhase = isotropicPhase;
+
+  #define CLOUD_SCATTERING_OCTAVES 4
+  #define CLOUD_SCATTERING_ATTENUATION 0.99
+  #define CLOUD_SCATTERING_CONTRIBUTION 0.99
+  #define CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION 0.5
+
+  float scatteringPhases[CLOUD_SCATTERING_OCTAVES];
+  float eccentricity = CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION;
+  for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
+    scatteringPhases[i] = henyeyGreenstein(eccentricity, VoL);
+    eccentricity *= eccentricity;
+  }
 
   bool hasHitStart = false;
   position = mix(start, end, 0.5) - cameraPosition;
+
+  float summedTransmittance = 0.0;
+  float summedDepth = 0.0;
 
   for (
     int i = 0;
@@ -228,43 +236,64 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     }
 
     // single scattering
-    vec2 transmittanceToSun = getVolumetricCloudTransmittanceToSun(
+    float densityToSun = getVolumetricCloudOpticalDepth(
       rayPos,
-      worldLightDir,
-      jitter.yz
+      normalize(worldLightDir + unmapSphere(jitter.yz) * 0.02),
+      jitter.y
     );
-    vec3 radiance = sunlightColor * transmittanceToSun.x * phase * 2;
-
-    // ambient scattering
-    radiance += skylightColor * pow2(1.0 - density); // no isotropic phase because it comes from every direction which cancels out
+    vec3 radiance =
+      sunlightColor *
+      exp(-densityToSun * cloudExtinction * vec3(0.85, 0.9, 1.0)) *
+      phase;
 
     // multiple scattering
-    float fMS =
-      (1.0 - exp(-1000.0 * density * cloudExtinction)) *
-      cloudScattering /
-      cloudExtinction;
+    vec3 contribution = vec3(CLOUD_SCATTERING_CONTRIBUTION); // * vec3(0.85, 0.9, 1.0); // slowly tint the clouds a bit blue with the scattering
+    float attenuation = CLOUD_SCATTERING_ATTENUATION;
+    for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
+      radiance +=
+        sunlightColor *
+        exp(-densityToSun * cloudExtinction * attenuation) *
+        scatteringPhases[i] *
+        contribution;
+      contribution *= contribution;
+      attenuation *= attenuation;
+    }
 
-    radiance += fMS * sunlightColor * transmittanceToSun.y * msPhase * 2;
+    // // ambient scattering
+    // float densityToSky = getVolumetricCloudOpticalDepth(
+    //   rayPos,
+    //   vec3(0.0, 1.0, 0.0),
+    //   jitter.y
+    // );
+    radiance += skylightColor * PI; // * exp(-densityToSky * cloudExtinction) * PI;
+
+    summedDepth += transmittance * stepLength * i;
+    summedTransmittance += transmittance;
+
+    if (lightningBoltPosition.w > 0.0) {
+      float distanceToLightning = distance(
+        rayPos.xz,
+        lightningBoltPosition.xz + cameraPosition.xz
+      );
+      radiance +=
+        vec3(0.8, 0.5, 1.0) *
+        10000000 *
+        exp(-distanceToLightning * cloudExtinction * density * stepLength);
+    }
 
     scattering +=
-      transmittance *
-      (radiance *
-        (1.0 - saturate(sampleTransmittance)) *
-        cloudScattering /
-        cloudExtinction);
+      transmittance * (radiance * (1.0 - saturate(sampleTransmittance)));
     transmittance *= sampleTransmittance;
   }
 
-  // // apply aerial perspective to clouds
-  // if (hasHitStart) {
-  //   // fuck it - random density value
-  //   // the assumption here is that any clouds far enough away to have aerial perspective
-  //   // applied to them are unlikely to have any terrain behind them
-  //   // so we can just fade them out into the sky
-  //   float atmoTransmittance = exp(-length(position) * 5e-5);
-  //   scattering *= atmoTransmittance;
-  //   transmittance = mix(1.0, transmittance, atmoTransmittance);
-  // }
+  float meanDepthWeightedTransmittance = summedDepth / summedTransmittance;
+  vec3 fogPos = mapAerialPerspectivePos(
+    mat3(gbufferModelView) * dir * meanDepthWeightedTransmittance
+  );
+  vec4 fog = texture(aerialPerspectiveLUTTex, clamp01(fogPos));
+  scattering *= fog.a;
+  scattering += fog.rgb;
+  transmittance *= fog.a;
 
   return vec4(scattering, transmittance);
 }

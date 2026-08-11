@@ -77,12 +77,6 @@ vec3 raymarchScattering(
     vec3 mieInScattering =
       mieScattering * (miePhaseValue * sunTransmittance + psiMS);
 
-    rayleighScattering *= ATMOSPHERIC_FOG_STRENGTH;
-    mieScattering *= ATMOSPHERIC_FOG_STRENGTH;
-    rayleighInScattering *= ATMOSPHERIC_FOG_STRENGTH;
-    mieInScattering *= ATMOSPHERIC_FOG_STRENGTH;
-    // extinction *= ATMOSPHERIC_FOG_STRENGTH;
-
     vec3 inScattering = rayleighInScattering + mieInScattering;
 
     // Integrated scattering within path segment.

@@ -186,22 +186,14 @@ vec3 getValFromSkyLUT(vec3 rayDir) {
 vec3 mapAerialPerspectivePos(vec3 viewPos) {
   vec3 pos;
   pos.xy = viewSpaceToScreenSpace(viewPos).xy;
-  #ifdef VOXY
-  pos.z = clamp01(abs(viewPos.z) / vxRenderDistance);
-  #else
-  pos.z = clamp01(abs(viewPos.z) / far);
-  #endif
+  pos.z = clamp01(abs(viewPos.z) / 32000);
   return pos;
 }
 
 vec3 unmapAerialPerspectivePos(vec3 pos) {
   vec3 viewPos;
   viewPos.xy = screenSpaceToViewSpace(pos).xy;
-  #ifdef VOXY
-  viewPos.z = -abs(pos.z) * vxRenderDistance;
-  #else
-  viewPos.z = -abs(pos.z) * far;
-  #endif
+  viewPos.z = -abs(pos.z) * 32000;
   return viewPos;
 }
 

@@ -60,6 +60,11 @@ void applyIntegratedPBR(inout Material material) {
   } else if (materialIsGlass(material.id)) {
     material.roughness = 0.0;
   }
+
+  #ifdef EVERYTHING_CHROME
+  material.roughness = 0.0;
+  material.metalID = CHROME;
+  #endif
   #endif
 }
 

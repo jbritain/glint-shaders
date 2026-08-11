@@ -198,7 +198,7 @@
       },
       "Emissive Strength": {
         "key": "EMISSIVE_STRENGTH",
-        "default": 1000,
+        "default": 1000.0,
         "values": "{frange(0, 2100, 100)}"
       },
       "Blocklight Color R": {
@@ -320,7 +320,7 @@
       },
       "Atmospheric Fog Strength": {
         "key": "ATMOSPHERIC_FOG_STRENGTH",
-        "default": 20.0,
+        "default": 2.0,
         "values": "{frange(1.0, 40.0, 1.0)}"
       }
     },
@@ -346,7 +346,7 @@
         },
         "Evening": {
           "key": "VOLUMETRIC_FOG_DENSITY_EVENING",
-          "default": "0.0",
+          "default": "0.001",
           "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Night": {
@@ -397,7 +397,7 @@
       },
       "Volumetric Cloud Primary Samples": {
         "key": "VOLUMETRIC_CLOUDS_PRIMARY_SAMPLES",
-        "default": "128"
+        "default": "32"
       },
       "Volumetric Cloud Secondary Samples": {
         "key": "VOLUMETRIC_CLOUDS_SECONDARY_SAMPLES",
@@ -405,7 +405,7 @@
       },
       "Volumetric Cloud Density": {
         "key": "VOLUMETRIC_CLOUDS_DENSITY",
-        "default": "1.0"
+        "default": "0.4"
       },
       "Volumetric Cloud Base Altitude": {
         "key": "VOLUMETRIC_CLOUDS_BASE_ALTITUDE",
@@ -734,6 +734,11 @@
     "White World": {
       "key": "WHITE_WORLD",
       "default": false
+    },
+    "Everything is Chrome...": {
+      "key": "EVERYTHING_CHROME",
+      "default": false,
+      "description": "...in the future"
     }
   }
 }

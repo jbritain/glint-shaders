@@ -62,25 +62,20 @@ void main() {
   // uint frameCount = min(texture(colortex11, texcoord).r, RSM_MAX_FRAMES);
   // clouds = (previousClouds * frameCount + clouds) / (frameCount + 1);
 
-  if (depth == 1.0) {
-    vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
-    previousPos = transformView(previousPos, gbufferPreviousModelView);
-    previousPos = viewSpaceToScreenSpace(
-      previousPos,
-      gbufferPreviousProjection
-    );
-    vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
-    float previousZ = screenSpaceToViewSpace(
-      texture(colortex5, previousPos.xy).a
-    );
-    if (
-      saturate(previousPos.xy) == previousPos.xy &&
-      abs(viewPos.z - previousZ) < 0.1
-    ) {
-      clouds = previousClouds;
-    } else {
-      clouds = texture(colortex14, texcoord);
-    }
+  vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
+  previousPos = transformView(previousPos, gbufferPreviousModelView);
+  previousPos = viewSpaceToScreenSpace(previousPos, gbufferPreviousProjection);
+  vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
+  float previousZ = screenSpaceToViewSpace(
+    texture(colortex5, previousPos.xy).a
+  );
+  if (
+    saturate(previousPos.xy) == previousPos.xy &&
+    abs(viewPos.z - previousZ) < 0.1
+  ) {
+    clouds = previousClouds;
+  } else if (depth == 1.0) {
+    clouds = texture(colortex14, texcoord);
   }
 
   if (

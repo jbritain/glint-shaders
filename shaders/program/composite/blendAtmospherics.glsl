@@ -35,6 +35,7 @@ layout(location = 0) out vec4 color;
 #include "/lib/atmosphere/volumetricClouds.glsl"
 #include "/lib/atmosphere/atmosphericFog.glsl"
 #include "/lib/util/upsample.glsl"
+#include "/lib/atmosphere/rainbows.glsl"
 
 void main() {
   color = texture(colortex0, texcoord);
@@ -84,6 +85,8 @@ void main() {
 
     #endif
   }
+
+  color.rgb += getRainbow(viewPos);
 
 }
 

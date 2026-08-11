@@ -32,11 +32,11 @@ float getCloudShadow(vec3 rayPos) {
       rayPos
     )
   ) {
-    shadow = getVolumetricCloudTransmittanceToSun(
+    shadow = exp(-cloudExtinction * getVolumetricCloudOpticalDepth(
       rayPos,
       worldLightDir,
-      vec2(0.0)
-    ).r;
+      0.0
+    ).r);
   }
   #endif
 

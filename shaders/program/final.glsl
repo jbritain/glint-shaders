@@ -65,7 +65,6 @@ void main() {
   #ifdef DEBUG_ENABLE
   if (hideGUI) {
     color = texture(debugtex, texcoord).rgb;
-    color = 1.0 - texture(highFrequencyCloudNoiseTex, vec3(texcoord, 0.5)).rrr;
   }
   printString((_D, _e, _b, _u, _g, _space, _m, _o, _d, _e, _space, _i, _s, _space, _a, _c, _t, _i, _v, _e));
   if (!hideGUI) {

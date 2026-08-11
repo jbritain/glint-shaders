@@ -174,7 +174,7 @@ void main() {
     sampleCoord = refractedPos.xy;
   }
 
-    if(sampleDepth <= translucentDepth){
+    if(sampleDepth >= translucentDepth){
       opaqueViewPos = refractedViewPos;
     } else {
       refractedPos = vec3(-1);
