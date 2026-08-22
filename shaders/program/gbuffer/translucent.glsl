@@ -83,12 +83,6 @@ void main() {
   color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
 
-  #ifdef GBUFFERS_WEATHER
-  if (color.b > color.g) {
-    discard;
-  }
-  #endif
-
   if (color.a < alphaTestRef) {
     discard;
   }
@@ -104,6 +98,14 @@ void main() {
 
   if (materialIsWater(materialID)) {
     color.a = 0.01;
+
+    // #ifdef MCWIND
+    // mcw_Water w = mcw_readWater(feetPlayerPos.xz + cameraPosition.xz);
+    // if (w.known) {
+    //   material.roughness += smoothstep(0.7, 1.0, w.open) * 0.1;
+    // }
+    // #endif
+
   }
 
   float shadow = getShadowFast(

@@ -2,4 +2,4 @@
 #define WORLD_OVERWORLD
 #define fsh
 #define GBUFFERS_WEATHER 
-#include "/program/gbuffer/translucent.glsl"
+#include "/program/gbuffer/weather.glsl"

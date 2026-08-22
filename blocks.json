@@ -7,12 +7,32 @@
     "%minecraft:crops",
     "%minecraft:flowers",
     "%minecraft:edible_for_sheep",
-    "minecraft:tall_grass",
+    "minecraft:tall_grass:half=upper",
+    "minecraft:tall_grass:half=lower",
     "minecraft:short_grass",
     "minecraft:bush"
   ],
   "leaves": [
     "%minecraft:leaves"
+  ],
+  "fire": [
+    "minecraft:fire"
+  ],
+  "grass": [
+    "minecraft:short_grass",
+    "minecraft:tall_grass:half=upper",
+    "minecraft:tall_grass:half=lower"
+  ],
+  "top_half": [
+    "minecraft:tall_grass:half=upper"
+  ],
+  "bottom_half": [
+    "minecraft:tall_grass:half=lower"
+  ],
+  "hanging": [
+    "minecraft:vine",
+    "minecraft:lantern",
+    "minecraft:copper_lantern"
   ],
   "iron": [
     "minecraft:iron_block",

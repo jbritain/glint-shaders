@@ -58,6 +58,8 @@ vec3 sampleHalos(vec2 uv) {
     texture(colortex16, sampleUv + 0.001 * dir).b
   );
 
+  // lensFlareSample *= abs(sin(dot(uv * 2.0 - 1.0, vec2(1.0, 0.0)) * 1000));
+
   return lensFlareSample;
 }
 

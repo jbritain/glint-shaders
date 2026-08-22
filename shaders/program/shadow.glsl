@@ -32,11 +32,9 @@ out vec2 originalPos;
 flat out uint materialID;
 
 #include "/lib/misc/voxel.glsl"
+#include "/lib/misc/waving.glsl"
 
 void main() {
-  gl_Position = ftransform();
-
-  shadowViewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
   if (
     renderStage == MC_RENDER_STAGE_TERRAIN_SOLID ||
     renderStage == MC_RENDER_STAGE_TERRAIN_CUTOUT ||
@@ -47,17 +45,16 @@ void main() {
     materialID = 0;
   }
 
+  shadowViewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+  vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
+  feetPlayerPos =
+    getVertexWave(feetPlayerPos + cameraPosition, materialID, at_midBlock.xyz) -
+    cameraPosition;
+  shadowViewPos = transformView(feetPlayerPos, shadowModelView);
+
   vec3 worldNormal = mat3(shadowModelViewInverse) * normal;
 
-  vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
-
   normal = normalize(gl_NormalMatrix * gl_Normal);
-  vec3 screenPos = gl_Position.xyz * 0.5 + 0.5;
-  imageAtomicMax(
-    undistortedShadowMap,
-    ivec2(screenPos.xy * imageSize(undistortedShadowMap) + 0.5),
-    floatBitsToUint(1.0 - screenPos.z)
-  );
 
   #ifdef FLOODFILL
 
@@ -109,6 +106,13 @@ void main() {
   }
   #endif
 
+  gl_Position = gl_ProjectionMatrix * vec4(shadowViewPos, 1.0);
+  vec3 screenPos = gl_Position.xyz * 0.5 + 0.5;
+  imageAtomicMax(
+    undistortedShadowMap,
+    ivec2(screenPos.xy * imageSize(undistortedShadowMap) + 0.5),
+    floatBitsToUint(1.0 - screenPos.z)
+  );
   originalPos = screenPos.xy;
   screenPos.xy += getWarp(screenPos.xy);
   gl_Position.xyz = screenPos * 2.0 - 1.0;

@@ -43,6 +43,12 @@ void main() {
   vec3 bloom = texture(colortex16, texcoord * 0.5).rgb;
   color = mix(color, bloom, BLOOM_STRENGTH);
 
+  uint weatherMask = texture(colortex17, texcoord).r;
+
+  if (weatherMask == RAIN) {
+    color = mix(color, bloom, 0.2);
+  }
+
   #ifdef LENS_FLARES
   vec3 lensFlares = texture(colortex6, texcoord).rgb;
   color += lensFlares;

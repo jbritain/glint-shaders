@@ -14,6 +14,8 @@
 #include "/lib/common.glsl"
 
 #ifdef vsh
+#include "/lib/misc/waving.glsl"
+
 in vec2 mc_Entity;
 in vec4 at_tangent;
 in vec4 at_midBlock;
@@ -35,7 +37,6 @@ flat out vec4 textureBounds;
 #endif
 
 void main() {
-  gl_Position = ftransform();
   texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
 
   vec2 lmcoord = gl_MultiTexCoord1.xy / 240;
@@ -45,11 +46,17 @@ void main() {
   tbn[2] = normalize(gl_NormalMatrix * gl_Normal);
   tbn[1] = normalize(cross(tbn[0], tbn[2]) * at_tangent.w);
 
-  viewPos = (gbufferProjectionInverse * gl_Position).xyz;
+  viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+  vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
+  materialID = uint(mc_Entity.x);
+  feetPlayerPos =
+    getVertexWave(feetPlayerPos + cameraPosition, materialID, at_midBlock.xyz) -
+    cameraPosition;
+  viewPos = transformView(feetPlayerPos, gbufferModelView);
+
+  gl_Position = gbufferProjection * vec4(viewPos, 1.0);
 
   glcolor = gl_Color;
-
-  materialID = uint(mc_Entity.x);
 
   if (
     renderStage == MC_RENDER_STAGE_TERRAIN_SOLID ||

@@ -23,9 +23,34 @@
 #include "/lib/lighting/cloudShadows.glsl"
 #include "/lib/misc/voxel.glsl"
 
+#include "/mcwind/mcwind.glsl"
+#include "/mcwind/mcwind_field.glsl"
+
 const float fogScattering = 1.0;
 const float fogAbsorption = 0.0;
 const float fogExtinction = fogScattering + fogAbsorption;
+
+#ifdef MCWIND
+float getWindFogDensity(vec3 worldPos) {
+  return 0.0;
+  float heightFactor = mcw_groundHeight(worldPos, cameraPosition);
+  heightFactor = 1.0 - smoothstep(0.0, 20, heightFactor);
+
+  mcw_Advect adv = mcw_advect(worldPos, mcw_windPhase, 8.0);
+  float densityA = texture(
+    lowFrequencyCloudNoiseTex,
+    fract(adv.a / vec3(100, 20, 100))
+  ).r;
+  float densityB = texture(
+    lowFrequencyCloudNoiseTex,
+    fract(adv.b / vec3(100, 20, 100))
+  ).r;
+
+  return smoothstep(0.4, 0.6, mix(densityB, densityA, adv.weightA)) *
+  0.05 *
+  heightFactor;
+}
+#endif
 
 float getFogDensity(vec3 position) {
   const float falloff = VOLUMETRIC_FOG_HEIGHT_FALLOFF;
@@ -71,16 +96,23 @@ float getFogDensity(vec3 position) {
     thunderStrength
   );
 
-  return clamp01(
-    (exp(-(position.y - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff) - topFactor) /
-      (1.0 - topFactor)
-  ) *
-  linearstep(
-    VOLUMETRIC_FOG_BOTTOM_PLANE,
-    VOLUMETRIC_FOG_MIDDLE_PLANE,
-    position.y
-  ) *
-  fogDensityFactor;
+  float density =
+    clamp01(
+      (exp(-(position.y - VOLUMETRIC_FOG_MIDDLE_PLANE) * falloff) - topFactor) /
+        (1.0 - topFactor)
+    ) *
+    linearstep(
+      VOLUMETRIC_FOG_BOTTOM_PLANE,
+      VOLUMETRIC_FOG_MIDDLE_PLANE,
+      position.y
+    ) *
+    fogDensityFactor;
+
+  #ifdef MCWIND
+  density += getWindFogDensity(position);
+  #endif
+
+  return density;
 }
 
 float integrateFogDensity(vec3 position, vec3 dir) {
@@ -194,9 +226,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
 
     #ifdef FLOODFILL
     radiance +=
-      sampleFloodfill(rayPos - cameraPosition) *
-      EMISSIVE_STRENGTH *
-      16;
+      sampleFloodfill(rayPos - cameraPosition) * EMISSIVE_STRENGTH * 16;
     #endif
 
     scattering +=

@@ -16,6 +16,8 @@
 #define WAVE_NORMALS_GLSL
 
 #include "/lib/util/perlinNoise.glsl"
+#include "/mcwind/mcwind.glsl"
+#include "/mcwind/mcwind_field.glsl"
 
 #define WAVE_INITIAL_AMPLITUDE 0.07
 #define WAVE_INITIAL_WAVELENGTH 10.0
@@ -82,6 +84,13 @@ float waveHeight(vec2 pos) {
   float wavelength = WAVE_INITIAL_WAVELENGTH;
   float amplitude = WAVE_INITIAL_AMPLITUDE;
 
+  #ifdef MCWIND
+  mcw_Water w = mcw_readWater(pos);
+  if (w.known) {
+    amplitude *= clamp01(w.cls / 6.0);
+  }
+  #endif
+
   for (int i = 0; i < WAVE_OCTAVES; i++) {
     float r = mod(i * 11.23456, TAU);
     vec2 dir = vec2(sin(r), cos(r));
@@ -110,6 +119,12 @@ vec2 waveHeightDeriv(vec2 pos) {
   vec2 grad = vec2(0.0);
   float wavelength = WAVE_INITIAL_WAVELENGTH;
   float amplitude = WAVE_INITIAL_AMPLITUDE;
+  #ifdef MCWIND
+  mcw_Water w = mcw_readWater(pos);
+  if (w.known) {
+    amplitude *= clamp01(w.cls / 6.0);
+  }
+  #endif
 
   for (int i = 0; i < WAVE_OCTAVES; i++) {
     float r = mod(float(i * 11.23456), TAU);

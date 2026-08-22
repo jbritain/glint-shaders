@@ -52,6 +52,9 @@ vec3 linearToSRGB(vec3 rgb) {
              lessThanEqual(rgb, vec3(0.0031308)));
 }
 
+#define RAIN 1
+#define SNOW 2
+
 #ifndef GBUFFERS_VOXY
 layout(std430, binding = 0) buffer environmentData {
   vec3 sunlightColor;

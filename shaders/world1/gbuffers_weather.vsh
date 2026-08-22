@@ -2,4 +2,4 @@
 #define WORLD_THE_END
 #define vsh
 #define GBUFFERS_WEATHER 
-#include "/program/gbuffer/translucent.glsl"
+#include "/program/gbuffer/weather.glsl"
