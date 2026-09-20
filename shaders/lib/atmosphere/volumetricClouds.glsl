@@ -241,23 +241,24 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
       normalize(worldLightDir + unmapSphere(jitter.yz) * 0.02),
       jitter.y
     );
-    vec3 radiance =
-      sunlightColor *
-      exp(-densityToSun * cloudExtinction * vec3(0.85, 0.9, 1.0)) *
-      phase;
+    float transmittanceToSun = exp(-densityToSun * cloudExtinction);
+    vec3 radiance = sunlightColor * transmittanceToSun * phase;
 
-    // multiple scattering
-    vec3 contribution = vec3(CLOUD_SCATTERING_CONTRIBUTION); // * vec3(0.85, 0.9, 1.0); // slowly tint the clouds a bit blue with the scattering
-    float attenuation = CLOUD_SCATTERING_ATTENUATION;
-    for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
-      radiance +=
-        sunlightColor *
-        exp(-densityToSun * cloudExtinction * attenuation) *
-        scatteringPhases[i] *
-        contribution;
-      contribution *= contribution;
-      attenuation *= attenuation;
-    }
+    // // multiple scattering
+    // vec3 contribution = vec3(CLOUD_SCATTERING_CONTRIBUTION); // * vec3(0.85, 0.9, 1.0); // slowly tint the clouds a bit blue with the scattering
+    // float attenuation = CLOUD_SCATTERING_ATTENUATION;
+    // for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
+    //   radiance +=
+    //     sunlightColor *
+    //     exp(-densityToSun * cloudExtinction * attenuation) *
+    //     scatteringPhases[i] *
+    //     contribution;
+    //   contribution *= contribution;
+    //   attenuation *= attenuation;
+    // }
+    float fMS = 1.0 - exp(-200.0 * density * cloudExtinction);
+    radiance +=
+      fMS / (1.0 - fMS) * sunlightColor * transmittanceToSun / (4.0 * PI);
 
     // // ambient scattering
     // float densityToSky = getVolumetricCloudOpticalDepth(
@@ -265,7 +266,7 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     //   vec3(0.0, 1.0, 0.0),
     //   jitter.y
     // );
-    radiance += skylightColor * PI; // * exp(-densityToSky * cloudExtinction) * PI;
+    radiance += skylightColor; // * exp(-densityToSky * cloudExtinction) * PI;
 
     summedDepth += transmittance * stepLength * i;
     summedTransmittance += transmittance;

@@ -84,6 +84,7 @@ float getFogDensity(vec3 position) {
 }
 
 float integrateFogDensity(vec3 position, vec3 dir) {
+  return 0.0;
   const float steps = 8;
   if (
     position.y > VOLUMETRIC_FOG_TOP_PLANE && dir.y > 0 ||
@@ -194,9 +195,7 @@ vec4 getVolumetricFog(vec3 position, float depth) {
 
     #ifdef FLOODFILL
     radiance +=
-      sampleFloodfill(rayPos - cameraPosition) *
-      EMISSIVE_STRENGTH *
-      16;
+      sampleFloodfill(rayPos - cameraPosition) * EMISSIVE_STRENGTH * 16;
     #endif
 
     scattering +=

@@ -63,6 +63,8 @@ void main() {
   ).a;
   #endif
 
+  show(occlusion);
+
   uint frameCount = min(texture(colortex11, texcoord).r, AO_MAX_FRAMES);
 
   float previousOcclusion = texture(colortex3, previousPos.xy).r;
