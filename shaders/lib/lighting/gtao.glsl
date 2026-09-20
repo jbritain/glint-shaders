@@ -2,112 +2,139 @@
 #define GTAO_GLSL
 
 #include "/lib/util/packing.glsl"
+#include "/lib/util/dither.glsl"
 
-// GTAO BY CYBEREALITY
-// https://cybereality.com/screen-space-indirect-lighting-with-visibility-bitmask-improvement-to-gtao-ssao-real-time-ambient-occlusion-algorithm-glsl-shader-implementation/
-
-// #define GTAO_GI
-
-// https://cdrinmatane.github.io/posts/ssaovb-code/
-const uint sectorCount = 32u;
-uint updateSectors(float minHorizon, float maxHorizon, uint outBitfield) {
-  uint startBit = uint(minHorizon * float(sectorCount));
-  uint horizonAngle = uint(
-    ceil((maxHorizon - minHorizon) * float(sectorCount))
-  );
-  uint angleBit =
-    horizonAngle > 0u
-      ? uint(0xFFFFFFFFu >> sectorCount - horizonAngle)
-      : 0u;
-  uint currentBitfield = angleBit << startBit;
-  return outBitfield | currentBitfield;
+vec3 getViewPos(vec2 coord) {
+  float depth = texture(depthtex0, coord).r;
+  vec3 screenPos = vec3(coord, depth);
+  return screenSpaceToViewSpace(screenPos);
 }
 
-vec2 screenSize = vec2(viewWidth, viewHeight);
-const float twoPi = 2.0 * PI;
-const float halfPi = PI / 2.0;
+#define GTAO_SLICE_COUNT AO_SAMPLES
 
-vec3 getNormal(vec2 coord) {
-  uint encoded = texture(colortex1, coord).g;
-  vec2 packedGeometry;
-  packedGeometry.r = float(bitfieldExtract(encoded, 0, 8)) / 255.0;
-  packedGeometry.g = float(bitfieldExtract(encoded, 8, 8)) / 255.0;
-  return decodeUnitVector(packedGeometry);
-}
-
-vec4 getGTAO(vec3 position, vec3 normal, vec2 fragUV) {
-  uint indirect = 0u;
-  uint occlusion = 0u;
-
-  float visibility = 0.0;
-  vec3 lighting = vec3(0.0);
-  vec2 frontBackHorizon = vec2(0.0);
-  vec2 aspect = screenSize.yx / screenSize.x;
-  vec3 camera = normalize(-position);
-
-  float sliceRotation = twoPi / (AO_SAMPLES - 1.0);
-  float sampleScale = -AO_RADIUS * gbufferProjection[0][0] / position.z;
-  float sampleOffset = 0.01;
-  vec2 jitter = blueNoise(floor(gl_FragCoord.xy), frameCounter).rg;
-
-  for (float slice = 0.0; slice < AO_SAMPLES + 0.5; slice += 1.0) {
-    float phi = sliceRotation * (slice + jitter.r) + PI;
-    vec2 omega = vec2(cos(phi), sin(phi));
-    vec3 direction = vec3(omega.x, omega.y, 0.0);
-    vec3 orthoDirection = direction - dot(direction, camera) * camera;
-    vec3 axis = cross(direction, camera);
-    vec3 projNormal = normal - axis * dot(normal, axis);
-    float projLength = length(projNormal);
-
-    float signN = sign(dot(orthoDirection, projNormal));
-    float cosN = clamp(dot(projNormal, camera) / projLength, 0.0, 1.0);
-    float n = signN * facos(cosN);
-
-    for (
-      float currentSample = 0.0;
-      currentSample < GTAO_DIRECTION_SAMPLE_COUNT + 0.5;
-      currentSample += 1.0
-    ) {
-      float sampleStep =
-        (currentSample + jitter.g) / GTAO_DIRECTION_SAMPLE_COUNT + sampleOffset;
-      vec2 sampleUV = fragUV - sampleStep * sampleScale * omega * aspect;
-      vec3 samplePosition = screenSpaceToViewSpace(
-        vec3(sampleUV, texture(depthtex0, sampleUV).r)
-      );
-      vec3 sampleNormal = getNormal(sampleUV);
-      #ifdef GTAO_GI
-      vec3 sampleLight = texture(colortex5, sampleUV).rgb;
-      #endif
-      vec3 sampleDistance = samplePosition - position;
-      float sampleLength = length(sampleDistance);
-      vec3 sampleHorizon = sampleDistance / sampleLength;
-
-      frontBackHorizon.x = dot(sampleHorizon, camera);
-      frontBackHorizon.y = dot(
-        normalize(sampleDistance - camera * GTAO_THICKNESS),
-        camera
-      );
-
-      frontBackHorizon = facos(frontBackHorizon);
-      frontBackHorizon = clamp((frontBackHorizon + n + halfPi) / PI, 0.0, 1.0);
-
-      indirect = updateSectors(frontBackHorizon.x, frontBackHorizon.y, 0u);
-      #ifdef GTAO_GI
-      lighting +=
-        (1.0 - float(bitCount(indirect & ~occlusion)) / float(sectorCount)) *
-        sampleLight *
-        clamp(dot(normal, sampleHorizon), 0.0, 1.0) *
-        clamp(dot(sampleNormal, -sampleHorizon), 0.0, 1.0);
-      #endif
-      occlusion |= indirect;
-    }
-    visibility += 1.0 - float(bitCount(occlusion)) / float(sectorCount);
+float getHorizonAngle(
+  vec2 coord,
+  vec3 viewPos,
+  vec3 viewDir,
+  vec2 dir,
+  float radius,
+  float jitter
+) {
+  float maxCosHorizonAngle = 0.0;
+  vec2 rayStep = normalize(dir) * radius / GTAO_DIRECTION_SAMPLE_COUNT;
+  coord += rayStep * jitter;
+  for (int i = 0; i < GTAO_DIRECTION_SAMPLE_COUNT; i++) {
+    coord += rayStep;
+    vec3 samplePos = getViewPos(coord);
+    vec3 sampleDir = normalize(samplePos - viewPos);
+    maxCosHorizonAngle = max(maxCosHorizonAngle, dot(sampleDir, viewDir));
   }
 
-  visibility /= AO_SAMPLES;
-  lighting /= AO_SAMPLES;
+  return acos(maxCosHorizonAngle);
+}
 
-  return vec4(lighting, visibility);
+// vec4 getGTAO(vec3 viewPos, vec3 normal, vec2 coord) {
+//   float visibility = 0.0;
+//   vec3 viewDir = -normalize(viewPos);
+//   vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).xy;
+
+//   float depthScale = gbufferProjection[1][1] / -viewPos.z;
+//   float cosY = dot(normal, viewDir);
+//   float y = acos(cosY);
+//   float sinY = sin(y);
+
+//   for (int i = 0; i < AO_SAMPLES; i++) {
+//     float sliceAngle = (float(i) + jitter.x) / float(AO_SAMPLES) * 2.0 * PI;
+//     vec2 sliceDir = vec2(sin(sliceAngle), cos(sliceAngle));
+
+//     float theta1 = getHorizonAngle(
+//       coord,
+//       viewPos,
+//       viewDir,
+//       sliceDir,
+//       depthScale * AO_RADIUS * 0.1,
+//       jitter.y
+//     );
+//     float theta2 =
+//       PI -
+//       getHorizonAngle(
+//         coord,
+//         viewPos,
+//         viewDir,
+//         -sliceDir,
+//         depthScale * AO_RADIUS * 0.1,
+//         jitter.y
+//       );
+
+//     float a = 0.25 * (-cos(2.0 * theta1 - y) + cosY + 2.0 * theta1 * sinY);
+//     a += 0.25 * (-cos(2.0 * theta2 + y) + cosY + 2.0 * theta2 * sinY);
+
+//     visibility += a;
+//   }
+
+//   visibility /= AO_SAMPLES * 2.0;
+
+//   show(visibility);
+//   return vec4(vec3(0.0), visibility);
+// }
+
+vec4 getGTAO(vec3 cPosV, vec3 normalV, vec2 cTexCoord) {
+  float visibility = 0.0;
+
+  float scaling = gbufferProjection[1][1] / -cPosV.z;
+
+  vec3 viewV = -normalize(cPosV);
+
+  vec2 jitter = blueNoise(gl_FragCoord.xy, frameCounter).xy;
+
+  for (int slice = 0; slice < GTAO_SLICE_COUNT; slice++) {
+    float phi = PI / GTAO_SLICE_COUNT * (float(slice) + jitter.x);
+
+    vec2 omega = vec2(cos(phi), sin(phi));
+
+    vec3 directionV = vec3(omega.x, omega.y, 0); // direction of the slice in view space
+    vec3 axisV = cross(directionV, viewV);
+
+    // in the paper this is directionV − dot(directionV, viewV) ∗ viewV)
+    // this seems to be incorrect
+    // vec3 orthoDirectionV = directionV - dot(directionV, viewV) * viewV;
+    vec3 orthoDirectionV = cross(directionV, axisV);
+    vec3 projNormalV = normalV - axisV * dot(normalV, axisV);
+
+    float sgnN = sign(dot(orthoDirectionV, projNormalV));
+    float cosN = clamp01(dot(projNormalV, viewV) / length(projNormalV));
+    float n = sgnN * acos(cosN);
+
+    vec2 h;
+
+    for (int side = 0; side < 1; side++) {
+      float cHorizonCos = -1;
+      for (
+        int samp = 0;
+        samp < GTAO_DIRECTION_SAMPLE_COUNT && cHorizonCos < 0.95;
+        samp++
+      ) {
+        float s = (float(samp) + jitter.y) / float(GTAO_DIRECTION_SAMPLE_COUNT);
+        vec2 sTexCoord =
+          cTexCoord + (-1 + 2 * side) * s * vec2(omega.x, -omega.y) * scaling;
+        vec3 sPosV = getViewPos(sTexCoord);
+        vec3 sHorizonV = normalize(sPosV - cPosV);
+        cHorizonCos = max(cHorizonCos, dot(sHorizonV, viewV));
+      }
+
+      h[side] =
+        n + clamp((-1 + 2 * side) * acos(cHorizonCos) - n, -PI / 2, PI / 2);
+      visibility +=
+        length(projNormalV) *
+        (cosN + 2 * h[side] * sin(n) - cos(2 * h[side] - n)) /
+        4.0;
+    }
+  }
+
+  visibility /= float(GTAO_SLICE_COUNT);
+  show(visibility);
+
+  return vec4(vec3(0.0), visibility);
 }
 
 #endif
