@@ -57,6 +57,7 @@ void main() {
 #include "/lib/misc/voxel.glsl"
 #include "/lib/water/waveNormals.glsl"
 #include "/lib/material/integratedPBR.glsl"
+#include "/lib/water/foam.glsl"
 
 in vec2 lightmap;
 in vec2 texcoord;
@@ -73,6 +74,7 @@ layout(location = 1) out uvec3 gbufferData;
 layout(location = 2) out uvec2 materialData;
 
 void main() {
+  uint materialID = materialID;
   Gbuffer gbuffer;
 
   gbuffer.geometryNormal = mat3(gbufferModelViewInverse) * tbn[2];
@@ -87,26 +89,29 @@ void main() {
     discard;
   }
 
+  vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
+
+  if (materialIsWater(materialID)) {
+    color.a = 0.01;
+
+    #ifdef MCWIND
+    mcw_Water w = mcw_readWater(feetPlayerPos.xz + cameraPosition.xz);
+    float foam = getFoam(w.shoreDist, feetPlayerPos + cameraPosition);
+    if (w.known && foam > 0.5) {
+      materialID = MATERIAL_FOAM;
+      color.a = 1.0;
+      color.rgb = vec3(1.0);
+    }
+    #endif
+
+  }
+
   Material material = materialFromSpecularMap(
     sRGBToLinear(color.rgb),
     texture(specular, texcoord),
     materialID
   );
   applyIntegratedPBR(material);
-
-  vec3 feetPlayerPos = transformView(viewPos, gbufferModelViewInverse);
-
-  if (materialIsWater(materialID)) {
-    color.a = 0.01;
-
-    // #ifdef MCWIND
-    // mcw_Water w = mcw_readWater(feetPlayerPos.xz + cameraPosition.xz);
-    // if (w.known) {
-    //   material.roughness += smoothstep(0.7, 1.0, w.open) * 0.1;
-    // }
-    // #endif
-
-  }
 
   float shadow = getShadowFast(
     feetPlayerPos,

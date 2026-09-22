@@ -17,7 +17,6 @@
 
 #include "/lib/util/perlinNoise.glsl"
 #include "/mcwind/mcwind.glsl"
-#include "/mcwind/mcwind_field.glsl"
 
 #define WAVE_INITIAL_AMPLITUDE 0.07
 #define WAVE_INITIAL_WAVELENGTH 10.0
@@ -123,6 +122,7 @@ vec2 waveHeightDeriv(vec2 pos) {
   mcw_Water w = mcw_readWater(pos);
   if (w.known) {
     amplitude *= clamp01(w.cls / 6.0);
+    show(w.open);
   }
   #endif
 

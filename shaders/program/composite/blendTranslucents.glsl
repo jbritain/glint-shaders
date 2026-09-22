@@ -113,7 +113,7 @@ void main() {
   #endif
 
   bool isWater = materialIsWater(material.id);
-  if (isWater) {
+  if (isWater || materialIsFoam(material.id)) {
     gbuffer.surfaceNormal = getWaterParallaxNormal(
       translucentFeetPlayerPos,
       gbuffer.geometryNormal,

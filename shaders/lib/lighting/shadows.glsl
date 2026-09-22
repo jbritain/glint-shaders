@@ -168,6 +168,9 @@ vec3 getShadow(
 }
 
 float getShadowFast(vec3 playerPos, vec3 playerNormal, float skyLightmap) {
+  if (dot(playerNormal, worldLightDir) < 0.0) {
+    return 0.0;
+  }
   vec3 shadowViewPos = transformView(playerPos, shadowModelView);
 
   vec3 shadowViewNormal = mat3(shadowModelView) * playerNormal;

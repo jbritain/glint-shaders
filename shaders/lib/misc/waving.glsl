@@ -16,7 +16,6 @@
 #define WAVING_GLSL
 
 #include "/mcwind/mcwind.glsl"
-#include "/mcwind/mcwind_field.glsl"
 
 vec3 getVertexWave(vec3 worldPos, uint materialID, vec3 midBlock) {
   vec3 blockCentre = worldPos + midBlock / 64;

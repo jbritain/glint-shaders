@@ -59,6 +59,8 @@ void applyIntegratedPBR(inout Material material) {
     material.subsurface = 1.0;
   } else if (materialIsGlass(material.id)) {
     material.roughness = 0.0;
+  } else if (materialIsFoam(material.id)) {
+    material.subsurface = 1.0;
   }
 
   #ifdef EVERYTHING_CHROME

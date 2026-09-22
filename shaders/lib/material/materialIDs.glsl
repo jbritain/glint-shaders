@@ -33,3 +33,5 @@ bool materialIsWool(uint id){return id == 1018;}
 #define MATERIAL_WOOL 1018
 bool materialIsSand(uint id){return id == 1019;}
 #define MATERIAL_SAND 1019
+bool materialIsFoam(uint id){return id == 1022;}
+#define MATERIAL_FOAM 1022

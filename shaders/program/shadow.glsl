@@ -135,7 +135,9 @@ in vec2 originalPos;
 
 flat in uint materialID;
 
+#include "/mcwind/mcwind.glsl"
 #include "/lib/water/waveNormals.glsl"
+#include "/lib/water/foam.glsl"
 
 /* RENDERTARGETS: 0,1,2 */
 layout(location = 0) out vec4 color;
@@ -151,7 +153,18 @@ void main() {
 
   originalPosAndWaterMask = vec3(0.0, originalPos * 0.5 + 0.5);
 
+  vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
+
   if (materialIsWater(materialID)) {
+    #ifdef MCWIND
+    mcw_Water w = mcw_readWater(feetPlayerPos.xz + cameraPosition.xz);
+    float foam = getFoam(w.shoreDist, feetPlayerPos + cameraPosition);
+    if (w.known && foam > 0.5) {
+      color.a = 1.0;
+      color.rgb = vec3(1.0);
+    }
+    #endif
+
     originalPosAndWaterMask.r = 1.0;
     float blockerDistance =
       texture(shadowtex1, gl_FragCoord.xy / shadowMapResolution).r -
@@ -162,7 +175,7 @@ void main() {
     color.a = 0.01;
 
     #if ( defined REFRACTIVE_CAUSTICS || defined REFLECTIVE_CAUSTICS )
-    vec3 feetPlayerPos = transformView(shadowViewPos, shadowModelViewInverse);
+
     vec3 wave = waveNormal(
       feetPlayerPos.xz + cameraPosition.xz,
       vec3(0.0, 1.0, 0.0),

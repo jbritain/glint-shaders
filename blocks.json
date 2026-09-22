@@ -150,5 +150,8 @@
     "minecraft:snow",
     "minecraft:stonecutter",
     "minecraft:trapped_chest"
+  ],
+  "foam": [
+    "josh:foam"
   ]
 }

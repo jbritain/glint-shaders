@@ -24,7 +24,6 @@
 #include "/lib/misc/voxel.glsl"
 
 #include "/mcwind/mcwind.glsl"
-#include "/mcwind/mcwind_field.glsl"
 
 const float fogScattering = 1.0;
 const float fogAbsorption = 0.0;
@@ -116,6 +115,7 @@ float getFogDensity(vec3 position) {
 }
 
 float integrateFogDensity(vec3 position, vec3 dir) {
+  return 0.0;
   const float steps = 8;
   if (
     position.y > VOLUMETRIC_FOG_TOP_PLANE && dir.y > 0 ||
