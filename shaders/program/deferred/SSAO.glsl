@@ -58,7 +58,7 @@ void main() {
   #elif AO == 2
   occlusion = getGTAO(
     viewPos,
-    mat3(gbufferModelView) * gbuffer.geometryNormal,
+    mat3(gbufferModelView) * gbuffer.surfaceNormal,
     texcoord
   ).a;
   #endif
