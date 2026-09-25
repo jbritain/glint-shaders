@@ -34,6 +34,8 @@ void main() {
     pow(clamp(perlinNoise(texcoord, 16) * 0.5 + 0.5, 0.0, 1.0), 2.0) * 0.3 +
     0.7;
 
+  coverage = pow(coverage, 0.8);
+
   float height = pow(perlinNoise(texcoord, 32) * 0.5 + 0.5, 1.5) * 1.8 + 0.2;
 
   imageStore(

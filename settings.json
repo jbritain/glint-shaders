@@ -405,7 +405,7 @@
       },
       "Volumetric Cloud Density": {
         "key": "VOLUMETRIC_CLOUDS_DENSITY",
-        "default": "0.4"
+        "default": "0.05"
       },
       "Volumetric Cloud Base Altitude": {
         "key": "VOLUMETRIC_CLOUDS_BASE_ALTITUDE",

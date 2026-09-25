@@ -244,32 +244,16 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     float transmittanceToSun = exp(-densityToSun * cloudExtinction);
     vec3 radiance = sunlightColor * transmittanceToSun * phase;
 
-    // // multiple scattering
-    // vec3 contribution = vec3(CLOUD_SCATTERING_CONTRIBUTION); // * vec3(0.85, 0.9, 1.0); // slowly tint the clouds a bit blue with the scattering
-    // float attenuation = CLOUD_SCATTERING_ATTENUATION;
-    // for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
-    //   radiance +=
-    //     sunlightColor *
-    //     exp(-densityToSun * cloudExtinction * attenuation) *
-    //     scatteringPhases[i] *
-    //     contribution;
-    //   contribution *= contribution;
-    //   attenuation *= attenuation;
-    // }
-    float fMS = 1.0 - exp(-200.0 * density * cloudExtinction);
+    float fMS = 1.0 - exp(-400.0 * density * cloudExtinction);
     radiance +=
-      fMS / (1.0 - fMS) * sunlightColor * transmittanceToSun / (4.0 * PI);
+      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.5) / 2.0;
 
-    // // ambient scattering
-    // float densityToSky = getVolumetricCloudOpticalDepth(
-    //   rayPos,
-    //   vec3(0.0, 1.0, 0.0),
-    //   jitter.y
-    // );
-    radiance += skylightColor; // * exp(-densityToSky * cloudExtinction) * PI;
+    radiance += skylightColor * PI;
 
-    summedDepth += transmittance * stepLength * i;
-    summedTransmittance += transmittance;
+    if (transmittance < 1.0) {
+      summedDepth += transmittance * stepLength * i;
+      summedTransmittance += 1.0; //transmittance;
+    }
 
     if (lightningBoltPosition.w > 0.0) {
       float distanceToLightning = distance(
@@ -289,7 +273,10 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
 
   float meanDepthWeightedTransmittance = summedDepth / summedTransmittance;
   vec3 fogPos = mapAerialPerspectivePos(
-    mat3(gbufferModelView) * dir * meanDepthWeightedTransmittance
+    transformView(
+      start + dir * meanDepthWeightedTransmittance,
+      gbufferModelView
+    )
   );
   vec4 fog = texture(aerialPerspectiveLUTTex, clamp01(fogPos));
   scattering *= fog.a;
