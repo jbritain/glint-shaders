@@ -205,7 +205,7 @@ void main() {
   // );
 
   gbufferData = packGbuffer(gbuffer);
-  materialData = packMaterial(material);
+  materialData = packMaterial(material, color.rgb);
 }
 
 #endif

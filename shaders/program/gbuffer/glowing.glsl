@@ -93,7 +93,7 @@ void main() {
   color.a = 1.0;
 
   gbufferData = packGbuffer(gbuffer);
-  materialData = packMaterial(material);
+  materialData = packMaterial(material, color.rgb);
 }
 
 #endif

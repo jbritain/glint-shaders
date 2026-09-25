@@ -189,13 +189,13 @@ Material materialFromSpecularMap(
   return material;
 }
 
-uvec2 packMaterial(Material material) {
+uvec2 packMaterial(Material material, vec3 sRGBAlbedo) {
   uvec2 data = uvec2(0);
 
-  material.albedo = linearAlbedoAP1ToSrgb(material.albedo);
-  data.r = bitfieldInsert(data.r, uint(material.albedo.r * 255), 0, 8);
-  data.r = bitfieldInsert(data.r, uint(material.albedo.g * 255), 8, 8);
-  data.r = bitfieldInsert(data.r, uint(material.albedo.b * 255), 16, 8);
+  // material.albedo = linearAlbedoAP1ToSrgb(material.albedo);
+  data.r = bitfieldInsert(data.r, uint(sRGBAlbedo.r * 255), 0, 8);
+  data.r = bitfieldInsert(data.r, uint(sRGBAlbedo.g * 255), 8, 8);
+  data.r = bitfieldInsert(data.r, uint(sRGBAlbedo.b * 255), 16, 8);
   data.r = bitfieldInsert(data.r, uint(material.emission * 255), 24, 8);
 
   data.g = bitfieldInsert(data.g, uint(material.roughness * 255), 0, 8);

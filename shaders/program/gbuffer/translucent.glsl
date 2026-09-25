@@ -82,6 +82,7 @@ void main() {
 
   color = texture(gtexture, texcoord);
   color.rgb *= glcolor.rgb;
+  vec3 srgbAlbedo = color.rgb;
 
   #ifdef GBUFFERS_WEATHER
   if (color.b > color.g) {
@@ -156,7 +157,7 @@ void main() {
   #endif
 
   gbufferData = packGbuffer(gbuffer);
-  materialData = packMaterial(material);
+  materialData = packMaterial(material, srgbAlbedo);
 }
 
 #endif
