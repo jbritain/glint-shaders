@@ -32,7 +32,7 @@ vec3 sampleGalaxy(vec3 dir) {
 
 #if defined WORLD_THE_NETHER
 vec3 getSky(vec3 dir, bool includeSun) {
-  return sRGBToLinear(fogColor);
+  return srgbToLinearAlbedoAP1(fogColor);
 }
 #elif defined WORLD_THE_END
 vec3 getSky(vec3 dir, bool includeSun) {

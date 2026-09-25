@@ -49,7 +49,7 @@ vec3 getReflectiveShadowMap(vec3 playerPos, vec3 playerNormal) {
     );
     vec4 sampleColor = texture(shadowcolor0, warpedPos);
     vec3 sampleFlux = sampleColor.rgb * sampleColor.a;
-    sampleFlux = sRGBToLinear(sampleFlux);
+    sampleFlux = srgbToLinearAlbedoAP1(sampleFlux);
     vec3 sampleNormal = texture(shadowcolor1, warpedPos).rgb * 2.0 - 1.0;
     sampleNormal.z = sqrt(1.0 - dot(sampleNormal.xy, sampleNormal.xy));
 

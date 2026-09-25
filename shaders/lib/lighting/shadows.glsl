@@ -35,7 +35,7 @@ vec3 sampleShadow(vec3 shadowScreenPos) {
 
   vec4 shadowColorData = texture(shadowcolor0, shadowScreenPos.xy);
   vec3 shadowColor =
-    sRGBToLinear(shadowColorData.rgb) * (1.0 - shadowColorData.a);
+    srgbToLinearAlbedoAP1(shadowColorData.rgb) * (1.0 - shadowColorData.a);
   return mix(shadowColor * opaqueShadow, vec3(1.0), transparentShadow);
 }
 

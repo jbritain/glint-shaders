@@ -28,7 +28,7 @@ float RGBToLuminance(vec3 col) {
 
 float karisAverage(vec3 col) {
   // Formula is 1 / (1 + luma)
-  float luma = RGBToLuminance(linearToSRGB(col)) * 0.25f;
+  float luma = RGBToLuminance(linearToSrgb(col)) * 0.25f;
   return 1.0f / (1.0f + luma);
 }
 

@@ -52,6 +52,8 @@ void main() {
   color = purkinje(color);
   #endif
 
+  color = ap1ToLinear(color);
+
   color = tonemap(color);
   color = grade(color);
 

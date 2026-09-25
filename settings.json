@@ -218,7 +218,7 @@
       },
       "Blocklight Color": {
         "key": "blocklightColor",
-        "default": "sRGBToLinear(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0) * EMISSIVE_STRENGTH / 16.0"
+        "default": "srgbToLinearAlbedoAP1(vec3(BLOCKLIGHT_COLOR_R, BLOCKLIGHT_COLOR_G, BLOCKLIGHT_COLOR_B) / 255.0) * EMISSIVE_STRENGTH / 16.0"
       }
     },
     "Sub-Surface Scattering": {
@@ -514,7 +514,7 @@
       },
       "Water Absorption": {
         "key": "waterAbsorption",
-        "default": "WATER_ABSORPTION_MOD * vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) / 255",
+        "default": "linearToAP1(WATER_ABSORPTION_MOD * vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) / 255)",
         "const": true,
         "type": "vec3",
         "hidden": true
@@ -541,7 +541,7 @@
       },
       "Water Scattering": {
         "key": "waterScattering",
-        "default": "WATER_SCATTERING_MOD * vec3(WATER_SCATTERING_R, WATER_SCATTERING_G, WATER_SCATTERING_B) / 255",
+        "default": "linearToAP1(WATER_SCATTERING_MOD * vec3(WATER_SCATTERING_R, WATER_SCATTERING_G, WATER_SCATTERING_B) / 255)",
         "const": true,
         "type": "vec3",
         "hidden": true

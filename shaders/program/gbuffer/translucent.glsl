@@ -94,7 +94,7 @@ void main() {
   }
 
   Material material = materialFromSpecularMap(
-    sRGBToLinear(color.rgb),
+    srgbToLinearAlbedoAP1(color.rgb),
     texture(specular, texcoord),
     materialID
   );

@@ -81,7 +81,7 @@ void main() {
 
     // data.color = getBlocklightColor(materialID);
 
-    data.color = sRGBToLinear(averageTextureData.rgb);
+    data.color = srgbToLinearAlbedoAP1(averageTextureData.rgb);
     data.opacity =
       renderStage == MC_RENDER_STAGE_TERRAIN_SOLID
         ? 1.0

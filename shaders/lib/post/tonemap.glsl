@@ -18,7 +18,7 @@
 vec3 jodieReinhardTonemap(vec3 v) {
   float l = luminance(v);
   vec3 tv = v / (1.0f + v);
-  return linearToSRGB(mix(v / (1.0f + l), tv, tv));
+  return linearToSrgb(mix(v / (1.0f + l), tv, tv));
 }
 
 vec3 uncharted2TonemapPartial(vec3 x) {
@@ -37,7 +37,7 @@ vec3 uncharted2FilmicTonemap(vec3 v) {
 
   vec3 W = vec3(11.2f);
   vec3 white_scale = vec3(1.0f) / uncharted2TonemapPartial(W);
-  return linearToSRGB(curr * white_scale);
+  return linearToSrgb(curr * white_scale);
 }
 
 vec3 hejlBurgessTonemap(vec3 v) {
@@ -51,7 +51,7 @@ vec3 ACESTonemap(vec3 v) {
   float c = 2.43;
   float d = 0.59;
   float e = 0.14;
-  return linearToSRGB(clamp01(v * (a * v + b) / (v * (c * v + d) + e)));
+  return linearToSrgb(clamp01(v * (a * v + b) / (v * (c * v + d) + e)));
 }
 
 // 0: Default, 1: Golden, 2: Punchy
@@ -85,7 +85,7 @@ vec3 agx(vec3 val) {
   const float max_ev = 4.026069f;
 
   // Input transform
-  val = agx_mat * val;
+  val = max(agx_mat * val, vec3(1e-3));
 
   // Log2 space encoding
   val = clamp(log2(val), min_ev, max_ev);
@@ -107,7 +107,7 @@ vec3 agxEotf(vec3 val) {
   // Undo input transform
   val = agx_mat_inv * val;
 
-  val = linearToSRGB(val);
+  val = linearToSrgb(val);
 
   return val;
 }
@@ -162,7 +162,7 @@ vec3 lottesTonemap(vec3 x) {
       pow(hdrMax, a) * pow(midIn, a * d) * midOut) /
     ((pow(hdrMax, a * d) - pow(midIn, a * d)) * midOut);
 
-  return linearToSRGB(pow(x, a) / (pow(x, a * d) * b + c));
+  return linearToSrgb(pow(x, a) / (pow(x, a * d) * b + c));
 }
 
 uniform sampler3D tonyMcMapfaceTex;
