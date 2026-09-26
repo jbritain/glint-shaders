@@ -55,13 +55,14 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
     float progress = float(i + jitter) / float(VOLUMETRIC_WATER_SAMPLES);
 
     float shadow = 1.0;
-    float distanceToSurface =
-      abs(dot(worldLightDir, vec3(0.0, 1.0, 0.0))) * stepLength * i;
+    float distanceToSurface = abs(dot(worldLightDir, -dir)) * stepLength * i;
     vec3 shadowRayPos = mix(shadowStart, shadowEnd, progress);
     vec3 rayPos = mix(start, end, progress);
     if (clamp01(shadowRayPos) == shadowRayPos) {
       shadowRayPos.xy += getWarp(shadowRayPos.xy);
       shadow = texture(shadowtex1HW, shadowRayPos).r;
+      float waterDepthShadow = texture(shadowtex0, shadowRayPos.xy).r;
+      distanceToSurface = max0(shadowRayPos.z - waterDepthShadow) * 256;
     }
 
     shadow *= getCloudShadow(rayPos);
@@ -82,25 +83,25 @@ vec3 getWaterFog(vec3 color, vec3 start, vec3 end) {
       shadow *= caustics;
     }
 
-    // shadow *= texture(shadowcolor2, shadowRayPos.xy).r * TAU;
+    shadow *= texture(shadowcolor2, shadowRayPos.xy).r * TAU;
 
     vec3 transmittanceToSun =
       shadow * exp(-distanceToSurface * waterExtinction);
     vec3 radiance = sunlightColor * transmittanceToSun * phase;
 
-    vec3 fMS =
-      (1.0 - exp(-WATER_MULTIPLE_SCATTERING * waterExtinction * stepLength)) *
-      waterScattering /
-      waterExtinction;
-    fMS = mix(fMS, fMS * 0.99, smoothstep(0.99, 1.0, fMS));
-    radiance +=
-      sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
+    // vec3 fMS =
+    //   (1.0 - exp(-WATER_MULTIPLE_SCATTERING * waterExtinction * stepLength)) *
+    //   waterScattering /
+    //   waterExtinction;
+    // fMS = mix(fMS, fMS * 0.99, smoothstep(0.99, 1.0, fMS));
+    // radiance +=
+    //   sunlightColor * transmittanceToSun * isotropicPhase * fMS / (1.0 - fMS);
 
-    radiance += skylightColor * isotropicPhase * EBS.y;
+    // radiance += skylightColor * isotropicPhase * EBS.y;
 
-    #ifdef FLOODFILL
-    radiance += sampleFloodfill(rayPos) * EMISSIVE_STRENGTH * isotropicPhase;
-    #endif
+    // #ifdef FLOODFILL
+    // radiance += sampleFloodfill(rayPos) * EMISSIVE_STRENGTH * isotropicPhase;
+    // #endif
 
     scattering +=
       transmittance *

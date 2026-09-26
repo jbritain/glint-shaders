@@ -21,6 +21,7 @@
 #include "/lib/util/misc.glsl"
 #include "/lib/util/perlinNoise.glsl"
 #include "/lib/atmosphere/atmosphericFog.glsl"
+#include "/lib/atmosphere/sky.glsl"
 
 const float cloudExtinction = 0.2;
 
@@ -36,7 +37,7 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
 
   vec2 coverageCoord = fract(rayPos.xz / 200000 + 0.5);
   vec2 coverageData = texture(cloudCoverageTex, coverageCoord).rg;
-  float coverage = linearstep(0.5 * (1.0 - wetness), 0.7, coverageData.r);
+  float coverage = linearstep(0.6 * (1.0 - wetness), 0.7, coverageData.r);
 
   float cloudHeight = coverageData.g;
   // cloudHeight = mix(cloudHeight, 1.0, wetness);
@@ -95,7 +96,7 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
 
   density *= coverage;
 
-  density *= 1.0;
+  // density *= smoothstep(0.1, 0.2, density);
   return density * VOLUMETRIC_CLOUDS_DENSITY;
 }
 
@@ -246,13 +247,22 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
 
     float fMS = 1.0 - exp(-400.0 * density * cloudExtinction);
     radiance +=
-      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.5) / 2.0;
+      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.5) / 4.0;
 
-    radiance += skylightColor * PI;
+    // radiance += skylightColor;
+    vec3 skyDir = unmapSphere(jitter.yz);
+    float densityToSky = getVolumetricCloudOpticalDepth(
+      rayPos,
+      skyDir,
+      jitter.x
+    );
+    radiance += skylightColor * isotropicPhase * transmittance;
+
+    // radiance *= smoothstep(0.0, 0.3, abs(worldLightDir.y));
 
     if (transmittance < 1.0) {
       summedDepth += transmittance * stepLength * i;
-      summedTransmittance += 1.0; //transmittance;
+      summedTransmittance += transmittance;
     }
 
     if (lightningBoltPosition.w > 0.0) {
@@ -274,7 +284,7 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
   float meanDepthWeightedTransmittance = summedDepth / summedTransmittance;
   vec3 fogPos = mapAerialPerspectivePos(
     transformView(
-      start + dir * meanDepthWeightedTransmittance,
+      start - cameraPosition + dir * meanDepthWeightedTransmittance,
       gbufferModelView
     )
   );

@@ -90,17 +90,11 @@ void main() {
 
     if (materialIsEndPortal(blockEntityId)) {
       data.emission = 1.0;
-    }
-
-    if (materialIsTintedGlass(materialID)) {
+    } else if (materialIsTintedGlass(materialID)) {
       data.opacity = 1.0;
-    }
-
-    if (materialLetsLightThrough(materialID)) {
+    } else if (materialLetsLightThrough(materialID)) {
       data.opacity = 0.0;
-    }
-
-    if (materialIsWater(materialID)) {
+    } else if (materialIsWater(materialID)) {
       data.color = 1.0 - waterScattering;
     }
 

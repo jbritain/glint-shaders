@@ -47,7 +47,7 @@ vec3 SSRSample(
     rayPos,
     depthBuffer,
     0,
-    gbufferPreviousProjection
+    gbufferProjection
   );
 
   float skyBlendWeight = 1.0;

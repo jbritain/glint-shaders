@@ -64,6 +64,7 @@ void main() {
 
   vec3 previousPos = feetPlayerPos + cameraPosition - previousCameraPosition;
   previousPos = transformView(previousPos, gbufferPreviousModelView);
+  vec3 previousViewPos = previousPos;
   previousPos = viewSpaceToScreenSpace(previousPos, gbufferPreviousProjection);
   vec4 previousClouds = catmullRom5(colortex8, previousPos.xy);
   float previousZ = screenSpaceToViewSpace(
@@ -71,7 +72,7 @@ void main() {
   );
   if (
     saturate(previousPos.xy) == previousPos.xy &&
-    abs(viewPos.z - previousZ) < 0.1
+    abs(previousViewPos.z - previousZ) < 10.0
   ) {
     clouds = previousClouds;
   } else if (depth == 1.0) {

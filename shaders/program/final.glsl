@@ -136,9 +136,9 @@ void main() {
     );
     // color = vec3(getWarp(gl_FragCoord.xy / 255), 0);
   } else if (gl_FragCoord.x < 266 && gl_FragCoord.y < 256) {
-    color = vec3(yWarpMap[int(gl_FragCoord.y)]);
+    color = vec3(texelFetch(colortex4, ivec2(gl_FragCoord.y, 1), 0));
   } else if (gl_FragCoord.y < 266 && gl_FragCoord.x < 256) {
-    color = vec3(xWarpMap[int(gl_FragCoord.x)]);
+    color = vec3(texelFetch(colortex4, ivec2(gl_FragCoord.x, 0), 0));
   }
   #endif
 

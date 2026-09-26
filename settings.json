@@ -341,7 +341,7 @@
         },
         "Day": {
           "key": "VOLUMETRIC_FOG_DENSITY_DAY",
-          "default": "0.001",
+          "default": "0.0",
           "values": "{frange(0.0, 0.051, 0.001)}"
         },
         "Evening": {
@@ -382,7 +382,7 @@
       },
       "Volumetric Fog Top Plane": {
         "key": "VOLUMETRIC_FOG_TOP_PLANE",
-        "default": "320",
+        "default": "150",
         "values": "{frange(-64, 384, 4)}"
       },
       "Volumetric Fog Height Falloff": {
@@ -472,19 +472,14 @@
       "default": "8",
       "values": "{frange(4, 17, 1)}"
     },
-    "Water Multiple Scattering": {
-      "key": "WATER_MULTIPLE_SCATTERING",
-      "default": "10",
-      "values": "{frange(0, 20, 1)}"
-    },
     "Water Parallax": {
       "key": "WATER_PARALLAX",
       "default": true
     },
     "Water Parallax Samples": {
       "key": "WATER_PARALLAX_SAMPLES",
-      "default": "8",
-      "values": "{frange(4, 17, 1)}"
+      "default": "16",
+      "values": "{frange(4, 65, 1)}"
     },
     "Water Anisotropy": {
       "key": "WATER_ANISOTROPY",
@@ -536,8 +531,8 @@
       },
       "Water Scattering Multiplier": {
         "key": "WATER_SCATTERING_MOD",
-        "default": "0.2",
-        "values": "{frange(0, 2.1, 0.1)}"
+        "default": "0.02",
+        "values": "{frange(0, 0.5, 0.01)}"
       },
       "Water Scattering": {
         "key": "waterScattering",
@@ -739,6 +734,10 @@
       "key": "EVERYTHING_CHROME",
       "default": false,
       "description": "...in the future"
+    },
+    "Debug Rectilinear Warp": {
+      "key": "DEBUG_RECTILINEAR",
+      "default": false
     }
   }
 }

@@ -107,7 +107,7 @@ void main() {
     diffuse += subsurfaceScattering * occlusion;
 
     float reflectiveCaustics = sampleReflectiveCaustics(feetPlayerPos, gbuffer.geometryNormal);
-    diffuse += reflectiveCaustics * sunlightColor;
+    diffuse += reflectiveCaustics * sunlightColor * PI;
 
     #ifdef PHOTONICS
     diffuse += texture(indirectRadiosityTex, texcoord).rgb * occlusion;

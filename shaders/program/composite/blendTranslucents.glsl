@@ -117,7 +117,7 @@ void main() {
     gbuffer.surfaceNormal = getWaterParallaxNormal(
       translucentFeetPlayerPos,
       gbuffer.geometryNormal,
-      noise.r,
+      bayer8(gl_FragCoord.xy),
       1.0
     );
     
