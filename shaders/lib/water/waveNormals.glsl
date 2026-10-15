@@ -169,6 +169,14 @@ vec3 getWaterParallaxNormal(
   float heightmapFactor
 ) {
   #ifdef WATER_PARALLAX
+  if (worldNormal.y < 0.99) {
+    return waveNormal(
+      playerPos.xz + cameraPosition.xz,
+      worldNormal,
+      heightmapFactor
+    );
+  }
+
   // we know no wave is ever more than WAVE_DEPTH above the surface
   // so we shift the ray forwards until it is WAVE_DEPTH above the surface
   float fractionalDistance;

@@ -94,7 +94,7 @@ float getVolumetricCloudDensity(vec3 rayPos, bool highQuality) {
     density = remap(density, 0.6 * highFrequencyNoise, 1.0, 0.0, 1.0);
   }
 
-  density *= coverage;
+  // density *= coverage;
 
   // density *= smoothstep(0.1, 0.2, density);
   return density * VOLUMETRIC_CLOUDS_DENSITY;
