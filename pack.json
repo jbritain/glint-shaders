@@ -82,7 +82,8 @@
         ],
         "dimensions": [
           "OVERWORLD"
-        ]
+        ],
+        "enabledBy": "(defined VOLUMETRIC_CLOUDS)"
       }
     ],
     "shadowcomp": [

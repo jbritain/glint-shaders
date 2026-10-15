@@ -29,7 +29,7 @@ const float atmosphereRadiusMM = 6.46;
 
 vec3 atmospherePos = vec3(
   0.0,
-  groundRadiusMM + (cameraPosition.y + 5000) * 1e-6,
+  groundRadiusMM + (cameraPosition.y + 200) * 1e-6,
   0.0
 );
 
@@ -42,13 +42,13 @@ const vec2 skyViewLUTRes = vec2(200.0, 200.0);
 const vec3 groundAlbedo = vec3(0.3);
 
 // These are per megameter.
-const vec3 rayleighScatteringBase = linearToAP1(vec3(6.602, 12.39, 29.4));
+vec3 rayleighScatteringBase = linearToAP1(vec3(6.602, 12.39, 29.4));
 const float rayleighAbsorptionBase = 0.0;
 
 const float mieScatteringBase = 3.996;
 const float mieAbsorptionBase = 4.4;
 
-const vec3 ozoneAbsorptionBase = linearToAP1(vec3(0.2341, 0.154, 0.0));
+vec3 ozoneAbsorptionBase = linearToAP1(vec3(0.2341, 0.154, 0.0));
 
 float getMiePhase(float cosTheta) {
   const float g = 0.8;

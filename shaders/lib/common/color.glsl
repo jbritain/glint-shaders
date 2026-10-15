@@ -89,7 +89,7 @@ const mat3 CONE_RESP_CAT02 = mat3(
   vec3(0.003, 0.0136, 0.9834)
 );
 
-const mat3 CONE_RESP_CAT02_INV = inverse(CONE_RESP_CAT02);
+mat3 CONE_RESP_CAT02_INV = inverse(CONE_RESP_CAT02);
 
 const mat3 CONE_RESP_BRADFORD = mat3(
   vec3(0.8951, 0.2664, -0.1614),

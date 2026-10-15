@@ -188,12 +188,14 @@ uniform usampler3D voxelMapTex;
 uniform sampler3D floodfillVoxelMapTex1;
 uniform sampler3D floodfillVoxelMapTex2;
 
+#ifdef VOLUMETRIC_CLOUDS
 uniform sampler3D lowFrequencyCloudNoiseTex;
 uniform sampler3D highFrequencyCloudNoiseTex;
 // uniform sampler2D cloudCoverageTex1;
 // uniform sampler2D cloudCoverageTex2;
 uniform sampler2D cloudCoverageTex;
 // uniform sampler2D cloudProfileTex;
+#endif
 
 uniform sampler2D vanillacloudtex;
 

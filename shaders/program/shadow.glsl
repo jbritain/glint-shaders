@@ -86,7 +86,12 @@ void main() {
       renderStage == MC_RENDER_STAGE_TERRAIN_SOLID
         ? 1.0
         : pow(averageTextureData.a, rcp(3));
-    data.emission = pow2(at_midBlock.w / 15.0);
+
+    data.emission = 0.0;
+    if(renderStage != MC_RENDER_STAGE_BLOCK_ENTITIES){
+      data.emission = pow2(at_midBlock.w / 15.0);
+    }
+    
 
     if (materialIsEndPortal(blockEntityId)) {
       data.emission = 1.0;

@@ -206,12 +206,12 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
   #define CLOUD_SCATTERING_CONTRIBUTION 0.99
   #define CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION 0.5
 
-  float scatteringPhases[CLOUD_SCATTERING_OCTAVES];
-  float eccentricity = CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION;
-  for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
-    scatteringPhases[i] = henyeyGreenstein(eccentricity, VoL);
-    eccentricity *= eccentricity;
-  }
+  // float scatteringPhases[CLOUD_SCATTERING_OCTAVES];
+  // float eccentricity = CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION;
+  // for (int i = 0; i < CLOUD_SCATTERING_OCTAVES; i++) {
+  //   scatteringPhases[i] = henyeyGreenstein(eccentricity, VoL);
+  //   eccentricity *= eccentricity;
+  // }
 
   bool hasHitStart = false;
   position = mix(start, end, 0.5) - cameraPosition;
@@ -248,6 +248,10 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     float fMS = 1.0 - exp(-400.0 * density * cloudExtinction);
     radiance +=
       fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.5) / 4.0;
+
+    fMS = 1.0 - exp(-200.0 * density * cloudExtinction);
+    radiance +=
+      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.1) / 4.0;
 
     // radiance += skylightColor;
     vec3 skyDir = unmapSphere(jitter.yz);

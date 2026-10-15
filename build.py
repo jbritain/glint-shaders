@@ -228,7 +228,7 @@ def recurse_settings(pack, screen_name, settings, sliders, default_profile, dept
                 else:
                     t = "float"
                 pack["settings"].append(
-                    f"{'  ' * depth}{'// ' if disabled else ''}const {t} {value['key']} = {value['default']}; {values}"
+                    f"{'  ' * depth}{'// ' if disabled else ''}{t} {value['key']} = {value['default']}; {values}"
                 )
             else:
                 pack["settings"].append(
