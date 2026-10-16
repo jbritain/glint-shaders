@@ -201,10 +201,10 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
   float phase = hgDraine(11, VoL);
   // float msPhase = isotropicPhase;
 
-  #define CLOUD_SCATTERING_OCTAVES 4
-  #define CLOUD_SCATTERING_ATTENUATION 0.99
-  #define CLOUD_SCATTERING_CONTRIBUTION 0.99
-  #define CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION 0.5
+  // #define CLOUD_SCATTERING_OCTAVES 4
+  // #define CLOUD_SCATTERING_ATTENUATION 0.99
+  // #define CLOUD_SCATTERING_CONTRIBUTION 0.99
+  // #define CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION 0.5
 
   // float scatteringPhases[CLOUD_SCATTERING_OCTAVES];
   // float eccentricity = CLOUD_SCATTERING_ECCENTRICITY_ATTENUATION;
@@ -215,6 +215,9 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
 
   bool hasHitStart = false;
   position = mix(start, end, 0.5) - cameraPosition;
+
+  float scatteringPhase1 = henyeyGreenstein(0.5, VoL);
+  float scatteringPhase2 = isotropicPhase;
 
   float summedTransmittance = 0.0;
   float summedDepth = 0.0;
@@ -247,11 +250,11 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
 
     float fMS = 1.0 - exp(-400.0 * density * cloudExtinction);
     radiance +=
-      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.5) / 4.0;
+      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.5) * scatteringPhase1 * 2;
 
     fMS = 1.0 - exp(-200.0 * density * cloudExtinction);
     radiance +=
-      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.1) / 4.0;
+      fMS / (1.0 - fMS) * sunlightColor * exp(-densityToSun * 0.1) * scatteringPhase2 * 2;
 
     // radiance += skylightColor;
     vec3 skyDir = unmapSphere(jitter.yz);
