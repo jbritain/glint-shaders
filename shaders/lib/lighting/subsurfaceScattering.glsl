@@ -33,7 +33,7 @@ vec3 getSubsurfaceScattering(
 
   float VoL = dot(playerDir, worldLightDir);
 
-  float phase = mix(henyeyGreenstein(0.4, VoL), isotropicPhase, 0.1);
+  float phase = isotropicPhase;//mix(henyeyGreenstein(0.4, VoL), isotropicPhase, 0.5);
 
   vec3 scatter =
     SUBSURFACE_SCATTERING_STRENGTH *

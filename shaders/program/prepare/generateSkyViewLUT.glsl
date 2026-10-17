@@ -29,13 +29,14 @@ layout(rgba16f) uniform image2D skyViewLUT;
     https://www.shadertoy.com/view/slSXRW
 */
 
-const int numScatteringSteps = 32;
+const int numScatteringSteps = 512;
 vec3 raymarchScattering(
   vec3 pos,
   vec3 rayDir,
   vec3 sunDir,
   float tMax,
-  float numSteps
+  float numSteps,
+  out vec3 transmittance
 ) {
   float cosTheta = dot(rayDir, sunDir);
 
@@ -43,7 +44,7 @@ vec3 raymarchScattering(
   float rayleighPhaseValue = getRayleighPhase(-cosTheta);
 
   vec3 lum = vec3(0.0);
-  vec3 transmittance = vec3(1.0);
+  transmittance = vec3(1.0);
   float t = 0.0;
   for (float i = 0.0; i < numSteps; i += 1.0) {
     float newT = (i + 0.3) / numSteps * tMax;
@@ -77,11 +78,12 @@ vec3 raymarchScattering(
       mieScattering * (miePhaseValue * sunTransmittance + psiMS);
     vec3 inScattering = rayleighInScattering + mieInScattering;
 
-    // Integrated scattering within path segment.
     vec3 scatteringIntegral =
       (inScattering - inScattering * sampleTransmittance) / extinction;
 
     lum += scatteringIntegral * transmittance;
+
+
 
     transmittance *= sampleTransmittance;
   }
@@ -127,13 +129,15 @@ void main() {
   );
   float groundDist = rayIntersectSphere(atmospherePos, rayDir, groundRadiusMM);
   float tMax = groundDist < 0.0 ? atmoDist : groundDist;
+  vec3 transmittance;
   vec3 lum =
     raymarchScattering(
       atmospherePos,
       rayDir,
       worldSunDir,
       tMax,
-      float(numScatteringSteps)
+      float(numScatteringSteps),
+      transmittance
     ) *
     sunIlluminance;
 
@@ -143,12 +147,36 @@ void main() {
       rayDir,
       worldMoonDir,
       tMax,
-      float(numScatteringSteps)
+      float(numScatteringSteps),
+      transmittance
     ) *
     moonIlluminance *
     abs(moonPhase - 4) /
     4.0;
   ;
+  
+  if(groundDist > 0.0){
+    vec3 groundPos = atmospherePos + groundDist * rayDir;
+
+    vec3 sunTransmittance = getValFromTLUT(
+      sunTransmittanceLUTTex,
+      tLUTRes,
+      groundPos,
+      worldSunDir
+    );
+    
+    lum += transmittance * sunIlluminance * groundAlbedo * sunTransmittance * dot(worldSunDir, normalize(groundPos)) / PI;
+
+
+    vec3 moonTransmittance = getValFromTLUT(
+      sunTransmittanceLUTTex,
+      tLUTRes,
+      groundPos,
+      worldMoonDir
+    );
+
+    lum += transmittance * moonIlluminance * groundAlbedo * moonTransmittance * dot(worldMoonDir, normalize(groundPos)) / PI;
+  }
 
   imageStore(skyViewLUT, texelCoord, vec4(lum, 1.0));
 

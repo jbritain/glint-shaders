@@ -263,7 +263,7 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
       skyDir,
       jitter.x
     );
-    radiance += skylightColor * isotropicPhase * transmittance;
+    radiance += skylightColor * isotropicPhase * 10 * transmittance;
 
     // radiance *= smoothstep(0.0, 0.3, abs(worldLightDir.y));
 
@@ -288,17 +288,18 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
     transmittance *= sampleTransmittance;
   }
 
+  if(summedDepth > 0){
   float meanDepthWeightedTransmittance = summedDepth / summedTransmittance;
-  vec3 fogPos = mapAerialPerspectivePos(
-    transformView(
-      start - cameraPosition + dir * meanDepthWeightedTransmittance,
-      gbufferModelView
-    )
-  );
-  vec4 fog = texture(aerialPerspectiveLUTTex, clamp01(fogPos));
-  scattering *= fog.a;
-  scattering += fog.rgb;
-  transmittance *= fog.a;
+  float ap = 1.0 - exp(-meanDepthWeightedTransmittance * 6e-5);
+
+  scattering = mix(scattering, vec3(0.0), ap);
+  transmittance = mix(transmittance, 1.0, ap);
+  }
+
+  // vec4 fog = texture(aerialPerspectiveLUTTex, clamp01(fogPos));
+  // scattering *= fog.a;
+  // scattering += fog.rgb;
+  // transmittance *= fog.a;
 
   return vec4(scattering, transmittance);
 }

@@ -129,7 +129,7 @@ void main() {
       texelFetch(shadowImportanceMapTex, ivec2(gl_FragCoord.xy), 0).r,
       texelFetch(
         shadowtex0,
-        ivec2(gl_FragCoord.xy * shadowMapResolution / 256),
+        ivec2(gl_FragCoord.xy),
         0
       ).r,
       0.0

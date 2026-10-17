@@ -39,7 +39,7 @@ const vec2 msLUTRes = vec2(32.0, 32.0);
 // better for sunrise.
 const vec2 skyViewLUTRes = vec2(200.0, 200.0);
 
-const vec3 groundAlbedo = vec3(0.3);
+const vec3 groundAlbedo = vec3(0.18, 0.2, 0.3);
 
 // These are per megameter.
 vec3 rayleighScatteringBase = linearToAP1(vec3(6.602, 12.39, 29.4));
@@ -98,7 +98,7 @@ float safeacos(const float x) {
 }
 
 // From
-// https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code.
+// https://gamedev.stackexchange.com/a/96487
 float rayIntersectSphere(vec3 ro, vec3 rd, float rad) {
   float b = dot(ro, rd);
   float c = dot(ro, ro) - rad * rad;
