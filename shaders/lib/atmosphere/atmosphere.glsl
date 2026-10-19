@@ -48,7 +48,7 @@ const float rayleighAbsorptionBase = 0.0;
 const float mieScatteringBase = 3.996;
 const float mieAbsorptionBase = 4.4;
 
-vec3 ozoneAbsorptionBase = linearToAP1(vec3(0.2341, 0.154, 0.0));
+vec3 ozoneAbsorptionBase = linearToAP1(vec3(2.341, 1.54, 0.0));
 
 float getMiePhase(float cosTheta) {
   const float g = 0.8;
@@ -75,6 +75,7 @@ void getScatteringValues(
   // Note: Paper gets these switched up.
   float rayleighDensity = exp(-altitudeKM / 8.0);
   float mieDensity = exp(-altitudeKM / 1.2);
+  float ozoneDensity = max0(1.0 - abs(altitudeKM - 25.0) / 15.0);
 
   rayleighScattering = rayleighScatteringBase * rayleighDensity;
   float rayleighAbsorption = rayleighAbsorptionBase * rayleighDensity;
@@ -83,7 +84,7 @@ void getScatteringValues(
   float mieAbsorption = mieAbsorptionBase * mieDensity;
 
   vec3 ozoneAbsorption =
-    ozoneAbsorptionBase * max(0.0, 1.0 - abs(altitudeKM - 25.0) / 15.0);
+    ozoneAbsorptionBase * ozoneDensity;
 
   extinction =
     rayleighScattering +

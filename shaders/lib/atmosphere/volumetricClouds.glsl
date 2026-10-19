@@ -15,6 +15,8 @@
 #ifndef CLOUDS_GLSL
 #define CLOUDS_GLSL
 
+#ifdef VOLUMETRIC_CLOUDS
+
 #include "/lib/util/dither.glsl"
 #include "/lib/atmosphere/atmosphere.glsl"
 #include "/lib/util/phaseFunctions.glsl"
@@ -303,5 +305,7 @@ vec4 getVolumetricClouds(inout vec3 position, bool sky) {
 
   return vec4(scattering, transmittance);
 }
+
+#endif
 
 #endif // CLOUDS_GLSL
